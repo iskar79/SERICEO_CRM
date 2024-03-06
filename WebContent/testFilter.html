@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=0.7, minimum-scale=0.4, maximum-scale=3">
+	<meta http-equiv="X-FRAME-OPTIONS" content="DENY" />
+
+	<style type="text/css">
+		#extFilterArea table 
+		{
+			width: 100%
+		}
+		#extFilterArea table,tr,td,th
+		{
+			border-style: solid;
+			border-width: 1px;
+		}
+	</style>
+	
+    <link rel="apple-touch-icon" href="MonArch-blue57x57.ico" />
+    <link rel="shortcut icon" href="favicon.ico" />
+    <title>MonArch820 FrameWorks</title>
+    <link id="CSSlink" type="text/css" href="/css/Theme_Redwine.css" rel="stylesheet" />
+    <link type="text/css" href="/css/Common.css" rel="stylesheet" />
+    <script type="text/javascript" src="/js/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="/js/jquery.kdb.filter.js"></script>
+	
+	<script type="text/javascript">
+	
+	var testData = [
+		{label:"테스트필드01", field:"TEST_FIELD01", type:"text" ,operator:"!=", value:"테스트값1"},
+		{label:"테스트필드02", field:"TEST_FIELD02", type:"select", codes:"USER_LIST" }
+	]
+	
+	$(document).ready(function () {
+		var  ef = $("#extFilterArea");
+		//ef.superExtFilter();
+		
+		ef.superExtFilter({
+			'filters': testData
+		}); //슈퍼확장필터 생성
+		
+		 
+		
+		$('#saveBtn').click(function(e){
+			ef.showPresetDlg();//잡버튼 실행 예제			
+		});
+			
+	});	
+	
+
+    </script>
+	
+</head>
+<body >
+	<div id="topArea">topArea</div>
+	<div id="extFilterArea"></div>
+	<div id="jobArea"><input id='saveBtn' type="button" value="저장" ></div>
+</body>
+</html>

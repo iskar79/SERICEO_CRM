@@ -1,0 +1,53 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=0.7, minimum-scale=0.4, maximum-scale=3">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta http-equiv="X-FRAME-OPTIONS" content="DENY" />
+    <link rel="apple-touch-icon" href="MonArch-blue57x57.ico" />
+    <link rel="shortcut icon" href="favicon.ico" />
+    <title>Oops! sorry for your inconvenience..</title>
+    <link id="CSSlink" type="text/css" href="/css/Theme_Redwine.css" rel="stylesheet" />
+    <link type="text/css" href="/css/Common.css" rel="stylesheet" />
+    <script type="text/javascript" src="/js/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            //var url = location.href;
+            //$('#url').text("URL = " + url + "");
+            $('.i-25-b, .label').click(function () {
+                location.href = "/monform.htm";
+            });
+
+        });
+    </script>
+    <style type="text/css">
+        body { background-color:#F2F2F2; color:#444444; font-family:Dotum, Arial, Sans-serif; font-size:.8em; }
+        #errorPanel     { width: 800px; position:absolute; top:50%; left:50%; margin:-11em 0 0 -33.5em; background-color:White; padding:30px; }
+        #errorMain      {  }
+        #errorHeader    { font-size:1.6em; font-weight:bold; color:#222222; padding:0 0 10px 0; }
+        #errorBody      { border-top:1px solid #000000; line-height:1.5em; padding:20px 0; }
+        #errorBody #url { color:#444444; }
+        #errorFooter    { height:60px; line-height:90px; text-align:right; }
+    </style>
+</head>
+<body>
+
+    <div id="errorPanel">
+        <div id="errorMain">
+            <div id="errorHeader">
+                시스템 장애가 발생하였습니다.
+            </div>
+            <div id="errorBody">
+                
+
+                <div style="text-align:right;">문제 해결이 안 될 경우 관리자에게 문의하세요.</div>
+            </div>
+            <div id="errorFooter">
+                <span class="icon i-25-b icon-i25-home align-middle" style="margin-left:-2px;"></span><span class="align-middle label" style="height:25px; font-weight:bold; cursor:pointer;">메인 페이지로</span>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

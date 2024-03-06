@@ -1,0 +1,108 @@
+
+/*================================================================================================================================
+  JDM CSS3 Standard & Skill : Campaign Workflow... temporary
+================================================================================================================================*/
+
+
+._jsPlumb_connector                     { z-index:18; }
+._jsPlumb_endpoint                      { z-index:19; }
+._jsPlumb_overlay                       { z-index:20; }
+._jsPlumb_connector._jsPlumb_hover      { z-index:21 !important; }
+._jsPlumb_endpoint._jsPlumb_hover       { z-index:22 !important; }
+._jsPlumb_overlay._jsPlumb_hover        { z-index:23 !important; }
+
+._jsPlumb_source_hover, ._jsPlumb_target_hover {
+	background-color:#8FB3FF!important;
+	color:white;
+}
+
+path { cursor:pointer; }
+
+#workflowPanel { position:relative!important; overflow:hidden; background-color:White; } 
+
+.Node { 
+	padding:1em;
+	position:absolute!important;
+	border: 1px solid black;
+	z-index:40;
+	border-radius:1em;
+	border:1px solid #4D4D4D;
+	box-shadow: 2px 2px 19px #e0e0e0;
+	-o-box-shadow: 2px 2px 19px #e0e0e0;
+	-webkit-box-shadow: 2px 2px 19px #e0e0e0;
+	-moz-box-shadow: 2px 2px 19px #e0e0e0;
+	-moz-border-radius:0.5em;
+	/*border-radius:0.5em;*/
+	/*opacity:0.8;*/
+	/*filter:alpha(opacity=80);*/
+	background-color:white;
+	font-size:12px;
+	color:#444444;
+	text-align:left;
+	-webkit-transition:background-color 0.25s ease-in;
+	-moz-transition:background-color 0.25s ease-in;
+	transition:background-color 0.25s ease-in;
+}
+
+.subNode  
+{
+    height:3em;
+    line-height:3em;
+	padding:1em;
+	position:absolute!important;
+	z-index:39;
+	border-radius:1em;
+	box-shadow: 2px 2px 19px #e0e0e0;
+	-o-box-shadow: 2px 2px 19px #e0e0e0;
+	-webkit-box-shadow: 2px 2px 19px #e0e0e0;
+	-moz-box-shadow: 2px 2px 19px #e0e0e0;
+	-moz-border-radius:0.5em;
+	/*border-radius:0.5em;*/
+	/*opacity:0.8;*/
+	/*filter:alpha(opacity=80);*/
+	background-color:white;
+	font-size:12px;
+	color:#444444;
+	font-weight: bold;
+	text-align:left;
+	-webkit-transition:background-color 0.25s ease-in;
+	-moz-transition:background-color 0.25s ease-in;
+	transition:background-color 0.25s ease-in;	
+}
+
+
+.nodeTitle { margin-left:6px; font-weight:bold; cursor:pointer; }
+.nodeTitle:hover { color:Blue!important; }
+.nodeSubTitle { cursor:pointer; margin-top:10px; }
+
+#Tooltip 
+{
+    padding:1em;
+	position:absolute;    
+	z-index:41;	
+	box-shadow: 2px 2px 19px #e0e0e0;
+	-o-box-shadow: 2px 2px 19px #e0e0e0;
+	-webkit-box-shadow: 2px 2px 19px #e0e0e0;
+	-moz-box-shadow: 2px 2px 19px #e0e0e0;	
+	background-color:white;
+	text-align:left;
+	-webkit-transition:background-color 0.25s ease-in;
+	-moz-transition:background-color 0.25s ease-in;
+	transition:background-color 0.25s ease-in;	
+}
+
+#Tooltip li
+{
+    cursor:pointer;
+}
+
+#Tooltip li:hover
+{
+    background-color: #5c96bc;
+	-webkit-transition:background-color 0.25s ease-in;
+	-moz-transition:background-color 0.25s ease-in;
+	transition:background-color 0.25s ease-in;	
+}
+
+
+

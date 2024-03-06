@@ -1,0 +1,81 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=0.4, maximum-scale=3">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge"/><!--호환성보기 강제해제-->
+    <link rel="apple-touch-icon" href="MonArch-blue57x57.ico" />
+    <link rel="shortcut icon" href="favicon.ico" />
+    <title>보고서보기</title>
+    <script type="text/javascript" src="/js/jquery-1.7.1.min.js"></script>
+    <link type="text/css" href="/css/MonArch.8.1.css" rel="stylesheet" />
+    <link type="text/css" href="/css/superContaner.css" rel="stylesheet" />
+    <script type="text/javascript" src="/js/MSetCookie.js"></script>
+    <script type="text/javascript">
+        if (opener) {
+            var doc = opener.document;
+            var vkey = getCookie(doc, 'UKEY');
+
+            document.cookie = "";
+            setCookie('UKEY', vkey);
+            //alert(vkey + " this:" + document.cookie);    
+        }
+    
+    
+    
+    </script>
+    <script type="text/javascript" src="/js/MonArch.js"></script>
+    <script type="text/javascript" src="/js/jquery.kdb.MonArch800.js"></script>
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+			
+            var v_site = $.getUrlVars()["site"];
+            var v_gcorp = $.getUrlVars()["gcorp"];
+            var v_startdt = $.getUrlVars()["startdt"];
+            var v_enddt = $.getUrlVars()["enddt"];
+            var v_seq = $.getUrlVars()["seq"];
+            var v_rptnm = $.getUrlVars()["rptnm"];
+            var v_corp = $.getUrlVars()["corp"];
+            var v_surveyno = $.getUrlVars()["surveyno"];
+            // $("#MainList").superContaner('superTable', '키맨ListJson_POP');
+
+            var v_ozrName = v_rptnm +".ozr"; //리포트 ozr 파일명(확장자 포함)
+            var v_odiName = v_rptnm; //odi 파일명(이름만 정의)
+
+
+                //odi 파라메터 정의
+                var odiParam = new Array();
+                odiParam.push("site=" + v_site);
+                odiParam.push("gcorp=" + v_gcorp);
+                odiParam.push("corp=" + v_corp);
+                odiParam.push("startdt=" + v_startdt);
+                odiParam.push("enddt=" + v_enddt);
+                odiParam.push("surveyno=" + v_surveyno);
+
+				debugger;
+                var iFrameUrl = "/ui/ozreport/OzReportView.aspx?ozrName=" + v_ozrName + "&odiName=" + v_odiName + "&odiParamVal=" + odiParam;
+                //alert("iFrameUrl:"+iFrameUrl);
+                document.getElementById('report_iframe').src = iFrameUrl;
+
+         
+
+
+        });
+    
+    </script>
+</head>
+<body>
+    <div class="Blue">
+        <div class="">
+            <div class="PopTitle">
+                <span class="icon1"></span><span id="TbName">보고서보기</span>
+            </div>
+            <div height='1050px' style='overflow: hidden;'>
+                <iframe id='report_iframe' name='report_iframe' src='' width='1050px' height='1050px'
+                    style='overflow: hidden;' />
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,55 @@
+﻿body {
+	background-color: #FFFFFF;
+	font-family: 굴림, Arial, san-serif; 	font-size:0.8em;
+	scrollbar-3dlight-color: #F0F0EE;
+	scrollbar-arrow-color: #676662;
+	scrollbar-base-color: #F0F0EE;
+	scrollbar-darkshadow-color: #DDDDDD;
+	scrollbar-face-color: #E0E0DD;
+	scrollbar-highlight-color: #F0F0EE;
+	scrollbar-shadow-color: #F0F0EE;
+	scrollbar-track-color: #F5F5F5;
+}
+
+td {
+	font-family: 굴림, Arial, san-serif; 	font-size:0.9em;
+}
+
+pre {
+	font-family: 굴림, Arial, san-serif; 	font-size:0.9em;
+}
+
+.tablerow1 {
+	background-color: #BBBBBB;
+}
+
+thead {
+	background-color: #FFBBBB;
+}
+
+tfoot {
+	background-color: #BBBBFF;
+}
+
+th {
+	font-family: 굴림, Arial, san-serif; 	font-size:1em;
+}
+pre
+{
+	background-color:White;
+	border: 1px solid gray;
+}
+
+word
+{
+    background-color: #FFFF00;
+    background-image: none;
+}
+
+p
+{
+    margin:5px 2px 2px 5px;
+    padding:0;
+    background-color: #FFFFFF;
+   
+}

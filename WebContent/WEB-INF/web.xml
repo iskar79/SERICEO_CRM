@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+	id="monarch" version="3.0">
+	<display-name>MonArch820</display-name>
+	<welcome-file-list>
+<!-- 		<welcome-file>index.html</welcome-file> -->
+<!-- 		<welcome-file>index.htm</welcome-file> -->
+<!--		<welcome-file>index.jsp</welcome-file> -->
+<!-- 		<welcome-file>default.html</welcome-file> -->
+<!-- 		<welcome-file>default.htm</welcome-file> -->
+<!-- 		<welcome-file>default.jsp</welcome-file> -->
+		<welcome-file>index.jsp</welcome-file>
+
+	</welcome-file-list>
+	<error-page>
+		<error-code>412</error-code>
+		<location>/index.jsp</location>
+  	</error-page>
+  	<error-page>
+		<error-code>404</error-code>
+		<location>/error.htm</location>
+  	</error-page>
+  	<!-- error-code 추가해서 error.html로 이동하게 설정 추가 필요 -->
+  	<!-- 205는 코드 별로 오류 페이지를 일일이 지정해야함(3.0부터 코드를 사용하지 않아도 됨) -->
+
+	<filter>  
+		<filter-name>Set Character Encoding</filter-name>  
+		<filter-class>co.kr.kydbm.core.utils.SetCharacterEncodingFilter</filter-class>  
+		<init-param>  
+			<param-name>encoding</param-name>  
+			<param-value>UTF-8</param-value>  
+		</init-param>  
+	</filter>  
+  
+	<filter-mapping>  
+		<filter-name>Set Character Encoding</filter-name>  
+		<url-pattern>/*</url-pattern>  
+	</filter-mapping>
+	
+	<servlet>
+		<servlet-name>Monarch820</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+
+	<servlet-mapping>
+		<servlet-name>Monarch820</servlet-name>
+		<url-pattern>*.mon</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>Monarch820</servlet-name>
+		<url-pattern>*.json</url-pattern>
+	</servlet-mapping>
+
+
+	<!-- log4j 설정 -->
+	<context-param>
+		<param-name>log4jConfigLocation</param-name>
+		<param-value>/WEB-INF/log4j.properties</param-value>
+	</context-param>
+	<listener>
+		<listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
+	</listener>
+	
+	<session-config>
+		<session-timeout>60</session-timeout>
+		<cookie-config>
+			<http-only>true</http-only>
+			<secure>false</secure>
+		</cookie-config>
+	</session-config>
+</web-app>

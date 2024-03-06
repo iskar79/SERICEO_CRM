@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, minimum-scale=0.4, maximum-scale=3" />
+    <meta http-equiv="X-FRAME-OPTIONS" content="DENY" />
+    <link rel="apple-touch-icon" href="MonArch-blue57x57.ico" />
+    <link rel="shortcut icon" href="favicon.ico" />
+    <title>CRM Survey Sheet</title>
+    <link type="text/css" href="/css/Common.css" rel="stylesheet" />;
+    <script type="text/javascript" src="js/jquery-1.10.2.min.js"></script>
+<!-- <script type="text/javascript" src="/js/jquery-1.7.1.min.js"></script> -->
+    <script type="text/javascript" src="/js/jquery.kdb.MonArch800.js"></script>
+    <script type="text/javascript" src="/js/MonArch_Simple.js"></script>
+	<!--<script type="text/javascript" src="/js/MonArch-min.js?vr=201307261350"></script>-->
+    <script type="text/javascript">
+        $(document).ready(function () {
+			var sno = $.getUrlVars()["sno"];
+            var key = $.getUrlVars()["key"];
+            var ccid = $.getUrlVars()["ccid"];
+            var csid = $.getUrlVars()["csid"];
+            var sno = $.getUrlVars()["sno"];
+            var dspmode = $.getUrlVars()["dspmode"]; //1이면 프리뷰모드
+	
+            key = decodeURIComponent(key);
+            key = htmlDecode(key);
+            if (key == "${키맨번호}") {
+                key = "";
+            }
+            var type = $.getUrlVars()["type"];
+            
+            //////////////////////////
+            // 클릭기록부터 저장하기
+            // http://urlpath/SurveyAnsform.htm?sno=51&key=${키맨번호}&type=C&ccid=${field1}&csid=${field2}
+            /////////////////////////
+           if (type == 'C') {
+//                 var pl = new JSONClientParameters();
+//                 pl.add("EMAILLOGID", ccid);
+//                 pl.add("HCSTID", key);
+//                 pl.add("URL", '설문지참여클릭 : ' + sno +'번 설문지');
+               
+                if (csid != undefined && sno != undefined && ccid != undefined && type != undefined) {
+                    var option = GETJSON('SURVEY_ANSWER_POPUP', csid, true);
+                    option.type = type;
+                    $("#Surveybody").superContaner("SuperAnswer", option, ccid, sno, csid,dspmode);
+                } else {
+                    //   alert("잘못된 파라미터 입니다.");
+                    //   self.close();
+                }                
+           } else {
+               
+           }
+            
+            //TODO 최조 설문항목 숨김.
+            $('.SurveyBlue').hide();
+            
+         	//TODO 개인정보수입정책 동의 여부에 따른 설문항목 쇼,하이드 처리 이벤트
+			$('.privacyPolicyChk').change(function(e){
+				
+				if($(this).val() == '1') {
+		            //TODO 개인정보수입정책 [동의함]을 선택할 경우
+					$('.SurveyBlue').show();
+				}else{
+    	        	//TODO 개인정보수입정책 [동의안함]을 선택할 경우
+					$('.SurveyBlue').hide();
+				}
+			});
+        });
+    </script>
+</head>
+<body>
+	<div id="title" class="title">
+	KTNET 고객만족도 설문조사
+	</div>
+<!-- 	<div id="preview" class="preview"> -->
+<!-- 		저희 공영DBM 서비스를 이용해주신데 대해 감사를 드리며, 아울러 보다 나은 서비스 제공을 위해 서비스<br> -->
+<!-- 		만족도 조사를 실시하오니, 고객님의 소중한 의견을 부탁드립니다. -->
+<!-- 	</div> -->
+<!-- 	<div id="privacyPolicy" class="privacyPolicy">  -->
+<!-- 	<div class="privacyPolicy-desc"> -->
+<!-- 		※ 개인정보 수집 활용 동의 -->
+<!-- 		 입력하신 정보는 설문분석 및 당첨자 추첨/경품발송의 목적으로만<br>  -->
+<!-- 		 사용되며, 서비스 개선 을 위한 기초자료로 (사)한국무역협회에 제공될 수 있습니다. -->
+<!-- 	</div> -->
+<!-- 	<div class="privacyPolicy-checkArea"> -->
+<!-- 		<input type="radio" class="privacyPolicyChk" name="privacyPolicyChk" value='1'>동의함 -->
+<!-- 		<input type="radio" class="privacyPolicyChk" name="privacyPolicyChk" value='0'>동의안함 -->
+<!-- 	</div> -->
+<!-- 	</div> -->
+    <div class="SurveyBlue">
+        <div class="SurveyBox">  
+            <div id="Surveyhead">
+                <div id="Top"><a id="SurveyTopbg"></a><span id="logobg" style="background:none; line-height:50px; left:10px; font-weight:bold; font-size:14pt; color:#F0F0F0; "></span><span id="SurveyTopText"></span></div>
+            </div>
+            <style type="text/css">
+            	#title { 
+           			background-color:#fff;
+           			font-size:24px;
+					font-weight:bold;
+         			padding:2em;
+         			text-align: center;
+         		}
+         		
+         		#preview { 
+           			background-color:#fff;
+           			padding-left:2em;
+         		}
+            	
+            	#privacyPolicy { 
+           			background-color:#fff;
+           			padding:2em;
+           			color: purple;
+         		}
+            
+            
+           		#Surveybody { 
+           			background-color:#fff;
+           			padding:2em; 
+         		}
+         		
+         		.SurveyArea.Qobj {
+         			margin-bottom:40px;
+         		}
+         		
+         		.head {
+         			padding-left: 10px;
+         			font-size:15px;
+         			font-weight:bold;
+         		}
+         		
+         		#Surveybody ul {
+         			margin:0;
+         			padding:1em 0 0 1em;         			         			
+         		}
+         		
+         		#Surveybody li {
+         			height:30px;         			
+         			list-style:none;
+         		}
+         		
+         		#Surveybody input[type=text], #Surveybody textarea {
+         			margin:1.5em 0 0 1.5em;
+         			padding-left:10px;
+         			height:25px;
+         			line-height:25px;
+         		}
+         		
+         		#Surveybody input[type=radio], #Surveybody input[type=checkbox] {
+         			margin-right:10px;
+         		}
+         		
+         		#Surveybody #BtnOK {
+         			background-color:#4173c9;
+         			color:#fff;
+         			font-size:13px;
+         			font-weight:bold;
+         			padding:7px 12px;
+         			border:2px solid transparent;
+         			cursor:pointer;
+         		}
+         		
+         		.ui-widget-overlay 	{ background-color:#494949; opacity:.1; }
+				.ui-dialog			{ padding: .6em .6em 0 .6em; background-color:#FFFFFF; border:1px solid #4173c9;} /* Change : sets the same theme bg */
+				.ui-dialog-titlebar { line-height:40px; background-color:#254774; }
+				.ui-dialog-title	{ color:#FFFFFF; border-bottom:0px solid transparent; }
+				.ui-dialog-content {padding-top: 10px;}
+				.i-20			{ width:20px; height:20px; background-image:url("/image/sp-icon-i20.png"); }
+				.icon-cancel 		{ background-position: -83px -4px; 	}
+            </style>            
+            <div id="Surveybody">
+            	
+           	</div>
+        </div>
+    </div>
+    <!--<div id="Surveyfoot">This survey is conducted by <b id="leadingcomp"></b></div>-->
+</body>
+</html>

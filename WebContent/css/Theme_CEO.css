@@ -1,0 +1,555 @@
+/*================================================================================================================================
+  reset All CSS properties 
+================================================================================================================================*/
+
+* 			                                    { margin:0; padding:0; border:0; outline:none; box-sizing:border-box; }
+body, input, textarea                           { } /* Change : sets character sets in use */
+ul, ol                                          { list-style: none; }
+/* ul li		                                    { float:left; } */
+table                                           { width:100%; border:0; border-spacing:0px; border-collapse:collapse; table-layout:fixed; }
+img                                             { margin:0; padding:0; border:0;  }
+a:hover,a:link, a:visited,a:active 				{ padding: 0; text-decoration: none; }
+input[type=text]								{ height:26px; line-height:26px; padding-left:4px; width:100%; } /* Change : sets height of Input box. It must be the same height as inputs */
+input[type=password]							{ height:26px; line-height:26px; padding-left:4px; width:100%; }
+input[type=radio], input[type=checkbox], label 	{ vertical-align:middle; }
+input[type=button] 		                        { background-color:transparent; } /* Change : sets button background */
+input[for=datepicker]							{ float:left; }
+input[for=linkkey]                          	{ width:90%; }
+input[layout=centering], span[layout=centering],
+select[layout=centering]						{ margin-top:.25em; } /* Change : sets margin-top for vertically centered look */
+select										    { min-height:20px; line-height:20px; padding:2px 0; font-family:Noto Sans !important; } /* Change : sets height of Select box. It must be the same height as inputs */
+textarea									    { width:99%; padding:6px; margin:6px 0px; }
+.readonlyPre									{ width:99%; padding:6px; margin:6px 0px; text-align:left; }
+th, td, input[for=datepicker]                   { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.Box, #Footer									{ min-width:989px; } /* Theme : Sets minimum size of whole screen */
+.hyphen											{ margin-right:4px; }
+.multichkspn, .multichkspn input[type=checkbox], .radiospn, .radiospn input[type=radio], 
+.radiospn-line, .radiospn-line input[type=radio], .pinset input[type=radio], .pinset input[type=checkbox] { margin-right:6px; }
+
+/*================================================================================================================================
+  Favorite Properties
+================================================================================================================================*/					
+
+.float-l			{ float:left; }
+.float-r			{ float:right; }
+.inline				{ display:inline; }
+.inline-block		{ display:inline-block; }
+.block				{ display:block; }
+.relative			{ position:relative; }
+.absolute			{ position:absolute; }
+.align-left		    { text-align:left; }
+.align-center		{ text-align:center; }
+.align-right		{ text-align:right; }
+.align-middle		{ vertical-align:middle; }
+.align-top			{ vertical-align:top; }
+.center				{ margin:0px auto; }
+.bold				{ font-weight:bold; }
+.normal				{ font-weight:normal; }
+.justify			{ text-align:justify; }
+.none				{ display:none!important; }
+.transparent		{ background-color:transparent; }
+.padding			{ padding: 6px 6px 6px 6px; } /* Change : sets standard padding value on this theme */
+.left-padding		{ padding: 0 6px 0px 0px; }
+.Wraper-padding		{ /* padding: 6px 6px 6px 0px; */ }
+.blind				{ text-indent:-9999px; position:absolute; left:-9999px; top:0; overflow:hidden; width:0; height:0; }
+
+/* ICON */
+.icon 				{}
+a.icon:hover 		{background-position:inherit; }
+.icon.s-20 			{ width:20px; height:20px; background-size:cover; background-position:center center; }
+.icon.s-20:hover	{ width:20px; height:20px; }
+.icon.settings		{ background-image:url(/image/icon_settings.svg); }
+.icon.logout		{ background-image:url(/image/icon_logout.svg); }
+
+/*================================================================================================================================
+  Login page Controlling Section
+================================================================================================================================*/
+
+.LoginPop                   	{ width:100%; min-height:1024px; top:0px; left:0px; position:absolute; background-color:White; overflow:hidden; }
+.LoginPop .login            	{ width:989px; margin:15% auto; }
+.LoginPop .login .logleft      	{ width:657px; height:344px; background-image:url('/image/login/login-left.png'); float:left; }
+.LoginPop .login .logcenter    	{ width:200px; height:344px; margin-left:657px; text-align:center; background:url('/image/login/login-input.png') no-repeat 0px 0px;   }
+.LoginPop .login .logcenter .logtop     { width:199px; height:44px; }
+.LoginPop .login .logcenter .logmain    { width:199px; height:300px; }
+.LoginPop .login .logright     	{ float:right; width:125px; height:370px; background-image:url('/image/login/login-right.png'); }
+.LoginPop .login .logbottom    	{ height:30px; background-image:url('../image/login-01-cropped-bottom.jpg'); }
+
+
+.LoginPop .login div a      	{ }
+.LoginPop .login div .loginSCODE	{ width:144px; height:20px; margin-top:94px; padding-left:4px; color:#555555; background:url("/image/loginSCODE.png") no-repeat 0px center #FFFFFF; }
+.LoginPop .login div .loginID 	{ width:144px; height:20px; margin-top:94px; padding-left:4px; color:#555555; background:url("/image/loginID.png") no-repeat 0px center #FFFFFF; }
+.LoginPop .login div .loginPS 	{ width:144px; height:20px; padding-left:4px; color:#555555; background:url("/image/loginPS.png") no-repeat 0px center #FFFFFF; }
+.LoginPop .login div input  	{ width:140px; height:17px; border:1px solid #e2e2e2; margin:3px auto; }
+.LoginPop .login div span   	{ width: 90px; height:40px; margin:7px 0px 0px 23px; border: 0px; padding:0; text-align:center; cursor:pointer; float:left; background-image:url('/image/login/login-btn.png'); }
+
+/*================================================================================================================================
+  Header Controlling Section
+================================================================================================================================*/
+
+#head		{ position:relative; }
+#Top        { display:flex; align-items:center; justify-content:space-between; height:45px; padding:0 10px; background:#fff; } 
+#Topbg		{ width: 989px; height:50px; display:block; } 
+#logobg		{ width: 230px; height:50px; top:0px; left:0px; position:absolute; } 	
+#top_leaf	{ width: 500px; height:50px; top:0px; right:10px; position:absolute; } 	/* Change : only for LG. display none or not */
+#rightlogo	{ width: 130px; height:50px; top:0px; right: 15px; position:absolute; display:none; } 	/* Change : only for LG. display none or not */
+#TopText	{ position:absolute; top:50%; right: 10px; margin-top:-.5em; display:none; }							/* Change : only for CDN. display none or not */
+.Topbar		{ height:1px; background:#000; }
+.logo-wrap 	{ display:flex; align-items:center; }
+.logo		{ width:144px; height:22px; background:url(../image/logo_CEO.png) top left no-repeat; background-size:auto 100%; }
+.logo-wrap .ui-site .selsite { margin-left:25px; border:1px solid #aaa; background:#ddd; }
+.logoutarea	{ display:flex; align-items:center; gap:8px; }
+.logoutarea .ui-username { font-weight:600;}
+.logoutarea .ui-username .name { color:#185de0; }
+.logoutarea div		{ display:inline-block; }
+.logoutarea span	{ display:inline-block; }
+
+/*================================================================================================================================
+  Left Navigation Menu Controlling Section
+================================================================================================================================*/
+
+#TopMenu    			{ float: left; width: 180px; }
+#TopMenu ul 			{ } 
+#TopMenu li 			{  } /* Theme */
+#TopMenu li.menu-on-b .SubMenu 	{ max-height:1000px; }
+#TopMenu li a 			{ display:block; font-weight:400; font-size:15px; line-height:29px; }
+.TopMenu-ft		{ color:#FFFFFF; display:block; padding:15px 20px; font-size:16px; }
+.SubMenu-ft		{ font-weight:bold; color:#FFFFFF; }
+
+.SubMenu    			{ transition:all 0.4s; max-height:0; overflow:hidden; }
+.SubMenu #MonArch 		{ width:115px; height:170px; position:absolute; } /* Change : only for CDN. display none or not */
+.SubMenu ul 			{ padding:10px 10px 10px 35px; } 
+.SubMenu li 			{ line-height:2em; }
+.SubMenu li a:hover		{ color:#232E5C; font-weight:bold !important; }
+.SubMenu li a.on		{ position:relative; color:#232E5C; font-weight:bold !important; }
+.SubMenu li a.on:before { content:""; position:absolute; top:12px; left:-10px; display:inline-block; width:5px; height:5px; border-radius:10px; background:#232E5C; }
+.SubMenu #Subtab  		{ width:10px; height:46px; position:absolute; right:0px; background:url("/image/Professionalblue/tab.png") no-repeat center center; display:none; }
+.SubMenu #menupin 		{ width:10px; height:27px; position:absolute; top:35px; right:0px; display:none; }
+.SubMenu .unpin-menu 	{ background:url("/image/Professionalblue/unpin-menu.png") no-repeat center center; }
+.SubMenu .pin-menu 		{ background:url("/image/Professionalblue/pin-menu.png") no-repeat center center; }
+
+
+.layoutTop #TopMenu    			    { width:100%; background-color:#444444; padding-top:10px; }
+.layoutTop #TopMenu li 			    { width:auto; height:27px; border:2px solid transparent; padding:6px 10px 6px 6px; float:none; display:inline-block; }
+.layoutTop #TopMenu li.menu-on-b    { border-width:2px 2px 0px 2px; border-style:solid; border-color:#000000; }
+.layoutTop #TopMenu li a 			{ display:inline-block; vertical-align:middle;}
+.layoutTop #TopMenu li span 		{ display:inline-block; vertical-align:middle; }
+           
+.layoutTop .SubMenu  
+{
+    width:auto;
+    top:99px; 
+    position:absolute; 
+    z-index:12; 
+    border-width:0px 2px 2px 2px; 
+    border-style:solid; 
+    border-color:#000000;
+}
+
+.layoutTop .SubMenu li 			    { width:115px; line-height:2em; float:none; padding-left:10px; }
+.layoutTop #MonArch                 { display:none; }
+.layoutTop .Holder                  { margin:60px 0px; }
+.layoutTop .navi-bg                 { background:none; }
+.layoutTop .Topbar                  { height : 0px; }
+
+/*================================================================================================================================
+  Main Controlling Section
+================================================================================================================================*/
+
+.Box		{ overflow:hidden; }
+.Holder		{ margin-left:180px; padding:10px 10px 0 10px; background:#fff; }
+.FoldHolder	{ margin-left: 70px; }
+.Content	{ }
+.Content:after {content:""; display:block; clear:both; }
+.left  		{ float:left; overflow:hidden; }
+.Wraper 	{ overflow:hidden; margin-bottom:6px; }
+
+/*================================================================================================================================
+  Main > Title Controlling Section
+================================================================================================================================*/
+
+.Title				{  }
+.Title-ft 			{ margin-bottom:30px; font-size:35px; font-weight:400; }
+
+.iconset			{ line-height:0px; }
+
+/*================================================================================================================================
+  Main > Progress Controlling Section
+================================================================================================================================*/
+
+#Flowtop					{  }
+.progress                   {  } /* Change : sets progressbar's bg & layout */
+.progress .tit              { display:none; margin-bottom:10px; font-size:28px; font-weight:400; }
+.progress ul                { display:flex; border-bottom:1px solid #ccc; background:#f6f7f8; }
+.progress li                { position:relative; }
+.progress li a              { display:block; padding:10px 25px; font-size:14px; }
+.progress li a:after		{ content:""; position:absolute; top:12px; right:0; width:1px; height:15px; background:#ccc; }
+.progress li.on	a			{ color:#232E5C; font-weight:bold; }
+.progress li.on:after       { content:""; position:absolute; bottom:-2px; left:0; right:0; display:block; height:3px; background:#232E5C; }
+.progress .right            { color:#444444; position:absolute; top:6px; right:10px;}
+
+/*================================================================================================================================
+  Main > SuperFlow Controlling Section
+================================================================================================================================*/
+
+.SuperFlow		{ /* height:25px; line-height:25px; */ }
+.SuperFlow-ft	                { font-weight:normal; color:#444444; }
+.on .SuperFlow-ft	            { /* font-weight:bold; color:#ffffff; */ }
+
+/*================================================================================================================================
+  Main > SuperTable Controlling Section
+================================================================================================================================*/
+
+.SuperTable             { /*padding:0 !important;*/ }
+.SuperTable .title      { height:25px; line-height:25px; padding-left:6px; }
+.SuperTable .head		{}
+.SuperTable .chartArea	{ }
+.SuperTable .chartArea .legend { }
+.SuperTable .chartArea .legend table { width:auto; }
+.SuperTable .chartArea .legend .legendLabel { padding-left: 6px; }
+.SuperTable .body		{ overflow-x:scroll; margin-top:6px; } /* Change : sets margin or padding to separate it from the surrounding elements */
+.SuperTable .body tbody tr td:first-child 	{ text-align:center; }
+.SuperTable thead th    { line-height:25px; }
+.SuperTable thead .th-text 		{  }
+.SuperTable thead .th-orderby   { display:none; }
+.SuperTable thead .SortDesc .th-orderby { background:url("/image/icon-sortdesc.png") no-repeat center center; display:inline-block; }
+.SuperTable thead .SortAsc .th-orderby	{ background:url("/image/icon-sortasc.png") no-repeat center center; display:inline-block; }
+
+/*================================================================================================================================
+  Main > SuperTable > SuperFilter Controlling Section
+================================================================================================================================*/
+
+.SuperFilter 	{ }
+.SuperFilter td				{ /* height:38px; */ }
+.SuperExtFilter             { border-bottom:1px solid #28247B; }
+.SuperExtFilter th          { text-align:left; }
+.SuperExtFilter select      { min-width:100px; }
+.SuperExtFilter .chkPart    { width:25px;  vertical-align:middle; display:inline-block; padding:3px 0px 3px 6px; }
+.SuperExtFilter .labelPart  { width:100px; vertical-align:middle; display:inline-block; padding:3px 0px 3px 0px; }
+.SuperExtFilter .operatorPart { width:180px; vertical-align:middle; display:inline-block; padding:3px 0px 3px 0px; }
+.SuperExtFilter .dataPart   { width:400px; vertical-align:middle; display:inline-block; padding:3px 0px 3px 0px; }
+.SuperExtFilter #presetTr   { padding-left:6px; border-top:2px solid #28247B; }
+
+.SuperExtFilter_Title       { background-color: #28247B; padding: 0px 10px; display: inline-block; margin-top: 4px; color: white; font-weight: bold; line-height:24px; }
+.SuperExtFilter #presetSelectBox { width:174px; margin-left:44px; }
+#presetSaveBtn, #presetUpdBtn, #presetDelBtn, #presetSetColsBtn { height:24px; padding:0px 6px; margin-left:6px; border-radius:2px; background-color:White!important; }
+#presetSetColsBtn { margin-right:6px; float:right; margin-top:5px; }
+#filterSelectBox  { width:150px; float:right; margin-top:5px; }
+
+.setDispColumnPopUp                 { }
+.setDispColumnPopUp a               { display:block; height:25px; line-height:30px; }
+.setDispColumnPopUp select          { width:185px; padding:6px; }
+.setDispColumnPopUp .filterDiv      { display:inline-block; padding-top:4px; }
+.setDispColumnPopUp .leftPart       { }
+.setDispColumnPopUp .rightPart      { }
+.setDispColumnPopUp .horiBtn        { width:40px; text-align:center; }
+.setDispColumnPopUp .vertBtn        { width:40px; text-align:center; }
+
+.setDispColumnPopUp .btn-arrow-left { display:inline-block; }
+.setDispColumnPopUp .btn-arrow-right{ display:inline-block; }
+.setDispColumnPopUp .btn-arrow-up   { display:inline-block; }
+.setDispColumnPopUp .btn-arrow-down { display:inline-block; }
+
+/*================================================================================================================================
+  Main > SuperTable > Job Controlling Section
+================================================================================================================================*/
+
+.jobArea 	            { margin-bottom:6px; position:relative; } /* Change : sets height */
+.buttonset	            { margin-top:5px; } /* Change : sets margin-top for vertically centered look */
+
+.jobAreaTR .jobArea		{ height:38px; }
+.jobAreaTR .buttonset 	{ /* float:right; */ padding-right:0px; margin-top:0px; position:static; } /* Change : static to position it in the middle of the row */
+.jobAreaTR .cmdspan 	{ line-height:24px; }
+.cmdspan	            { height:24px; line-height:24px; padding:0px 15px; margin-right:7px; display:inline-block; background:#0095C3 !important; border:1px solid #006b8c !important; border-radius:2px; } /* Change : sets size */
+.cmdspan:hover			{ background:#006b8c !important; transition:0.2s; }
+.cmdspan-block			{ height:10px; line-height:10px; margin:0px 6px; display:inline-block; border-left:1px solid #A7A7A7; display:none!important; }
+.cmdicon	            { width:20px; height:20px; display:inline-block; vertical-align:middle; margin-top:-1px; }
+.cmdspan .cmdspan-ft	{ font-weight:400;}
+
+/*================================================================================================================================
+  Main > SuperTable > Page Controlling Section
+================================================================================================================================*/
+
+.page				{ padding:0 5px; line-height:38px; } /* Change : sets size */
+.page ul 			{ float:right; }
+.page li			{ display:inline-block; vertical-align:middle; float:none; }
+.page .pgn			{ padding:0 4px; }
+.page .records 		{ margin-right:6px; }
+.page .pages   		{ margin-right:6px; }
+.page .pgnum		{  }
+.page .pgnum_first  { padding:0 0px; }
+.pgMsg 				{ float:left; }
+
+/*================================================================================================================================
+  Main > SuperView Controlling Section
+================================================================================================================================*/
+
+.SuperView      {}
+
+.havta	        { font-weight:bold; margin-right:10px; float:right; color:#FF6F05; }
+
+.ScrollableView { border-top:2px solid #333; }
+.viewGroup	{ position:relative; border-left:1px solid #B0B0B0; border-right:1px solid #B0B0B0; }
+.viewGroup .icon { position:absolute; top:7px; right:10px; display:inline-block; width:15px; height:15px; animation:acco-close 0.2s forwards; background:url(../image/icon_expand_more.png) center center no-repeat; background-size:20px auto; } /* Change : sets viewgroup icon */
+.viewGroup.is-active .icon { animation:acco-open 0.2s forwards; }
+.viewGroup td 	{ line-height:25px; padding-left:6px;} /* Change : sets size */
+.viewGroup-ft	{ background:#ccc; font-weight:bold; }
+@keyframes acco-open {
+	0%{transform:rotate(0deg);}
+	100%{transform:rotate(180deg);}
+}
+@keyframes acco-close {
+	0%{transform:rotate(180deg);}
+	100%{transform:rotate(0deg);}
+}
+
+
+/*================================================================================================================================
+  Main > SuperTable & View Elements Controlling Section
+================================================================================================================================*/
+
+.fieldContaner  { display:inline-block; }
+.fieldContaner[type=date] { width:auto !important; }
+.fieldContaner + .afterLabel { margin-left:-3px; margin-right:7px; }
+.fieldContaner .hasDatepicker { width:95px !important; }
+.fieldContaner .fieldSpace { margin-right:-2px !important; }
+.fieldContaner[type=datetimeBetween] .fieldSpace { margin-right:6px !important; }
+.fieldContaner select { width:100%; }
+
+td			    { height:30px; } /* Change : sets size */
+th			    { height:30px; } /* Change : sets size */
+
+.pinset         { display:inline-block; width:100%; }
+.imgSize		{ }
+.hasimgSize     { padding-top:6px; padding-bottom:6px; }
+
+.fldfiledown    { display:inline-block; }
+
+.fieldEdit 	    { padding-right:10px; width:auto !important; }
+.fldTdLabel	    { padding-left:10px; }
+.fldTdData	    { padding-left:10px; }
+.fldNote 	    { padding-left:10px; }
+
+.tabGroup	    { line-height:35px; padding-left:6px; margin-top:1px; }
+
+/*================================================================================================================================
+  Footer Controlling Section.
+================================================================================================================================*/
+
+#Footer	{ line-height:30px; text-align:center; }
+
+/*================================================================================================================================
+  Logo image Controlling Section.
+================================================================================================================================*/
+
+.logo-monarch		{ background:url("/image/Professionalblue/Monlogo.png") no-repeat center center;  }
+.logo-voc			{ background:url("/image/Redwine/lg-mainlogo.png") no-repeat center center; }
+.logo-Lghausys		{ background:url("/image/Redwine/lg-hausys.png") no-repeat center center; }
+
+/*================================================================================================================================
+  Deco image Controlling Section.
+================================================================================================================================*/
+
+.deco-leaf			{ background:url("/image/Redwine/lg-leaf.png") no-repeat center center; }
+.deco-lgpatt		{ background:url("/image/Redwine/lg-highlight.jpg"); }
+.deco-wave			{ background:url("/image/Professionalblue/top_bg_blue.jpg") no-repeat; }
+.deco-monarch		{ background:url("/image/Professionalblue/monarch2.png") no-repeat left top; }
+
+.coloring-tab		{ background-position: -40px -40px; }
+
+/*================================================================================================================================
+  Jquery UI Elements Controlling Section
+================================================================================================================================*/
+
+.ui-widget-overlay 	{ background-color:#494949; opacity:.1; }
+.ui-dialog			{ background-color:#fff; } /* Change : sets the same theme bg */
+.ui-dialog.ui-draggable { border:1px solid #232e5c; }
+.ui-dialog-titlebar { line-height:20px; background-color:#232E5C; }
+.ui-dialog-title	{ color:#FFFFFF; font-size:16px; font-weight:400; }
+.ui-dialog-content	{ padding:20px; }
+.ui-dialog.ui-widget .ui-dialog-titlebar-close { background:url(/image/icon_close.png) top left no-repeat; background-size:cover }
+.ui-dialog.ui-widget .ui-dialog-titlebar-close .ui-button-text { overflow:hidden; }
+.ui-dialog.ui-widget .ui-dialog-buttonpane { margin:0; padding:0 20px 20px; }
+.ui-dialog.ui-widget .ui-dialog-buttonpane .ui-dialog-buttonset { display:flex; justify-content:right; gap:8px; }
+.ui-dialog.ui-widget .ui-dialog-buttonpane button { margin:0; border-radius:2px; }
+
+.JsonEditPop				{ overflow:hidden!important; }
+.JsonEditPop .EditpopTitle 	{ height:30px; line-height:30px; font-weight:bold; padding-left:10px; background-color:#666; color:#FFFFFF; }
+.SourceEdit 		{ width:96.5%; height:630px; margin:0px; padding:15px 18px 15px 15px; overflow-x:hidden; border:1px solid #cccccc; }
+.ui-button			{ background-color:#808080; }
+.ui-button:hover	{ background-color:#666; }
+.ui-button-text		{ color:#FFFFFF; font-weight:bold; }
+
+.ui-datepicker				{ background-color:#fff; border:1px solid #aabbce; }
+.ui-datepicker-header 		{ border-bottom:1px solid #f2f2f2; }
+.ui-widget-header a { top:9px !important; }
+.ui-widget-header .ui-corner-all{ background:url(../image/icon_cal_prev.png) no-repeat; background-size:contain; }
+.ui-widget-header .ui-corner-all.ui-datepicker-next { transform:rotate(180deg); }
+.ui-datepicker-calendar {  }
+.ui-datepicker-calendar th span				{ color:#000000; }
+.ui-datepicker-calendar th span[title=토]	{ color:#5055e2; }
+.ui-datepicker-calendar th span[title=일]	{ color:#ee317c; }
+.ui-datepicker-calendar td:first-child a	{ color:#ee317c; }
+.ui-datepicker-calendar td:last-child a		{ color:#5055e2; }
+.ui-datepicker-calendar tbody tr td				 {  }
+.ui-datepicker-calendar tbody tr td:first-child  {  }
+.ui-datepicker-calendar tbody tr td:last-child   {  }
+.ui-datepicker-calendar .ui-state-default 	{ color:#232323; text-align:center; border-radius:25px; width:25px; height:25px; }
+.ui-datepicker-calendar .ui-state-active 	{ color:#fff !important; background:#5f7ad1; }
+.ui-datepicker-calendar .ui-state-active.ui-state-hover { color:#fff; }
+.ui-datepicker-calendar .ui-state-hover		{ color:#888888; }
+.ui-datepicker-calendar .ui-state-highlight	{ color:#fff !important; background:#aabbce; }
+.ui-slider .ui-slider-range { background:#FF6F05 !important; }
+.calChkArea .ui-datepicker-prev { width:20px; height:20px; display:block; background:url("/image/icon-pageprev.png") no-repeat center center;  }
+.calChkArea .ui-datepicker-next	{ width:20px; height:20px; display:block; background:url("/image/icon-pagenext.png") no-repeat center center;  }
+.calDiv		{ line-height:27px; border:1px solid #CCCCCC; background-color:#EAEAEA; color:#4C4C4C; font-weight:bold; }
+.calCategory{ margin:6px 0px; line-height:27px; border:1px solid #CCCCCC; background-color:#EAEAEA; color:#4C4C4C; font-weight:bold; text-align:center; }
+.selectArea { line-height:27px; padding-left:6px; }
+
+
+.Tabs { background-color:transparent; } /* Change : sets the background of Tabs area */
+.Tabs .ui-tabs-panel { border-top:3px solid #232E5C; }
+.ui-tabs-nav { background-color:transparent; padding:.6em 0 0!important; font-weight:400 !important; } /* Change : sets the background of Tabs' head */
+.ui-tabs-nav li	{ }
+.ui-tabs-nav .ui-state-default a { color:#FFFFFF; background-color:#aaa; }
+.ui-tabs-nav .ui-state-default.ui-tabs-active a	 { background-color:#232E5C; } 
+.ui-tabs-nav .ui-state-default a {  } /* Change : sets the background & font-color of each taps */
+
+.FileManagerPopup .row, .GalleryPopUp .row, .DataUploadPopup .row
+{ height:30px; line-height:30px; padding-left:12px; background-color:#385A87; }
+.FileManagerPopup #Filename, .GalleryPopUp #Filename, .DataUploadPopup #Filename
+{ width:40.5%; height:23px; line-height:20px; }
+.GetImgFileUpload, .GalleryPopUp 						{ }
+.FileManagerPopup .Label, .GalleryPopUp .Label, .DataUploadPopup .Label
+{ min-width:150px; padding-right:6px; color:#FFFFFF; font-weight:bold; display:inline-block; }
+#Urlname {  }
+
+.GalleryPopUp .Label		{ color:#000000; font-weight:bold; }
+.GalleryPopUp .row 			{ color:#FFFFFF; background-color:transparent; }
+#GetImgGallery .body 		{ overflow:hidden; }
+.GalleryLists 				{ margin:17px 17px 0px; background-color:#F1F1F1; border:2px solid transparent; float:none; display:inline-block; }
+.GalleryLists.li_selected 	{ margin:17px 17px 0px; background-color:#D8D8D8; border:2px solid #000000; }
+.GalleryLists:hover 		{ margin:17px 17px 0px; background-color:#D8D8D8; border:2px solid #666666; }
+.GalleryTitle 				{ padding:3px; color:#FFFFFF; font-weight:bold; background-color:#28247B; }
+.GalleryDesc 				{ padding:3px; color:#FFFFFF; font-weight:bold; background-color:#28247B; }
+
+.DataUploadPopup .Label		{ color:#000000; font-weight:bold; min-width:90px; }
+.DataUploadPopup .row 		{ color:#FFFFFF; background-color:transparent; }
+.DataUploadPopup #Filename  { width:70%; }
+.DataUploadPopup #uploadName{ width:70%; }
+
+.button                                     { width:60px; height:20px; padding:0px 10px; margin-left:10px; }
+input[type=button].button-upload            { background-color:#ffffff; border:1px solid transparent; }
+input[type=button].button-upload:hover      { background-color:#ffffff; border-width:0px 1px 1px 0px; border-style:none solid solid none; border-color:#4D4D4D; }
+input[type=button].button-upload.clicked    { border-width:1px 0px 0px 1px; border-style:solid none none solid; border-color:#4D4D4D; }
+#Filename                                   { color:#000000; vertical-align:middle; background-color:#ffffff; }
+
+.slider                         { left:5px; margin:5px; padding:1px; margin-right:10px; width:80%; display:inline-block; vertical-align:middle; }
+.sliderEdit a                   { border:1px solid #eaeaea; background:#999; border-radius:10px; }
+.sliderEdit a:hover             { background:#B8B8B8; }
+.sliderEdit .ui-widget-content  { border:1px solid #eaeaea; background-color:#f2f2f2; color:#222222; border-radius:4px 4px; }
+
+/*================================================================================================================================
+  Calendar Area Controlling Section
+================================================================================================================================*/
+
+.calHide    { display:none; }
+.calTitle	{ height:30px; line-height:30px; text-align:center; }
+.calArea    { margin-left:202px; }
+.calChkArea { width:190px; padding:6px; float:left; }
+.calChkArea .ui-datepicker				{ width:auto; background-color:transparent; border:1px solid transparent; }
+.calChkArea .ui-datepicker-header 		{ background-color:#FFFFFF; }
+.calChkArea .ui-datepicker-calendar th span				{ color:#222222; }
+.calChkArea .ui-datepicker-calendar th span[title=토]	{ color:#3037c4; }
+.calChkArea .ui-datepicker-calendar th span[title=일]	{ color:#940000; }
+.calChkArea .ui-datepicker-calendar tbody tr td				 {  }
+.calChkArea .ui-datepicker-calendar tbody tr td:first-child  {  }
+.calChkArea .ui-datepicker-calendar tbody tr td:last-child   {  }
+.calChkArea .ui-datepicker-calendar .ui-state-default 	{ color:#232323; text-align:center; }
+.calChkArea .ui-datepicker-calendar .ui-state-hover		{ border:1px solid #eaeaea; }
+.calChkArea .ui-datepicker-calendar .ui-state-highlight	{ color:#0f1d36; font-weight:bold; }
+.calChkArea .ui-datepicker-prev { width:20px; height:20px; display:block; background:none; }
+.calChkArea .ui-datepicker-next	{ width:20px; height:20px; display:block; background:none; }
+
+
+/*================================================================================================================================
+  Border Color Controlling Section
+================================================================================================================================*/
+
+.b-all				{ border-width:1px; 		border-style:solid; 		}
+.b-t				{ border-top-width:1px; 	border-top-style:solid;  	}
+.b-r				{ border-right-width:1px; 	border-right-style:solid;  	}
+.b-b 				{ border-bottom-width:1px; 	border-bottom-style:solid;  }
+.b-l 				{ border-left-width:1px; 	border-left-style:solid;  	}
+
+.b-bx2				{ border-bottom-width:2px;  border-bottom-style:solid;  }
+
+.b-radi-all         { -moz-border-radius:4px; 				-webkit-border-radius:4px; 				-khtml-border-radius:4px; 				border-radius:4px; 				}
+.b-radi-tl          { -moz-border-radius-topleft:4px; 		-webkit-border-top-left-radius:4px; 	-khtml-border-top-left-radius:4px; 		border-top-left-radius:4px; 	}
+.b-radi-tr          { -moz-border-radius-topright:4px; 		-webkit-border-top-right-radius:4px; 	-khtml-border-top-right-radius:4px; 	border-top-right-radius:4px; 	}
+.b-radi-br          { -moz-border-radius-bottomleft:4px; 	-webkit-border-bottom-left-radius:4px; 	-khtml-border-bottom-left-radius:4px; 	border-bottom-left-radius:4px; 	}
+.b-radi-tl          { -moz-border-radius-bottomright:4px; 	-webkit-border-bottom-right-radius:4px; -khtml-border-bottom-right-radius:4px; 	border-bottom-right-radius:4px; }
+
+.b-co				{  } 							/* Change : sets the color of border */
+.b-co-basic	    	{ border-color:#B0B0B0; } 		/* Change : sets the basic, standard border color for this theme */
+.b-co-outer			{ border-color:#B0B0B0; } 		/* Change : sets the outer border color for this theme */
+.b-co-transparent	{ border-color:transparent; } 	/* Change : sets when you want to get rid of border */
+
+/*================================================================================================================================
+  Left Navi Background Color Controlling Section
+================================================================================================================================*/
+
+.navi-bg			{ background:#232E5C; }/* Change: body background */
+
+.menu-on-b > span		{ color:#A58850; }
+/* .menu-on-b span:before	{ content:''; display: inline-block; width:5px; height:5px; border-bottom:1px solid #fff; border-right:1px solid #fff; transform:rotate(-45deg); margin-right:8px; }*/
+.SubMenu-bg			{ background-color:#A58850; box-shadow:inset 0px 3px 5px rgba(0,0,0,.3)}
+
+.Title-bg			{ background-color:#232E5C; }
+.title-bg			{ height:auto !important; color:#fff; background-color:#232E5C; }
+.SuperFlow-bg		{ }
+.SuperFilter-bg 	{ background-color:#E7E7E7; }
+.fldTdLabel-bg 		{ background-color:#E7E7E7; }
+.fldTdData-bg		{ }
+.th-bg 				{ background-color:#E7E7E7; }
+.tabGroup-bg		{ }
+.body-bg			{ background-color:#FFFFFF; }
+.SelectTR			{ background-color:#A0DDFF; }
+.jobArea-bg			{ background-color:transparent; }
+
+.cmdspan:hover	    {  }
+.cmdspan-bg			{ background-color:#ECECEC; }
+
+#ShowEdit table		{ background-color:#FFFFFF; }
+.SuperTree 		    { background-color:#FFFFFF; }
+
+.fldNote-bg			{ background-color:#F4FFBA; }
+.page-bg			{ background-color:#ECECEC; }
+
+.Footer-bg			{ background-color:#444444; }
+
+.input-bg			{ background-color:#FFFFFF; }
+.imgSize-bg						{ background:url("/image/bg-transparent.png") repeat 0px 0px; }
+
+.Themetop			{ background:url("/image/Professionalblue/bg-blue.png") repeat-x 0px 0px; }
+.Themewindow		{ background-color:#FFFFFF; }
+
+.Top-ft 		{ font-weight:normal; color:#CCCCCC; }
+.tabGroup-ft	{ }
+.input-ft 		{ }
+.th-ft			{ font-weight:normal; color:#444444; }
+.page-ft		{ }
+.fldNote-ft		{ }
+.fldTdLabel-ft 	{ }
+.fldTdData-ft	{ }
+.cmdspan-ft		{ font-weight:bold; color:#fff; }
+.Footer-ft		{ font-weight:normal; color:#FFFFFF; }
+
+.bg-grad-lgpatt		{ background:url("/image/Redwine/lg-bgrepeat.gif") repeat-x 0px 0px; } 			/* LG :: Top bg */
+.bg-grad-pink		{ background:url("/image/Redwine/bg-title-hotpink.gif") repeat-x 0px 0px; } 		/* LG title Jobarea */
+.bg-grad-monblue	{ background:url("/image/Professionalblue/top_bg.gif") repeat-x 0px 0px; } 			/* CDN Top bg */
+.bg-grad-blue		{ background:url("/image/Professionalblue/bg-title-blue.gif") repeat-x 0px 0px; } 	/* CDN Title Jobarea */
+.bg-grad-wng		{ background:url("/image/Professionalblue/bg_jobarea.gif") repeat-x 0px 0px; } 		/* CDN Jobarea */
+.bg-grad-grey		{ background:url("/image/Thebuttons/gray-bg.png") repeat-x 0px 0px;}			/* PTS Title */
+.bg-grad-btn		{ background:url("/image/Thebuttons/bg-for-button.png") repeat-x 0px 0px; }		/* PTS Cmd */
+
+.jstree-default		{ border:1px solid #aaa; }

@@ -1,0 +1,542 @@
+/*================================================================================================================================
+  reset All CSS properties 
+================================================================================================================================*/
+
+* 			                                    { margin:0; padding:0; border:0; outline:none; }
+body, input, textarea                           { font-family: Dotum, Arial, Sans-serif; font-size: 10pt; } /* Change : sets character sets in use */
+ul, ol                                          { list-style: none; }
+ul li		                                    { float:left; }
+table                                           { width:100%; border:0; border-spacing:0px; border-collapse:collapse; table-layout:fixed;  }
+IMG                                             { margin:0; padding:0; border:0;  }
+a:hover,a:link, a:visited,a:active 				{ padding: 0; text-decoration: none; }
+input[type=text]								{ height:18px; line-height:18px; padding-left:4px; width:100%; } /* Change : sets height of Input box. It must be the same height as inputs */
+input[type=password]							{ height:18px; line-height:18px; padding-left:4px; width:100%; }
+input[type=radio], input[type=checkbox], label 	{ vertical-align:middle; }
+input[type=button] 		                        { background-color:transparent; } /* Change : sets button background */
+input[for=datepicker]							{ float:left; }
+input[for=linkkey]								{ width:90%; }
+input[layout=centering], span[layout=centering],
+select[layout=centering] 						{ margin-top:.25em; } /* Change : sets margin-top for vertically centered look */
+select										    { min-height:20px; line-height:20px; } /* Change : sets height of Select box. It must be the same height as inputs */
+textarea									    { width:99%; padding:6px; margin:6px 0px; }
+.readonlyPre									{ width:99%; padding:6px; margin:6px 0px; text-align:left; overflow-y:scroll; }
+th, td, input[for=datepicker]                   { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.Box, #Footer									{ min-width:989px; } /* Change : sets minimum width of screen */
+.hyphen											{ margin-right:4px; }
+.multichkspn, .multichkspn input[type=checkbox], .radiospn, .radiospn input[type=radio], 
+.radiospn-line, .radiospn-line input[type=radio], .pinset input[type=radio], .pinset input[type=checkbox] { margin-right:6px; }
+
+/*================================================================================================================================
+  Favorite Properties
+================================================================================================================================*/					
+
+.float-l			{ float:left; }
+.float-r			{ float:right; }
+.inline				{ display:inline; }
+.inline-block		{ display:inline-block; }
+.block				{ display:block; }
+.relative			{ position:relative; }
+.absolute			{ position:absolute; }
+.align-left		    { text-align:left; }
+.align-center		{ text-align:center; }
+.align-right		{ text-align:right; }
+.align-middle		{ vertical-align:middle; }
+.align-top			{ vertical-align:top; }
+.center				{ margin:0px auto; }
+.bold				{ font-weight:bold; }
+.normal				{ font-weight:normal; }
+.justify			{ text-align:justify; }
+.none				{ display:none!important; }
+.transparent		{ background-color:transparent; }
+.padding			{ padding: 6px 6px 6px 6px; } /* Change : sets standard padding value on this theme */
+.left-padding		{ padding: 0px 0px 0px 0px; }
+.Wraper-padding		{ padding: 0px 0px 0px 0px; }
+
+/*================================================================================================================================
+  Login page Controlling Section
+================================================================================================================================*/
+
+.LoginPop                   	        { width:100%; min-height:1024px; top:0px; left:0px; position:absolute; background-color:White; overflow:hidden; }
+.LoginPop .login            	        { width:989px; margin:15% auto; }
+.LoginPop .login .logleft      	        { width:657px; height:344px; background-image:url('/image/login/login-left.png'); float:left; }
+.LoginPop .login .logcenter    	        { width:200px; height:344px; margin-left:657px; text-align:center; background:url('/image/login/login-input.png') no-repeat 0px 0px;   }
+.LoginPop .login .logcenter .logtop     { width:199px; height:44px; }
+.LoginPop .login .logcenter .logmain    { width:199px; height:300px; }
+.LoginPop .login .logright     	        { float:right; width:125px; height:370px; background-image:url('/image/login/login-right.png'); }
+.LoginPop .login .logbottom    	        { height:30px; line-height:30px; text-align:center; color:#555555; font-size:8pt; padding-left:180px; }
+
+
+.LoginPop .login div a      	        { }
+.LoginPop .login div .loginSCODE	    { width:144px; height:20px; margin-top:94px; padding-left:4px; color:#555555; background:url("/image/loginSCODE.png") no-repeat 0px center #FFFFFF; }
+.LoginPop .login div .loginID 	        { width:144px; height:20px; padding-left:4px; color:#555555; background:url("/image/loginID.png") no-repeat 0px center #FFFFFF; }
+.LoginPop .login div .loginPS 	        { width:144px; height:20px; padding-left:4px; color:#555555; background:url("/image/loginPS.png") no-repeat 0px center #FFFFFF; }
+.LoginPop .login div input  	        { width:140px; height:17px; border:1px solid #e2e2e2; margin:3px auto; }
+.LoginPop .login div span   	        { width: 90px; height:40px; margin:7px 0px 0px 23px; border: 0px; padding:0; text-align:center; cursor:pointer; float:left; background-image:url('/image/login/login-btn.png'); }
+
+/*================================================================================================================================
+  Header Controlling Section
+================================================================================================================================*/
+
+#head		{ position:relative; }
+#Top        { height:50px; } 
+#Topbg		{ width: 989px; height:50px; display:block; } 
+#logobg		{ width: 230px; height:50px; top:0px; left :0px; position:absolute; } 	
+#top_leaf	{ width: 500px; height:50px; top:0px; right:10px; position:absolute; } 	/* Change : only for LG. display none or not */
+#rightlogo	{ width: 130px; height:50px; top:0px; right: 15px; position:absolute; } /* Change : only for LG. display none or not */
+#TopText	{ position:absolute; top:50%; right: 10px; margin-top:-.5em; }			/* Change : only for CDN. display none or not */
+.Topbar		{ height:6px; }
+
+/*================================================================================================================================
+  Left Navigation Menu Controlling Section
+================================================================================================================================*/
+
+#TopMenu    			{ width:70px; float:left; }
+#TopMenu ul 			{  } 
+#TopMenu li 			{ width:70px; height:35px; padding:10px 0px 15px 0px; text-align:center; border-top:1px solid transparent; border-bottom:1px solid transparent; } /* Change : sets Leftmenu layout */
+#TopMenu li a 			{ width:25px; height:25px; margin:0px auto; display:block; }
+#TopMenu li span 		{ margin:0px auto; display:block; }
+
+#SubMenu    			{ width:130px; left:70px; position:absolute; }
+#SubMenu #MonArch 		{ width:115px; height:170px; position:absolute; } /* Change : only for CDN. display none or not */
+#SubMenu ul 			{ padding:17px 10px; border-top:1px solid transparent; border-bottom:1px solid transparent; position:relative;  } 
+#SubMenu li 			{ width:115px; line-height:2em; float:none; }
+#SubMenu #Subtab  		{ width:10px; height:46px; float:right; background:url("/image/Professionalblue/tab.png") no-repeat center center; }
+#SubMenu #menupin 		{ width:10px; height:27px; position:absolute; top:35px; right:0px; }
+#SubMenu .unpin-menu 	{ background:url("/image/Professionalblue/unpin-menu.png") no-repeat center center; }
+#SubMenu .pin-menu 		{ background:url("/image/Professionalblue/pin-menu.png") no-repeat center center; }
+
+
+.layoutTop #TopMenu    			    { width:100%; background-color:#232323; padding-top:10px; }
+.layoutTop #TopMenu li 			    { width:auto; height:27px; border:2px solid transparent; padding:6px 10px 6px 6px; float:none; display:inline-block; }
+.layoutTop #TopMenu li.menu-on-b    { border-width:2px 2px 0px 2px; border-style:solid; border-color:#000000; }
+.layoutTop #TopMenu li a 			{ display:inline-block; vertical-align:middle;}
+.layoutTop #TopMenu li span 		{ display:inline-block; vertical-align:middle; }
+           
+.layoutTop #SubMenu  
+{
+    width:auto;
+    top:99px; 
+    position:absolute; 
+    z-index:12; 
+    border-width:0px 2px 2px 2px; 
+    border-style:solid; 
+    border-color:#000000;
+}
+
+.layoutTop #SubMenu li 			    { width:115px; line-height:2em; float:none; padding-left:10px; }
+.layoutTop #MonArch                 { display:none; }
+.layoutTop .Holder                  { margin:60px 0px; }
+.layoutTop .navi-bg                 { background:none; }
+.layoutTop .Topbar                  { height : 0px; }
+
+/*================================================================================================================================
+  Main Controlling Section
+================================================================================================================================*/
+
+.Box		{ overflow:hidden; }
+.Holder		{ margin-left:207px; }
+.FoldHolder	{ margin-left: 70px; }
+.Content	{ }
+.left  		{ float:left; overflow:hidden; }
+.Wraper 	{ overflow:hidden; margin-bottom:6px; }
+
+/*================================================================================================================================
+  Main > Title Controlling Section
+================================================================================================================================*/
+
+.Title				{ padding-left:6px; height:28px; position:relative; }
+.centering_left		{ position:absolute; left: 6px; top:50%; margin-top:-1em; line-height:2em; }
+.centering_right	{ position:absolute; right:6px; top:50%; margin-top:-1em; line-height:2em; }
+.logoutarea 		{ float:right; }
+.logoutarea div		{ display:inline-block; }
+.logoutarea span	{ display:inline-block; }
+
+.iconset			{ line-height:0px; }
+
+/*================================================================================================================================
+  Main > Progress Controlling Section
+================================================================================================================================*/
+
+.SuperFlow					{ padding: 1px 6px; }
+.progress                   { height:25px; line-height:15px; margin:6px 0px 6px 0px; border-right:1px solid #000000; overflow:hidden; position:relative; background: none ;} /* Change : sets progressbar's bg & layout */
+.progress .tit              { height:20px; line-height:15px; margin:0; font-size:11px; color:#fff; font-size:1em; text-align:center;  position:relative; padding:5px 20px 0px 20px; float:left;  z-index:10; background-color:#999999;}
+.progress ul                { margin:0 auto; padding:0; }
+.progress li,.progress li a { background:none; white-space:nowrap;list-style: none; }
+.progress li                { margin:0 0 0 0; padding:0 15px; float:left; background-position:-287px 0 }
+.progress li a              { height:20px; padding:5px; font-size: 1em; display:inline-block; background-position:100% top; }
+.progress li.on             { color:#ffffff; background-color:#3D3D3D ;position:relative; z-index:10; background-position:0 100%; }
+.progress li.on a           { background:none; }
+.progress li.last,.progress li.last a { background:none }
+.progress .right            { color:#ffffff; position:absolute; top:6px; right:10px6;}
+
+/*================================================================================================================================
+  Main > SuperTable Controlling Section
+================================================================================================================================*/
+
+.SuperTable 			{ }
+.SuperTable .title      { height:35px; line-height:35px; padding-left:6px; }
+.SuperTable .head		{ }
+.SuperTable .chartArea	{ background-color:White; }
+.SuperTable .chartArea .legend { }
+.SuperTable .chartArea .legend table { width:auto; }
+.SuperTable .chartArea .legend .legendLabel { padding-left: 6px; }
+.SuperTable .body		{ overflow-x:scroll; } /* Change : sets margin or padding to separate it from the surrounding elements */
+.SuperTable .body tbody tr td:first-child 	{ text-align:center; }
+.SuperTable thead th    { padding:4px; margin:0px 5px; }
+.SuperTable .resizeBar {    border-right: solid 1px #ccc; }
+.SuperTable thead .th-text 		{  }
+.SuperTable thead .th-orderby   { display:none; }
+.SuperTable thead .SortDesc .th-orderby { background:url("/image/icon-sortdesc.png") no-repeat center center; display:inline-block; }
+.SuperTable thead .SortAsc .th-orderby	{ background:url("/image/icon-sortasc.png") no-repeat center center; display:inline-block; }
+
+/*================================================================================================================================
+  Main > SuperTable > SuperFilter Controlling Section
+================================================================================================================================*/
+
+.SuperFilter 		        { }
+.SuperFilter td		        { height:28px; }
+.SuperExtFilter             { border-bottom:1px solid #4D4D4D;  color: #FFFFFF;}
+.extFilterTr {background-color: #4D4D4D;}
+.SuperExtFilter th          { text-align:left; }
+.SuperExtFilter select      { min-width:100px; }
+.SuperExtFilter .chkPart    { width:25px;  vertical-align:middle; display:inline-block; padding:3px 0px 3px 6px; }
+.SuperExtFilter .labelPart  { width:100px; vertical-align:middle; display:inline-block; padding:3px 0px 3px 0px; }
+.SuperExtFilter .operatorPart { width:180px; vertical-align:middle; display:inline-block; padding:3px 0px 3px 0px; }
+.SuperExtFilter .dataPart   { width:400px; vertical-align:middle; display:inline-block; padding:3px 0px 3px 0px; }
+.SuperExtFilter #presetTr   { padding-left:6px; border-top:2px solid #4D4D4D; }
+
+.SuperExtFilter_Title       { background-color: #4D4D4D; padding: 0px 10px; display: inline-block; margin-top: 4px; color: white; font-weight: bold; line-height:26px; }
+.SuperExtFilter #presetSelectBox { width:174px; margin-left:44px; }
+#presetSaveBtn, #presetUpdBtn, #presetDelBtn, #presetSetColsBtn { height:20px; padding:0px 6px; margin-left:6px; background-color:White!important; }
+#presetSetColsBtn { margin-right:6px; float:right; margin-top:5px; }
+#filterSelectBox  { width:150px; float:right; margin-top:5px; }
+
+
+
+
+
+.setDispColumnPopUp                 { }
+.setDispColumnPopUp a               { display:block; height:25px; line-height:30px; }
+.setDispColumnPopUp select          { width:185px; padding:6px; }
+.setDispColumnPopUp .filterDiv      { display:inline-block; padding-top:4px; }
+.setDispColumnPopUp .leftPart       { }
+.setDispColumnPopUp .rightPart      { }
+.setDispColumnPopUp .horiBtn        { width:40px; text-align:center; }
+.setDispColumnPopUp .vertBtn        { width:40px; text-align:center; }
+
+.setDispColumnPopUp .btn-arrow-left { display:inline-block; }
+.setDispColumnPopUp .btn-arrow-right{ display:inline-block; }
+.setDispColumnPopUp .btn-arrow-up   { display:inline-block; }
+.setDispColumnPopUp .btn-arrow-down { display:inline-block; }
+
+/*================================================================================================================================
+  Main > SuperTable > Job Controlling Section
+================================================================================================================================*/
+
+.jobArea 	            { height:35px; position:relative; } /* Change : sets height */
+.buttonset	            { position:absolute; left:0px; top:50%; margin-top:-1em; } /* Change : sets margin-top for vertically centered look */
+
+.jobAreaTR .jobArea		{ height:38px; }
+.jobAreaTR .buttonset 	{ padding-right:0px; margin-top:0px; float:left; position:static; } /* Change : static to position it in the middle of the row */
+.jobAreaTR .cmdspan 	{ line-height:24px; }
+.cmdspan	            { height:24px; line-height:24px; padding:0px 10px; margin-left:0px; display:inline-block; } /* Change : sets size*/
+.cmdspan-block			{ height:10px; line-height:10px; margin:0px 6px; display:inline-block; border-left:1px solid #A7A7A7; }
+.cmdicon	            { width:20px; height:20px; display:inline-block; vertical-align:middle; margin-top:-1px; }
+
+/*================================================================================================================================
+  Main > SuperTable > Page Controlling Section
+================================================================================================================================*/
+
+.page 				{  }
+.page				{ height:30px; line-height:30px; padding-left:6px; } /* Change : sets size */
+.page ul 			{ float:right; }
+.page li			{ display:inline-block; vertical-align:middle; float:none; }
+.pgMsg 				{ float:left; }
+.page .pgn			{ padding:0 3px; }
+.page .records 		{ margin-right:6px; }
+.page .pages   		{ margin-right:6px; }
+
+/*================================================================================================================================
+  JDM :: Main > SuperView Controlling Section
+================================================================================================================================*/
+
+.SuperView 			{ }
+
+.havta				{ font-family:dotum; margin-right:5px; float:right; }
+
+.viewGroup td 		{ line-height:24px; padding-left:6px; } /* Change : sets size */
+.viewGroup a        { background:url("/image/icon-viewgroup(lg).png") no-repeat center center; }
+
+
+/*================================================================================================================================
+  Main > SuperTable & View Elements Controlling Section
+================================================================================================================================*/
+
+.fieldContaner 				{ display:inline-block; }
+.fieldContaner select 		{ width:100.7%; }
+
+td							{ height:22px; } /* Change : sets size */
+th							{ height:22px; } /* Change : sets size */
+
+.pinset 					{ display:inline-block; width:100%; position:relative; }
+.imgSize					{ }
+.hasimgSize                 { padding-top:6px; padding-bottom:6px; }
+
+.fldfiledown 				{ display:inline-block; }
+
+.fieldEdit 					{ padding-right:10px; }
+.fldTdLabel 				{ padding-left:6px; }
+.SuperFilter .fldTdLabel	{ padding-right:6px; text-align:right; }
+.fldTdData					{ padding-left:6px; }
+.fldNote 					{ padding-left:6px; line-height:22px; }
+
+.tabGroup					{ line-height:35px; padding-left:6px; margin-top:1px; }
+
+
+/*================================================================================================================================
+  Footer Controlling Section.
+================================================================================================================================*/
+
+#Footer				{ line-height:30px; text-align:center; }
+
+/*================================================================================================================================
+  Logo image Controlling Section.
+================================================================================================================================*/
+
+.logo-monarch		{ background:url("/image/Professionalblue/Monlogo.png") no-repeat center center; }
+.logo-voc			{ background:url("/image/AliveBlack/lg-mainlogo.png") no-repeat center center; }
+.logo-Lghausys		{ background:url("/image/AliveBlack/lg-hausys.png") no-repeat center center; }
+
+/*================================================================================================================================
+  Deco image Controlling Section.
+================================================================================================================================*/
+
+.deco-leaf			{ background:url("/image/AliveBlack/lg-leaf.png") no-repeat center center; }
+.deco-lgpatt		{ background:url("/image/AliveBlack/lg-highlight.jpg"); }
+.deco-wave			{ background:url("/image/Professionalblue/top_bg_blue.jpg") no-repeat; }
+.deco-monarch		{ background:url("/image/Professionalblue/monarch.png") no-repeat left top; }
+
+.coloring-tab		{ background-position: -40px -0px; }
+
+/*================================================================================================================================
+  Jquery UI Elements Controlling Section
+================================================================================================================================*/
+
+.ui-widget-overlay 		{ background-color:#494949; opacity:.1; }
+.ui-dialog				{ padding: .6em .6em 0 .6em; background-color:#E8E5DC; } /* Change : sets the same theme bg */
+.ui-dialog-titlebar 	{ line-height:40px; background-color:#AF174A; }
+.ui-dialog-title		{ color:#FFFFFF; border-bottom:0px solid transparent; }
+
+.JsonEditPop				{ overflow:hidden!important; }
+.JsonEditPop .EditpopTitle	{ height:30px; line-height:30px; font-weight:bold; padding-left:10px; background-color:#830000; color:#FFFFFF; }
+.FileManagerPopup .row 		{ height:30px; line-height:30px; font-weight:bold; padding-left:10px; background-color:#00506F; color:#FFFFFF; }
+
+.SourceEdit 			{ width:96.5%; height:630px; margin:0px; padding:15px 18px 15px 15px; overflow-x:hidden; border:1px solid #cccccc; }
+.ui-button				{ background-color:#AF174A; }
+.ui-button:hover		{ background-color:#AF174A; opacity:.7; }
+.ui-button-text			{ color:#FFFFFF; font-weight:bold; }
+
+.ui-datepicker				{ background-color:#E8E5DC; border:1px solid #232323; }
+.ui-datepicker-header 		{ background-color:#9C3C3C; }
+.ui-datepicker-calendar th span				{ color:#000000; }
+.ui-datepicker-calendar th span[title='토']	{ color:#000000; }
+.ui-datepicker-calendar th span[title='일']	{ color:#000000; }
+.ui-datepicker-calendar tbody tr td				 {  }
+.ui-datepicker-calendar tbody tr td:first-child  {  }
+.ui-datepicker-calendar tbody tr td:last-child   {  }
+.ui-datepicker-calendar .ui-state-default 	{ color:#232323; text-align:center; }
+.ui-datepicker-calendar .ui-state-hover		{ color:#888888; font-weight:bold; }
+.ui-datepicker-calendar .ui-state-highlight	{ color:#9C3C3C; font-weight:bold; }
+.ui-datepicker-prev { width:20px; height:20px; display:block; background:url("/image/icon-pageprev.png") no-repeat center center; }
+.ui-datepicker-next	{ width:20px; height:20px; display:block; background:url("/image/icon-pagenext.png") no-repeat center center; }
+
+.Tabs { background-color:transparent; } /* Change : sets the background of Tabs area */
+.Tabs .ui-tabs-panel { }
+.ui-tabs-nav { background-color:#9C3C3C; padding:.6em .4em 0!important; } /* Change : sets the background of Tabs' head */
+.ui-tabs-nav li	{ border-width:1px 1px 0px 1px; border-style:solid; border-color:#ccc; }
+.ui-tabs-nav .ui-state-default { opacity:.8; }
+.ui-tabs-nav .ui-tabs-selected { opacity: 1; } 
+.ui-tabs-nav .ui-state-default a { color:#232323; background-color:#FFFFFF; } /* Change : sets the background & font-color of each taps */
+
+.FileManagerPopup .row, .GalleryPopUp .row, .DataUploadPopup .row, .MultiFileManagerPopup .row				
+{ height:30px; line-height:30px; padding-left:12px; background-color:#830000; }
+.FileManagerPopup #Filename, .GalleryPopUp #Filename, .DataUploadPopup #Filename , .MultiFileManagerPopup #Filename
+{ width:40.5%; height:20px; line-height:20px; }
+.GetImgFileUpload, .GalleryPopUp 						{ }
+.FileManagerPopup .Label, .GalleryPopUp .Label, .DataUploadPopup .Label, .MultiFileManagerPopup .Label
+{ min-width:150px; padding-right:6px; color:#FFFFFF; font-weight:bold; display:inline-block; }
+#Urlname {  }
+
+.GalleryPopUp .Label, .MultiFileManagerPopup .Label		{ color:#000000; font-weight:bold; }
+.GalleryPopUp .row 	, .MultiFileManagerPopup .row	    { color:#FFFFFF; background-color:transparent; }
+#GetImgGallery .body 		{ overflow:hidden; }
+.GalleryLists 				{ margin:18px 18px 0px; background-color:#F1F1F1; border:2px solid transparent; float:none; display:inline-block; }
+.GalleryLists.li_selected 	{ margin:18px 18px 0px; background-color:#D8D8D8; border:2px solid #000000; }
+.GalleryLists:hover 		{ margin:18px 18px 0px; background-color:#D8D8D8; border:2px solid #666666; }
+.GalleryTitle 				{ padding:3px; color:#FFFFFF; font-weight:bold; background-color:#AF174A; }
+.GalleryDesc 				{ padding:3px; color:#FFFFFF; font-weight:bold; background-color:#AF174A; }
+
+.DataUploadPopup .Label		{ color:#000000; font-weight:bold; min-width:90px; }
+.DataUploadPopup .row 		{ color:#FFFFFF; background-color:transparent; }
+.DataUploadPopup #Filename  { width:70%; }
+.DataUploadPopup #uploadName{ width:70%; }
+
+.button                                     { height:20px; padding:0px 10px; margin-left:10px; }
+input[type=button].button-upload            { background-color:#ffffff; border:1px solid transparent; }
+input[type=button].button-upload:hover      { background-color:#ffffff; border-width:0px 1px 1px 0px; border-style:none solid solid none; border-color:#4D4D4D; }
+input[type=button].button-upload.clicked    { border-width:1px 0px 0px 1px; border-style:solid none none solid; border-color:#4D4D4D; }
+#Filename                                   { color:#000000; vertical-align:middle; background-color:#ffffff; }
+
+.slider                         { left:5px; margin:5px; padding:1px; margin-right:10px; width:80%; display:inline-block; vertical-align:middle; }
+.sliderEdit a                   { border:1px solid #eaeaea; background:#D3D3D3; }
+.sliderEdit a:hover             { background:#B8B8B8; }
+.sliderEdit .ui-widget-content  { border:1px solid #eaeaea; background-color:#f2f2f2; color:#222222; border-radius:4px 4px; }
+
+/*================================================================================================================================
+  Calendar Area Controlling Section
+================================================================================================================================*/
+
+.SuperCalendar .body { background-color:#FFFFFF; }
+
+.calHide    { display:none; }
+.calTitle	{ height:30px; line-height:30px; text-align:center; }
+.calArea    { margin-left:202px; }
+.calChkArea { width:190px; padding:6px; float:left; }
+.calChkArea .ui-datepicker				{ width:auto; background-color:transparent; border:1px solid transparent; }
+.calChkArea .ui-datepicker-header 		{ background-color:transparent; }
+.calChkArea .ui-datepicker-calendar th span				{ color:#222222; }
+.calChkArea .ui-datepicker-calendar th span[title=토]	{ color:#3037c4; }
+.calChkArea .ui-datepicker-calendar th span[title=일]	{ color:#940000; }
+.calChkArea .ui-datepicker-calendar tbody tr td				 {  }
+.calChkArea .ui-datepicker-calendar tbody tr td:first-child  {  }
+.calChkArea .ui-datepicker-calendar tbody tr td:last-child   {  }
+.calChkArea .ui-datepicker-calendar .ui-state-default 	{ color:#232323; text-align:center; }
+.calChkArea .ui-datepicker-calendar .ui-state-hover		{ border:1px solid #eaeaea; }
+.calChkArea .ui-datepicker-calendar .ui-state-highlight	{ color:#0f1d36; font-weight:bold; }
+.calChkArea .ui-datepicker-prev { width:20px; height:20px; display:block; background:url("/image/icon-pageprev.png") no-repeat center center;  }
+.calChkArea .ui-datepicker-next	{ width:20px; height:20px; display:block; background:url("/image/icon-pagenext.png") no-repeat center center;  }
+.calDiv		{ line-height:27px; border:1px solid #CCCCCC; background-color:#EAEAEA; color:#4C4C4C; font-weight:bold; }
+.calCategory{ margin:6px 0px; line-height:27px; border:1px solid #CCCCCC; background-color:#EAEAEA; color:#4C4C4C; font-weight:bold; text-align:center; }
+.selectArea { line-height:27px; padding-left:6px; }
+
+
+
+/*================================================================================================================================
+  Border Color Controlling Section
+================================================================================================================================*/
+
+.b-all				{ border-width:1px; 		border-style:solid; 		}
+.b-t				{ border-top-width:1px; 	border-top-style:solid;  	}
+.b-r				{ border-right-width:1px; 	border-right-style:solid;  	}
+.b-b 				{ border-bottom-width:1px; 	border-bottom-style:solid;  }
+.b-l 				{ border-left-width:1px; 	border-left-style:solid;  	}
+
+.b-bx2				{ border-bottom-width:2px;  border-bottom-style:solid;  }
+
+.b-radi-all         { -moz-border-radius:4px; 				-webkit-border-radius:4px; 				-khtml-border-radius:4px; 				border-radius:4px; 				}
+.b-radi-tl          { -moz-border-radius-topleft:4px; 		-webkit-border-top-left-radius:4px; 	-khtml-border-top-left-radius:4px; 		border-top-left-radius:4px; 	}
+.b-radi-tr          { -moz-border-radius-topright:4px; 		-webkit-border-top-right-radius:4px; 	-khtml-border-top-right-radius:4px; 	border-top-right-radius:4px; 	}
+.b-radi-br          { -moz-border-radius-bottomleft:4px; 	-webkit-border-bottom-left-radius:4px; 	-khtml-border-bottom-left-radius:4px; 	border-bottom-left-radius:4px; 	}
+.b-radi-tl          { -moz-border-radius-bottomright:4px; 	-webkit-border-bottom-right-radius:4px; -khtml-border-bottom-right-radius:4px; 	border-bottom-right-radius:4px; }
+
+.b-co				{  } 							/* Change : sets the color of border */
+.b-co-basic	    	{ border-color:#B0B0B0; } 		/* Change : sets the basic, standard border color for this theme */
+.b-co-outer			{ border-color:#4D4D4D; } 		/* Change : sets the outer border color for this theme */
+.b-co-transparent	{ border-color:transparent; }	/* Change : sets when you want to get rid of border */
+
+/*================================================================================================================================
+  JDM :: Main Theme Elements Group ** Important **
+================================================================================================================================*/
+
+.navi-bg	 		            { background:url("/image/AliveBlack/lg-bgbody.png") repeat-y 0px 0px; } /* Change: Left&Submenu bg */
+
+.behind-bg			            { background-color:#000000; } /* Change: body background */
+
+.menu-on-b						{ background-color:#4D4D4D; }
+.SubMenu-bg			            { background-color:#4D4D4D; }
+
+.Title-bg			            { background-color:#4D4D4D; }
+.title-bg						{ background-color:#4D4D4D; }
+.SuperFlow-bg		        { background-color:#000000; }
+.SuperFilter-bg 	            { background-color:#303030; } /* Change: body background */
+.fldTdLabel-bg 		            { background-color:#E8E5DC; } /* Change: body background */
+.fldTdData-bg		            { background-color:#FFFFFF; }
+.SuperFilter .fldTdData-bg	    { background-color:transparent; }
+.th-bg 				            { background-color:#F0F0F0; }
+.viewGroup-bg		            { background-color:#F0F0F0; }
+.tabGroup-bg					{ background-color:#FFFFFF; }
+.body-bg			            { background-color:#FFFFFF; }
+.SelectTR			            { background-color:#AAAAAA; }
+.jobArea-bg			            { background-color:#E1E1E1; }
+.jobAreaTR .jobArea-bg			{ }
+#ShowEdit table					{ background-color:#FFFFFF; }
+.SuperTree 		                { background-color:#FFFFFF; }
+
+.cmdspan:hover	            	{ }
+.cmdspan-bg						{ }
+
+.page-bg			            { background-color:#ECECEC; }
+.fldNote-bg		                { background-color:#FFFFFF; }
+
+.Footer-bg			            { background-color:#232323; }
+
+.input-bg			            { background-color:#FFFFFF; }
+.imgSize-bg						{ background:url("/image/bg-transparent.png") repeat 0px 0px; }
+
+.Themetop						{ background-color:#AF174A; }
+.Themewindow					{ background-color:#E8E5DC; }
+
+.TopMenu-ft		                { font-weight:bold; color:#FFFFFF; }
+.title-ft						{ font-weight:bold; color:#444444; }
+.SubMenu-ft		                { font-weight:bold; color:#FFFFFF; }
+.Top-ft 		                { }
+.Title-ft 		                { font-weight:bold; color:#FFFFFF; }
+.SuperFlow-ft	                { font-weight:normal; color:#FFFFFF; }
+.on .SuperFlow-ft	            { font-weight:bold; color:#ffffff; }
+.viewGroup-ft	                { }
+.tabGroup-ft					{ }
+.input-ft 		                { }
+.th-ft			                { font-weight:normal; }
+.page-ft						{ }
+.pgn_selected .pgn				{ font-weight:bold; color:#000000; }
+.fldNote-ft		                { }
+.fldTdLabel-ft 	                { }
+.fldTdData-ft	                { }
+.cmdspan-ft		                { font-weight:bold; color:#444444; }
+.Footer-ft		                { font-weight:normal; color:#FFFFFF; }
+
+
+.bg-grad-lgpatt		            { background:url("/image/AliveBlack/lg-bgrepeat.gif") repeat-x 0px 0px; } 			/* LG :: Top bg */
+.bg-grad-pink		            { background:url("/image/AliveBlack/bg-title-hotpink.gif") repeat-x 0px 0px; } 		/* LG title Jobarea */
+.bg-grad-monblue	            { background:url("/image/Professionalblue/top_bg.gif") repeat-x 0px 0px; } 			/* CDN Top bg */
+.bg-grad-blue		            { background:url("/image/Professionalblue/bg-title-blue.gif") repeat-x 0px 0px; } 	/* CDN Title Jobarea */
+.bg-grad-wng		            { background:url("/image/Professionalblue/bg_jobarea.gif") repeat-x 0px 0px; } 		/* CDN Jobarea */
+.bg-grad-grey		            { background:url("/image/Thebuttons/gray-bg.png") repeat-x 0px 0px;}			/* PTS Title */
+.bg-grad-btn		            { background:url("/image/Thebuttons/bg-for-button.png") repeat-x 0px 0px; }		/* PTS Cmd */
+
+#Top							{ background:url("/image/AliveBlack/lg-bgrepeat.gif") repeat-x 0px 0px; }
+#Topbg							{ background:url("/image/AliveBlack/lg-highlight.jpg"); }
+#logobg							{ background:url("/image/Professionalblue/logo2.png") no-repeat center center; }
+#top_leaf						{ background:url("/image/ontheright-redwine.png") no-repeat center center; }
+#rightlogo						{  }
+#TopText						{ display:none; }
+#MonArch						{ display:none; }
+#Subtab							{ display:none; }
+#menupin						{ display:none; }
+
+.tr								{ border-width:1px 0px 1px 0px; border-style:solid; border-color:#b0b0b0; }
+.SuperTable .title              { border-width:2px; border-style:solid; border-color:#DFDFDF; }
+.SuperFilter tbody tr:last-child{ border-bottom:0px solid transparent; }
+.SuperFilter					{ border-right:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; }
+.body							{ border-right:0px solid transparent; border-left:0px solid transparent; border-top:0px solid transparent; }
+#Flowtop						{ border-width:0px 1px 0px 1px; border-style:solid; border-color:#4D4D4D; }
+.page							{ border-right:0px solid transparent; border-left:0px solid transparent;  }
+.jobAreaTR .jobArea				{ border-width:1px 0px 2px 0px; border-style:solid; border-color:#4D4D4D; }
+.jobArea						{ border-width:1px 0px 1px 0px; border-style:solid; border-color:#4D4D4D; }
+.th								{ border-color:#4D4D4D; }
+.SuperView .fldTdLabel			{ border-left:0px solid transparent; }
+.left							{ border-width:1px 0px 1px 1px; border-style:solid; border-color:#4D4D4D; }
+.Wraper							{ border-width:1px; border-style:solid; border-color:#4D4D4D; }
+.cmdspan						{ border-color:transparent; }
+.tabGroup						{ border-bottom:5px solid #9C3C3C; }
+.CodeMirror-gutters             { border-right: 2px solid #CCCCCC; }

@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" 
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+       http://www.springframework.org/schema/aop
+       http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context-3.0.xsd
+       http://www.springframework.org/schema/mvc
+       http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
+
+
+	<!-- ========================= JDBC RESOURCE DEFINITIONS ========================= -->
+
+	<!--  프로퍼티 암호화 처리 start -->
+	<bean id="environmentVariablesConfiguration"
+      class="org.jasypt.encryption.pbe.config.EnvironmentStringPBEConfig">
+        <property name="algorithm" value="PBEWithMD5AndDES" />
+        <property name="passwordEnvName" value="APP_ENCRYPTION_PASSWORD" />
+    </bean>
+  
+    <bean id="configurationEncryptor"
+      class="org.jasypt.encryption.pbe.StandardPBEStringEncryptor">
+        <property name="config" ref="environmentVariablesConfiguration" />
+        <property name="password" value="kydbmJasyptPass" />
+    </bean>
+   	<bean id="propertyConfigurer"
+		class="org.jasypt.spring3.properties.EncryptablePropertyPlaceholderConfigurer">
+		<constructor-arg ref="configurationEncryptor" />
+		<property name="locations">
+			<list>
+				<value>classpath:properties/jdbc.properties</value>
+			</list>
+		</property>
+	</bean>
+    <!--  프로퍼티 암호화 처리 end -->
+    
+<!--    	<bean id="propertyConfigurer" -->
+<!-- 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"> -->
+<!-- 		<property name="locations"> -->
+<!-- 			<list> -->
+<!-- 				<value>/WEB-INF/jdbc.properties</value> -->
+<!-- 			</list> -->
+<!-- 		</property> -->
+<!-- 	</bean> -->
+	
+    
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+		destroy-method="close">
+		<property name="driverClassName" value="${jdbc.driverClassName}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+		<property name="maxActive" value="500" />
+		<property name="maxIdle" value="100" />
+	</bean>
+	
+<!-- 	<bean id="monOraDataSource" class="org.apache.commons.dbcp.BasicDataSource" -->
+<!-- 		destroy-method="close"> -->
+<!-- 		<property name="driverClassName" value="${jdbc.oracle.driverClassName}" /> -->
+<!-- 		<property name="url" value="${jdbc.oracle.url}" /> -->
+<!-- 		<property name="username" value="${jdbc.oracle.username}" /> -->
+<!-- 		<property name="password" value="${jdbc.oracle.password}" /> -->
+<!-- 		<property name="maxActive" value="500" /> -->
+<!-- 		<property name="maxIdle" value="100" /> -->
+<!-- 	</bean> -->
+
+<!-- 	<bean id="mon820DataSource" class="org.apache.commons.dbcp.BasicDataSource" -->
+<!-- 		destroy-method="close"> -->
+<!-- 		<property name="driverClassName" value="${jdbc.monarch.driverClassName}" /> -->
+<!-- 		<property name="url" value="${jdbc.monarch.url}" /> -->
+<!-- 		<property name="username" value="${jdbc.monarch.username}" /> -->
+<!-- 		<property name="password" value="${jdbc.monarch.password}" /> -->
+<!-- 		<property name="maxActive" value="500" /> -->
+<!-- 		<property name="maxIdle" value="100" /> -->
+<!-- 	</bean> -->
+
+	<!--트랜젝션메니져 -->
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	<bean id="transactionTemplateRequired"
+		class="org.springframework.transaction.support.TransactionTemplate">
+		<property name="transactionManager" ref="transactionManager" />
+		<property name="propagationBehaviorName" value="PROPAGATION_REQUIRED" />
+	</bean>
+
+	<!--JDBC템플릿 -->
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<constructor-arg ref="dataSource" />
+	</bean>
+
+	<bean id="namedJdbcTemplate"
+		class="org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate">
+		<constructor-arg ref="dataSource" />
+	</bean>
+
+
+
+	<bean id="nativeJdbcExtractor"
+		class="org.springframework.jdbc.support.nativejdbc.CommonsDbcpNativeJdbcExtractor"
+		lazy-init="true" />
+
+	<bean id="lobHandler" class="org.springframework.jdbc.support.lob.OracleLobHandler"
+		lazy-init="true">
+		<property name="nativeJdbcExtractor">
+			<ref bean="nativeJdbcExtractor" />
+		</property>
+	</bean>
+
+	<!-- com.skyunoe.spring 패키지의 하위 bean 자동 등록 -->
+	<context:component-scan base-package="co.kr.kydbm" />
+
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<!-- json-->
+			<mvc:mapping path="/DATACRUD.json" />
+			<mvc:mapping path="/M5Hash.json" />
+			<mvc:mapping path="/GetJs.json" />
+			<mvc:mapping path="/GetCode.json" />
+			<mvc:mapping path="/GetHtml.json" />
+			<mvc:mapping path="/sendIndvEmail.json" />
+			<mvc:mapping path="/getUserInfo.json" />
+			<!-- mon -->
+			<mvc:mapping path="/upload.mon" />
+			<mvc:mapping path="/fileupload.mon" />
+			<mvc:mapping path="/filedownload.mon" />
+			<mvc:mapping path="/exceldown.mon" />
+			<mvc:mapping path="/doUploadDataFile.mon" />
+			<mvc:mapping path="/main.mon"/>
+			<bean class="co.kr.kydbm.core.interceptor.LoginCheckInterceptor" />
+		</mvc:interceptor>
+	</mvc:interceptors>
+	
+	<bean id="exceptionResolver" class="co.kr.kydbm.core.exception.ExceptionResolver">
+	</bean>
+	
+	<!-- handler mapping -->
+	<bean id="handlerMapping"
+		class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping" />
+
+	<!-- view resolver -->
+	<bean
+		class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+		<property name="mediaTypes">
+			<map>
+				<entry key="atom" value="application/atom+xml" />
+				<entry key="html" value="text/html" />
+ 				<!--  <entry key="mon" value="text/html" /> -->
+				<entry key="json" value="application/json" />
+			</map>
+		</property>
+		<property name="viewResolvers">
+			<list>
+				<bean class="org.springframework.web.servlet.view.BeanNameViewResolver" >
+				</bean>
+				<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+					<property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
+					<property name="prefix" value="/ui/" />
+					<property name="suffix" value=".jsp" />
+				</bean>
+			</list>
+		</property>
+		<property name="defaultViews">
+			<list>
+				<bean id="jsonView" 
+					class="co.kr.kydbm.core.utils.MappingJacksonJsonViewEx">
+<!-- 					class="org.springframework.web.servlet.view.json.MappingJacksonJsonView"> -->
+<!-- 					<bean class="co.kr.kydbm.core.utils.MappingJacksonJsonViewEx"> -->
+					<property name="prefixJson" value="false" /><!-- 헤더에{}&& 가 
+						붙는현상..false로 하면 안보임 -->
+				</bean>
+			</list>
+		</property>
+	</bean>
+	
+	<!-- Dao Bean 설정 -->
+	<bean id="MonArchDao" class="co.kr.kydbm.core.dao.MonArchDaoImpl">
+<!-- 		<property name="dataSource" ref="dataSource" /> -->
+		<property name="lobHandler" ref="lobHandler" />
+	</bean>
+	<bean id="MonArchExtDao" class="co.kr.kydbm.core.dao.DataSourceSupport">
+		<property name="dataSource" ref="dataSource" />
+		<!--<property name="monOraDataSource" ref="monOraDataSource" /> -->
+	</bean>
+	<bean id="DataUploadDao" class="co.kr.kydbm.core.dao.DataUploadDaoImpl">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<!-- <bean id="LegacyIfDao" class="co.kr.kydbm.lghausys.scheduler.Dao.LegacyIfDaoImpl"> 
+		<property name="osbdbDataSource" ref="osbdbDataSource" /> <property name="lgchhomeDataSource" 
+		ref="lgchhomeDataSource" /> <property name="dataSource" ref="dataSource" 
+		/> </bean> -->
+		
+<!-- 	<bean id="MonArchExtDao" class="co.kr.kydbm.core.dao.MonArchExtDaoImpl"> -->
+<!-- 		<property name="mon820DataSource" ref="mon820DataSource" /> -->
+<!-- 	</bean> -->
+
+
+
+	<!-- Configure the multipart resolver -->
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<!-- one of the properties available; the maximum file size in bytes 30MB -->
+		<property name="defaultEncoding" value="UTF-8" />
+		<property name="maxUploadSize" value="30000000" />
+	</bean>
+
+
+	<!-- Schedule -->
+	<!-- 1. 스케쥴 대상이 되는 클래스 정의 Start -->
+	<!-- 모나크 공통스케쥴러 Job -->
+<!-- 	<bean id="cronTest01Job" class="org.springframework.scheduling.quartz.JobDetailBean"> -->
+<!-- 	<property name="jobClass" value="co.kr.kydbm.scheduler.job.MonarchCommonJob" /> -->
+<!-- 	<property name="jobDataAsMap"> -->
+<!-- 		<map> -->
+<!-- 			<entry key="usite"  value="13" /> -->
+<!-- 			<entry key="serviceName"  value="M_SRVMGMT" /> -->
+<!-- 			<entry key="methodName"  value="LIST" /> -->
+<!-- 		</map> -->
+<!-- 	</property> -->
+<!-- 	</bean> -->
+	<!-- 다중커넥션 스케쥴러 예제 Job -->
+<!-- 	<bean id="cronOracleToMariaDBTestJob" class="org.springframework.scheduling.quartz.JobDetailBean"> -->
+<!-- 	<property name="jobClass" value="co.kr.kydbm.scheduler.job.OracleToMariaDBJob" /> -->
+<!-- 	</bean> -->
+	
+	<!-- 개별다이렉트 메일 발송 Job -->
+	<bean id="cronSendDirectMailJob" class="org.springframework.scheduling.quartz.JobDetailBean">
+		<property name="jobClass" value="co.kr.kydbm.scheduler.job.SendDirectMailJob" />
+	</bean>
+	
+	<!-- 1. 스케쥴 대상이 되는 클래스 정의 End -->
+	
+	
+	<!-- 2. 스케쥴 시간 설정 Start -->
+	<!-- 개별다이렉트 메일 발송 실행시간 설정 -->
+<!-- 	<bean id="cronTest01JobTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean"> -->
+<!-- 		<property name="jobDetail" ref="cronTest01Job" /> -->
+<!-- 		<property name="cronExpression" value="0/10 * * * * ?"/> -->
+<!-- 	</bean> -->
+	
+<!-- 	<bean id="cronOracleToMariaDBTestJobTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean"> -->
+<!-- 		<property name="jobDetail" ref="cronOracleToMariaDBTestJob" /> -->
+<!-- 		<property name="cronExpression" value="0/10 * * * * ?"/> -->
+<!-- 	</bean> -->
+	
+	<!-- 개별다이렉트 메일 발송 실행시간 설정 -->
+	<bean id="SendDirectMailJobTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="cronSendDirectMailJob" />
+		<property name="cronExpression" value="0/30 * * * * ?"/>
+	</bean>
+	<!-- 2. 스케쥴 시간 설정 End -->
+	
+	<!-- 3. 스케쥴 실행  Start -->
+	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="triggers">
+			<list>
+<!-- 				<ref bean="cronTest01JobTrigger" /> -->
+<!-- 				<ref bean="cronOracleToMariaDBTestJobTrigger" /> -->
+				<!--<ref bean="SendDirectMailJobTrigger" />-->
+			</list>
+		</property>
+		<property name="quartzProperties">
+			<props>
+				<prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
+				<prop key="org.quartz.threadPool.threadCount">5</prop>
+				<prop key="org.quartz.threadPool.threadPriority">4</prop>
+				<prop key="org.quartz.jobStore.class">org.quartz.simpl.RAMJobStore</prop>
+				<prop key="org.quartz.jobStore.misfireThreshold">60000</prop>
+			</props>
+		</property>
+	</bean>
+	<!-- 3. 스케쥴 실행  End -->
+
+
+	<!-- 서버기동초기화 -->
+	<bean id="InitProc" class="co.kr.kydbm.core.meta.Initializer"
+		init-method="init">
+	</bean>
+</beans>
+
+

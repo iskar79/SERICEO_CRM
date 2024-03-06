@@ -1,0 +1,607 @@
+/*================================================================================================================================
+  Default Elements Controlling Section
+================================================================================================================================*/
+
+@font-face {
+  font-display: swap;
+  font-family: 'Noto Sans';
+  font-style: normal;
+  font-weight: 100;
+  src: local('Noto Sans KR Thin'), local('Noto Sans CJK KR Thin'),
+  url('./font/noto-sans-kr-v36-korean-100.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: 'Noto Sans';
+  font-style: normal;
+  font-weight: 200;
+  src: local('Noto Sans KR ExtraLight'), local('Noto Sans CJK KR ExtraLight'),
+  url('./font/noto-sans-kr-v36-korean-200.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: 'Noto Sans';
+  font-style: normal;
+  font-weight: 300;
+  src: local('Noto Sans KR Light'), local('Noto Sans CJK KR Light'),
+  url('./font/noto-sans-kr-v36-korean-300.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: 'Noto Sans';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Noto Sans KR Regular'), local('Noto Sans KR'),
+  local('Noto Sans CJK KR Regular'), local('Noto Sans CJK KR'),
+  url('./font/noto-sans-kr-v36-korean-regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: 'Noto Sans';
+  font-style: normal;
+  font-weight: 500;
+  src: local('Noto Sans KR Medium'), local('Noto Sans CJK KR Medium'),
+  url('./font/noto-sans-kr-v36-korean-500.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: 'Noto Sans';
+  font-style: normal;
+  font-weight: 600;
+  src: local('Noto Sans KR SemiBold'), local('Noto Sans CJK KR SemiBold'),
+  url('./font/noto-sans-kr-v36-korean-600.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: 'Noto Sans';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Noto Sans KR Bold'), local('Noto Sans CJK KR Bold'),
+  url('./font/noto-sans-kr-v36-korean-700.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: 'Noto Sans';
+  font-style: normal;
+  font-weight: 800;
+  src: local('Noto Sans KR ExtraBold'), local('Noto Sans CJK KR ExtraBold'),
+  url('./font/noto-sans-kr-v36-korean-800.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: 'Noto Sans';
+  font-style: normal;
+  font-weight: 900;
+  src: local('Noto Sans KR Black'), local('Noto Sans CJK KR Black'),
+  url('./font/noto-sans-kr-v36-korean-900.woff2') format('woff2');
+}
+
+*, input {font-family:'Noto Sans','Noto Sans KR','Apple SD Gothic Neo','애플 SD 산돌고딕 Neo','Helvetica Neue','Roboto','sans-serif'; font-size: 13px;}
+
+.body td, .body th      { padding:0px 6px; }
+input[for="calicon"] 	{ width:640px; margin-left:2px; padding-left:6px; }
+input[type="radio"] 	{ border:1px; }
+input[type="file"] 		{ border:0px; }
+#Footer                 { position:fixed; bottom:0px; width:100%; z-index:50; }
+.Wraper                 { margin-bottom:36px; } /* Footer 하단 고정하면서 최하단 컨텐츠 올바르게 볼 수 있도록 표준 마진 6px + footer height 30px 만큼 부여함 */
+.fldfiledown li 		{ float:none; }
+.fldfiledown li a 		{ }
+.fieldContaner[type=multicheck], .fieldContaner[type=radio] { white-space:normal; }
+.radiospn-line, .multichkspn 	{ min-width:120px; display:inline-block; padding:6px 0; }
+.caliconSelect					{ width:60px; height:20px; line-height:20px; display:inline-block; }
+.caliconText					{ height:20px; line-height:20px; display:inline-block; }
+
+input:focus		{ /* background-color:#D5E4E1; border-color:#527BE4; */ }
+.blockPage  	{ border:0px!important; } /* blockUI 작동할 때 중앙에 3px 선 만큼 박스 보이는거 가리기 위함 */ 
+.tdAuction      { text-decoration:underline; }
+
+/* select, textarea, pre	{ font-family:Dotum, Arial, Sans-serif; } */
+
+#tabledailog	{ padding-top:6px; line-height:95px; text-align:center; font-weight:bold; }
+.listBlock		{ width:1px; height:10px; display:inline-block; }
+.listBlock:hover{ background:green; }
+
+.hover-cmdspan 	{ border-color:#acacac; }
+.down-cmdspan  	{ border-color:#acacac transparent transparent #acacac; }
+.up-cmdspan		{ border-color:transparent #acacac #acacac transparent; }
+
+.ziplines, .contactlines { margin:2px 0px; }
+
+.multiuser      { height:26px; padding:2px; width:90%; }
+.multiuserblock { display:inline-block; height:26px; line-height:26px; vertical-align:middle; padding:0px 6px 0px 6px; background-color:#E8E5DC; }
+.multiusername  { vertical-align:middle; }
+
+
+#MultiEmail .contactlines               , #MultiTel .contactlines                     { width:340px; margin:6px auto 0px; }
+#MultiEmail .contactlines input.repflag , #MultiTel .contactlines input.repflag       { margin:0px 2px; }
+#MultiEmail .contactlines .emailtype    , #MultiTel .contactlines .teltype            { width:60px; }
+#MultiEmail .contactlines .email        , #MultiTel .contactlines .telno              { width:56%; height:18px; padding-left:6px; overflow:hidden; text-overflow:ellipsis; }
+#MultiEmail .contactlines .badflag      , #MultiTel .contactlines .badflag            { margin-left:5px; }
+
+
+
+.fieldContaner[type="multiemail"] .pinset                     , .fieldContaner[type="multitel"] .pinset                         { margin:0px auto; }
+.fieldContaner[type="multiemail"] .contactlines .emailtype    , .fieldContaner[type="multitel"] .contactlines .teltype          { width:60px; }
+.fieldContaner[type="multiemail"] .contactlines .email        , .fieldContaner[type="multitel"] .contactlines .telno            { width:62%; height:18px; padding-left:6px; overflow:hidden; text-overflow:ellipsis; }
+.fieldContaner[type="multiemail"] .contactlines .contactLabel , .fieldContaner[type="multitel"] .contactlines .contactLabel     { width:40px; display:inline-block; }
+.fieldContaner[type="multiemail"] .contactlines .contactData  , .fieldContaner[type="multitel"] .contactlines .contactData      { width:65%; display:inline-block; overflow:hidden; text-overflow:ellipsis; }
+
+
+.fieldContaner[type="multiaddress"] .pinset                     { margin:0px auto; }
+.fieldContaner[type="multiaddress"] .contactlines #addrtype     { width:60px; }
+.fieldContaner[type="multiaddress"] .contactlines .contactLabel { width:40px; display:inline-block; }
+.fieldContaner[type="multiaddress"] .contactlines .contactData  { width:65%; display:inline-block; overflow:hidden; text-overflow:ellipsis; }
+.fieldContaner[type="multiaddress"] .contactlines .address      { width:100%; height:18px; overflow:hidden; text-overflow:ellipsis; }
+
+
+.contactlines[repemail="1"]              { border-bottom:1px solid #B0B0B0; padding:6px 0px; margin-bottom:6px; font-weight:bold; }
+.contactlines[bademail="1"]              { color:Gray; }
+.contactlines[bademail="1"] .contactData { text-decoration:line-through; }
+
+.contactlines[reptel="1"]                { border-bottom:1px solid #B0B0B0; padding:6px 0px; margin-bottom:6px; font-weight:bold; }
+.contactlines[badtel="1"]                { color:Gray; }
+.contactlines[badtel="1"] .contactData   { text-decoration:line-through; }
+
+.contactlines[repaddr="1"]               { border-bottom:1px solid #B0B0B0; padding:6px 0px; margin-bottom:6px; font-weight:bold; }
+.contactlines[badaddr="1"]               { color:Gray; }
+.contactlines[badaddr="1"] .contactData  { text-decoration:line-through; }
+
+
+.mce-btn button                 { padding:2px 6px!important; }
+.mce-flow-layout-item span      { font-size:10pt!important; /* font-family:Dotum, Arial, Sans-serif; */}
+.mce-colorbutton .mce-preview  { margin-left:-19px!important; }
+/*================================================================================================================================
+  Theme Elements Controlling Section
+================================================================================================================================*/
+
+.ThemeLogo			{ }
+.Themewindow		{ width:800px; height:295px; position:absolute; left:50%; top:50%; margin:-200px 0px 0px -400px; z-index:1; }
+.Themetop			{ height:40px; line-height:40px; margin:6px 6px 0px; padding-left:8px; font-weight:bold; color:#FFFFFF; }
+.Themebody			{ width:750px; height:180px; display:block; margin:25px auto; }
+.Themelist			{ height:45px; line-height:45px; margin-left:35px; }
+.Themelist li		{ width:150px; height:145px; background:url("../image/theme-shadow.png") no-repeat 0px 0px; }
+.Themebottom		{ height:45px; line-height:45px; text-align:center; background-color:#CCCCCC; }
+.Themeli.Redwine	{ margin-right:25px; }
+.Themeli.Thebuttons	{ margin-right:25px; }
+.Themeli.Professionalblue	{ margin-right:25px; }
+.Themeli.Cloudy		{ margin-right:25px; }
+.Themeli.AliveBlack	{ margin-right:25px; }
+#lg					{ width:142px; height:138px; display:block; background:url("/image/theme-01.png") no-repeat 0px 0px; }
+#pts				{ width:142px; height:138px; display:block; background:url("/image/theme-03.png") no-repeat 0px 0px; }
+#cdn				{ width:142px; height:138px; display:block; background:url("/image/theme-02.png") no-repeat 0px 0px; }
+#t820				{ width:142px; height:138px; display:block; background:url("/image/theme-04.png") no-repeat 0px 0px; }
+#lg:hover			{ width:142px; height:138px; display:block; background:url("/image/theme-01.png") no-repeat 2px 2px; }
+#pts:hover			{ width:142px; height:138px; display:block; background:url("/image/theme-03.png") no-repeat 2px 2px; }
+#cdn:hover			{ width:142px; height:138px; display:block; background:url("/image/theme-02.png") no-repeat 2px 2px; }
+#t820:hover			{ width:142px; height:138px; display:block; background:url("/image/theme-04.png") no-repeat 2px 2px; }
+.sp:hover			{ background-position:-80px -2px; }
+
+/*================================================================================================================================
+  Login Layout Controlling Section 
+================================================================================================================================*/
+
+.selectBranches         { margin-top:70px; position:relative; top:-117px; }
+.selectBranches a       { position:absolute; left:24px; color:#FFFFFF; font-weight:bold;  }
+.selectBranches select  { width:150px; position:absolute; left:24px; top:22px; }
+
+
+.btn-block { display:none; }
+
+/*================================================================================================================================
+  SuperTree Controlling Section
+================================================================================================================================*/
+
+.SuperTree 		{ }
+.SuperTree ul   { }
+.SuperTree li 	{ min-height:20px; float:none }
+.SuperTree span { display:inline-block; vertical-align:middle; }
+.SuperTree a 	{ padding-left:3px; vertical-align:middle; height:20px; line-height:20px; display:inline-block; }
+.treeLevel1 	{ min-width:100px; min-height:20px; }
+.treeLevel2 	{ min-width:100px; min-height:20px; margin-left:20px; }
+.treeLevel3 	{ min-width:100px; min-height:20px; margin-left:20px; }
+.treeLevel4 	{ min-width:100px; min-height:20px; margin-left:20px; }
+
+
+/*================================================================================================================================
+  icon sets 
+================================================================================================================================*/
+
+
+.icon			{ display:inline-block; }
+.i-20			{ width:20px; height:20px; background-image:url("../image/sp-icon-i20.png"); }
+.i-25   		{ width:25px; height:25px; background-image:url("../image/sp-icon-i25.png"); }
+.i-25-b   		{ width:25px; height:25px; background-image:url("../image/sp-icon-i25-b.png"); }
+.calicon 		{ width:20px; height:20px; background-image:url("../image/sp-icon-i20-calicon.png"); }
+.opticon		{ width:20px; height:20px; background-image:url("../image/sp-icon-i20-opticon.png"); }
+.coloring		{ width:20px; height:20px; background-image:url("../image/sp-icon-i20-coloring.png"); }
+.extrabtn       { width:20px; height:20px; background-image:url("../image/sp-icon-i20-extrabtn.png"); }
+
+.icon-title			{ background:url("../image/temp.png") no-repeat 0px 0px; }
+.icon-default		{ background-position: 0px 0px; }
+.icon-box			{ background-position: 0px -20px; }
+.icon-search		{ background:url(../image/icon_search.svg) no-repeat; background-size:20px 20px; }
+.icon-registration 	{ background-position: 0px -60px; }
+.icon-trash 		{ background-position: 0px -80px; }
+.icon-list 			{ background-position: 0px -100px; }
+.icon-add 			{ background-position: 0px -120px; }
+.icon-save 			{ background-position: 0px -140px; }
+.icon-upward 		{ background-position: 0px -160px; }
+.icon-downward 		{ background-position: 0px -180px; }
+.icon-copy 			{ background-position: 0px -200px; }
+.icon-switch 		{ background-position: 0px -220px; }
+.icon-magicstick 	{ background-position: -20px -0px; }
+.icon-person 		{ background-position: -20px -20px; }
+.icon-agent 		{ background-position: -20px -40px; }
+.icon-approval 		{ background-position: -20px -60px; }
+.icon-return 		{ background-position: -20px -80px; }
+.icon-refresh 		{ background-position: -20px -100px; }
+.icon-geolocate 	{ background:url(../image/icon_location.svg) center center no-repeat !important; background-size:20px 20px !important; }
+.icon-text 			{ background-position: -20px -140px; }
+.icon-lms 			{ background-position: -20px -160px; }
+.icon-sms 			{ background-position: -20px -180px; }
+.icon-mail 			{ background:url(../image/icon_mail.svg) center center no-repeat; background-size:20px 20px; }
+.icon-email 		{ background-position: -20px -220px; }
+.icon-filedown 		{ background-position: -40px -0px; }
+.icon-fileupload 	{ background-position: -40px -20px; }
+.icon-pagefirst 	{ background-position: -40px -40px; }
+.icon-pageprev 		{ background-position: -40px -60px; }
+.icon-pagenext 		{ background-position: -40px -80px; }
+.icon-pagelast 		{ background-position: -40px -100px; }
+.icon-address 		{ background-position: -40px -120px; }
+.icon-clock 		{ background:url(../image/icon_clock.svg) center center no-repeat; background-size:20px 20px; }
+.icon-file 			{ background:url(../image/icon_attachment.svg) center center no-repeat; background-size:20px 20px; }
+.icon-calendar 		{ background:url(../image/icon_calendar.svg) center center no-repeat; background-size:20px 20px; }
+.icon-expand 		{ background-position: -40px -200px; }
+.icon-contract 		{ background-position: -40px -220px; }
+.icon-monitor 		{ background-position: -60px -0px; }
+.icon-menuapply 	{ background-position: -60px -20px; }
+.icon-excel 		{ background-position: -60px -40px; }
+.icon-uploadexcel 	{ background-position: -60px -60px; }
+.icon-downexcel 	{ background-position: -60px -80px; }
+.icon-wayout 		{ background-position: -60px -100px; }
+.icon-coffee 		{ background-position: -60px -120px; }
+.icon-curveupward 	{ background-position: -60px -140px; }
+.icon-counselor 	{ background-position: -60px -160px; }
+.icon-initilization { background-position: -60px -180px; }
+.icon-compound 		{ background-position: -60px -200px; }
+.icon-finish 		{ background-position: -60px -220px; }
+.icon-cancel 		{ background-position: -80px -0px; 	}
+.icon-alive 		{ background-position: -80px -20px; }
+.icon-dead 			{ background-position: -80px -40px; }
+.icon-able 			{ background-position: -80px -60px; }
+.icon-disable 		{ background-position: -80px -80px; }
+.icon-sortdesc 		{ background-position: -80px -100px; }
+.icon-sortasc 		{ background-position: -80px -120px; }
+.icon-template 		{ background-position: -80px -140px; }
+.icon-image 		{ background-position: -80px -160px; }
+.icon-company 		{ background-position: -80px -180px; }
+.icon-attach 		{ background-position: -80px -200px; }
+.icon-plus          { background-position: -80px -220px; }
+.icon-minus         { background-position: -100px -0px;  }
+.icon-attachment    { background:url(../image/icon_attachment.svg) center center no-repeat; background-size:20px 20px; }
+.icon-stretch       { background-position: -100px -40px; }
+.icon-shrink        { background-position: -100px -60px; }
+.icon-share         { background-position: -100px -80px; z-index:9999; }
+.icon-open          { background-position: -100px -100px; }
+.icon-code          { background-position: -100px -120px; }
+.icon-send          { background-position: -100px -140px; }
+.icon-campaign      { background-position: -100px -160px; }
+.icon-target        { background-position: -100px -180px; }
+.icon-checklist     { background-position: -100px -200px; }
+.icon-edit          { background-position: -100px -220px; }
+.icon-mms           { background-position: -120px -0px;  }
+.icon-tm            { background-position: -120px -20px; }
+
+
+
+/* extrabtn icon... */
+.icon-x                         { background-position: -0px -0px; }
+.icon-x:hover                   { background-position: -20px -0px; }
+.icon-xx                        { background-position: -0px -20px; }
+.icon-xx:hover                  { background-position: -20px -20px; }
+.icon-x-white                   { background-position: -40px -0px; }
+.icon-x-white:hover             { background-position: -60px -0px; }
+.icon-xx-white                  { background-position: -40px -20px; }
+.icon-xx-white:hover            { background-position: -60px -20px; }
+.icon-chat                      { background-position: -0px -40px; }
+.icon-chat:hover                { background-position: -20px -40px; }
+.icon-chat-active               { background-position: -20px -40px; }
+.icon-notification              { background-position: -0px -60px; }
+.icon-notification:hover        { background-position: -20px -60px; }
+.icon-notification-active       { background-position: -20px -60px; }
+.icon-chat-white                { background-position: -40px -40px; }
+.icon-chat-white:hover          { background-position: -60px -40px; }
+.icon-chat-white-active         { background-position: -60px -40px; }
+.icon-notification-white        { background-position: -40px -60px; }
+.icon-notification-white:hover  { background-position: -60px -60px; }
+.icon-notification-white-active { background-position: -60px -60px; }
+.icon-text-white                { background-position: -0px -80px;  }
+.icon-text-white:hover          { background-position: -20px -80px; }
+.icon-text-white-active         { background-position: -20px -80px; }
+.extrabtn.icon-share                     { background-position: -0px -100px; }
+.extrabtn.icon-share:hover               { background-position: -20px -100px;}
+.extrabtn.icon-share-active              { background-position: -20px -100px;}
+.extrabtn.icon-share-white               { background-position: -40px -100px;}
+.extrabtn.icon-share-white:hover         { background-position: -60px -100px;}
+.extrabtn.icon-share-white-active        { background-position: -60px -100px;}
+
+
+
+
+
+
+
+
+
+.icon-i25-dashboard		{ background-position: 0px 0px; 	}
+.icon-i25-call			{ background-position: 0px -25px; 	}
+.icon-i25-heart			{ background-position: 0px -50px; 	}
+.icon-i25-fire			{ background-position: 0px -75px; 	}
+.icon-i25-tweak			{ background-position: 0px -100px; 	}
+.icon-i25-briefcase		{ background-position: 0px -125px; 	}
+.icon-i25-reward		{ background-position: 0px -150px; 	}
+.icon-i25-report		{ background-position: 0px -175px; 	}
+.icon-i25-piechart		{ background-position: 0px -200px; 	}
+.icon-i25-complain		{ background-position: -25px 0px; 	}
+.icon-i25-desktop		{ background-position: -25px -25px; }
+.icon-i25-box			{ background-position: -25px -50px; }
+.icon-i25-construction	{ background-position: -25px -75px; }
+.icon-i25-agent			{ background-position: -25px -100px;}
+.icon-i25-calendar		{ background-position: -25px -125px;}
+.icon-i25-customer		{ background-position: -25px -150px;}
+.icon-i25-crown			{ background-position: -25px -175px;}
+.icon-i25-default		{ background-position: -200px; 		}
+.icon-i25-system		{ background-position: -50px 0px; 	}
+.icon-i25-mail			{ background-position: -50px -25px; }
+.icon-i25-home			{ background-position: -50px -50px; }
+.icon-i25-toolx			{ background-position: -50px -75px; }
+.icon-i25-code			{ background-position: -50px -100px;}
+.icon-i25-campaign  	{ background-position: -50px -125px;}
+
+.calicon-balloon		{ background-position: 0px 0px; 	}
+.calicon-bookmark		{ background-position: 0px -20px; 	}
+.calicon-cake			{ background-position: 0px -40px; 	}
+.calicon-calendar		{ background-position: 0px -60px; 	}
+.calicon-contact		{ background-position: 0px -80px; 	}
+.calicon-email			{ background-position: 0px -100px; 	}
+.calicon-frame			{ background-position: 0px -120px; 	}
+.calicon-graph			{ background-position: 0px -140px; 	}
+.calicon-heart			{ background-position: 0px -160px; 	}
+.calicon-money			{ background-position: 0px -180px; 	}
+.calicon-ring			{ background-position: -20px -0px; 	}
+.calicon-star			{ background-position: -20px -20px; }
+.calicon-time			{ background-position: -20px -40px; }
+.calicon-wballoon		{ background-position: -20px -60px; }
+.calicon-noicon			{ background-position: 0px -200px;  }
+
+.opticon-config			{ background-position: 0px -40px; }
+.opticon-config:hover	{ background-position: -20px -40px; }
+.opticon-chrome			{ background-position: 0px 0px; }
+.opticon-chrome:hover	{ background-position: -20px 0px; }
+.opticon-theme			{ background-position: 0px -80px; }
+.opticon-theme:hover	{ background-position: -20px -80px; }
+.opticon-logout			{ background-position: -200px 0px; width:70px; height:21px; }
+.opticon-logout:hover	{ background-position: -280px 0px; width:70px; height:21px; }
+.opticon-help			{ background-position: 0px -20px; }
+.opticon-help:hover		{ background-position: -20px -20px; }
+
+.coloring-green         { background-position: 0px -40px; }
+.coloring-gray          { background-position: 0px -60px; }
+
+.defaultSkin .mceButton						{ width:30px!important; text-align:center; }
+.defaultSkin span.mceIcon, .defaultSkin img.mceIcon { display:inline-block!important; }
+.defaultSkin span.mce_bold 					{ background:url("../image/mceicon-bold.png") no-repeat center 1px!important; }
+.defaultSkin span.mce_italic 				{ background:url("../image/mceicon-italic.png") no-repeat center 1px!important; }
+.defaultSkin span.mce_underline 			{ background:url("../image/mceicon-underline.png") no-repeat center 2px!important; }
+.defaultSkin span.mce_strikethrough 		{ background:url("../image/mceicon-strikethrough.png") no-repeat -2px 1px!important; }
+.defaultSkin .mce_forecolor span.mceAction 	{ background:url("../image/mceicon-textcolor.png") no-repeat 3px 5px!important; }
+.defaultSkin .mce_backcolor span.mceAction 	{ background:url("../image/mceicon-textbg.png") no-repeat 3px 4px!important; }
+.defaultSkin span.mce_link 					{ background:url("../image/mceicon-link.png") no-repeat center 1px!important; }
+.defaultSkin span.mce_unlink 				{ background:url("../image/mceicon-unlink.png") no-repeat center 1px!important; }
+.defaultSkin span.mce_preview 				{ background:url("../image/mceicon-monitor.png") no-repeat center 1px!important; }
+.defaultSkin span.mce_code 					{ background:url("../image/mceicon-code.png") no-repeat center 1px!important; }
+.defaultSkin span.mce_fullscreen 			{ background:url("../image/mceicon-fullscreen.png") no-repeat 1px center!important; }
+.defaultSkin span.mce_print 				{ background:url("../image/mceicon-print.png") no-repeat center 1px!important; }
+.mceColorPreview							{ margin-left:3px!important; height:3px!important; }
+
+.btn-view				{ background:url("../image/icon-search.png") no-repeat center center; }
+.btn-add				{ background:url("../image/icon-registration.png") no-repeat center center; }
+.btn-delete				{ background:url("../image/icon-trash.png") no-repeat center center; }
+.btn-dev				{ background:url("../image/icon-development.png") no-repeat center center; }
+.btn-email				{ background:url("../image/icon-email.png") no-repeat center center; }
+.btn-list				{ background:url("../image/icon-list.png") no-repeat center center; }
+.btn-save				{ background:url("../image/icon-save.png") no-repeat center center; }
+.btn-save[index="APPROVE"]				{ background:url("../image/icon-approval.png") no-repeat center center; }
+.btn-save[index="RETURN"]				{ background:url("../image/icon-return.png") no-repeat center center; }
+.btn-sms 				{ background:url("../image/icon-sms.png") no-repeat center center; }
+.btn-mode				{ background:url("../image/icon-switch.png") no-repeat center center; }
+.btn-copy				{ background:url("../image/icon-copy.png") no-repeat center center; }
+.btn-apply				{ background:url("../image/icon-magicstick.png") no-repeat center center; }
+.btn-prev				{ background:url("../image/icon-upward.png") no-repeat center center; }
+.btn-next				{ background:url("../image/icon-downward.png") no-repeat center center; }
+.btn-copyadd			{ background:url("../image/icon-copy.png") no-repeat center center; }
+.icon-company			{ background:url("../image/icon-agent.png") no-repeat center center; }
+.btn-test				{ background:url("../image/icon-monitor.png") no-repeat center center; }
+.btn-extend				{ background:url("../image/icon-curvedupward.png") no-repeat center center; }
+.btn-menuapply			{ background:url("../image/icon-menuapply.png") no-repeat center center; }
+
+.ui-filetype-excel								{ background:url("../image/icon-excel.png") no-repeat center center; }
+.ui-filetype-excel[index="uploadDataFile"]      { background:url("../image/icon-uploadexcel.png") no-repeat center center; }
+.ui-filetype-excel[index="DownXls"] 			{ background:url("../image/icon-downexcel.png") no-repeat center center; }
+
+.icon-page		{ vertical-align:middle; display:inline-block; background-position:0px 0px; text-indent:9999px; }
+.icon-pagefirst { background:url("../image/icon-pagefirst.png") no-repeat center center; }
+.icon-pagelast 	{ background:url("../image/icon-pagelast.png") no-repeat center center; }
+.icon-pageprev 	{ background:url("../image/icon-pageprev.png") no-repeat center center; }
+.icon-pagenext 	{ background:url("../image/icon-pagenext.png") no-repeat center center; }
+
+.fldfiledown 	{ vertical-align:middle;}
+.fileSelectBox 	{ vertical-align:middle; top:0px; margin-left:6px; }
+
+#AutoCompleteDiv { position:absolute; } 
+.ui-autocomplete-loading { background: white url("../image/ui-anim_basic_16x16.gif") right center no-repeat; }
+.ui-autocomplete { max-height: 120px; overflow-y: auto; overflow-x: hidden; border-bottom:1px solid #9D9D9D; background:white url("../image/shadowbg3.png") no-repeat 50% 105px; }
+.ui-autocomplete .ui-state-hover { margin:0px!important; background-color:#f1f1f1; }
+.ui-autocomplete .ui-menu-item { border:1px solid transparent!important; height:25px; }
+
+/*================================================================================================================================
+  chartArea Controlling Section
+================================================================================================================================*/
+
+.chartArea .base { background:#FFFFFF; }
+
+
+/*================================================================================================================================
+  Cursor attributes Controlling Section
+================================================================================================================================*/
+
+#TopMenu, .SubMenu-ft, 
+.cmdspan, .cmdbtn, 
+.imgSize, 
+input[type=checkbox], input[type=radio], select, 
+.viewGroup td,
+.selectArea,
+.opticon, .icon, 
+.pgs, .pgn,
+.progress ul li, .tit,
+.ui-datepicker-next, .ui-datepicker-prev,
+.SuperTree a, .SuperTree span,
+.mtctadd,
+.tdAuction,
+.SuperExtFilter input,
+.sliderEdit a
+
+{ cursor:pointer; }
+
+.icon-clock { cursor:normal; }
+
+
+
+
+
+
+
+/*================================================================================================================================
+  Default Button
+================================================================================================================================*/
+
+.defaultButton 
+{
+    border:2px outset buttonface;
+    padding:1px 6px;
+    -webkit-appearance: button;
+    vertical-align:middle;
+}
+
+
+
+
+
+
+
+/*================================================================================================================================
+  CallBack Generated Elements Controlling Section
+================================================================================================================================*/
+
+#ContentPreview { width:500px; height:300px; padding:20px; background-color:#eaeaea; }
+
+
+/*================================================================================================================================
+  Media query Controlling Section
+================================================================================================================================*/
+
+@media (min-width: 1024px) {
+    input[for="datepicker"] { width:80px!important; }
+}
+
+@media (min-width: 1280px) {
+    input[for="datepicker"] { width:100px!important; }
+}
+
+@media (min-width: 1336px) {
+    input[for="datepicker"] { width:110px!important; }
+}
+
+@media (min-width: 1440px) {
+	input[for="datepicker"] { width:130px!important; }
+}
+
+@media (min-width: 1600px) {
+	input[for="datepicker"] { width:150px!important; }
+}
+
+@media (min-width: 1660px) {
+	input[for="datepicker"] { width:160px!important; }
+}
+
+@media only screen and (min-device-width : 768px) and (max-device-width : 1021px) and (-webkit-min-device-pixel-ratio: 1) and (orientation : landscape) {
+	* 				{ cursor:pointer; -webkit-appearance:none; -webkit-focus-ring-color: none; }
+	input[for=datepicker] { width:30px!important; }
+	.LoginPop		{ width:auto; }
+	.jobArea		{ overflow-x:scroll; }
+}
+
+@media only screen and (min-device-width : 768px) and (max-device-width : 1021px) and (-webkit-min-device-pixel-ratio: 1) and (orientation : portrait) {
+	* 				{ cursor:pointer; -webkit-appearance:none; -webkit-focus-ring-color: none; }
+	input[for=datepicker] { width:30px!important; }
+	.LoginPop		{ width:auto; }
+	.jobArea		{ overflow-x:scroll; }
+}
+
+@media only screen and (min-device-width : 768px) and (max-device-width : 1021px) and (-webkit-min-device-pixel-ratio: 2) and (orientation : landscape) {
+	* 				{ cursor:pointer; -webkit-appearance:none; -webkit-focus-ring-color: none; }
+	input[for=datepicker] { width:60px!important; }
+	.LoginPop		{ width:100%; }
+	.jobArea		{ overflow-x:scroll; }
+}
+
+@media only screen and (min-device-width : 768px) and (max-device-width : 1021px) and (-webkit-min-device-pixel-ratio: 2) and (orientation : portrait) {
+	* 				{ cursor:pointer; -webkit-appearance:none; -webkit-focus-ring-color: none; }
+	input[for=datepicker] { width:40px!important; }
+	.LoginPop		{ width:100%; }
+	.jobArea		{ overflow-x:scroll; }
+}
+@media only screen and (max-device-width: 480px) {
+	* 				{ cursor:pointer; -webkit-appearance:none; -webkit-focus-ring-color: none; }
+	input[for=datepicker] { width:30px!important; }
+	.LoginPop		{ width:auto; }
+	.jobArea		{ overflow-x:scroll; }
+}
+
+@media only screen and (max-device-width: 480px) and (-webkit-min-device-pixel-ratio: 1.5) {	
+	* 				{ cursor:pointer; -webkit-appearance:none; -webkit-focus-ring-color: none; }
+	input[for=datepicker] { width:50px!important; }
+	.LoginPop		{ width:auto; }
+	.jobArea		{ overflow-x:scroll; }	
+}
+
+.td-btn-batch {height:20px; display:block; background:url("../image/Thebuttons/extbtn/btn-batch.png") no-repeat center center; }
+
+
+/*================================================================================================================================
+  Login
+================================================================================================================================*/
+.login					{ width:480px; margin:5% auto 0; padding:70px 60px; border-radius:8px; border:1px solid #ccc; }
+.login .logo-img		{ margin-bottom:20px; }
+.login .logo-img p		{ font-size:36px; font-weight:bold; }
+.login .logo-img img	{ height:25px; }
+.login .form			{ display:flex; gap:15px; flex-direction:column; }
+.login .form input		{ height:54px; padding:0 10px; border:1px solid #F4F4F4; line-height:52px; background:#F4F4F4; border-radius:4px; }
+.login .form input.error{ border-color:#FF6F05; }
+.login .form .text		{  }
+.login .form .text.error{ color:#FF6F05; }
+.login .btn-login		{ display:block; height:56px; margin-top:20px; padding:0 10px; border-radius:4px; color:#fff; line-height:56px; text-align:center; font-size:16px; background:#245DE3; }
+.login .checkbox		{ display:block; margin-top:10px; }
+.login .checkbox input	{ position:absolute; top:0; left:0; z-index:1; width:17px; height:17px; vertical-align:middle; opacity:0 !important; }
+.login .checkbox input+label		{ position:relative; padding-left:22px; }
+.login .checkbox input+label:before { content:""; position:absolute; top:0; left:0; width:17px; height:17px; display:inline-block; border:1px solid #999; }
+.login .checkbox input:checked+label:before		{ border-color:#236be3; background:#236be3 url(../image/icon_check.png) center center no-repeat; background-size:13px auto; }
+.LoginSeri                   	{ width:100%; top:0px; left:0px; bottom:0; position:absolute; background-color:White; overflow:hidden; }

@@ -1,0 +1,52 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=0.4, maximum-scale=3">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge"/><!--호환성보기 강제해제-->
+    <link rel="apple-touch-icon" href="MonArch-blue57x57.ico" />
+    <link rel="shortcut icon" href="favicon.ico" />
+	<title>회원정보</title>
+
+    <link type="text/css" href="/css/Theme_CEO.css" rel="stylesheet" />
+	<link type="text/css" href="/css/Common.css" rel="stylesheet" />
+	<script type="text/javascript" src="/js/jquery-1.10.2.min.js"></script>
+	<script type="text/javascript" src="/js/jquery.kdb.MonArch800.js"></script>
+	<script type="text/javascript" src="/js/MonArch.js"></script>
+
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+        	_M = opener._M;
+            $("#MainList").superContaner('superTable', '키맨ListJson_POP');
+            $("#MainView").superContaner('superView', '키맨ViewJson_POP');
+
+        });
+    
+	</script>
+	
+	
+</head>
+
+<body class="">
+ 	
+	<div id="Flowtop" style="margin:15px;">
+		<div class="title title-bg title-ft" style="padding:10px;font-weight:bold;">
+			회원정보
+		</div>
+	</div>
+
+	<div class="Content" style="margin:15px;">
+		<div class="Wraper Wraper-padding">
+			<div class="main">
+	            <div id="TopList"></div>
+	            <div id="MainList"></div>
+	            <div id="MainView"></div>
+	            <div id="BottomView"></div>
+			</div>
+		</div>
+	</div>
+                
+</body>
+</html>

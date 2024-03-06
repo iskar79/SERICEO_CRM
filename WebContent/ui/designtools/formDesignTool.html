@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title> Fom Design Wizard</title>
+	<meta http-equiv="X-FRAME-OPTIONS" content="DENY" />
+	
+</head>
+<body>
+	<!--<script src="http://static.jstree.com/3.0.0-beta10/assets/jquery-1.10.2.min.js"></script>-->
+	<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
+  <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+  <script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+  <script src="/js/thirdparties/jquery-validation-1.12.0/dist/jquery.validate.min.js"></script>
+ <!-- <link rel="stylesheet" href=" https://jqueryui.com/resources/demos/style.css">-->
+ 
+	<style>
+		
+
+			#headerArea {
+			border: 0px solid #0f0;
+			background: #0f0;
+		}		
+		
+		#fieldItemsArea {
+			float: left;
+			border: 0px solid #00f;
+			background: #00f;
+			min-height: 500px;
+			width: 20%;
+		}			
+		
+		#fieldItemsArea li {
+			margin: 5px;
+			padding: 5px;
+			width: 150px; 
+		}
+		
+		.fieldItem-over {
+			background:orange;
+		}
+		.fieldItem {
+			background:white;
+		}
+		
+		#fieldItemsArea ul { 
+			list-style-type: none; 
+			margin: 0; 
+			padding: 0; 
+			margin-bottom: 10px;
+		}
+		
+		#formArea {
+			float: left;
+			border: 0px solid purple;
+			background: purple;
+			min-height: 500px;
+			width: 60%;
+			
+		}		
+
+		.formColumns {
+			border: 0px solid black;
+			background: yellow;
+			float:left;
+			width:50%;
+			min-height: 500px;
+		}
+	
+		
+		.formColumns ul { 
+			list-style-type: none; 
+			margin: 0; 
+			padding: 0; 
+			border: 0px soft black;
+			min-height: 500px;			
+		}	
+		
+		
+		
+		.fieldLi{
+			height:60px;
+			background: #eee;
+			border-bottom: 1px solid black;
+			border-right: 1px solid black;
+		}
+		
+		.fldLabel {
+			float: left;
+			background:white;
+			width: 50%;
+			
+		}
+		.fldEditDiv {
+			float: left;
+			position: relative;
+			left: 6px;
+			width: 50%;
+		}
+		
+		/*
+		.fldEdit {
+			float: right;	
+		}
+		*/
+		
+		#propertiesArea {
+			float: left;
+			border: 0px solid orange;
+			background: orange;
+			width:19%;
+			min-height: 500px;
+		}				
+			
+		.placeHolder { 
+			height: 60px;
+			background: pink;
+			margin: 5px 0 5px 0;
+			border: 2px dotted pink;
+			opacity: 0.8;       
+		}
+	
+		.fieldLiMouseOver {
+			height: 60px;
+			background: orange;
+			margin: 0 0 0px 0;
+			border: 2px dotted #0f0;   
+		}
+		
+		.fieldLiSelected {
+			height: 60px;
+			background: purple;
+			margin: 0 0 1px 0;
+			border: 2px dotted #00f;
+			     
+		}
+		
+		.fieldLi-trashbox {
+			display :none;
+		}
+		
+		.fieldLi-trashbox-selected {
+			display: inline;
+			background: red;
+			position: relative;
+			top: 5px;
+			left: 87%;
+			text-align: center;
+			bottom: 13px;
+			z-index: 5;
+		}
+		
+		
+		.propertiesUl { 
+			font-size: 8;
+			background: red;
+			list-style-type: none; 
+			margin: 0; 
+			padding: 0; 
+			border: 0px soft black;
+			min-height: 500px;			
+		}	
+		.propertiesLi{
+			height:60px;
+			background: #eee;
+			border-bottom: 1px solid black;
+			border-right: 1px solid black;
+		}	
+		.propertiesLabel {
+			float: left;
+			background:white;
+			width: 35%;
+			
+		}
+		.propertiesDiv {
+			float: left;
+			position: relative;
+			left: 6px;
+			width: 50%;
+		}
+		.propertiesFld {
+			width: inherit;	
+		}
+	</style>
+	
+	<script>
+	
+		/* 테스트용 폼 데이터  */
+		var testFormData = {
+			
+			formProperties : {
+				formName : {useable: true},
+				formLayout:  {useable: true}
+			},
+			fieldProperties : [
+				//필드 정보
+				{
+					fieldType: "text"
+					,fieldName: "테스트필드"
+					,fieldId: "TEST_FLD_01"
+					,maxLength: 10
+					,required: false
+					,defaultValue: "디폴트값"
+					,fieldAlign: "left"				
+				}
+			]
+		};
+	
+		/* 해당 필드에 사용될 속성들 지정 */
+		var usableFieldProperties = {
+			"text" : {
+					fieldType: 1
+					,fieldName: 1
+					,fieldId: 1
+					,maxLength: 1
+					,required: 1
+					,defaultValue: 1
+					,fieldAlign: 1
+			}
+		}
+		
+		
+		$(document).ready(function () {
+			
+			formWizard.init();
+			
+		});
+		
+		var formWizard = {
+			fieldSerialNo: 0, //자동 시리얼 번호
+			/*  초기 처리 */
+			init: function(){
+				this.connectToSortable();
+				$("#propertiesArea").tabs({
+					active: 0,
+					activate: function(event, ui) {
+						var tabId = ui.newPanel.attr('id');
+						if(tabId == 'tabs-formProperties'){
+							formWizard.showFormProperties();
+						}
+						if(tabId == 'tabs-fieldProperties'){
+							formWizard.showFieldProperties();
+						}
+					}
+				}); //프로퍼티영역 탭 그리기		
+				formWizard.showFormProperties();
+				fieldSerialNo = 0;
+			},
+			/* 드롭된 필드의 속성에 따라 처리 펑션 호출됨. */
+			makeField : function(event, ui, obj){
+
+				var fldType = event.toElement.getAttribute('fldType');
+				var targetForm = event.target;		
+				var div = $('<div class="fldEditDiv"></div>');
+				var trashBoxDiv = $('<div class="fieldLi-trashbox" onclick="formWizard.removeField($(this))">☓삭제</div>');
+				var li = $('<li class="fieldLi ui-draggable"></li>');
+				li.mouseover(function(){
+					console.log('mouse over!!!');
+					$(this).addClass("fieldLiMouseOver");
+				});
+				li.mouseout(function(){
+					console.log('mouse out!!!');
+					$('.fieldLiMouseOver').removeClass('fieldLiMouseOver');				
+				});
+				li.click(function(event){
+					console.log('field click!!!');
+					if($(event.target).hasClass('fieldLi-trashbox-selected')){
+						return;
+					}
+					//formWizard.unselectField();
+					formWizard.selectField($(this));					
+					//$('#propertiesArea').tabs('option', 'active',1); 
+				});
+				
+				var lbl;	
+				var tag;
+				console.log("필드타입: " + fldType);
+				switch(fldType) {
+					case 'text': 
+						lbl = this.getLabelTag('Text');
+						tag = this.makeTextField(targetForm);
+						break;
+					case 'textArea':
+						lbl = this.getLabelTag('Text Area');	
+						tag = this.makeTextAreaField(targetForm);
+						break;
+					case 'checkBox':
+						lbl = this.getLabelTag('checkBox');
+						tag = this.makeCheckBoxField(targetForm);
+						break;
+					case 'selectBox':
+						lbl = this.getLabelTag('selectBox');
+						tag = this.makeSelectBoxField(targetForm);
+						break;						
+					default:
+						break;
+				}
+				div.append(tag);
+				obj.before(li.append(lbl).append(div).append(trashBoxDiv));
+				this.unselectField();
+				this.selectField(li);	
+			},
+			
+			/* 텍스트필드 생성 */
+			makeTextField: function(targetForm){
+				var tag =$('<input type="text" class="fldEdit" readonly="true"></input>');				
+				return tag;
+			},
+			
+			/* 텍스트에어리어 생성 */
+			makeTextAreaField: function(targetForm){			
+				var tag =$('<textarea class="fldEdit" readonly="true"></textarea>');		
+				return tag;
+			},		
+			/* 체크박스 생성 */
+			makeCheckBoxField: function(targetForm){			
+				var tag =$('<input type="checkbox"  class="fldEdit" name="example" value="샘플" checked />');	
+				tag.click(function(e){
+					e.preventDefault();
+				});
+				return tag;		
+			},
+			
+			makeSelectBoxField: function(targetForm){
+				var tag =$('<select  class="fldEdit"></select>');
+				tag.click(function(e){
+					e.preventDefault();
+				});				
+				return tag;
+			},
+			
+			getLabelTag: function (label){
+				var lblTag = $('<label class="fldLabel" ></label>');
+				lblTag.text(label);
+				return lblTag;
+			},
+					
+			/* 선택필드 삭제  */
+			removeField : function(event) {
+				event.parent().remove();
+				$('#propertiesArea').tabs('option', 'active',0); //해당프로퍼티가 존재하지않으므로 폼프로퍼티 선택
+			},
+			
+			/* 폼 프로퍼티 속성 표시 */
+			showFormProperties: function(){
+				//todo 타켓 필드가 선택되어 있지 않은 경우에는 가장 빠른 index의 필드를 선택하여 취득
+				if($('.fieldLi').hasClass('fieldLiSelected')){
+					//alert('aready selected!');
+					this.unselectField();
+				}else{
+					//alert('not selected!');
+				}
+				//formProperties속성창이 없을때만 새로 생성함
+				if($('#formProperties').length == 0){
+					$('#formPropertiesFrm').load('./formProperties.html', function(){
+						//벨리데이션 속성 셋팅
+						$('#formPropertiesFrm').validate(formWizard.formPropValidations);
+					
+						$('#formName').change(function(){
+							$('#formTitle').text($(this).val());
+						});
+					
+						$('.formLayout').click(function(){
+							formWizard.changeLayout($(this).val());
+						});
+					//폼속성화면 생성
+						formWizard.makeFormProperties(testFormData);	
+					});
+				}
+
+
+				
+				
+				
+				/*$("#formPropertiesFrm").tooltip({
+					show: false,
+					hide: false
+				});*/
+
+			},
+			/* 필드프로퍼티 속성 표시 */
+			showFieldProperties: function(){
+				
+				if($('.fieldLi').hasClass('fieldLiSelected')){
+					//alert('aready selected!');
+				}else{
+					//alert('not selected!');
+					//todo 선택된 데이터가 없으므로 디폴트로 최초li선택
+					$('.fieldLi:first').trigger('click');
+				}
+			},	
+			/* 선택되어 있는 필드 비선택화 */
+			unselectField: function(){
+				$('.fieldLiSelected').removeClass('fieldLiSelected');
+				$('.fieldLi-trashbox-selected').removeClass('fieldLi-trashbox-selected');
+			},
+			selectField: function(obj){
+				this.unselectField();
+				obj.addClass("fieldLiSelected");
+				obj.find('.fieldLi-trashbox').addClass('fieldLi-trashbox-selected');
+				$('#propertiesArea').tabs('option', 'active',1); 
+			},
+			
+			changeLayout: function(colCnt){
+				//opt : '1' : 1열 배치  '2':2열배치
+				var formColumns = $('.formColumns');
+				//todo 기존 Li정보를 모두 하나로 취합한다.
+				var allFieldLi = $('.fieldLi', formColumns);
+				
+				//기존 컬럼 삭세후 skeletion 재생성
+				formColumns.remove();
+				this.makeSkeleton($('#formArea'), colCnt);
+				this.moveLiField(allFieldLi, colCnt);
+			},
+			/* layout 뼈대 만들기 */
+			makeSkeleton: function(targetObj, colCnt){
+				debugger;
+				for(var i = 1; i <= colCnt; i++){
+					//todo 해당 layout컬럼만큼 영역 생성
+					var formColumn; //신규추가될 폼열영역
+					formColumn = '<div id="formColumn'+i+'" class="formColumns">';
+					formColumn += '<ul class="formColumns-ul"></ul></div>';
+					targetObj.append(formColumn);
+				}	
+				this.connectToSortable();
+			},
+			/* FieldLi의 화면 영역 이동 */
+			moveLiField: function(allFieldLi, colCnt){
+				//todo 해당 건수필드를 각 컬럼에 나눠서 지정한다.
+				//todo 각 필드 정보에는 정렬정보가 존재해야한다.
+				var cnt = 1;
+				$.each(allFieldLi, function(idx,targetFld){
+					//todo
+					var targetFormColUl = $('#formColumn' + cnt).find('.formColumns-ul');
+					 
+					targetFormColUl.append(targetFld);
+					
+					if(cnt  >= colCnt) {
+						cnt = 1;
+					}else{
+						cnt++;
+					}
+				});
+				
+			},
+			/* 툴에 관련된 드레그앤드롭 셋팅 처리 */
+			connectToSortable: function(){
+				$('#fieldItems li').draggable({ 
+					connectToSortable: ".formColumns ul",
+					cursor:'move',
+					helper: "clone",
+					opacity: 0.8
+				}).mouseover(function(){
+					$(this).removeClass('fieldItem');
+					$(this).addClass('fieldItem-over');
+				}).mouseout(function(){
+					$(this).removeClass('fieldItem-over');
+					$(this).addClass('fieldItem');
+				});
+				
+				
+				$('.formColumns ul').sortable({
+					cursor:'move',
+					opacity: 0.8,
+					connectWith: ".formColumns ul",
+					placeholder: "placeHolder",				
+					start: function(event,ui){
+						$('.placeHolder').append('<span>Drop Here</span>');
+					},
+					receive: function(event,ui){
+						
+						var fldType = event.toElement.getAttribute('fldType');
+						if(undefined != fldType){
+							//필드아이템에서 이동했을경우 
+							var obj = $(this).find('.fieldItem');
+							formWizard.makeField(event, ui, obj);
+							obj.remove();
+						}
+					},
+					stop: function(event, ui) {				
+					
+						var targetFld = ui.item;
+						if(targetFld.hasClass('fieldLi')){
+							//폼내부에서 필드 이동
+							formWizard.selectField($(targetFld));
+						}
+						
+					}
+				});
+			},
+			/* 폼정보를 취득하여 폼속성을 그린다. */			
+			makeFormProperties:function(formData){
+				//TODO 해당 필드 및 속성별 액션을 만들자.
+				/*
+				var props= formData.formProperties.sort(function(a,b){
+					return a.sort - b.sort; //asc order by 
+				});
+				*/
+				var props= formData.formProperties;
+				/* 속성 생성*/
+				$.each(props, function(propName, prop){
+					//해당하는 속성만큼 true/false 여부로 표시여부 판단
+					var propLiId = $('#' + propName+'-li');
+					console.log(propLiId);
+					if (!prop.useable) {
+						console.log(prop.useable);
+						debugger;
+						propLiId.hide();
+					}
+				});
+				
+			},
+			/*form 프로퍼티의 속성창 validation */
+			formPropValidations: {
+				focusCleanup: true, //에러를 계속 표시하고 싶지 않을때
+				submitHandler: function(form) {
+				    //$(form).ajaxSubmit();
+				    return;
+				},
+				rules: {
+					"formName":{
+						required: true,
+						maxlength: 5
+					},
+					"formLayout":{
+						required: true,
+						digits: true,
+						maxlength: 1
+					}
+				},
+				messages: {
+					"formName": {
+					 	required: "집어넣어!",
+					 	maxlength:"{0}자리 넘었어 임마!"
+					},
+					"formLayout": {
+					 	required: "집어넣어!",
+					 	maxlength:"{0}자리 넘었어 임마!",
+					 	digits: "숫자넣으라고 짜샤~!"
+					}
+				},
+				/*showErrors: function(map, list) {
+						// there's probably a way to simplify this
+						var focussed = document.activeElement;
+						if (focussed && $(focussed).is("input, textarea")) {
+							$(this.currentForm).tooltip("close", { currentTarget: focussed }, true)
+						}
+						this.currentElements.removeAttr("title").removeClass("ui-state-highlight");
+						$.each(list, function(index, error) {
+							$(error.element).attr("title", error.message).addClass("ui-state-highlight");
+						});
+						if (focussed && $(focussed).is("input, textarea")) {
+							$(this.currentForm).tooltip("open", { target: focussed });
+						}
+					}*/
+			}
+		}
+	</script>
+	<h1>Form Design Wizard</h1>
+	<div id="designWizard">
+		<div id= "headerArea">header Area
+			<label id="formTitle">제목</label>
+		</div>
+		<div id= "fieldItemsArea">FieldItems Area
+			<ul id="fieldItems">
+				<li class='fieldItem' fldType='text'>Text</li>
+				<li class='fieldItem' fldType='textArea'>TextArea</li>
+				<li class='fieldItem' fldType='checkBox'>CheckBox</li>
+				<li class='fieldItem' fldType='selectBox'>selectBox</li>
+			</ul>
+		</div>
+		<div id= "formArea">
+			<div id="formColumn1" class='formColumns'>
+				<!--FormColumn1 -->
+				<ul class='formColumns-ul'>
+				</ul>
+			</div>
+			<div id="formColumn2" class='formColumns'>
+				<!--FormColumn2 -->
+				<ul class='formColumns-ul'>
+				</ul>
+			</div>
+			
+		</div>
+		<div id= "propertiesArea">Properties Area
+			<ul>
+				<li><a href="#tabs-formProperties">Form</a></li>
+				<li><a href="#tabs-fieldProperties">Field</a></li>
+			</ul>
+			<div id="tabs-formProperties">
+				<p>Form Properties Tab Area</p>
+				<form id="formPropertiesFrm">
+				</form>
+			</div>
+
+			<div id="tabs-fieldProperties"><p>Field Properties Tab Area</p></div>
+			
+		</div>
+	</div>
+	
+	
+</body>
+</html>
+
+

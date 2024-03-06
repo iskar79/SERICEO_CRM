@@ -1,0 +1,189 @@
+
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>MonArch</title>
+	<script src="lib/jquery-1.7.1.min.js"></script>
+    <link rel="stylesheet" href="lib/codemirror.css">
+    <script src="lib/codemirror.js"></script>
+    <link rel="stylesheet" href="theme/neat.css">
+    <link rel="stylesheet" href="theme/elegant.css">
+    <link rel="stylesheet" href="theme/erlang-dark.css">
+    <link rel="stylesheet" href="theme/night.css">
+    <link rel="stylesheet" href="theme/monokai.css">
+    <link rel="stylesheet" href="theme/cobalt.css">
+    <link rel="stylesheet" href="theme/eclipse.css">
+    <link rel="stylesheet" href="theme/rubyblue.css">
+    <link rel="stylesheet" href="theme/lesser-dark.css">
+    <link rel="stylesheet" href="theme/xq-dark.css">
+    <link rel="stylesheet" href="theme/xq-light.css">
+    <link rel="stylesheet" href="theme/ambiance.css">
+    <link rel="stylesheet" href="theme/blackboard.css">
+    <link rel="stylesheet" href="theme/vibrant-ink.css">
+    <link rel="stylesheet" href="theme/solarized.css">
+    <link rel="stylesheet" href="theme/twilight.css">
+    <link rel="stylesheet" href="theme/midnight.css">
+    <link rel="stylesheet" href="doc/docs.css">
+
+    <style type="text/css">
+      .CodeMirror {border: 1px solid black; font-size:13px}
+    </style>
+  </head>
+  <body>
+    <h1>Monarch Test</h1>
+
+    <textarea id="code" name="code">
+function findSequence(goal) {
+  function find(start, history) {
+    if (start == goal)
+      return history;
+    else if (start > goal)
+      return null;
+    else
+      return find(start + 5, "(" + history + " + 5)") ||
+             find(start * 3, "(" + history + " * 3)");
+  }
+  return find(1, "1");
+}</textarea>
+
+	<div class="Codearea">
+		<textarea id="cde" style="width:1022px; height:300px;">
+{
+    "ContanerType": "superView",
+    colgroup: [
+                { index: "Col1", LabelWidth: "10%", DataWidth: "20%" },
+                { index: "Col2", LabelWidth: "0%", DataWidth: "70%" }
+                   ],
+    tr: [
+            { TD: [
+         { type: "field", label: "서비스", colspan: 1, fieldContaner: [{ field: "서비스", type: "text",width: "100%", required: false}] },
+         { type: "field", label: "쿼리문", colspan: 0,rowspan:9, fieldContaner: [{ field: "쿼리문", type: "textarea", width: "100%", height:"290px", required: true}] }
+                 ]},
+            { TD: [{ type: "field", label: "테이블명", colspan: 1, fieldContaner: [{ field: "테이블명", type: "text",width: "100%", required:true}] }]},
+            { TD: [{ type: "field", label: "메소드", colspan: 1, fieldContaner: [{ field: "메소드", type: "text",codes:"쿼리메소드", width: "100%", required: false,defaultValue:"CREATE"}] }]},
+            { TD: [{ type: "note", label: "기본메소드  <a class='ActionCmd' Action='CreateSet'>CREATE</a>, <a class='ActionCmd' Action='ReadSet'>READ</a>, <a class='ActionCmd' Action='UpdateSet'>UPDATE</a>, <a class='ActionCmd' Action='DeleteSet'>DELETE</a>, <a class='ActionCmd' Action='ListSet'>LIST</a> 중에 1개를 지정해야 합니다.", colspan: 1}]},
+            { TD: [{ type: "field", label: "실행방식", colspan: 1, fieldContaner: [{ field: "실행방식", type: "select",codes:"QUERY_TYPE", width: "100%", required: false,defaultValue:"CREATEIDENTITY"}] }]},
+            { TD: [{ type: "note", label: "실행방식은  CREATE, CREATEIDENTITY, READ, UPDATE, DELETE, LIST 중에 1개를 지정해야 합니다.", colspan: 1}]},
+            { TD: [{ type: "field", label: "대상 데이터소스", colspan: 1, fieldContaner: [{ field: "데이터소스명", type: "select",codes:"DS_LIST", width: "100%", required: false }] }]},
+            { TD: [{ type: "field", label: "사용여부", colspan: 1, fieldContaner: [{ field: "사용여부", type:_M.DataType.check,label:"사용", width: "30%", required: false ,defaultValue:"1"}]}]},
+            { TD: [{ type: "field", label: "쿼리설명", colspan: 1, fieldContaner: [{ field: "쿼리설명", type: _M.DataType.textarea, width: "100%", required: false}] } ]}
+     ],
+    jobs: [
+        { name: "", index: "prevTr", inComm: "MovePrevTr", css: "icon-upward" },
+        { name: "", index: "nextTr", inComm: "MoveNextTr", css: "icon-downward" },
+    // { name: "목록", index: "List", inComm: "ViewToggleClose", css: "icon-list" },
+     { name: "추가", index: "New", inComm: "New", css: "icon-add" },
+     { name: "저장", index: "Save", inComm: "Save", css: "icon-save" },
+     { name: "삭제", index: "Del", inComm: "Delete", css: "icon-trash" },
+     { name: "모드변경", index: "modeChange", inComm: "modeChange", css: "icon-switch" },
+     { name: "복사", index: "CopyNew", inComm: "CopyNew", css: "icon-copy" },
+     { name: "쿼리생성", index: "GenSERVICE", inComm: "GenService", css: "icon-magicstick" },
+     { name: "개발", index: "tableDel", inComm: "getJson", css: "icon-box" }
+        ],
+    tabs: [
+        { name: '이력', type: 'superTable', json: 'MON_SYS_서비스이력SUB_TBL' }
+     ],
+
+    isEditMode: true, /* view모드인지 edit모드인지 결정함 */
+    isTabMode: true,
+
+    // -----------------------------------------------
+    // MainView link  
+    // -----------------------------------------------
+    mainListID: "#MainList",  // mainview링크용 객체 Selected
+    mainViewToggle: false,  // view화면이랑 토글동작시키기 옵션
+CreateSet: function(cmd, _View) {
+      _View.superContaner('changeValue', $(".fieldContaner[field='메소드']",_View),"CREATE");
+      _View.superContaner('changeValue', $(".fieldContaner[field='실행방식']",_View),"CREATEIDENTITY");
+},
+ReadSet: function(cmd, _View) {
+      _View.superContaner('changeValue', $(".fieldContaner[field='메소드']",_View),"READ");
+      _View.superContaner('changeValue', $(".fieldContaner[field='실행방식']",_View),"READ");
+},
+UpdateSet: function(cmd, _View) {
+      _View.superContaner('changeValue', $(".fieldContaner[field='메소드']",_View),"UPDATE");
+      _View.superContaner('changeValue', $(".fieldContaner[field='실행방식']",_View),"UPDATE");
+},
+DeleteSet: function(cmd, _View) {
+      _View.superContaner('changeValue', $(".fieldContaner[field='메소드']",_View),"DELETE");
+      _View.superContaner('changeValue', $(".fieldContaner[field='실행방식']",_View),"DELETE");
+},
+ListSet: function(cmd, _View) {
+      _View.superContaner('changeValue', $(".fieldContaner[field='메소드']",_View),"LIST");
+     _View.superContaner('changeValue', $(".fieldContaner[field='실행방식']",_View),"LIST");
+},
+    // -----------------------------------------------
+    // Svc  
+    // -----------------------------------------------
+    service: "MON_COMMON",
+    method: { Create: "SERVICE_CREATE", Update: "SERVICE_UPDATE", Read: "SERVICE_READ", Delete: "SERVICE_DELETE", List: "SERVICE_LIST" },
+    keyName: "쿼리번호",
+    order: "쿼리번호",
+    displayName: "쿼리명",
+    showMessage: true,          /* 저장완료 등의 메시지를 표시할지 여부 */
+    whoIs: "2.0"
+}</textarea>
+	</div>
+
+<p>Select a theme: <select onchange="selectTheme()" id=select>
+    <option selected>default</option>
+    <option>ambiance</option>
+    <option>blackboard</option>
+    <option>cobalt</option>
+    <option>eclipse</option>
+    <option>elegant</option>
+    <option>erlang-dark</option>
+    <option>lesser-dark</option>
+    <option>midnight</option>
+    <option>monokai</option>
+    <option>neat</option>
+    <option>night</option>
+    <option>rubyblue</option>
+    <option>solarized dark</option>
+    <option>solarized light</option>
+    <option>twilight</option>
+    <option>vibrant-ink</option>
+    <option>xq-dark</option>
+    <option>xq-light</option>
+</select>
+</p>
+
+<script>
+
+		var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+			lineNumbers: true
+		});
+
+		//var myCodeMirror = CodeMirror(function(elt) {
+		//	$("#cde")[0].parentNode.replaceChild(elt, $("#cde")[0]);
+		//}, 
+		//{
+		//	value: $("#cde")[0].value,
+		//	lineNumbers: true
+		//});
+		
+		var myCodeMirror = CodeMirror.fromTextArea($('#cde')[0], 
+		{
+			lineNumbers:true,
+			theme: "default",
+			matchBrackets:true,
+			tabSize: 8
+		});
+		
+		var input = document.getElementById("select");
+			function selectTheme() {
+			var theme = input.options[input.selectedIndex].innerHTML;
+			editor.setOption("theme", theme);
+		}
+
+		var choice = document.location.search &&
+			decodeURIComponent(document.location.search.slice(1));
+			if (choice) {
+				input.value = choice;
+				editor.setOption("theme", choice);
+			}
+
+</script>
+  </body>
+</html>

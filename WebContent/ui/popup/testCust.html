@@ -1,0 +1,94 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=0.4, maximum-scale=3">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge"/><!--호환성보기 강제해제-->
+    <link rel="apple-touch-icon" href="MonArch-blue57x57.ico" />
+    <link rel="shortcut icon" href="favicon.ico" />
+	<title>회원정보</title>
+    <script type="text/javascript" src="/js/jquery-1.7.1.min.js"></script>
+    
+    <link type="text/css" href="/css/MonArch.8.1.css" rel="stylesheet" />
+    <link type="text/css" href="/css/superContaner.css" rel="stylesheet" />
+    
+	<script type="text/javascript" src="/js/MonArch.js"></script>
+	<script type="text/javascript" src="/js/MSetCookie.js"></script>
+	<script type="text/javascript" src="/js/jquery.kdb.MonArch800.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+				//var doc = opener.document;
+				//var vkey = getCookie(doc, 'UKEY');
+
+				//document.cookie = "";
+				//setCookie('UKEY', vkey);
+				//alert(vkey + " this:" + document.cookie);
+			
+			$(document.body).attr('mode', 'guest');
+			var Gsite; 
+			if (location.href.indexOf('&') > 1) {
+				Gsite = location.href.substring(location.href.indexOf('?') + 6, location.href.indexOf('&'));
+			} else {
+				Gsite = location.href.substring(location.href.indexOf('?') + 6, location.href.length);
+			}
+
+			if (_M.UserInfo.key.length > 0 ) {
+    			
+			_M.UserInfo.SID = 44;
+			_M.UserInfo.dvl = 0;
+			_M.UserInfo.edl = 1;
+			_M.UserInfo.key = undefined;
+
+			
+
+			if ( Gsite == "CEO" || Gsite == "MS" || Gsite == "NU" || Gsite == "PRO" ) {
+				_M.UserInfo.gsite = Gsite;$('.LoginPop').remove();
+
+				$("#MainList").superContaner('superTable', '키맨ListJson_CTI_POP');
+				$("#MainView").superContaner('superView', '키맨ViewJson_CTI_POP1');
+			} else {
+				alert("사이트 정보가 없습니다. 관리자에게 문의해주세요");
+			}
+
+			} else {
+				console.log("로그인 정보 보유중..");				
+			}
+			
+			
+		});
+    
+	</script>
+	
+	
+</head>
+<body>
+	<div class="Blue">
+        <div class="">  
+	    <div class="PopTitle">
+	         <span class="icon1"></span><span id="TbName">회원정보</span>
+	    </div> 
+	     <div id="Flowtop" style="margin-left:0px;"></div>
+	       
+		<div class="PopContent">
+                    <div class="left">
+                        <div id="LeftTopList"></div>
+                        <div id="LeftMainList"></div>
+                        <div id="LeftMainView"></div>
+                        <div id="LeftBottomView"></div>
+                    </div>
+
+                    <div class="Wraper">
+                        <div class="main">
+                            <div id="TopList"></div>
+                            <div id="MainList"></div>
+                            <div id="MainView"></div>
+                            <div id="BottomView"></div>
+                        </div>
+                    </div>
+                </div>
+                
+     </div>
+</div>
+                
+</body>
+</html>

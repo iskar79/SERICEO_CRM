@@ -1,0 +1,1 @@
+var labelInfo = [{"LABEL_CODE":"TEST","LANG":"ch","LABEL_NAME":"試験","UI_USE_FLAG":"1","USITE":"5"}]
