@@ -62,7 +62,7 @@ var _M = {
 			fileUpload:"fileupload.mon", //물리파일 저장방식
             fileDownload : "filedownload.mon", //물리파일 다운로드
 			exceldown: "exceldown.mon",	
-			exceldownold: "exceldownold.mon",	
+			exceldownOld: "exceldownOld.mon",	
 			dataFileUpload:"doUploadDataFile.mon", //데이터파일 업로드
 			GetHtml: "GetHtml.json", //속도개선을 위한 html파싱후다운처리시 사용.
 			sendIndvEmail: "sendIndvEmail.json", //개별 이메일 처리 요청
@@ -71,7 +71,7 @@ var _M = {
 		}
 	},
     aSync: { sync: false, async: true },
-    UserInfo: { id: '', lid: '', name: '', SID: '', depart: '', departnm: '', cardcd: '', key: '', dvl: '0', level: '0', lang: '', logo: '', gsite: '', gcorp:'', gcorpnm:'',tcorp:'',tcorpnm:'' },
+    UserInfo: { id: '', lid: '', name: '', SID: '', depart: '', departnm: '', cardcd: '', key: '', dvl: '0', xlauth: '0', level: '0', lang: '', logo: '', gsite: '', gcorp:'', gcorpnm:'',tcorp:'',tcorpnm:'' },
     SubMenu: {},
     Permission: { C: true, R: true, U: true, D: true },
     PopUpDialog: { width: 950, height: 500 },
@@ -358,6 +358,26 @@ var _M = {
                 var s = leadingZeros(nd.getFullYear(), 4) + '-' +
 						leadingZeros(nd.getMonth() + 1, 2) + '-' +
 						leadingZeros(nd.getDate(), 2);
+                return s;
+            },
+            getFDateChange: function (changeDate) {
+				var nd = new Date();
+                //var d = new Date();
+                
+                let stndDate = changeDate.substring(0,2).toLowerCase();
+				let regex = /[^-\0-9]/g;
+                let chgeDate = changeDate.substring(2).replace(regex, "") * 1;
+                
+                if(!isNaN(chgeDate) && isNotEmpty(chgeDate)) {
+	                if(stndDate == 'fy') {
+						nd.setFullYear(nd.getFullYear() + chgeDate);
+					} else if (stndDate == 'fm') {
+						nd.setMonth(nd.getMonth() + chgeDate);
+					}
+				}
+
+                var s = leadingZeros(nd.getFullYear(), 4) + '-' +
+						leadingZeros(nd.getMonth() + 1, 2) + '-01';
                 return s;
             },
             e: ''

@@ -39,7 +39,9 @@
                                 break;
                         }
                     }
-                    //if (value.inComm == 'getJson' && _M.UserInfo.dvl < 1) return true; //시스템개발자인경우에만 개발버튼 보이도록
+                    if (value.inComm == 'getJson' && _M.UserInfo.dvl < 1) return true; //시스템개발자인 경우에만 개발버튼 보이도록
+                    if (value.inComm == 'DownXls' && _M.UserInfo.xlauth < 1) return true; //엑셀출력관리자인 경우에만 개발버튼 보이도록
+                    
                     if ($('.cmdspan:last .cmdicon', jobsArea).hasClass('btn-block') && value.css == 'btn-block') return;
                     var _butSet = $(jobsArea).find('.buttonset');
                     var _cmdspan = $("<span class='cmdspan cmdspan-bg align-middle b-t b-r b-b b-l b-co b-co-basic'></span>").appendTo(_butSet);

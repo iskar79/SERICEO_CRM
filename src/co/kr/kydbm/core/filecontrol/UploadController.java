@@ -499,6 +499,8 @@ public class UploadController
 		String xmlParams  =URLDecoder.decode(XmlParms, "UTF-8");
 		xmlParams = parsingForJonType(xmlParams);
 		
+		log.debug("exceldown.mon from frontWeb ==> khma");
+		
 		List<Map<String,Object>> ds = null;
         String SqlComm = "";
         String rlt = "";

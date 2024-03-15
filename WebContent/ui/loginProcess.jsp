@@ -128,7 +128,7 @@ if ( resultInfo != null ) {
 		</div>
 
 		<div id="Footer" class="Footer-bg Footer-ft">
-			<span class="align-middle">copyright ⓒ<b>2012 공영DBM.</b> All
+			<span class="align-middle">copyright ⓒ<b>2024 SERICEO.</b> All
 				Rights Reserved.
 			</span>
 		</div>

@@ -54,7 +54,6 @@ var _Biz = {
                     }
                 });
             }
-            debugger;
 		},
 		/* 이전 버전 로그인 (UKEY 사용)
 		sessionlogin: function (id, pass, scode) {
@@ -163,6 +162,15 @@ function setUserInfo(data){
     _M.UserInfo.level = data["LEVEL"];
     _M.UserInfo.lang = data["userLang"];
     _M.UserInfo.dvl = data["dvLevel"];
+    
+    _M.UserInfo.xlauth = data["excelAuth"];
+    if(data["excelAuth"] == undefined || data["excelAuth"] == ""){
+		$.SvcGetRow('M_USER','READ_XLS_AUTH','M_USER_NO', _M.UserInfo.id, function(Row) {
+			//엑셀다운로드 권한 조회를 위하여 추가함
+			_M.UserInfo.xlauth = Row.XLS_AUTH;
+		});
+	}
+    
     _M.UserInfo.logo = data["siteLogo"];
     _M.UserInfo.menupos = data["menuPosition"];
     
@@ -185,7 +193,14 @@ function setUserInfo(data){
                                                     
     $('.ui-username').html("<span class='name'>" + _M.UserInfo.name + "</span>님");
     //$('.ui-direction').html("◀");
-    changeTheme(data["theme"]); //테마 
+    //changeTheme(data["theme"]); //테마 
+    var Mon_Theme = 'css/Theme_CEO.css';
+    if(_M.UserInfo.gsite == 'CEO' || _M.UserInfo.gsite == 'PRO'){
+		Mon_Theme = 'css/Theme_' + _M.UserInfo.gsite + '.css';
+	} else {
+		Mon_Theme = 'css/Theme_ETC.css';
+	}
+    changeTheme(Mon_Theme);
     if ( null != _M.UserInfo.logo && '' != _M.UserInfo.logo ) {
     	$('#logobg').css({'background': 'url('+ _M.UserInfo.logo+')  no-repeat center center'}); //로고
     }
@@ -220,6 +235,7 @@ function clearUserInfo(){
     _M.UserInfo.departnm = '';
     _M.UserInfo.cardcd = '';
     _M.UserInfo.dvl = '0';
+    _M.UserInfo.xlauth = '0';
     _M.UserInfo.logined = false;
 }
 /**

@@ -2103,6 +2103,65 @@
         });
         $(document.body).find('.kcontextMenu').dialog("open");
     };
+    
+    $.ShowDataUpdatePopupOld = function (popupInfo, callBackFn) {  //20121130 hsjung 유니코 대응버전
+
+        var popTitle = "Excel 데이터 업로드";
+        if (undefined != popupInfo.title) popTitle = popupInfo.title;
+
+        $(document.body).find('.kcontextMenu').remove();
+        $(document.body).append("<div class='kcontextMenu DataUploadPopup' ></div>");
+
+        var _o = $('<form id="frmDataFile" name="frmDataFile" method="post" enctype="multipart/form-data"></form>').appendTo($(document.body).find('.kcontextMenu'));
+
+        var _fileTag = $('<div class="row"></div>').appendTo(_o);
+        $('<a class="Label">파일선택</a>').appendTo(_fileTag);
+        $('<input type="file" size="30" name="Filename" id="Filename" title="PCFile" />').appendTo(_fileTag);
+        $('<input type="hidden" size="30" name="methodname" id="methodname" />').appendTo(_fileTag);
+        $('<input type="hidden" size="30" name="GSITE" id="GSITE" />').appendTo(_fileTag);
+        $('<input type="hidden" size="30" name="SID" id="SID" />').appendTo(_fileTag);
+        $('<input type="hidden" size="30" name="UID" id="UID" />').appendTo(_fileTag);
+        $('<input type="hidden" name="jsonParam" id="jsonParam" />').appendTo(_fileTag);
+        $('<input type="hidden" size="30" name="jobType" id="jobType" />').appendTo(_fileTag);
+        $('<input type="hidden" name="procName" id="procName" />').appendTo(_fileTag);
+
+        var frm = $('#frmDataFile');
+        frm.ajaxForm(function (data, state) {
+            $(document.body).find('.kcontextMenu').dialog("close");
+            $.unblockUI();
+            if (data == "error") {
+                alert("처리중 에러 발생!!" + date.toString());
+            } else {
+                alert("업로드완료");
+            }
+        });
+        frm.submit(function () {
+            return false;
+        });
+
+        //다이얼로그 열기
+        $(document.body).find('.kcontextMenu').dialog({
+            autoOpen: false,
+            modal: true,
+            width: 400,
+            height: 110,
+            title: popTitle,
+            closeOnEscape: false,
+            buttons: {
+                "데이터업로드": function () {
+                    ExeUploadDataFile(popupInfo);
+                },
+                "닫기": function () {
+                    $(this).dialog("close");
+                }
+            },
+            close: function (event, ui) {
+                $(document.body).find('.kcontextMenu').remove();
+            }
+        });
+        $(document.body).find('.kcontextMenu').dialog("open");
+
+	}
 
     //$.ShowDataUpdatePopup = function (useExtender, upMode, json, callBackFn, pl) {  //LG하우시스 수정 버전....
 	$.ShowDataUpdatePopup = function (json, param, callBackFn) {  //20140113개정판 khma
@@ -3081,6 +3140,7 @@
         });
 
         $(document.body).find('.ShowOpenViewJson').dialog("open");
+        //$(document.body).find('.ShowOpenViewJson').parents('.ui-dialog').css('position','absolute');
         return $("#ShowOpenViewShowEdit");
 
     };
@@ -3583,7 +3643,9 @@
         $('<p class="text">※ 비밀번호는 대소문자를 구분합니다.</p>').appendTo(_o3);
 
         var _o4 = $('<a href="#" class="loginBTN btn-login">로그인 하기</a>').appendTo(_o);
-        var _o4 = $('<span class="checkbox"><input type="checkbox" id="chk-save"><label for="chk-save">아이디 저장</label></span>').appendTo(_o);
+        
+        //khma	20240315 로그인 페이지 아이디 저장 체크박스 주석 처리 ==> 추후 해당 옵션 처리 필요 
+        //var _o4 = $('<span class="checkbox"><input type="checkbox" id="chk-save"><label for="chk-save">아이디 저장</label></span>').appendTo(_o);
 
         ////$("<div><input type='text' for='login' class='loginSCODE b-t b-r b-l b-b b-co b-co-basic' /></div>").appendTo(_o5);
         //$("<div><input type='text' for='login' class='loginID b-t b-r b-l b-b b-co b-co-basic' /></div>").appendTo(_o5);
@@ -3920,6 +3982,7 @@ function isDate(val){
 
 function validatePassword(pw, options)
 {
+	debugger;
 	var result = true;
 
 	var o = {
@@ -3928,7 +3991,7 @@ function validatePassword(pw, options)
 				alpha: 0,
 				numeric: 0,
 				special: 0,
-				length: [7, Infinity],
+				length: [8, Infinity],
 				custom: [],
 				badWords: [],
 				badSequenceLength: 0,
@@ -4009,12 +4072,26 @@ function validatePassword(pw, options)
 		}
 	}
 	
+	if(pw.search(re.alpha) < 0 
+		//khma 대소문자구분에서 영문존재만 체크 하도록 수정
+		//|| pw.search(re.lower) < 0 
+		//|| pw.search(re.upper) < 0 
+		|| (pw.search(re.lower) < 0
+		&& pw.search(re.upper) < 0) 
+		
+		|| pw.search(re.special) < 0 
+		|| pw.search(re.numeric) < 0)
+	{
+		result = false;//return false;
+	}
+	
 	if (!result)
 	{
 		alert("입력한 암호를 확인해 주십시오.\n\n" + 
 		      "-----------------------------------------\n\n" + 
 		      "1) 암호는 최소 8글자 이상이여야 합니다.\n\n" +
-		      "2) 4회이상연속된 숫자나 알파벳을 입력할 수 없습니다."); 
+		      "2) 3회이상 연속된 숫자나 알파벳을 입력할 수 없습니다.\n\n" +
+		      "3) 암호는 최소 숫자/소문자/대문자/특수문자를 각각 하나씩 포함해야 합니다."); 
 	}
 
 	return (result);				

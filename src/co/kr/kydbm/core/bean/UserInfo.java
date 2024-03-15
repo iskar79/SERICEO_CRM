@@ -40,6 +40,7 @@ public class UserInfo implements Serializable{
 	}
 
 	private int    dvLevel;      /* 개발자 레벨 */
+	private int    excelAuth;      /* 개발자 레벨 */
 	private int    connDur;      /* 접속시간 : CONN_DUR */
 	private String menuPosition; // 메뉴 위치
 	private Date pwUpdDate; /*  비밀번호 변경일 */
@@ -165,6 +166,13 @@ public class UserInfo implements Serializable{
 		this.dvLevel = dvLevel;
 	}
 
+	public int getExcelAuth() {
+		return excelAuth;
+	}
+	public void setExcelAuth(int excelAuth) {
+		this.excelAuth = excelAuth;
+	}
+	
 	public String getCorp() {
 		return corp;
 	}
@@ -220,6 +228,8 @@ public class UserInfo implements Serializable{
 		builder.append(usiteNo);
 		builder.append(", dvLevel=");
 		builder.append(dvLevel);
+		builder.append(", excelAuth=");
+		builder.append(excelAuth);
 		builder.append(", connDur=");
 		builder.append(connDur);
 		builder.append(", menuPosition=");

@@ -395,6 +395,7 @@ function JSONClientParameters() {
         xml += ',UNM:"' + JSONClientParameters._serialize(_M.UserInfo.name) + '"';
         xml += ',USITE:"' + JSONClientParameters._serialize(_M.UserInfo.SID) + '"';
         xml += ',GSITE:"' + JSONClientParameters._serialize(_M.UserInfo.gsite) + '"';
+        xml += ',GCORP:"' + JSONClientParameters._serialize(_M.UserInfo.gcorp) + '"';
         xml += ',UDEPT:"' + JSONClientParameters._serialize(_M.UserInfo.depart) + '"';
         xml += ',ULANG:"' + JSONClientParameters._serialize(_M.UserInfo.lang) + '"';
         xml += ',MENUID:"' + JSONClientParameters._serialize(_M.PrevActGbn.currMenuId) + '"';
@@ -421,6 +422,7 @@ function JSONClientParameters() {
         xml += ',"UNM":"' + JSONClientParameters._serialize(_M.UserInfo.name) + '"';
         xml += ',"USITE":"' + JSONClientParameters._serialize(_M.UserInfo.SID) + '"';
         xml += ',"GSITE":"' + JSONClientParameters._serialize(_M.UserInfo.gsite) + '"';
+        xml += ',"GCORP":"' + JSONClientParameters._serialize(_M.UserInfo.gcorp) + '"';
         xml += ',"UDEPT":"' + JSONClientParameters._serialize(_M.UserInfo.depart) + '"';
         xml += ',"ULANG":"' + JSONClientParameters._serialize(_M.UserInfo.lang) + '"';
         xml += ',"MENUID":"' + JSONClientParameters._serialize(_M.PrevActGbn.currMenuId) + '"';
@@ -465,6 +467,7 @@ function JSONClientParameters() {
         xml += '&UNM=' + JSONClientParameters._serialize(_M.UserInfo.name) + '';
         xml += '&USITE=' + JSONClientParameters._serialize(_M.UserInfo.SID) + '';
         xml += '&GSITE=' + JSONClientParameters._serialize(_M.UserInfo.gsite) + '';
+        xml += '&GCORP=' + JSONClientParameters._serialize(_M.UserInfo.gcorp) + '';
         xml += '&UDEPT=' + JSONClientParameters._serialize(_M.UserInfo.depart) + '';
         xml += '&ULANG=' + JSONClientParameters._serialize(_M.UserInfo.lang) + '';
         xml += '&MENUID=' + JSONClientParameters._serialize(_M.PrevActGbn.currMenuId) + '';

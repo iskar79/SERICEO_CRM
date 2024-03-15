@@ -134,6 +134,7 @@
 			<mvc:mapping path="/fileupload.mon" />
 			<mvc:mapping path="/filedownload.mon" />
 			<mvc:mapping path="/exceldown.mon" />
+			<mvc:mapping path="/exceldownOld.mon" />
 			<mvc:mapping path="/doUploadDataFile.mon" />
 			<mvc:mapping path="/main.mon"/>
 			<bean class="co.kr.kydbm.core.interceptor.LoginCheckInterceptor" />

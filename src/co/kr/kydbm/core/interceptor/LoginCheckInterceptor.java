@@ -27,9 +27,9 @@ public class LoginCheckInterceptor extends HandlerInterceptorAdapter{
 			//logger.debug("사용자 정보: " + userInfo.toString());
 			result = true;
 		}
-		else { // UserInfo is nothing in Session
-			throw new AuthException("세션 정보가 없습니다.");
-		}
+		//else { // UserInfo is nothing in Session
+		//	throw new AuthException("세션 정보가 없습니다.");
+		//}
 		logger.debug("LoginCheckInterceptor: preHandle() end");
 		return result;
 	}

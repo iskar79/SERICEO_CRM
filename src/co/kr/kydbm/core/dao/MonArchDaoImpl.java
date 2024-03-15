@@ -983,6 +983,8 @@ public class MonArchDaoImpl   extends DataSourceSupport{
 		.append(", (SELECT 거래처명 FROM 거래처 B WHERE B.거래처번호 = U.CORP) AS CORPNM ")
 		.append(", U.TCORP ")
 		.append(", (SELECT 거래처명 FROM 거래처 B WHERE B.거래처번호 = U.TCORP) AS TCORPNM ")
+		.append(", FN_DVL_CONFIRM(U.M_USER_NO) AS dvLevel ")
+		.append(", FN_EXCEL_AUTH(U.M_USER_NO) AS excelAuth ")
 		.append("FROM   M_USER U")
 		.append("       INNER JOIN M_USITE S")
 		.append("       ON    S.M_USITE_NO = U.M_USITE_NO")

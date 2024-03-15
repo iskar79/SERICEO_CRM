@@ -2003,7 +2003,7 @@ $(document).on("blur", ".t_Money", function (e) {
       // Body생성
       /* ----------------------------------------------------------------------------- */
       var _body = $(
-        "<div class='body tbody body-bg b-t b-l b-r b-co b-co-basic'></div>"
+        "<div class='body tbody body-bg b-t b-l b-r b-b b-co b-co-basic'></div>"
       ).appendTo(_Obj);
       if (_Obj.find(".page")) {
         _Obj.find(".page").before(_body); // page 가 그려줘있으면 위치이동
@@ -6716,8 +6716,10 @@ $(document).on("blur", ".t_Money", function (e) {
       }
       pl = _Obj.superContaner("tableGetFilter");
       pl.add("_order", _Obj.attr("_order"));
-      pl.add("_sort", _Obj.attr("_sort")); // 20130125 jwkim
+      pl.add("_sort", _Obj.attr("_sort"));
       pl.add("USITE", _M.UserInfo.SID);
+      pl.add("GSITE", _M.UserInfo.gsite);
+      pl.add("GCORP", _M.UserInfo.gcorp);
       pl.add("UID", _M.UserInfo.id);
       pl.add("UKEY", $("#authValue").val());
       pl.add("key", "0");
@@ -6869,6 +6871,15 @@ $(document).on("blur", ".t_Money", function (e) {
     /* ------------------------------------------------------- */
     /* Excel이나 CSV등의 데이터파일을 디비에 저장할때 사용 */
     /* ------------------------------------------------------- */
+    uploadDataFileOld: function (jobObj) {
+		//var _Obj = $(this);
+		var _json = $(this).data("jsonData");
+		$.ShowDataUpdatePopupOld(_json.uploadDataFile,function() {});
+	},
+
+    /* ------------------------------------------------------- */
+    /* Excel이나 CSV등의 데이터파일을 디비에 저장할때 사용 */
+    /* ------------------------------------------------------- */
     uploadDataFile: function (jobObj) {
       var _Obj = $(this);
       var _json = $(this).data("jsonData");
@@ -6957,6 +6968,7 @@ $(document).on("blur", ".t_Money", function (e) {
        * param); }else{ alert("구조체에 uploadDataFile속성이 정의되어 있지 않습니다."); }
        */
     },
+    
     /* ------------------------------------------------------- */
     /* 메타코드(공통코드)를 메모리에 새로 읽어들임 */
     /* ------------------------------------------------------- */
@@ -12263,7 +12275,7 @@ $(document).on("blur", ".t_Money", function (e) {
         case "date": //
           _o = $("input", _Obj);
           _retVal = _o.val();
-          _retVal = _retVal.replace(/-/gi, "");
+          //_retVal = _retVal.replace(/-/gi, "");
           _Obj.attr("Value", _retVal);
           if (apl != undefined) apl.add(_Obj.attr("field"), _Obj.attr("Value"));
           break;
@@ -12522,7 +12534,8 @@ $(document).on("blur", ".t_Money", function (e) {
           if (_filterObj.hasClass("SuperFilter")) {
             $(".fieldEdit input ", _Obj).each(function (e) {
               if ($(this).is(":checked"))
-                DataArr.push("&#39;" + $(this).val() + "&#39;");
+                //DataArr.push("&#39;" + $(this).val() + "&#39;");
+                DataArr.push($(this).val());
             });
             _retVal = DataArr.join(",");
           } else {
@@ -13528,12 +13541,12 @@ $(document).on("blur", ".t_Money", function (e) {
             $("input", _Obj).val("");
           }
           $(".fieldView", _Obj).html(
-            $("input:eq(0)", _Obj).val() + " - " + $("input:eq(1)", _Obj).val()
+            $("input:eq(0)", _Obj).val() + " ~ " + $("input:eq(1)", _Obj).val()
           );
           if (!_Obj.find(".fieldEdit").length)
             _Obj.html(
               $("input:eq(0)", _Obj).val() +
-                " - " +
+                " ~ " +
                 $("input:eq(1)", _Obj).val()
             );
           break;
@@ -14356,23 +14369,34 @@ $(document).on("blur", ".t_Money", function (e) {
               break;
           }
 
-if (_type == "datetime" && _value == "NOW") {
-  _Obj.superContaner("changeValue", $(this), _M.f.d.getDate(), 0, pl);
-  _Obj.superContaner("changeValue", $(this), _M.f.d.getTime(), 1, pl);
-} else if (_type == "datetimeBetween" && _value == "NOW") {
-  _Obj.superContaner("changeValue", $(this), _M.f.d.getDate(), 0, pl);
-  _Obj.superContaner("changeValue", $(this), _M.f.d.getTime(), 1, pl);
-  _Obj.superContaner("changeValue", $(this), _M.f.d.getDate(), 2, pl);
-  _Obj.superContaner("changeValue", $(this), _M.f.d.getTime(), 3, pl);
-} else if (_type == "dateBetween" && _value == "NOW") {
-  _Obj.superContaner("changeValue", $(this), _M.f.d.getDate(), 0, pl);
-  _Obj.superContaner("changeValue", $(this), _M.f.d.getDate(), 1, pl);
-} else if (_type == "dateBetween" && isNotEmpty(_value)) {
-  _Obj.superContaner("changeValue", $(this), _M.f.d.getDateChange(_value), 0, pl);
-  _Obj.superContaner("changeValue", $(this), _M.f.d.getDate(), 1, pl);
-} else {
-  _Obj.superContaner("changeValue", $(this), _value, 0, pl);
-}
+			if (_type == "datetime" && _value == "NOW") {
+			  _Obj.superContaner("changeValue", $(this), _M.f.d.getDate(), 0, pl);
+			  _Obj.superContaner("changeValue", $(this), _M.f.d.getTime(), 1, pl);
+			} else if (_type == "datetimeBetween" && _value == "NOW") {
+			  _Obj.superContaner("changeValue", $(this), _M.f.d.getDate(), 0, pl);
+			  _Obj.superContaner("changeValue", $(this), _M.f.d.getTime(), 1, pl);
+			  _Obj.superContaner("changeValue", $(this), _M.f.d.getDate(), 2, pl);
+			  _Obj.superContaner("changeValue", $(this), _M.f.d.getTime(), 3, pl);
+			} else if (_type == "dateBetween" && _value == "NOW") {
+			  _Obj.superContaner("changeValue", $(this), _M.f.d.getDate(), 0, pl);
+			  _Obj.superContaner("changeValue", $(this), _M.f.d.getDate(), 1, pl);
+			} else if (_type == "dateBetween" && isNotEmpty(_value)) {
+				if(_value.substring(0,1).toLowerCase() == "y"
+					|| _value.substring(0,1).toLowerCase() == "m"
+					|| _value.substring(0,1).toLowerCase() == "d"
+					) {
+					_Obj.superContaner("changeValue", $(this), _M.f.d.getDateChange(_value), 0, pl);
+					_Obj.superContaner("changeValue", $(this), _M.f.d.getDate(), 1, pl);
+					
+				} else if (_value.substring(0,2).toLowerCase() == "fy"
+					|| _value.substring(0,2).toLowerCase() == "fm"
+					) {
+					_Obj.superContaner("changeValue", $(this), _M.f.d.getFDateChange(_value), 0, pl);
+					_Obj.superContaner("changeValue", $(this), _M.f.d.getDate(), 1, pl);
+				} 
+			} else {
+			  _Obj.superContaner("changeValue", $(this), _value, 0, pl);
+			}
         }
       });
       // Sub View페이지에서 상위객체 초기화가 있다면 처리한다

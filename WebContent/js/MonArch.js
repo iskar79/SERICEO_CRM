@@ -225,13 +225,13 @@ function getUserInfo() {
 					    	if(pwUpdDate == null) {
 					    		//TODO pwUpdDate가 null이면 최초 등록시 로그인 유저이므로 비밀번호 변경 권유
 					    		alert('최초 로그인 후 패스워드를 변경하지 않았습니다.\n 패스워드를 변경해 주십시요.');
-					    		//$('.opticon-config').trigger('click');
+					    		$('.opticon-config').trigger('click');
 					    	}else {
 					    		var betweenDays = ((new Date()).getTime() - pwUpdDate)/1000/60/60/24;
 					    		if( betweenDays > 90 ) {
 					    			//TODO 비밀번호가 변경된 지 90일이 지났습니다. \n보안을 위해서 새 비밀번호로 변경해 주십시요.
 					    			alert('비밀번호가 변경된 지 90일이 지났습니다. \n보안을 위해서 새 비밀번호로 변경해 주십시요.');
-					    			//$('.opticon-config').trigger('click');
+					    			$('.opticon-config').trigger('click');
 					    		}else {
 					    			//TODO
 					    		}

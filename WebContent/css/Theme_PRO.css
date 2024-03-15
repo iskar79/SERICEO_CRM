@@ -1,0 +1,22 @@
+.logo				{ width:146px; height:22px; background:url(../image/logo_PRO.png) top left no-repeat; background-size:auto 100%; }
+.logo-wrap .ui-site .selsite 	{ margin-left:23px; }
+.logoutarea .ui-username .name 	{ color:#14B9B9; }
+.navi-bg						{ background:#574b3f; }
+.menu-on-b > span				{ color:#F0A042; }
+.SubMenu-bg 					{ background-color:#33281c; }
+.SubMenu li a:hover				{ color:#F0A042; font-weight:bold !important; }
+.SubMenu li a.on				{ color:#F0A042; }
+.SubMenu li a.on:before			{ background:#F0A042; }
+
+
+.title-bg						{ background-color:#33281c; }
+.progress li.on	a				{ color:#00bcb4; }
+.progress li.on:after			{ background:#00bcb4; }
+.cmdspan						{ background:#14B9B9 !important; border:1px solid #117a7a !important; }
+.cmdspan:hover					{ background:#117a7a !important; }
+.Tabs .ui-tabs-panel { border-top:3px solid #1b8383; }
+.ui-tabs-nav .ui-state-default.ui-tabs-active a	 { background-color:#1b8383; }
+.icon-able { background-color:#14B9B9; }
+
+.ui-dialog.ui-draggable { border:1px solid #33281c; }
+.ui-dialog-titlebar { background-color:#33281c; }

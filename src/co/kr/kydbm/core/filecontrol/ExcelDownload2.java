@@ -45,8 +45,8 @@ import au.com.bytecode.opencsv.CSVWriter;
  * @since version 1.0.0
  */
 @Controller
-public class ExcelDownload {
-	Logger log = Logger.getLogger(ExcelDownload.class.getName());
+public class ExcelDownload2 {
+	Logger log = Logger.getLogger(ExcelDownload2.class.getName());
 
 //	public Boolean downExcel(List<Map<String, Object>> ds, String service,
 //			String type, HttpServletRequest request,
@@ -363,9 +363,6 @@ public class ExcelDownload {
 			List<Map<String, Object>> showDataList, 
 			ArrayList<Map<String, Object>> arrHeaderInfo, String xlsType) {
 
-
-		log.debug("makeExcel ==> khma");
-		
 		// 액셀파일 저장루트 설정(다운로드를 위한 temp폴더에 저장하여 파일을 내림)
 		WritableWorkbook workbook = null;
 		try {
@@ -395,22 +392,17 @@ public class ExcelDownload {
 			// 헤더를 그린다.
 			if (arrHeaderInfo.size() > 0) {
 				//기존의 엑셀다운로드 방식 사용
-				if(showDataList.size() > 0) {
-					setExcelHeaderOld(sheet, headerFormat, showDataList);
-					setExcelDataOld(sheet, dataFormat, showDataList);
-				} else {
-					setExcelHeaderEmpty(sheet, headerFormat, arrHeaderInfo);
-				}
+				setExcelHeaderOld(sheet, headerFormat, showDataList);
 				//신규 엑셀다운로드 방식 미사용
 			//	setExcelHeader(sheet, headerFormat, notiFormat, showDataList, arrHeaderInfo, xlsType);
 			}
 			// 데이터를 그린다.
-//			if (showDataList.size() > 0) {
-//				//기존의 엑셀다운로드 방식 사용
-//				setExcelDataOld(sheet, dataFormat, showDataList);
-//				//신규 엑셀다운로드 방식 미사용
-//			//	setExcelData(sheet, dataFormat, showDataList, arrHeaderInfo, xlsType);
-//			}
+			if (showDataList.size() > 0) {
+				//기존의 엑셀다운로드 방식 사용
+				setExcelDataOld(sheet, dataFormat, showDataList);
+				//신규 엑셀다운로드 방식 미사용
+			//	setExcelData(sheet, dataFormat, showDataList, arrHeaderInfo, xlsType);
+			}
 			workbook.write();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -437,44 +429,27 @@ public class ExcelDownload {
 	 * @throws RowsExceededException 
 	    */
 	   private void setExcelHeaderOld(WritableSheet sheet, WritableCellFormat cellFormat, List<Map<String, Object>> ds) throws RowsExceededException, WriteException {
-			// TODO Auto-generated method stub
-			Object[] keys = ds.get(0).keySet().toArray();
-			jxl.write.Label label =null;
-			//		jxl.write.Blank blank=null;
-			String keyName="";
-			int colSize = 10;
-			int colNum = 0; //RNUM과 RCOUNT칼럼제거 하기위한 카운트
-			
-			for (int i = 0; i < keys.length; i++) {
-				keyName = keys[i].toString();
-				if ( "RNUM".equals(keyName) || "RCOUNT".equals(keyName)) { //RNUM과 RCOUNT칼럼제거	
-					colNum++;
-				}else{
-					label = new jxl.write.Label(i-colNum, 0, keyName, cellFormat);
-					sheet.addCell(label);
-//						if(!keyName.isEmpty()) colSize = keyName.length()*3 ;  //jdk1.6
-					if(!StringUtils.isEmpty(keyName)) colSize = keyName.length()*3 ; //jdk.15
-					sheet.setColumnView(i-colNum, colSize);
-				}
-			}
-	   }
-
-	   private void setExcelHeaderEmpty(WritableSheet sheet, WritableCellFormat cellFormat, List<Map<String, Object>> ds) throws RowsExceededException, WriteException {
-			// TODO Auto-generated method stub
-			jxl.write.Label label =null;
-			String keyName = "";
-			
-			int colSize = 10;
-			int colNum = 0; //RNUM과 RCOUNT칼럼제거 하기위한 카운트		
-			
-			for (int i = 0; i < ds.size(); i++) {
-				keyName = ds.get(i).values().toArray()[1].toString();
-				label = new jxl.write.Label(i, 0, keyName, cellFormat);
+		// TODO Auto-generated method stub
+		Object[] keys = ds.get(0).keySet().toArray();
+		jxl.write.Label label =null;
+//		jxl.write.Blank blank=null;
+		String keyName="";
+		int colSize = 10;
+		int colNum = 0; //RNUM과 RCOUNT칼럼제거 하기위한 카운트
+		
+		for (int i = 0; i < keys.length; i++) {
+			keyName = keys[i].toString();
+			if ( "RNUM".equals(keyName) || "RCOUNT".equals(keyName)) { //RNUM과 RCOUNT칼럼제거	
+				colNum++;
+			}else{
+				label = new jxl.write.Label(i-colNum, 0, keyName, cellFormat);
 				sheet.addCell(label);
+//				if(!keyName.isEmpty()) colSize = keyName.length()*3 ;  //jdk1.6
 				if(!StringUtils.isEmpty(keyName)) colSize = keyName.length()*3 ; //jdk.15
-				sheet.setColumnView(i, colSize);
+				sheet.setColumnView(i-colNum, colSize);
 			}
 		}
+	}
 
 	/**
 	 * 액셀의 헤더부분을 그리는 메소드
