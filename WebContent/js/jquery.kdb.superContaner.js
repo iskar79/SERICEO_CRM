@@ -5,7 +5,7 @@
 /*
  * superContaner
  *
- * version 0.1 2011-03-10
+ * version 0.1 2016-03-10
  * Requires jQuery v1.4.2 or later
  * Dual licensed under the MIT and GPL licenses:
  * http://www.opensource.org/licenses/mit-license.php
@@ -72,7 +72,7 @@ $(document).on("click", ".opticon-logout", function (e) {
    * '/' }); $.cookie('UID', '', { path: '/' }); $.cookie('UNM', '', { path:
    * '/' }); _M.UserInfo.key = ''; _M.UserInfo.lid = ''; _M.UserInfo.SID = '';
    * _M.UserInfo.depart = ''; _M.UserInfo.departnm = ''; _M.UserInfo.cardcd =
-   * ''; _M.UserInfo.dvl = '0'; //SSO쿠키도 삭제 20120803 khma //
+   * ''; _M.UserInfo.dvl = '0'; //SSO쿠키도 삭제 20170803 khma //
    * /$.cookie('ssoUID', null); $.cookie('ssoUID','', { path: '/' });
    */
   // _M.SubMenu = {};
@@ -132,7 +132,7 @@ $(document).on("change", ".selsite", function (e) {
 /*
  * $(document).on("click", ".iconset2", function (e) {
  * $.ShowReadEditJson("사용자비밀번호수정ViewJson", _M.UserInfo.id, function () { }); });
- */ // 사용자 개인정보 수정에 통합함 jwkim 20130325
+ */ // 사용자 개인정보 수정에 통합함 jwkim 20180325
 // ---------------------------------------------------------------------
 // SupersuperContanerView live 이벤트 정의
 // ---------------------------------------------------------------------
@@ -147,7 +147,7 @@ $(document).on("change", ".SuperTable .body .trChkAll input", function (e) {
   var _Obj = $(this).parents(".SuperTable");
   $(".body tbody tr td:nth-child(1) input", _Obj)
     .prop("checked", $(this).is(":checked"))
-    .trigger("change"); // 2013.10.16
+    .trigger("change"); // 2018.10.16
   // dmjung ::
   // 확장필터 체크박스까지
   // 체크처리되서 .body
@@ -339,7 +339,7 @@ $(document).on("click", ".SuperView .viewGroup", function (e) {
 });
 // 작업버턴 클릭이벤트
 // $(document).on("click", ".SuperView > table > tbody > .jobArea > td >
-// .cmdspan", function(e) { //20130122 CSS최적화 작업으로 변경
+// .cmdspan", function(e) { //20180122 CSS최적화 작업으로 변경
 $(document).on(
   "click",
   ".SuperView > .jobArea > .buttonset >.cmdspan",
@@ -351,7 +351,7 @@ $(document).on(
   }
 );
 // $(document).on("click", ".SuperView > table > tbody > .jobArea > td >
-// .cmdspan", function(e) { //20130122 CSS최적화 작업으로 변경
+// .cmdspan", function(e) { //20180122 CSS최적화 작업으로 변경
 $(document).on(
   "click",
   ".SuperView > table > tbody > .jobAreaTR >.jobBottomArea >.buttonset > .cmdspan",
@@ -393,6 +393,55 @@ $(document).on(
     });
   }
 );
+
+
+// 계약파일 추가 레코드 20240619
+$(document).on(
+  "click",
+  ".SuperView .fieldContaner[type='signfile'] .fieldEdit .fileSelectBox",
+  function (e) {
+    var _file = $(this).parents(".fieldEdit");
+    var fileSearchKey = _file.find("#fileSearchKey").attr("value");
+    var extenders;
+    if (undefined != _file.data("extenders")) {
+      extenders = _file.data("extenders");
+    }
+
+    var container = $(this).parents(".fieldContaner");
+    var column = container.attr("field");
+
+    var jobType = _file.attr("jobType");
+    //if (undefined == jobType || "" == jobType) {
+      // 작업종류가 없으면 경고창 표시후 처리 종료
+      //alert("파일속성에 작업종류(jobType)가 설정되지 않았습니다.");
+      //return false;
+    //}
+
+    var viewStat = $(this).parents(".SuperView").attr("ViewStatus");
+    if ("N" != viewStat) {
+      var option = $(this).parents(".SuperView").data("jsonData");
+      var pl = new JSONClientParameters();
+      pl.add("service", option.service);
+      pl.add("method", option.method.Update);
+      pl.add(option.keyName, $(this).parents(".SuperView").attr("keyvalue"));
+      pl.add(column, fileSearchKey);
+
+      //PostJsonData(_M.svcUrl[_M.Webtype].crudUrl, pl, function (_data) {
+        $.GetSignFile(jobType, fileSearchKey, extenders, function () {
+          var _Obj = _file.parents(".SuperView ");
+          _Obj.superContaner("GetSignFileList", _file, jobType, fileSearchKey);
+        });
+      //});
+    } else {
+      $.GetSignFile(jobType, fileSearchKey, extenders, function () {
+        var _Obj = _file.parents(".SuperView ");
+        _Obj.superContaner("GetSignFileList", _file, jobType, fileSearchKey);
+      });
+    }
+  }
+  
+);
+
 
 // 멀티파일추가용 레코드(LG하우시스 적용분)
 $(document).on(
@@ -805,12 +854,12 @@ $(document).on("blur", ".t_Money", function (e) {
     superView: function (option, parentKeyValue) {
       var _Obj = $(this);
       var _jsonName = option;
-      var listOption = $("#MainList").data("jsonData"); // 2013.10.07
+      var listOption = $("#MainList").data("jsonData"); // 2018.10.07
       // dmjung ::
       // MainList 가 두
       // 개 이상 오는 경우가
       // 없을 때만 유효함..
-      // 2013.10.23 dmjung :: List 영역에 SuperView 가 들어올 경우 listOption 이
+      // 2018.10.23 dmjung :: List 영역에 SuperView 가 들어올 경우 listOption 이
       // undefined 되므로...
       if (listOption == undefined) {
         listOption = _Obj;
@@ -1188,7 +1237,7 @@ $(document).on("blur", ".t_Money", function (e) {
 
           $.each(option.tabs, function (index, value) {
             if (value == undefined) return;
-            var _divId = "tabs-" + formCID++; // 20130829
+            var _divId = "tabs-" + formCID++; // 20180829
             // khma
             // var _id =
             // 'm_'+_M.PrevActGbn.currMenuId+':t_'+value.idx;
@@ -1316,7 +1365,7 @@ $(document).on("blur", ".t_Money", function (e) {
           if (!_superContanerRemoteMode) {
             $(_tabs).tabs({
               // select: function (event, ui) { //탭선택시 해쉬정보 취득
-              // 20130829 khma
+              // 20180829 khma
               // location.hash = ui.tab.hash;
               // }
             });
@@ -1442,7 +1491,7 @@ $(document).on("blur", ".t_Money", function (e) {
       } else {
         _theme = option.theme;
       }
-      // 20130124 jwkim start
+      // 20180124 jwkim start
       var sort = getSortOption(option.sort);
       _Obj
         .data("jsonData", option)
@@ -1458,7 +1507,7 @@ $(document).on("blur", ".t_Money", function (e) {
       // SuperTable').addClass(_theme).attr("_order",
       // option.order).attr("_viewpage", "1").attr("_pagecnt",
       // option.rowNum);
-      // 20130124 jwkim end
+      // 20180124 jwkim end
       // 호출한 상위객체정보를 저장한다.
       if (parentObj != undefined) {
         _Obj.data("parentObj", parentObj);
@@ -1568,7 +1617,7 @@ $(document).on("blur", ".t_Money", function (e) {
       } else {
         _theme = option.theme;
       }
-      // 20130124 jwkim start
+      // 20180124 jwkim start
       var sort = getSortOption(option.sort);
       _Obj
         .data("jsonData", option)
@@ -1579,7 +1628,7 @@ $(document).on("blur", ".t_Money", function (e) {
         .attr("_pagecnt", option.rowNum)
         .attr("_sort", sort)
         .attr("_order", option.order);
-      // 20130124 jwkim end
+      // 20180124 jwkim end
       // _Obj.data("jsonData",
       // option).removeClass().addClass('SuperContaner
       // SuperTable').addClass(_theme).attr("_order",
@@ -1639,7 +1688,7 @@ $(document).on("blur", ".t_Money", function (e) {
         "<table class='SuperFilter SuperFilter-bg b-t b-r b-b b-l b-co b-co-basic'></table>"
       ).appendTo(_head);
       var superExtFilter;
-      // 20130922 khma 확장필터 호출
+      // 20180922 khma 확장필터 호출
       if (isNotEmpty(option.extFilterView)) {
         superExtFilter = _head.superExtFilter({
           filters: option.extFilterView,
@@ -1947,7 +1996,7 @@ $(document).on("blur", ".t_Money", function (e) {
         true == option.isAutoRun
       ) {
         $(document).ready(function () {
-          // 20130922 khma 확장필터 호출
+          // 20180922 khma 확장필터 호출
           if (isNotEmpty(option.extFilterView)) {
             _head.superExtFilter("selectDefaultPreset");
           } else {
@@ -2243,7 +2292,7 @@ $(document).on("blur", ".t_Money", function (e) {
       }
       _Obj.removeClass();
 
-      // 20130124 jwkim start
+      // 20180124 jwkim start
       var sort = getSortOption(option.sort);
       _Obj
         .data("jsonData", option)
@@ -2257,7 +2306,7 @@ $(document).on("blur", ".t_Money", function (e) {
       // option).removeClass().addClass('SuperContaner
       // SuperGallery').attr("_order", option.order).attr("_viewpage",
       // "1").attr("_pagecnt", option.rowNum);
-      // 20130124 jwkim end
+      // 20180124 jwkim end
       /* ----------------------------------------------------------------------------- */
       // 구조체권한검색
       /* ----------------------------------------------------------------------------- */
@@ -2881,7 +2930,7 @@ $(document).on("blur", ".t_Money", function (e) {
           var _li = $("<li></li>").appendTo(_ul);
           if (location.pathname == value.href) _li.addClass("on");
           _li.attr("step", value.step);
-          // 20121026 khma 로그기록
+          // 20171026 khma 로그기록
           _li.attr("stepMenu", value.title);
           if (i == 2) setPrevActGbn(undefined, value.title, undefined);
           var hashUrl = "m_" + _M.PrevActGbn.currMenuId + ":f_" + value.step;
@@ -3346,7 +3395,7 @@ $(document).on("blur", ".t_Money", function (e) {
 
       $(".status", _Obj).toggle(option.isShowStatus);
 
-      // 2013.01.30 dmjung :: resize 이벤트를 Calendar 생성 이후 호출, 특정 요일만 비율 맞지
+      // 2018.01.30 dmjung :: resize 이벤트를 Calendar 생성 이후 호출, 특정 요일만 비율 맞지
       // 않는 문제 해결하기 위함.
       $(window).resize();
     },
@@ -3423,7 +3472,7 @@ $(document).on("blur", ".t_Money", function (e) {
               function (_data) {
                 if (_data.resultData.length > 0) {
                   /*
-                   * 20130328 khma 캘린더 속도
+                   * 20180328 khma 캘린더 속도
                    * 개선용 Start
                    */
                   var eventList = new Array(); // khma
@@ -3475,7 +3524,7 @@ $(document).on("blur", ".t_Money", function (e) {
                      * calinfo.attr('eventTimeCss')); }
                      * if(row.allDayFlag !=
                      * undefined){
-                     * //20130327
+                     * //20180327
                      * db에서
                      * 설정된
                      * alldayflag
@@ -3506,7 +3555,7 @@ $(document).on("blur", ".t_Money", function (e) {
                     event.end = _to;
                     event.sticker = row.sticker;
                     if (row.allDayFlag != undefined) {
-                      // 20130327
+                      // 20180327
                       // db에서
                       // 설정된
                       // alldayflag
@@ -3556,7 +3605,7 @@ $(document).on("blur", ".t_Money", function (e) {
                   // 리스트 표시전 대상 칼렌더를 클리어함
                   _calArea.fullCalendar("addEventSource", eventList);
                   /*
-                   * 20130328 khma 캘린더 속도
+                   * 20180328 khma 캘린더 속도
                    * 개선용 End
                    */
 
@@ -3997,7 +4046,7 @@ $(document).on("blur", ".t_Money", function (e) {
         if (targetEvent.length > 0)
           calArea.fullCalendar("removeEventSource", targetEvent[0].source);
       }
-    }, // 20130329 미사용
+    }, // 20180329 미사용
     CalendarListParent: function (key) {
       // var _Obj = $('#MainView').find('.SuperCalendar');
       var _Obj = $(".SuperCalendar");
@@ -4975,7 +5024,7 @@ $(document).on("blur", ".t_Money", function (e) {
       var mUsiteNo = _Obj.attr("mUsiteNo"); // 회원사번호
 
       if (KEY == "") {
-        $.MessageBox("설문 오류", "설문 대상이 아닙니다."); // 20130114 키맨번호가 존재하지
+        $.MessageBox("설문 오류", "설문 대상이 아닙니다."); // 20180114 키맨번호가 존재하지
         // 않을때
         return false;
       }
@@ -5153,7 +5202,7 @@ $(document).on("blur", ".t_Money", function (e) {
         },
         function (response) {
           // alert(response.Message);
-          return false; // 20121127 PKH 에러발생후 다음 진행 중단처리.
+          return false; // 20171127 PKH 에러발생후 다음 진행 중단처리.
         },
         false
       );
@@ -5547,7 +5596,7 @@ $(document).on("blur", ".t_Money", function (e) {
         "<table class='SuperFilter SuperFilter-bg b-t b-r b-b b-l b-co b-co-basic'></table>"
       ).appendTo(_head);
       var superExtFilter;
-      // 20130922 khma 확장필터 호출
+      // 20180922 khma 확장필터 호출
       if (isNotEmpty(option.extFilterView)) {
         superExtFilter = _head.superExtFilter({
           filters: option.extFilterView,
@@ -5814,7 +5863,7 @@ $(document).on("blur", ".t_Money", function (e) {
       pl.add("service", _json.service);
       pl.add("method", _json.method.List);
       pl.add("_order", _Obj.attr("_order"));
-      /* 20130124 jwkim SQL sort속성 추가 */
+      /* 20180124 jwkim SQL sort속성 추가 */
       pl.add("_sort", _Obj.attr("_sort"));
       pl.add("_viewpage", _Obj.attr("_viewpage"));
       pl.add("_pagecnt", _Obj.attr("_pagecnt"));
@@ -5850,7 +5899,7 @@ $(document).on("blur", ".t_Money", function (e) {
         }
       }
       // ----------------------------------------------------------------------------
-      // 목록 이중실행 방지를 위해 추가함. 20121108
+      // 목록 이중실행 방지를 위해 추가함. 20171108
       // ----------------------------------------------------------------------------
       if (_Obj.attr("RunTime") == undefined) {
         // 실행중이 아니면 바로실행
@@ -5898,7 +5947,7 @@ $(document).on("blur", ".t_Money", function (e) {
         pl,
         function (_data) {
           $(".body", _Obj).unblock();
-          _Obj.attr("RunTime", ""); // 20121108 이중실행방지를 위해 추가
+          _Obj.attr("RunTime", ""); // 20171108 이중실행방지를 위해 추가
 
           if (_data.resultData.length > 0) {
             _Obj.superContaner("tableShowData", _data.resultData, ListOption);
@@ -5976,7 +6025,7 @@ $(document).on("blur", ".t_Money", function (e) {
         },
         function (response) {
           $(".body", _Obj).unblock();
-          _Obj.attr("RunTime", ""); // 20121108 이중실행방지를 위해 추가
+          _Obj.attr("RunTime", ""); // 20171108 이중실행방지를 위해 추가
           _Obj.superContaner("tableShowMessage", response.Message);
 
           // 2014.03.24 dmjung start :: 레코드가 없을 때 페이징 숨김
@@ -6041,7 +6090,7 @@ $(document).on("blur", ".t_Money", function (e) {
       );
     },
 
-    // 2013.12.03 dmjung :: 김이사님 컴퍼넌트에 필요한 메서드.
+    // 2018.12.03 dmjung :: 김이사님 컴퍼넌트에 필요한 메서드.
     FilterClear: function () {
       var _Obj = $(this);
       _Obj.superContaner("tableModeChange", true);
@@ -6078,7 +6127,7 @@ $(document).on("blur", ".t_Money", function (e) {
       return dataset;
     },
 
-    // 2013.08.05 dmjung :: Lunar to Solar // Solar to Lunar
+    // 2018.08.05 dmjung :: Lunar to Solar // Solar to Lunar
     LunardateSet: function (type, object) {
       var dataset;
       var year = object.find("select#lunaryear");
@@ -6434,7 +6483,7 @@ $(document).on("blur", ".t_Money", function (e) {
             break;
         }
       }
-      // 2013.09.16 dmjung :: 추가버튼 시 afterNewCallBack 동작하도록. ( New: 에
+      // 2018.09.16 dmjung :: 추가버튼 시 afterNewCallBack 동작하도록. ( New: 에
       // 정의되어있던 것임. TableNew 에도 추가 )
       if (option.afterNewCallBack != undefined)
         eval(option.afterNewCallBack)(_Obj);
@@ -6482,7 +6531,7 @@ $(document).on("blur", ".t_Money", function (e) {
                 _M.aSync.sync
               );
             });
-            // 2013.07.25 dmjung :: 삭제 후 리스트 다시 불러오기
+            // 2018.07.25 dmjung :: 삭제 후 리스트 다시 불러오기
             // 추가..
             _Obj.superContaner("List");
             $("#tabledailog").remove();
@@ -6616,8 +6665,8 @@ $(document).on("blur", ".t_Money", function (e) {
 
     viewParentKeyRefresh: function () {
       var _Obj = $(this);
-      // 2013.07.29 jwkim ::
-      if (undefined != _Obj.data("jsonData").Read) {
+      // 2018.07.29 jwkim ::
+      if (undefined != _Obj.data("jsonData").method.Read) {
         _parentkeyValue = _Obj.attr("parentKeyValue");
         _Obj.superContaner("Read", _parentkeyValue);
       }
@@ -6696,134 +6745,140 @@ $(document).on("blur", ".t_Money", function (e) {
 
     DownXls: function (oCmd) {
       var _Obj = $(this);
-      var _json = $(this).data("jsonData");
-      var _popup = false;
-      var idx = oCmd.attr("index");
-      // 20120905 액셀다운로드 확장기능(확장클래스 사용)
-      var _jobInfo;
-      for (var c = 0; c < _json.jobs.length; c++) {
-        if (_json.jobs[c].inComm == "DownXls" && _json.jobs[c].index == idx) {
-          _popup = _json.jobs[c].popup;
-          _jobInfo = _json.jobs[c];
-        }
-      }
-      // todo 20140107 액셀다운로드 개선을 위해 excelOpt:{excelType, excelService,
-      // excelMethod와 }을 추가
+	  var _RCD_CNT = $('.pgMsg.records',_Obj).text();
+	  var regex = /[^0-9]/g;
+	  if(_RCD_CNT.replace(regex,"") == "0"){
+		  alert('조회 건수가 0건 입니다. 데이터를 조회해 주세요.');
+	  } else {
+		  var _json = $(this).data("jsonData");
+		  var _popup = false;
+		  var idx = oCmd.attr("index");
+		  // 20170905 액셀다운로드 확장기능(확장클래스 사용)
+		  var _jobInfo;
+		  for (var c = 0; c < _json.jobs.length; c++) {
+			if (_json.jobs[c].inComm == "DownXls" && _json.jobs[c].index == idx) {
+			  _popup = _json.jobs[c].popup;
+			  _jobInfo = _json.jobs[c];
+			}
+		  }
+		  // todo 20140107 액셀다운로드 개선을 위해 excelOpt:{excelType, excelService,
+		  // excelMethod와 }을 추가
 
-      var _svc = _json.method.List;
-      if (_json.method.Excel != "" && _json.method.Excel != undefined) {
-        _svc = _json.method.Excel;
-      }
-      pl = _Obj.superContaner("tableGetFilter");
-      pl.add("_order", _Obj.attr("_order"));
-      pl.add("_sort", _Obj.attr("_sort"));
-      pl.add("USITE", _M.UserInfo.SID);
-      pl.add("GSITE", _M.UserInfo.gsite);
-      pl.add("GCORP", _M.UserInfo.gcorp);
-      pl.add("UID", _M.UserInfo.id);
-      pl.add("UKEY", $("#authValue").val());
-      pl.add("key", "0");
-      // pl.add("ExcelService", _svc);
-      pl.add("MENUID", _M.PrevActGbn.currMenuId);
-      pl.add("STEPMENU", _M.PrevActGbn.currStepMenu);
-      pl.add("ACTIONNAME", _M.PrevActGbn.actionName);
+		  var _svc = _json.method.List;
+		  if (_json.method.Excel != "" && _json.method.Excel != undefined) {
+			_svc = _json.method.Excel;
+		  }
+		  pl = _Obj.superContaner("tableGetFilter");
+		  pl.add("_order", _Obj.attr("_order"));
+		  pl.add("_sort", _Obj.attr("_sort"));
+		  pl.add("USITE", _M.UserInfo.SID);
+		  pl.add("GSITE", _M.UserInfo.gsite);
+		  pl.add("GCORP", _M.UserInfo.gcorp);
+		  pl.add("UID", _M.UserInfo.id);
+		  pl.add("UKEY", $("#authValue").val());
+		  pl.add("key", "0");
+		  // pl.add("ExcelService", _svc);
+		  pl.add("MENUID", _M.PrevActGbn.currMenuId);
+		  pl.add("STEPMENU", _M.PrevActGbn.currStepMenu);
+		  pl.add("ACTIONNAME", _M.PrevActGbn.actionName);
 
-      var serviceName = "";
-      // 20140107 액셀처리 관련 옵션 추가 start
-      if (_jobInfo.xlsOption != undefined) {
-        var xlsOpt = _jobInfo.xlsOption;
-        if (xlsOpt.xlsName != "" && xlsOpt.xlsName != undefined) {
-          pl.add("xlsName", xlsOpt.xlsName);
-        }
+		  var serviceName = "";
+		  // 20140107 액셀처리 관련 옵션 추가 start
+		  if (_jobInfo.xlsOption != undefined) {
+			var xlsOpt = _jobInfo.xlsOption;
+			if (xlsOpt.xlsName != "" && xlsOpt.xlsName != undefined) {
+			  pl.add("xlsName", xlsOpt.xlsName);
+			}
 
-        if (xlsOpt.extClass != "" && xlsOpt.extClass != undefined) {
-          pl.add("extClass", _jobInfo.xlsOption.extClass);
-        }
+			if (xlsOpt.extClass != "" && xlsOpt.extClass != undefined) {
+			  pl.add("extClass", _jobInfo.xlsOption.extClass);
+			}
 
-        if (xlsOpt.type != "" && xlsOpt.type != undefined) {
-          pl.add("xlsType", xlsOpt.type);
-        } else {
-          pl.add("xlsType", "report");
-        }
+			if (xlsOpt.type != "" && xlsOpt.type != undefined) {
+			  pl.add("xlsType", xlsOpt.type);
+			} else {
+			  pl.add("xlsType", "report");
+			}
 
-        if (xlsOpt.service != "" && xlsOpt.service != undefined) {
-          serviceName = xlsOpt.service; // pl.add("xlsService",
-          // xlsOpt.service);
-        } else {
-          serviceName = _json.service; // pl.add("xlsService",
-          // _json.service);
-        }
+			if (xlsOpt.service != "" && xlsOpt.service != undefined) {
+			  serviceName = xlsOpt.service; // pl.add("xlsService",
+			  // xlsOpt.service);
+			} else {
+			  serviceName = _json.service; // pl.add("xlsService",
+			  // _json.service);
+			}
 
-        if (xlsOpt.method != "" && xlsOpt.method != undefined) {
-          pl.add("xlsMethod", xlsOpt.method);
-        } else {
-          pl.add("xlsMethod", _svc);
-        }
-      } else {
-        pl.add("xlsType", "report");
-        // pl.add("xlsService", _json.service);
-        pl.add("xlsMethod", _svc);
-        serviceName = _json.service;
-      }
-      var dispCols;
-      if ($(".SuperExtFilter", _Obj).length > 0) {
-        dispCols = superExtFilter.getParameters("label");
-      } else {
-        dispCols = _Obj.superExtFilter({
-          exec: "getCurrentColsInfo",
-        });
-      }
-      pl.add("dispCols", dispCols);
-      pl.add("xlsService", serviceName);
+			if (xlsOpt.method != "" && xlsOpt.method != undefined) {
+			  pl.add("xlsMethod", xlsOpt.method);
+			} else {
+			  pl.add("xlsMethod", _svc);
+			}
+		  } else {
+			pl.add("xlsType", "report");
+			// pl.add("xlsService", _json.service);
+			pl.add("xlsMethod", _svc);
+			serviceName = _json.service;
+		  }
+		  var dispCols;
+		  if ($(".SuperExtFilter", _Obj).length > 0) {
+			dispCols = superExtFilter.getParameters("label");
+		  } else {
+			dispCols = _Obj.superExtFilter({
+			  exec: "getCurrentColsInfo",
+			});
+		  }
+		  pl.add("dispCols", dispCols);
+		  pl.add("xlsService", serviceName);
 
-      pl.add("structureName", _Obj.attr("jsonname"));
-      // 20140107 액셀처리 관련 옵션 추가 end
+		  pl.add("structureName", _Obj.attr("jsonname"));
+		  // 20140107 액셀처리 관련 옵션 추가 end
 
-      /*
-       * if(_jobInfo.xlsName != "" && _jobInfo.xlsName != undefined) {
-       * pl.add("xlsName", _jobInfo.xlsName); }
-       */
-      // 20120905 액셀 확장클래스를 지정하면 처리할 클래스명을 파라메터로 넘김 김정원
-      /*
-       * if(_jobInfo.extClass != "" && _jobInfo.extClass != undefined) {
-       * pl.add("extClass", _jobInfo.extClass); }
-       */
-      if (
-        _Obj.attr("parentkeyvalue") != null &&
-        _Obj.attr("parentkeyvalue") != undefined &&
-        _Obj.attr("parentkeyvalue") != ""
-      ) {
-        pl.add(_json.parentKey, _Obj.attr("parentkeyvalue"));
-      }
-      // (type, cols, service, pl) {
-      if (_jobInfo.xlsOption != undefined && _jobInfo.xlsOption.popup) {
-        var _col = new Array();
-        var i = 0;
+		  /*
+		   * if(_jobInfo.xlsName != "" && _jobInfo.xlsName != undefined) {
+		   * pl.add("xlsName", _jobInfo.xlsName); }
+		   */
+		  // 20170905 액셀 확장클래스를 지정하면 처리할 클래스명을 파라메터로 넘김 김정원
+		  /*
+		   * if(_jobInfo.extClass != "" && _jobInfo.extClass != undefined) {
+		   * pl.add("extClass", _jobInfo.extClass); }
+		   */
+		  if (
+			_Obj.attr("parentkeyvalue") != null &&
+			_Obj.attr("parentkeyvalue") != undefined &&
+			_Obj.attr("parentkeyvalue") != ""
+		  ) {
+			pl.add(_json.parentKey, _Obj.attr("parentkeyvalue"));
+		  }
+		  // (type, cols, service, pl) {
+		  if (_jobInfo.xlsOption != undefined && _jobInfo.xlsOption.popup) {
+			var _col = new Array();
+			var i = 0;
 
-        $(".body thead > tr:first-child > th", _Obj)
-          .not(".resizeBar")
-          .each(function (index, value) {
-            if (
-              $(this).attr("field") != undefined &&
-              $(this).attr("field") != "" &&
-              $(this).attr("field") != "ROWNUM"
-            ) {
-              _col[$(this).attr("field")] = $(this).attr("label");
-              i++;
-            }
-          });
-        // 서비스, 함수 제대로 들어갔는지 확인하고 pl데이터 들어갔는지 확인
-        $.GetExcelColumn("XLS", _col, _jobInfo.service, pl);
-      } else {
-        $.SvcDownXls(_json.service, pl);
-      }
+			$(".body thead > tr:first-child > th", _Obj)
+			  .not(".resizeBar")
+			  .each(function (index, value) {
+				if (
+				  $(this).attr("field") != undefined &&
+				  $(this).attr("field") != "" &&
+				  $(this).attr("field") != "ROWNUM"
+				) {
+				  _col[$(this).attr("field")] = $(this).attr("label");
+				  i++;
+				}
+			  });
+			// 서비스, 함수 제대로 들어갔는지 확인하고 pl데이터 들어갔는지 확인
+			$.GetExcelColumn("XLS", _col, _jobInfo.service, pl);
+		  } else {
+			$.SvcDownXls(_json.service, pl);
+		  }
+	  }
     },
     
     DownXlsOld: function() {
         var _Obj = $(this);
         var _json = $(this).data("jsonData");
         var _popup = false;
-		//20120905 액셀다운로드 확장기능(확장클래스 사용)
+		//20170905 액셀다운로드 확장기능(확장클래스 사용)
 		var _jobInfo; 
         for(var c = 0;c<_json.jobs.length;c++){
             if(_json.jobs[c].inComm == "DownXlsOld"){
@@ -6846,7 +6901,7 @@ $(document).on("blur", ".t_Money", function (e) {
         pl.add("STEPMENU", _M.PrevActGbn.currStepMenu);
         pl.add("ACTIONNAME", _M.PrevActGbn.actionName);	
  
-		//20120905 액셀 확장클래스를 지정하면 처리할 클래스명을 파라메터로 넘김 김정원
+		//20170905 액셀 확장클래스를 지정하면 처리할 클래스명을 파라메터로 넘김 김정원
         if(_jobInfo.extClass != "" && _jobInfo.extClass != undefined) {
 			pl.add("extClass", _jobInfo.extClass);
 		}
@@ -6872,17 +6927,99 @@ $(document).on("blur", ".t_Money", function (e) {
     /* Excel이나 CSV등의 데이터파일을 디비에 저장할때 사용 */
     /* ------------------------------------------------------- */
     uploadDataFileOld: function (jobObj) {
-		//var _Obj = $(this);
-		var _json = $(this).data("jsonData");
-		$.ShowDataUpdatePopupOld(_json.uploadDataFile,function() {});
+		debugger;
+		
+		var errMsg = "데이터 업로드 처리 옵션이 정상적으로 정의되어 있지 않습니다.\n관리자에게 문의하여 주시기 바랍니다.";
+	  
+		if (isEmpty(jobObj.attr("upMode"))) {
+			alert(errMsg);
+			return;
+		} else {
+			var upMode; // single[셀렉트미표시],singleExt(확장클래스),
+			var xlsService;
+			var xlsMethod;
+			var xlsProcName;
+			var xlsTitle;
+			var xlsJobType;
+			var xlsUploadName;
+			var extClass;
+
+			// xlsOpt.upMode확인 후 single일때와 multi일때의 처리 구분
+			if (isNotEmpty(jobObj.attr("upMode"))) {
+			  upMode = jobObj.attr("upMode");
+			}
+
+			if(isNotEmpty(jobObj.attr("procName"))) {
+				
+				if (jobObj.attr("upMode") == "proc") {
+					xlsService = "MON_EXCEL_UPLOAD";
+					xlsProcName = jobObj.attr("procName");	
+				} else {
+					alert(errMsg);
+					return;
+				}
+				
+			}  else {
+				
+				if(isNotEmpty(jobObj.attr("service"))) {
+					xlsService = jobObj.attr("service");
+				} else {
+					alert(errMsg);
+					return;
+				}
+				
+			}
+				
+			if(isNotEmpty(jobObj.attr("method"))) {
+				xlsMethod = jobObj.attr("method");
+			} else {
+				alert(errMsg);
+				return;
+			}
+
+			if(isNotEmpty(jobObj.attr("title"))) {
+				xlsTitle = jobObj.attr("title");
+			}
+
+			if(isNotEmpty(jobObj.attr("jobType"))) {
+				xlsJobType = jobObj.attr("jobType");
+			} else {
+				alert(errMsg);
+				return;
+			}
+
+			if(isNotEmpty(jobObj.attr("uploadName"))) {
+				xlsUploadName = jobObj.attr("uploadName");
+			}
+
+			if(isNotEmpty(jobObj.attr("extClass"))) {
+				extClass = jobObj.attr("extClass");
+			}
+
+			var param = {
+						  upMode: upMode,
+						  service: xlsService,
+						  method: xlsMethod,
+						  procName: xlsProcName,
+						  title: xlsTitle,
+						  jobType: xlsJobType,
+						  name: xlsUploadName,
+						  extClass: extClass
+						};
+			
+		}
+		
+		$.ShowDataUpdatePopupOld(param,function() {});
 	},
 
     /* ------------------------------------------------------- */
     /* Excel이나 CSV등의 데이터파일을 디비에 저장할때 사용 */
     /* ------------------------------------------------------- */
     uploadDataFile: function (jobObj) {
+		debugger;
       var _Obj = $(this);
-      var _json = $(this).data("jsonData");
+      //var _json = $(this).data("jsonData");
+      var _json = _Obj.data("jsonData");
       /*
        * var param = new JSONClientParameters(); if(undefined != pl){
        * param = pl; };
@@ -6896,6 +7033,7 @@ $(document).on("blur", ".t_Money", function (e) {
 		// todo 실행한 job버튼객체의 index와 inComm이 타겟데이터의 index, inComm과 동일할때
 		// 동작한다.
 		// 해당 데이터의 xlsOption취득
+		
 		if (_json.jobs[c].inComm == "uploadDataFile" && jobObj.attr("index") == _json.jobs[c].index ) {
 		  	if (isNotEmpty(jobs[c].xlsOption)) {
 		    	xlsOpt = jobs[c].xlsOption;
@@ -6985,7 +7123,7 @@ $(document).on("blur", ".t_Money", function (e) {
     /* 메타코드(공통라벨)를 메모리에 새로 읽어들임 */
     /* ------------------------------------------------------- */
     refreshMetaLabel: function () {
-      // 20121206 다국어를 위해 추가함 khma
+      // 20171206 다국어를 위해 추가함 khma
       $.InitMetaLabel(function (resultFlag) {
         if (resultFlag == "SUCCESS") {
           alert("공통라벨 적용성공");
@@ -6998,7 +7136,7 @@ $(document).on("blur", ".t_Money", function (e) {
     /* 메타코드(공통라벨)를 메모리에 새로 읽어들임 */
     /* ------------------------------------------------------- */
     refreshMetaMessage: function () {
-      // 20130326 다국어를 위해 추가함 khma
+      // 20180326 다국어를 위해 추가함 khma
       /*
        * $.InitMetaLabel( function(resultFlag){ if( resultFlag=="SUCCESS" ){
        * alert("공통라벨 적용성공"); }else{ alert("공통라벨 적용실패"); } });
@@ -7008,7 +7146,7 @@ $(document).on("blur", ".t_Money", function (e) {
     /* SMTP개별 메일 발송 처리 */
     /* ------------------------------------------------------- */
     indvEmail: function (jobObj) {
-      // 20130326 다국어를 위해 추가함 khma
+      // 20180326 다국어를 위해 추가함 khma
 
       var json = "MON_COM_INDVMAIL_PVIW";
       if (jobObj.attr("index") == "Notice") {
@@ -7198,6 +7336,13 @@ $(document).on("blur", ".t_Money", function (e) {
       }
       // 2014.11.26 dmjung :: Tab 테이블의 isAutuRun 옵션 처리 종료.
       var pl = new JSONClientParameters();
+	  // 2024.05.29 khma 서브테이블에서 조회조건의 값이 있는데도 필터를 타지 않는 이유로 인해서 아래의 each 구문을 추가함
+	  $(".head .fieldContaner", $(this)).each(function (e) {
+			_val = $(this).superContaner("getFieldValue");
+			if(_val != undefined && _val != ""){
+				$(this).addClass("fldChange");
+			}
+      });
       $(".head .fieldContaner.fldChange", $(this)).each(function (e) {
         _field = $(this).attr("field");
         _val = $(this).superContaner("getFieldValue");
@@ -7360,6 +7505,15 @@ $(document).on("blur", ".t_Money", function (e) {
               _FileClassName = _data == "" ? "fileSelect" : "fileAttch";
               _data = "<span class='" + _FileClassName + "'></span>";
               break;
+              
+            case "signfile": // _data 에
+              // filepath
+              // 가 필요할 경우,
+              // 이 곳에 서비스
+              // 추가 해야 함.
+              _FileClassName = _data == "" ? "fileSelect" : "fileAttch";
+              _data = "<span class='" + _FileClassName + "'></span>";
+              break;
 
             case _M.DataType.text:
               if (typeof _data === "string") _data = $.decHTML(_data);
@@ -7436,7 +7590,7 @@ $(document).on("blur", ".t_Money", function (e) {
         htmlString += newTr[0].outerHTML;
       });
       $(".body tbody", _Obj).append(htmlString);
-      _records = _rows[0]["RCOUNT"]; // 20120629 김정원 자바버전과 취합하기 위해
+      _records = _rows[0]["RCOUNT"]; // 20170629 김정원 자바버전과 취합하기 위해
       // _RCOUNT를 RCOUNT로 변경함.
       _pagecnt = parseInt(_Obj.attr("_pagecnt"));
       _pages = parseInt((_records + _pagecnt - 1) / _Obj.attr("_pagecnt"));
@@ -7829,7 +7983,7 @@ $(document).on("blur", ".t_Money", function (e) {
         $("<div class='GalleryTitle'>" + row.TITLE + "</div>").appendTo(_span);
         $("<div class='GalleryDesc'>" + row.DESC + "</div>").appendTo(_span);
       });
-      _records = _rows[0]["RCOUNT"]; // 20120629 김정원 자바버전과 취합하기 위해
+      _records = _rows[0]["RCOUNT"]; // 20170629 김정원 자바버전과 취합하기 위해
       // _RCOUNT를 RCOUNT로 변경함.
 
       _pagecnt = parseInt(_Obj.attr("_pagecnt"));
@@ -7931,7 +8085,7 @@ $(document).on("blur", ".t_Money", function (e) {
       _fieldContaner.attr("oldValue", "");
       _fieldContaner.attr("Value", "");
 
-      // _fieldContaner.attr('calType', ''); //2013.06.05 dmjung :: 모든 필드에
+      // _fieldContaner.attr('calType', ''); //2018.06.05 dmjung :: 모든 필드에
       // calType 속성값 표시되는 것 방지하기 위하여
 
       if (option.calType != undefined)
@@ -7949,7 +8103,7 @@ $(document).on("blur", ".t_Money", function (e) {
       if (option.method != undefined)
         _fieldContaner.attr("method", option.method);
       if (option.bindField != undefined)
-        _fieldContaner.attr("bindField", option.bindField); // 20130909
+        _fieldContaner.attr("bindField", option.bindField); // 20180909
       // khma
       // bindField추가
       if (option.parentfield != undefined)
@@ -7976,7 +8130,7 @@ $(document).on("blur", ".t_Money", function (e) {
 
       if (option.codes != undefined) _fieldContaner.attr("codes", option.codes);
 
-      // 2013.06.04 dmjung :: codeEditor 사용시 javascript, sql, css 모드 선택값을
+      // 2018.06.04 dmjung :: codeEditor 사용시 javascript, sql, css 모드 선택값을
       // 셋팅함.
       if (option.codemode != undefined)
         _fieldContaner.attr("codemode", option.codemode);
@@ -7994,7 +8148,7 @@ $(document).on("blur", ".t_Money", function (e) {
       if (option.jobType != undefined)
         _fieldContaner.attr("jobType", option.jobType);
 
-      // 2013.08.14 dmjung :: tokenfield 사용시 속성값 셋팅
+      // 2018.08.14 dmjung :: tokenfield 사용시 속성값 셋팅
       if (option.tokenFldOption != undefined) {
         _fieldContaner.attr("json", option.tokenFldOption.json);
         _fieldContaner.attr("label", option.tokenFldOption.label);
@@ -8233,7 +8387,7 @@ $(document).on("blur", ".t_Money", function (e) {
           $(
             "<span class='align-middle' id='solarArea'></span><span class='align-middle' id='lunarArea' style='color:#4d4d4d; font-size:8pt; margin-left:4px;'></span>"
           ).appendTo(_fieldView);
-          // 2013.08.05 dmjung ::
+          // 2018.08.05 dmjung ::
           var _store = _fieldEdit;
           var _span = $("<span class='pinset'></span>").appendTo(_fieldEdit);
 
@@ -8528,6 +8682,39 @@ $(document).on("blur", ".t_Money", function (e) {
             attachLabels(value, _span);
           }
           break;
+          
+          //khma 20240329 이메일 타입 신규 추가
+        case "email":
+          var _span = $("<span class='pinset'></span>").appendTo(_fieldEdit);
+          var _o = $(
+            "<input class='input-bg input-ft b-t b-r b-b b-l b-co b-co-basic align-middle email' type='text' value='' />"
+          ).appendTo(_span); 
+		  
+		  //khma 20240326 Adding Validation
+          _o.change(function () {
+			  var reg = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
+			   if (!reg.test($(this).val())) {
+				   alert('이메일 정보가 부정확합니다.');
+				   $(this).val("");
+				}
+          });
+		  
+          if (option.maxlength != undefined) {
+            _o.attr("maxlength", option.maxlength);
+          }
+
+          if (
+            option.beforeLabel != undefined ||
+            option.afterLabel != undefined
+          ) {
+            var value = {
+              before: option.beforeLabel ? option.beforeLabel : undefined,
+              after: option.afterLabel ? option.afterLabel : undefined,
+            };
+            attachLabels(value, _span);
+          }
+          break;
+          
         case "text":
           var _span = $("<span class='pinset'></span>").appendTo(_fieldEdit);
           var _o = $(
@@ -8638,7 +8825,7 @@ $(document).on("blur", ".t_Money", function (e) {
             /*
              * var _inputval = ""; if(_o.attr("data") != undefined){
              * _inputval = _o.attr("data"); }
-             */ // 20130909
+             */ // 20180909
             var _fieldContaner = $(this).parents(".fieldContaner");
             $.ShowPopUpTableJson(
               _fieldContaner.attr("linkJson"),
@@ -8660,7 +8847,7 @@ $(document).on("blur", ".t_Money", function (e) {
              * _fil.attr("value",_inputval).removeClass("fldChange").addClass("fldChange");
              * _fil.find("input").val(_inputval); }
              * $("#ShowPopUpTableJson_1").superContaner('List'); }
-             */ // 20130909
+             */ // 20180909
           });
           if (option.AutoSearch != undefined) {
             _o.superContaner("AutoSearch", option.AutoSearch, "linkKey");
@@ -8691,7 +8878,126 @@ $(document).on("blur", ".t_Money", function (e) {
                  * _fil.attr("value",_inputval).removeClass("fldChange").addClass("fldChange");
                  * _fil.find("input").val(_inputval); }
                  * $("#ShowPopUpTableJson_1").superContaner('List'); }
-                 */ // 20130909
+                 */ // 20180909
+              }
+            });
+          }
+
+          if (
+            option.beforeLabel != undefined ||
+            option.afterLabel != undefined
+          ) {
+            var value = {
+              before: option.beforeLabel ? option.beforeLabel : undefined,
+              after: option.afterLabel ? option.afterLabel : undefined,
+            };
+            attachLabels(value, _span);
+          }
+          break;
+		case "linkKey2": //20240621
+          var customIcon = option.customIcon;
+          if (undefined == customIcon || "" == customIcon) {
+            customIcon = "icon-search";
+          }
+
+          var _span = $("<span class='pinset'></span>").appendTo(_fieldEdit);
+          var _o = $(
+            "<input  class='input-bg input-ft b-t b-r b-b b-l b-co b-co-basic align-middle' type='text' value='' for='linkkey' />"
+          )
+            .appendTo(_span)
+            .change(function () {
+              // CSS JDM
+              _o.attr("data", $(this).val());
+            });
+
+          if (option.maxlength != undefined) {
+            _o.attr("maxlength", option.maxlength);
+          }
+
+          var _img = $(
+            "<span class='icon i-20 " + customIcon + " align-middle'></span>"
+          ).appendTo(_span);
+          _img.click(function (e) {
+            /*
+             * var _inputval = ""; if(_o.attr("data") != undefined){
+             * _inputval = _o.attr("data"); }
+             */ // 20180909
+            var _fieldContaner = $(this).parents(".fieldContaner");
+            $.ShowPopUpTableJson2(
+              _fieldContaner.attr("linkJson"),
+              _fieldContaner,
+              function (key, display, trobj) {
+                if (key != undefined) {
+                  $("input", _fieldContaner).val($.decHTML(display));
+                  $("input", _fieldContaner).attr("data", $.decHTML(display));
+                  _fieldContaner.attr("linkvalue", key);
+                  _fieldContaner.trigger("change");
+                }
+              }
+            );
+            $.ShowPrevSignPopUpJson(
+              _fieldContaner.attr("linkJson"),
+              _fieldContaner,
+              function (key, display, trobj) {
+                if (key != undefined) {
+                  $("input", _fieldContaner).val($.decHTML(display));
+                  $("input", _fieldContaner).attr("data", $.decHTML(display));
+                  _fieldContaner.attr("linkvalue", key);
+                  _fieldContaner.trigger("change");
+                }
+              }
+            );
+            /*
+             * if(option.filterData != undefined && option.filterData !=
+             * ""){ //alert(option.filterData + ' / ' + _inputval); var
+             * _fil = $(".ShowPopUpTableJson .fieldContaner[field='" +
+             * option.filterData + "']"); if(_inputval != ""){
+             * _fil.attr("value",_inputval).removeClass("fldChange").addClass("fldChange");
+             * _fil.find("input").val(_inputval); }
+             * $("#ShowPopUpTableJson_1").superContaner('List'); }
+             */ // 20180909
+          });
+          if (option.AutoSearch != undefined) {
+            _o.superContaner("AutoSearch", option.AutoSearch, "linkKey");
+          } else {
+            _o.keydown(function (e) {
+              var _fieldContaner = $(this).parents(".fieldContaner");
+              if (e.keyCode == "13") {
+                // var _inputval = _o.val();
+                e.preventDefault();
+                $.ShowPopUpTableJson(
+                  _fieldContaner.attr("linkJson"),
+                  _fieldContaner,
+                  function (key, display, trobj) {
+                    if (key != undefined) {
+                      $("input", _fieldContaner).val(display);
+                      _fieldContaner.attr("linkvalue", key);
+                      _fieldContaner.trigger("change");
+                    }
+                  }
+                );
+                $.ShowPrevSignPopUpJson(
+                  _fieldContaner.attr("linkJson"),
+                  _fieldContaner,
+                  function (key, display, trobj) {
+                    if (key != undefined) {
+                      $("input", _fieldContaner).val(display);
+                      _fieldContaner.attr("linkvalue", key);
+                      _fieldContaner.trigger("change");
+                    }
+                  }
+                );
+                /*
+                 * if(option.filterData != undefined &&
+                 * option.filterData != ""){
+                 * //alert(option.filterData + ' / ' + _inputval);
+                 * var _fil = $(".ShowPopUpTableJson
+                 * .fieldContaner[field='" + option.filterData +
+                 * "']"); if(_inputval != ""){
+                 * _fil.attr("value",_inputval).removeClass("fldChange").addClass("fldChange");
+                 * _fil.find("input").val(_inputval); }
+                 * $("#ShowPopUpTableJson_1").superContaner('List'); }
+                 */ // 20180909
               }
             });
           }
@@ -8857,7 +9163,7 @@ $(document).on("blur", ".t_Money", function (e) {
               $("input", $(this)).datepicker("show");
             });
 
-            // 2013.08.13 dmjung :: firefox 에서 아이콘이 인풋박스 보다 선행해서 그려지는 문제
+            // 2018.08.13 dmjung :: firefox 에서 아이콘이 인풋박스 보다 선행해서 그려지는 문제
             // 잡기 위해 append 마지막에 실행
             _calimg.appendTo(_span);
           }
@@ -8917,7 +9223,7 @@ $(document).on("blur", ".t_Money", function (e) {
           fromid = "dateBetween" + formCID++;
           _fromspan = $("<span class='pinset'></span>").appendTo(_fieldEdit);
 
-          // 2013.08.19 dmjung :: fromdate 클래스 추가
+          // 2018.08.19 dmjung :: fromdate 클래스 추가
           _from = $(
             "<input class='input-bg input-ft  b-t b-r b-b b-l b-co b-co-basic align-middle fromdate' type='text' value='' id='" +
               fromid +
@@ -8962,7 +9268,7 @@ $(document).on("blur", ".t_Money", function (e) {
           toid = "dateBetween" + formCID++;
           _tospan = $("<span class='pinset'></span>").appendTo(_fieldEdit2);
 
-          // 2013.08.19 dmjung :: todate 클래스 추가
+          // 2018.08.19 dmjung :: todate 클래스 추가
           $(
             "<input class='input-bg input-ft  b-t b-r b-b b-l b-co b-co-basic align-middle todate' type='text' value='' id='" +
               toid +
@@ -8990,7 +9296,7 @@ $(document).on("blur", ".t_Money", function (e) {
             changeMonth: true,
             numberOfMonths: 1,
             onSelect: function (selectedDate) {
-              // 2013.08.19 dmjung :: classList[9] 에
+              // 2018.08.19 dmjung :: classList[9] 에
               // fromdate or todate 클래스 string 값이 들어옴
               var type = "maxDate";
               if ($(this).attr("class").indexOf("fromdate") > 0)
@@ -9284,7 +9590,7 @@ $(document).on("blur", ".t_Money", function (e) {
             "<select class='input-bg input-ft b-t b-r b-b b-l b-co b-co-basic align-middle'></select>"
           ).appendTo(_span);
           if (undefined != option.selectOption) {
-            // 20130415 jwkim
+            // 20180415 jwkim
             // multiple관련 옵션추가
             if (true == option.selectOption.multiple) {
               _o.attr("multiple", true);
@@ -9392,9 +9698,27 @@ $(document).on("blur", ".t_Money", function (e) {
         case "phone":
           var _span = $("<span class='pinset'></span>").appendTo(_fieldEdit);
           var _o = $(
-            "<input class='input-bg input-ft  b-t b-r b-b b-l b-co b-co-basic align-middle t_Number' type='text' value='' />"
+            "<input class='input-bg input-ft  b-t b-r b-b b-l b-co b-co-basic align-middle ' type='text' value='' />"
+            //"<input class='input-bg input-ft  b-t b-r b-b b-l b-co b-co-basic align-middle t_Number' type='text' value='' />"
           ).appendTo(_span);
           $("<span class='view-telephone'></span>").appendTo(_span);
+          
+		  //khma 20240328 Adding Validation
+          _o.change(function (e) {
+			  let _phoneNumber = $(this).val().replace(/[^0-9]/g,"");
+			  if(_phoneNumber.length > 6 && _phoneNumber.length < 9) {
+				  _phoneNumber = _phoneNumber.replace(/^(\d+)(\d{4})$/, "$1-$2").replace(/(\-{1,2})$/g, "");
+			  } else if(_phoneNumber.length > 8 && _phoneNumber.substr(0,2) == "82") {
+				  _phoneNumber = "82-" + _phoneNumber.substr(2).replace(/^(02|\d{3})(\d+)(\d{4})$/, "$1-$2-$3").replace(/(\-{1,2})$/g, "");
+			  } else if(_phoneNumber.length > 8 && _phoneNumber.length < 12) {
+				  _phoneNumber = _phoneNumber.replace(/^(02|\d{3})(\d+)(\d{4})$/, "$1-$2-$3").replace(/(\-{1,2})$/g, "");
+			  } else {
+				   alert('번호가 부정확합니다.');
+				  _phoneNumber = "";
+			  }
+			  $(this).val(_phoneNumber);
+          });
+          
           if (option.maxlength != undefined) {
             _o.attr("maxlength", option.maxlength);
           } else {
@@ -9727,24 +10051,32 @@ $(document).on("blur", ".t_Money", function (e) {
               "<input class='input-bg input-ft  b-t b-r b-b b-l b-co b-co-basic align-middle' style='margin-right:4px;' type='text' value='' />"
             )
               .appendTo(_fieldEdit)
-              .css("width", "240px");
+              //.css("width", "240px");
+              .css("width", "340px"); //khma 20240322 size change
             if (option.maxlength != undefined) {
               // 2015.04.15 hycho : 상세주소 maxlength 추가
               $(
                 "<input class='input-bg input-ft  b-t b-r b-b b-l b-co b-co-basic align-middle' type='text' value='' />"
               )
                 .appendTo(_fieldEdit)
-                .css("width", "350px")
+                //.css("width", "350px")
+                .css("width", "240px") //khma 20240322 size change
                 .attr("maxlength", option.maxlength);
             } else {
               $(
                 "<input class='input-bg input-ft  b-t b-r b-b b-l b-co b-co-basic align-middle' type='text' value='' />"
               )
                 .appendTo(_fieldEdit)
-                .css("width", "350px");
+                //.css("width", "350px");
+                .css("width", "240px"); //khma 20240322 size change
             }
+            $(
+                "<span>※ 주소란에 회사, 부서, 직위, 직책 정보 입력 금지.</span>"
+              )
+              .appendTo(_fieldEdit)
+                .css("padding-left", "10px");
           } else {
-            // 2013.07.10 dmjung :: 새롭게 HTML 생성..
+            // 2018.07.10 dmjung :: 새롭게 HTML 생성..
             _zipspan = $("<div class='ziplines'></div>").appendTo(_fieldEdit);
             $(
               "<input class='input-bg input-ft  b-t b-r b-b b-l b-co b-co-basic align-middle' readonly='readonly' type='text' value='' />"
@@ -9785,7 +10117,7 @@ $(document).on("blur", ".t_Money", function (e) {
           //_zipfind.click(function(e) {
           //	var _fC = $(this).parents('.fieldContaner');
           //
-          //	// 2013.07.10 dmjung :: 파라메터 추가, 속성 추가 ( 임시 )
+          //	// 2018.07.10 dmjung :: 파라메터 추가, 속성 추가 ( 임시 )
           //	// $.ZipPopUp(function(zipCode, sido, gugun, dong, bunji,
           //	// tr) {
           //	$.ZipPopUp(function(addrType, addr) { // 20140331 jwkim ::
@@ -10005,7 +10337,7 @@ $(document).on("blur", ".t_Money", function (e) {
 
         case "textarea":
           if (_fieldEdit.parent().parent().hasClass("fldTdLabel") == true) {
-            // 2013.05.22 dmjung :: Textarea 가 dataTD 가 아니라 LabelTD 에 있는
+            // 2018.05.22 dmjung :: Textarea 가 dataTD 가 아니라 LabelTD 에 있는
             // 경우.
             _fieldEdit
               .parent()
@@ -10018,7 +10350,7 @@ $(document).on("blur", ".t_Money", function (e) {
           ).appendTo(_span);
           if (option.height != undefined) {
             _o.css("height", option.height);
-            // 2013.05.27 dmjung :: 텍스트에리어를 갖고 있을 경우, fieldContaner 에
+            // 2018.05.27 dmjung :: 텍스트에리어를 갖고 있을 경우, fieldContaner 에
             // height 값 할당하지 않음.
             // :::::::::::::::::::: fieldContaner height 때문에 textarea
             // 하단부 잘리던 부분 수정.
@@ -10053,7 +10385,7 @@ $(document).on("blur", ".t_Money", function (e) {
             "<textarea class='input-bg input-ft b-t b-r b-b b-l b-co b-co-basic align-middle' rows='5' cols='5'></textarea>"
           ).appendTo(_span);
 
-          // 2013.06.05 dmjung :: option.codemode 가 지정되어있지 않을 경우 default
+          // 2018.06.05 dmjung :: option.codemode 가 지정되어있지 않을 경우 default
           // 값을 javascript 로 셋팅
           if (
             option.codemode == undefined ||
@@ -10080,7 +10412,7 @@ $(document).on("blur", ".t_Money", function (e) {
 
           if (option.height != undefined) {
             _o.css("height", option.height);
-            // 2013.06.11 dmjung :: height 지정시 코드에디터에도 적용되도록 추가.
+            // 2018.06.11 dmjung :: height 지정시 코드에디터에도 적용되도록 추가.
             $(".CodeMirror").css("height", option.height);
             _o.parents(".fieldContaner").css("height", "auto");
           }
@@ -10146,14 +10478,14 @@ $(document).on("blur", ".t_Money", function (e) {
             ).appendTo(_span);
             // _o.attr("id", 'textword' + formCID++);
             _o.attr("id", taId);
-            // 2013.05.27 dmjung :: -20 높이값 마이너스 계산 삭제, 그리고
+            // 2018.05.27 dmjung :: -20 높이값 마이너스 계산 삭제, 그리고
             // fieldContaner 에 height 값 제거. 텍스트 에디터 하단이 잘리는 문제 수정.
             _M.WordOption.height = _fieldEdit.outerHeight();
             _fieldContaner.css("height", "5px").css("height", "auto");
             if (option.css) {
               _M.WordOption.content_css = option.css;
             }
-            // _o.tinymce(_M.WordOption); // 2013.10.23 jwkim :: tinymce
+            // _o.tinymce(_M.WordOption); // 2018.10.23 jwkim :: tinymce
             // 버전업
             // var taId ='#'+ _o.attr("id"); // khma
             _M.WordOption.selector = "#" + taId;
@@ -10188,7 +10520,7 @@ $(document).on("blur", ".t_Money", function (e) {
           var clickEvent = function (e) {
             var _o = $(this);
             $.GetImg(function (url, filename) {
-              // 2013.09.17 dmjung :: 선택취소 눌렀을 경우, img src 속성 공백 갱신해도
+              // 2018.09.17 dmjung :: 선택취소 눌렀을 경우, img src 속성 공백 갱신해도
               // 이미지가 지워지지 않아서 url 정보가 없을 경우 hide 처리로 변경.
               if (url == undefined || url == "") {
                 $(".fldimg", _o).attr("src", url).hide().trigger("change");
@@ -10351,7 +10683,57 @@ $(document).on("blur", ".t_Money", function (e) {
             attachLabels(value, _span);
           }
           break;
-        case "multifile": // 20120717 실제경로 파일업로드방식
+        case "signfile": // 20240619
+  
+          var jobType = "";
+          if (option.jobType != undefined) {
+            jobType = option.jobType;
+          }
+          var signFileOption; // 20140324 jwkim 확장자 제한 start
+          var extenders;
+          if (
+            isNotEmpty(option.signFileOption) &&
+            isNotEmpty(option.signFileOption.extenders)
+          ) {
+            // 옵션이
+            // 존재할때
+            extenders = option.signFileOption.extenders;
+            _fieldEdit.data("extenders", extenders);
+          } // 20140324 jwkim 확장자 제한 end
+
+          _fieldEdit.attr("jobType", jobType).css("position", "relative");
+          _span = $(
+            "<span class='fldfiledown' style='display:block;'></span>"
+          ).appendTo(_fieldEdit);
+          $(
+            "<div class='tempdiv'><label class='align-middle' style='font-weight:bold;'> 파일 업로드</label><span class='fileSelectBox icon i-20 icon-attachment'></span></div>"
+          ).appendTo(_fieldEdit);
+          $(".tempdiv")
+            .css("padding", "6px 0px")
+            .css("border-top", "2px solid #000")
+            .css("margin-top", "6px")
+            .css("width", "350px");
+          $(
+            "<span class='fldfiledown' style='display:block;'></span>"
+          ).appendTo(_fieldView);
+          // TODO 필드값 초기화 필요
+          $(this).superContaner(
+            "setFieldNameValue",
+            _fieldEdit.parent(".fieldContaner").attr("field"),
+            ""
+          );
+          if (
+            option.beforeLabel != undefined ||
+            option.afterLabel != undefined
+          ) {
+            var value = {
+              before: option.beforeLabel ? option.beforeLabel : undefined,
+              after: option.afterLabel ? option.afterLabel : undefined,
+            };
+            attachLabels(value, _span);
+          }
+          break;
+        case "multifile": // 20170717 실제경로 파일업로드방식
           // 작업종류를 셋팅
 
           // :: gen mutifile
@@ -10772,7 +11154,7 @@ $(document).on("blur", ".t_Money", function (e) {
           }
           break;
         case "sticker":
-          // 2013.05.22 dmjung :: qtip 플러그인 활용하여 아이콘 선택창 열었던 것, 불안정한 이유로
+          // 2018.05.22 dmjung :: qtip 플러그인 활용하여 아이콘 선택창 열었던 것, 불안정한 이유로
           // 기본 클릭 이벤트로 액션 대체.
           var _span = $(
             "<span class='pinset' style='position:relative; overflow:visible;'></span>"
@@ -10786,7 +11168,7 @@ $(document).on("blur", ".t_Money", function (e) {
           var _box = $(
             "<ul class='caliconlist b-t b-r b-b b-l b-co b-co-basic' style='display:none; width:285px; cursor:pointer; padding:16px; background-color:white; position:absolute; z-index:9999; top:21px; left:0px;'></ul>"
           ).appendTo(_span);
-          // 2013.06.20 dmjung :: XP IE8 에서 caliconlist 에 고정값이 없을 경우에 요소가
+          // 2018.06.20 dmjung :: XP IE8 에서 caliconlist 에 고정값이 없을 경우에 요소가
           // 자동으로 늘어나지 않으므로, 고정값 285px 추가. 아이콘 추가될 시 그에 따라 고정값도 늘려줘야 함.
           _fieldEdit.parent().parent().css("overflow", "visible");
           var counting = 0;
@@ -10838,7 +11220,7 @@ $(document).on("blur", ".t_Money", function (e) {
             $(".calicon", _box).click(function () {
               var css = $(this).attr("css");
 
-              // 2013.05.24 dmjung ::
+              // 2018.05.24 dmjung ::
               // 켈린더 스티커에서 노아이콘 선택시
               // 화살표 아이콘이 노아이콘 모양으로
               // 바뀌는 문제 방지하기 위해 조건 추가.
@@ -10916,7 +11298,7 @@ $(document).on("blur", ".t_Money", function (e) {
         var _fldTdLbl = _fieldContaner.parent().prev();
         if (_fldTdLbl.find("a").hasClass("havta")) {
         } else if (_fldTdLbl.hasClass("fldTdData")) {
-          // 2013.05.22 dmjung :: 필수 입력란 표시인 별표가 fldTdData 영역에 추가되는 것을
+          // 2018.05.22 dmjung :: 필수 입력란 표시인 별표가 fldTdData 영역에 추가되는 것을
           // 방지하기 위해 조건 추가.
           _fldTdLbl = _fldTdLbl.prev();
           $("<a class='havta'>*</a>").appendTo(_fldTdLbl);
@@ -10943,7 +11325,7 @@ $(document).on("blur", ".t_Money", function (e) {
       // 고유명령실행
       if (oCmd.attr("inComm") != "" && oCmd.attr("inComm") != "makeViewPopup") {
         _Obj.superContaner(oCmd.attr("inComm"), oCmd, oCmd);
-        _Obj.displayButtons(_Obj);
+        //_Obj.displayButtons(_Obj);
       }
       // alert("후처리작업이 실패하였습니다");
       if (option.afterJobCallBack != undefined) {
@@ -11276,7 +11658,7 @@ $(document).on("blur", ".t_Money", function (e) {
         .addClass("SortNone");
       th.removeClass("SortNone").addClass(_sortClass);
       if (_json.sort != undefined && _json.sort != "") {
-        _Obj.attr("_sort", _sortField); // 20130124 jwkim sort속성 추가
+        _Obj.attr("_sort", _sortField); // 20180124 jwkim sort속성 추가
       } else {
         _Obj.attr("_order", _sortField);
       }
@@ -11587,7 +11969,7 @@ $(document).on("blur", ".t_Money", function (e) {
         _M.aSync.sync
       );
 
-      // 2013.10.04 dmjung :: Read 성공시 최종 viewstatus 결정
+      // 2018.10.04 dmjung :: Read 성공시 최종 viewstatus 결정
       if (
         _Obj.attr("viewstatus") == "N" ||
         (_Obj.attr("viewstatus") == "E" && option.isEditMode == true) ||
@@ -11757,7 +12139,7 @@ $(document).on("blur", ".t_Money", function (e) {
       _key = _Obj.attr("keyvalue");
       option = $(this).data("jsonData");
 
-      // 2013.06.24 dmjung :: 셀렉터 간소화를 위한 변수 추가, 테이블명 / 메소드명없을 경우 경고창 띄움
+      // 2018.06.24 dmjung :: 셀렉터 간소화를 위한 변수 추가, 테이블명 / 메소드명없을 경우 경고창 띄움
       var TableName = $("div[field='TABLE_NAME'] input", _Obj);
       var ExecName = $("div[field='EXEC_TYPE'] select", _Obj);
       var MethodName = $("div[field='METHOD_NAME'] input", _Obj);
@@ -11785,7 +12167,7 @@ $(document).on("blur", ".t_Money", function (e) {
             .attr("value", _data.resultData[0].query)
             .trigger("change");
 
-          // 2013.06.24 dmjung :: 해당 셋팅값을 코드미러에 적용한다.
+          // 2018.06.24 dmjung :: 해당 셋팅값을 코드미러에 적용한다.
           var cmInst = $("div[field='QUERY_STMT']", _Obj).data(
             "CodeMirrorInstance"
           );
@@ -12098,7 +12480,7 @@ $(document).on("blur", ".t_Money", function (e) {
         case "tokenField": // 일반형
           _o = $("input", _Obj);
           _retVal = _o.val();
-          _retVal = _retVal.replace(/ /g, ""); // 2013.02.10 dmjung ::
+          _retVal = _retVal.replace(/ /g, ""); // 2018.02.10 dmjung ::
           // 벨류 삽입시 공백 제거
           _Obj.attr("Value", _retVal);
           if (_Obj.find("div.token").length == 0) {
@@ -12170,7 +12552,7 @@ $(document).on("blur", ".t_Money", function (e) {
           }
           break;
         case "multitel":
-          // 2013.07.18 dmjung :: get.. retVal2 는 이메일 타입 코드 값을 가져오기 위함.
+          // 2018.07.18 dmjung :: get.. retVal2 는 이메일 타입 코드 값을 가져오기 위함.
           var parentKey = _Obj.parents(".SuperView").attr("keyvalue");
           var searchKey = _Obj.attr("value");
 
@@ -12229,6 +12611,15 @@ $(document).on("blur", ".t_Money", function (e) {
             }
           }
           break;
+          
+          //khma 20240329 이메일 타입 신규 추가
+        case "email": // email validation 추가 
+          _o = $("input", _Obj);
+          _retVal = _o.val();
+          _Obj.attr("Value", _retVal);
+          if (apl != undefined) apl.add(_Obj.attr("field"), _Obj.attr("Value"));
+          break;
+          
         case "text": // 일반형
           _o = $("input", _Obj);
           _retVal = _o.val();
@@ -12256,6 +12647,11 @@ $(document).on("blur", ".t_Money", function (e) {
           if (apl != undefined) apl.add(_Obj.attr("field"), _Obj.attr("Value"));
           break;
         case "linkKey":
+          _retVal = _Obj.attr("linkvalue");
+          _Obj.attr("Value", _retVal);
+          if (apl != undefined) apl.add(_Obj.attr("field"), _Obj.attr("Value"));
+          break;
+        case "linkKey2": //20240621
           _retVal = _Obj.attr("linkvalue");
           _Obj.attr("Value", _retVal);
           if (apl != undefined) apl.add(_Obj.attr("field"), _Obj.attr("Value"));
@@ -12325,6 +12721,15 @@ $(document).on("blur", ".t_Money", function (e) {
 
           _Obj1Val = _Obj1.val();
           _Obj1Val = _Obj1Val.replace(/-/gi, "");
+		  
+		  /* 20240523 khma 추가 datetime null 선택시 기본값이 00으로 세팅 start */
+		  if(_Obj2.val() == undefined || _Obj2.val() == ""){
+			  _Obj2.val("00");
+		  }
+		  if(_Obj3.val() == undefined || _Obj3.val() == ""){
+			  _Obj3.val("00");
+		  }
+		  /* 20240523 khma 추가 datetime null 선택시 기본값이 00으로 세팅 end */
 
           _retVal = _Obj1Val + _Obj2.val() + _Obj3.val() + "00";
           _Obj.attr("Value", _retVal);
@@ -12404,7 +12809,7 @@ $(document).on("blur", ".t_Money", function (e) {
           _o = $("select", _Obj);
           _retVal = _o.val();
           _Obj.attr("Value", _retVal);
-          if (apl != undefined)
+          if (apl != undefined && _Obj.attr("Value") != undefined)
             apl.add(_Obj.attr("field"), _Obj.attr("Value").toString());
           break;
 
@@ -12594,9 +12999,9 @@ $(document).on("blur", ".t_Money", function (e) {
           break;
         case "textword":
           _o = $("textarea", _Obj);
-          // _retVal = _o.html(); //khma 20131023 에디터변경으로 수정
+          // _retVal = _o.html(); //khma 20181023 에디터변경으로 수정
           if (undefined != tinymce.activeEditor) {
-            _retVal = tinymce.activeEditor.getContent(); // khma 20131023 에디터변경으로 수정
+            _retVal = tinymce.activeEditor.getContent(); // khma 20181023 에디터변경으로 수정
           }
           _Obj.attr("Value", _retVal);
           if (apl != undefined) apl.add(_Obj.attr("field"), _Obj.attr("Value"));
@@ -12605,6 +13010,10 @@ $(document).on("blur", ".t_Money", function (e) {
           _o = $(".fldfiledown", _Obj);
           _retVal = _o.attr("src");
           _Obj.attr("Value", _retVal);
+          if (apl != undefined) apl.add(_Obj.attr("field"), _Obj.attr("Value"));
+          break;
+        case "signfile": //20240619
+          // :: get multifile
           if (apl != undefined) apl.add(_Obj.attr("field"), _Obj.attr("Value"));
           break;
         case "multifile":
@@ -12658,10 +13067,10 @@ $(document).on("blur", ".t_Money", function (e) {
           if (apl != undefined) apl.add(_Obj.attr("field"), _Obj.attr("Value"));
           break;
         case "sticker": // 일반형
-          // 2013.07.08 dmjung :: .icon 을 li 가 아닌 span 요소만 선택하도록 셀렉터 수정 (
+          // 2018.07.08 dmjung :: .icon 을 li 가 아닌 span 요소만 선택하도록 셀렉터 수정 (
           // IE9 에서 아이콘 바깥 영역 클릭시 클래스 전부 적용되던 문제 수정 )
           _Obj.find("span.icon").addClass(_Obj.attr("Value"));
-          // 2013.05.24 dmjung :: 켈린더 스티커에서 노아이콘 선택 후 저장시 화살표 아이콘이 노아이콘
+          // 2018.05.24 dmjung :: 켈린더 스티커에서 노아이콘 선택 후 저장시 화살표 아이콘이 노아이콘
           // 모양으로 바뀌는 문제 방지하기 위해 조건 추가.
           if (_Obj.find("span.icon").hasClass("calicon-noicon") == true) {
             _Obj.find("span.icon").removeClass("calicon-noicon");
@@ -13418,6 +13827,18 @@ $(document).on("blur", ".t_Money", function (e) {
             }
           }
           break;
+          
+          //khma 20240329 이메일 타입 신규 추가
+        case "email":
+          if (typeof _value === "string")
+            $("input", _Obj).val($.decHTML(_value));
+          else $("input", _Obj).val(_value);
+          $(".fieldView", _Obj).html(_value);
+          // if (!_Obj.find('.fieldEdit').length) _Obj.html(_value);
+          if (!_Obj.find(".fieldEdit").length)
+            _Obj.html(_Obj.text(_value).html());
+          break;
+          
         case "text":
           if (typeof _value === "string")
             $("input", _Obj).val($.decHTML(_value));
@@ -13438,6 +13859,19 @@ $(document).on("blur", ".t_Money", function (e) {
           if (!_Obj.find(".fieldEdit").length) _Obj.html("");
           break;
         case "linkKey":
+          _Obj.attr("linkvalue", _value);
+          var _linkKey = _Obj.attr("linkfield");
+          if (DataRow == undefined) {
+            _value = "";
+          } else {
+            _value = DataRow[_linkKey];
+          }
+
+          $("input", _Obj).val($.decHTML(_value));
+          $(".fieldView", _Obj).html(_value);
+          if (!_Obj.find(".fieldEdit").length) _Obj.html(_value);
+          break;
+        case "linkKey2": //20240621
           _Obj.attr("linkvalue", _value);
           var _linkKey = _Obj.attr("linkfield");
           if (DataRow == undefined) {
@@ -13515,7 +13949,7 @@ $(document).on("blur", ".t_Money", function (e) {
            * 삭제할것 var _o = eval(_value.replace(/\/Date\((\d+)\)\//gi, "new
            * Date($1)").replace(/\/Date\((\-\d+)\)\//gi, "new Date($1)"));
            * _value = _M.f.d.DateGetDate(_o); } else if ( _value == "" ||
-           * _value == undefined ){ // 2013.08.20 dmjung :: else if 분기점
+           * _value == undefined ){ // 2018.08.20 dmjung :: else if 분기점
            * 추가, _value 가 없고, 탭 화면일 때 필드값에 현재 날짜가 셋팅되는 현상 방지하기 위함. //
            * TO-DO :: 테스트 케이스가 부족해서 값이 있는 경우, 없는 경우, view에서 해당 타입을 사용할 경우에
            * 대한 테스트 필요. $('input', _Obj).val(''); } else
@@ -14043,11 +14477,11 @@ $(document).on("blur", ".t_Money", function (e) {
             .replace(/\s/g, " ")
             .replace(/<script[^>]*>(.*?)<\/script>/gi, ""); //todo 2015-05-20 hycho : 정규식을 이용한 스크립트태그 제거 XSS 취약점 대응
           if (undefined != editor) {
-            editor.setContent(_decValue); // khma 20131023
+            editor.setContent(_decValue); // khma 20181023
             // 에디터변경으로 수정
           } else {
             // setTimeout(function(){
-            // tinymce.activeEditor.setContent(_value); //khma 20131031
+            // tinymce.activeEditor.setContent(_value); //khma 20181031
             // 에디터변경으로 수정
             // },500);
           }
@@ -14060,7 +14494,7 @@ $(document).on("blur", ".t_Money", function (e) {
             // superTable일때에
             // fieldEdit가 없으므로 대응하기
             // 위한 처리
-            _Obj.html(_value); // khma 20131023 에디터변경으로 수정
+            _Obj.html(_value); // khma 20181023 에디터변경으로 수정
           }
           break;
         case _M.DataType.img:
@@ -14147,6 +14581,60 @@ $(document).on("blur", ".t_Money", function (e) {
               );
           }
           break;
+        case "signfile": //20240619
+           _o = $(".fldfiledown", _Obj);
+          _o.removeClass("fileSelect fileAttch");
+          _o.find("input").remove();
+          _o.find("ul").remove();
+          var _htm = "";
+          if (_value == "") {
+            var timestamp = new Date().getTime(); // 20170717
+           // var fileSearchKey =
+              //_M.UserInfo.id.toString() + timestamp.toString();
+            _htm =
+              "<input id ='fileSearchKey' name='fileSearchKey' mode='new' type='hidden' value='' />";
+            $(".tempdiv")
+              .css("padding", "0px 0px")
+              .css("border-top", "0px solid transparent")
+              .css("margin-top", "0px");
+            // _htm += "<ul><li>파일없음</li></ul>";
+
+            $(_htm).appendTo(_o);
+            // _o.append(_htm);
+            $(".fieldView input", _Obj).remove();
+            $(".fieldView ul", _Obj).remove();
+            $(".fieldView .fldfiledown", _Obj).append(_htm);
+            // $("#MainView
+            // .fieldContaner[field='ATTC_FILE_KEY']").removeClass("fldChange").addClass("fldChange");
+            $(this).removeClass("fldChange").addClass("fldChange");
+            $(this).attr("value", fileSearchKey);
+
+            // if (!_Obj.find('.fieldEdit').length) _Obj.html(_htm);
+          } else {
+            $(".tempdiv")
+              .css("padding", "6px 0px")
+              .css("border-top", "2px solid #000")
+              .css("margin-top", "6px")
+              .css("width", "350px");
+            _htm =
+              "<input id ='fileSearchKey' name='fileSearchKey' mode='modify' type='hidden' value='' />";
+            _o.append(_htm);
+            $(".fieldView input", _Obj).remove();
+            $(".fieldView .fldfiledown", _Obj).append(_htm);
+            if (!_Obj.find(".fieldEdit").length) _Obj.html(_htm);
+            // 파일목록을 뿌린다.
+            var _file = _o.parents(".fieldEdit");
+            var fileSearchKey = _file.find("#fileSearchKey").attr("value");
+            var jobType = _file.attr("jobType");
+            _Obj.superContaner(
+              "GetSignFileList",
+              _file,
+              jobType,
+              fileSearchKey
+            );
+          }
+
+          break;
         case "multifile":
           // :: set multifile
           _o = $(".fldfiledown", _Obj);
@@ -14155,7 +14643,7 @@ $(document).on("blur", ".t_Money", function (e) {
           _o.find("ul").remove();
           var _htm = "";
           if (_value == "") {
-            var timestamp = new Date().getTime(); // 20120717
+            var timestamp = new Date().getTime(); // 20170717
             var fileSearchKey =
               _M.UserInfo.id.toString() + timestamp.toString();
             _htm =
@@ -14370,8 +14858,9 @@ $(document).on("blur", ".t_Money", function (e) {
           }
 
 			if (_type == "datetime" && _value == "NOW") {
-			  _Obj.superContaner("changeValue", $(this), _M.f.d.getDate(), 0, pl);
-			  _Obj.superContaner("changeValue", $(this), _M.f.d.getTime(), 1, pl);
+			  //_Obj.superContaner("changeValue", $(this), _M.f.d.getDate(), 0, pl);
+			  //_Obj.superContaner("changeValue", $(this), _M.f.d.getTime(), 1, pl);
+			  $(this).find('.icon-clock').click();
 			} else if (_type == "datetimeBetween" && _value == "NOW") {
 			  _Obj.superContaner("changeValue", $(this), _M.f.d.getDate(), 0, pl);
 			  _Obj.superContaner("changeValue", $(this), _M.f.d.getTime(), 1, pl);
@@ -14648,6 +15137,81 @@ $(document).on("blur", ".t_Money", function (e) {
         _fieldContaner.removeClass("fldChange").addClass("fldChange");
       }
     },
+    
+
+	//계약 파일 목록 조회 20240619
+	GetSignFileList : function(obj, jobType, callBackFn, fileSearchKey) {
+		
+			if(fileSearchKey == undefined || fileSearchKey == ""){
+				var readKey = $(".fieldContaner[field='FILE_SEARCHKEY']").attr('value');
+				if(readKey != ""){
+					fileSearchKey = readKey;
+				}else{
+					return false;
+				}	
+			}
+
+			var pl = new JSONClientParameters();
+			pl.add("service", "MON_COMMON");
+      		pl.add("method", "SIGNFILE_LIST");
+			pl.add("UPPER_INFO", fileSearchKey);
+			pl.add("_viewpage", 1);
+			pl.add("_pagecnt", 999);
+			var ulTag = "<ul>";
+			var liTag = "";
+			
+			PostJsonData(
+		        _M.svcUrl[_M.Webtype].crudUrl, pl, function (_data) {
+
+					var rstData = _data.resultData;
+					for (var i = 0, j = rstData.length; i < j; i++) {
+						var f = rstData[i];
+						liTag += "<li class='filelist' title='"
+								+ f.FILE_NAME
+								+ "' style='padding:1px 0px; margin:3px 0px; font-weight:bold;'><a href='"
+								+ _M.svcUrl[_M.Webtype].signFileDownload
+								+ "?fid="
+								+ f.M_IMAGE_GAL_NO
+								+ "'><span class='icon i-20 icon-downward align-middle'></span> <label class='align-middle' style='height:20px; line-height:20px; font-weight:bold; color:initial; cursor:pointer;'>"
+								+ f.FILE_NAME
+								+ "</label></a><label class='align-middle' style='height:20px; line-height:20px; font-weight:normal; font-size:10px;'> ("
+								+ _M.f.c.setComma((f.FILE_SIZE / 1024)
+										.toString().substring(0, 5))
+								+ "kb)</label></li>";
+					}
+
+					if (undefined == rstData || rstData.length <= 0) {
+						// liTag +="<li class='filelist'>파일없음</li>";
+						$('.tempdiv').css('padding', '0px 0px').css(
+								'border-top', '0px solid transparent').css(
+								'margin-top', '0px');
+					}
+			}, function() {
+				alert("예상하지 못한 에러가 발생하였습니다.");
+			}, false);
+			
+
+			ulTag += liTag + "</ul>";
+			var _o = $('.fldfiledown', obj);
+
+			_o.find('ul').remove();
+			// _o.find('li').remove();
+			// $(uiTag).appendTo(_o);
+			_o.append(ulTag);
+			// _o.append(liTag);
+			var _fieldContaner = obj.parents(".fieldContaner");
+			var _fieldView = _fieldContaner.find(".fieldView .fldfiledown");
+			// _fieldView.find('ui').remove();
+			_fieldView.find('ul').remove();
+			_fieldView.append(ulTag);
+			_fieldContaner.attr("value", fileSearchKey);
+			option = _fieldContaner.parents(".SuperView").data("jsonData");
+			if (option.isEditMode) {
+				_fieldContaner.removeClass("fldChange").addClass("fldChange");
+			}
+
+		},
+		
 
     /* ----------------------------------------------------------------------------- */
     // AutoSearch
@@ -15656,7 +16220,7 @@ function makeTalbleTh(colModel, option) {
   var _name = colModel.name;
   var _label = colModel.label == undefined ? _name : colModel.label;
   var _field = colModel.field == undefined ? _name : colModel.field;
-  /* SQLInjection관련 20130124 jwkim Start */
+  /* SQLInjection관련 20180124 jwkim Start */
   var _orderAsc = "";
   var _orderDesc = "";
   if (option.sort != undefined) {
@@ -15674,7 +16238,7 @@ function makeTalbleTh(colModel, option) {
     _orderDesc =
       colModel.orderDesc == undefined ? _field + " DESC" : colModel.orderDesc;
   }
-  /* SQLInjection관련 20130124 jwkim End */
+  /* SQLInjection관련 20180124 jwkim End */
   var _orderYN = colModel.orderYN == undefined ? "Y" : colModel.orderYN;
 
   if (_label == "") return; // th-text , th-orderby HTML 요소 추가.
@@ -15764,7 +16328,7 @@ function makeTalbleTd(colModel, tr) {
   // colModel.clickAction).addClass('tdAuction');
 }
 
-// 2013.01.11 dmjung :: 자동 브라우저 height 로 화면 높이 설정하기, 리사이즈 할 때마다 화면 맞춤
+// 2018.01.11 dmjung :: 자동 브라우저 height 로 화면 높이 설정하기, 리사이즈 할 때마다 화면 맞춤
 $(window).resize(function () {
   var _height = $(window).height();
   var _result = _height - 92;
@@ -15783,7 +16347,7 @@ $(window).resize(function () {
   var sum = top + title - (bottom + 10);
   var total = _result - sum;
 
-  // 2013.12.16 dmjung :: chatting window 값 구하기 추가
+  // 2018.12.16 dmjung :: chatting window 값 구하기 추가
   if ($(".icon-chat-white-active").size() == 0) {
     $(".window-chatting").attr("data-mcm-height", total);
     $("#window-chatting-body").attr("data-mcm-height", total - 60);
@@ -15809,7 +16373,7 @@ function setRatio(selector, width) {
   } else {
     $(selector).css("width", "auto");
   }
-  // 2013.05.29 dmjung :: left에 컨텐츠가 없을 경우, 요소를 숨겨서 2px 차지하는 현상 방지
+  // 2018.05.29 dmjung :: left에 컨텐츠가 없을 경우, 요소를 숨겨서 2px 차지하는 현상 방지
   if ($(".left").width() < 3) {
     $(".left").hide();
   } else {

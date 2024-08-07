@@ -1,7 +1,7 @@
 ﻿/// <reference path="../Resource.js" />
 /// <reference path="MonArchResource.js" />
 /* jQuery grid plugin: 
-* version 0.1 2011-07-21
+* version 0.1 2016-07-21
 * Requires jQuery v1.6.2 or later
 * Dual licensed under the MIT and GPL licenses:
 * http://www.opensource.org/licenses/mit-license.php
@@ -122,7 +122,7 @@
     //   상호작용함수들...
     //*******************************************************************************
     //===============================================================================
-    // 2013.08.02 dmjung :: 임시로 height 파라메터 추가
+    // 2018.08.02 dmjung :: 임시로 height 파라메터 추가
     $.MessageBox = function (title, msg, width, height, callback) {
 
         $('#yesnodailog').remove();
@@ -159,7 +159,7 @@
 
 
 
-    // 2013.07.22 dmjung :: pop.. MultiEmail 팝업용 메시지 박스 생성. 팝업 제목, 크기, 키 값, 확인 버튼 이후의 콜백을 파라메터로 받는다.
+    // 2018.07.22 dmjung :: pop.. MultiEmail 팝업용 메시지 박스 생성. 팝업 제목, 크기, 키 값, 확인 버튼 이후의 콜백을 파라메터로 받는다.
     $.MultiEmail = function (title, width, height, key, object, callback) {
 
         $('#MultiEmail').remove();
@@ -173,7 +173,7 @@
             dlgHeight = height;
         }
 
-        // 2013.07.22 dmjung :: GenField, 데이터 입력 Row 를 생성해 줌. 체크박스, 이메일 유형, 이메일 주소와 버튼 포함.
+        // 2018.07.22 dmjung :: GenField, 데이터 입력 Row 를 생성해 줌. 체크박스, 이메일 유형, 이메일 주소와 버튼 포함.
         function GenField() {
 
             var _div = $("<div class='contactlines'></div>").appendTo($('#MultiEmail'));
@@ -207,12 +207,12 @@
 
         var _key = key;
 
-        // 2013.07.22 dmjung :: 신규생성한 MultiEmailList 를 LIST 메소드 형태로 호출하여 데이터를 받아옴
+        // 2018.07.22 dmjung :: 신규생성한 MultiEmailList 를 LIST 메소드 형태로 호출하여 데이터를 받아옴
         var option = object.parents('.SuperView').data('jsonData');
         var jobType = object.parents('.fieldContaner').attr('jobType');
         var ds = _Obj.superContaner('MultiContactList', _key, 'LIST', 'EMAIL_MGMT', 'EMAIL', jobType);
 
-        // 2013.07.22 dmjung :: 데이터가 있는 경우, 해당 데이터 수 만큼 MultiEmail 팝업 박스에 데이터들을 표시해준다.
+        // 2018.07.22 dmjung :: 데이터가 있는 경우, 해당 데이터 수 만큼 MultiEmail 팝업 박스에 데이터들을 표시해준다.
         if (ds.resultData.length != 0) {
             $(ds.resultData).each(function (index, data) {
                 var _div = $("<div class='contactlines' no='" + data.M_EMAIL_MGMT_NO + "'></div>").appendTo($('#MultiEmail'));
@@ -240,7 +240,7 @@
 
                 $('#MultiEmail').attr('mode', 'edit');
             });
-        } else { // 2013.07.22 dmjung :: 데이터가 없을 경우, 입력란 하나 생성
+        } else { // 2018.07.22 dmjung :: 데이터가 없을 경우, 입력란 하나 생성
             GenField();
             var emailtype = $('.emailtype', object).val();
             var email = $('.email', object).val();
@@ -355,7 +355,7 @@
         });
         $('#MultiEmail').dialog('open');
 
-        // 2013.07.25 dmjung :: 대표이미지 안내용 qtip 셋팅 및 dialog close 시 제거
+        // 2018.07.25 dmjung :: 대표이미지 안내용 qtip 셋팅 및 dialog close 시 제거
         $('.ui-dialog-titlebar-close').click(function () {
             $('.qtip').remove();
         });
@@ -424,7 +424,7 @@
         };
     };
 
-    // 2013.07.25 dmjung :: MultiEmail 팝업창 종료 ::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    // 2018.07.25 dmjung :: MultiEmail 팝업창 종료 ::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
 
@@ -434,7 +434,7 @@
 
 
 
-    // 2013.07.22 dmjung :: pop.. MultiTel 팝업용 메시지 박스 생성. 팝업 제목, 크기, 키 값, 확인 버튼 이후의 콜백을 파라메터로 받는다.
+    // 2018.07.22 dmjung :: pop.. MultiTel 팝업용 메시지 박스 생성. 팝업 제목, 크기, 키 값, 확인 버튼 이후의 콜백을 파라메터로 받는다.
     $.MultiTel = function (title, width, height, key, object, callback) {
 
         $('#MultiTel').remove();
@@ -448,7 +448,7 @@
             dlgHeight = height;
         }
 
-        // 2013.07.22 dmjung :: GenField, 데이터 입력 Row 를 생성해 줌. 체크박스, 이메일 유형, 이메일 주소와 버튼 포함.
+        // 2018.07.22 dmjung :: GenField, 데이터 입력 Row 를 생성해 줌. 체크박스, 이메일 유형, 이메일 주소와 버튼 포함.
         function GenField() {
 
             var _div = $("<div class='contactlines'></div>").appendTo($('#MultiTel'));
@@ -482,12 +482,12 @@
 
         var _key = key;
 
-        // 2013.07.22 dmjung :: 신규생성한 MultiEmailList 를 LIST 메소드 형태로 호출하여 데이터를 받아옴
+        // 2018.07.22 dmjung :: 신규생성한 MultiEmailList 를 LIST 메소드 형태로 호출하여 데이터를 받아옴
         var option = object.parents('.SuperView').data('jsonData');
         var jobType = object.parents('.fieldContaner').attr('jobType');
         var ds = _Obj.superContaner('MultiContactList', _key, 'LIST', 'TEL_MGMT', 'TEL', jobType);
 
-        // 2013.07.22 dmjung :: 데이터가 있는 경우, 해당 데이터 수 만큼 MultiEmail 팝업 박스에 데이터들을 표시해준다.
+        // 2018.07.22 dmjung :: 데이터가 있는 경우, 해당 데이터 수 만큼 MultiEmail 팝업 박스에 데이터들을 표시해준다.
         if (ds.resultData.length != 0) {
             $(ds.resultData).each(function (index, data) {
                 var _div = $("<div class='contactlines' no='" + data.M_TEL_MGMT_NO + "'></div>").appendTo($('#MultiTel'));
@@ -515,7 +515,7 @@
 
                 $('#MultiTel').attr('mode', 'edit');
             });
-        } else { // 2013.07.22 dmjung :: 데이터가 없을 경우, 입력란 하나 생성
+        } else { // 2018.07.22 dmjung :: 데이터가 없을 경우, 입력란 하나 생성
             GenField();
             var teltype = $('.teltype', object).val();
             var telno = $('.telno', object).val();
@@ -630,7 +630,7 @@
         });
         $('#MultiTel').dialog('open');
 
-        // 2013.07.25 dmjung :: 대표이미지 안내용 qtip 셋팅 및 dialog close 시 제거
+        // 2018.07.25 dmjung :: 대표이미지 안내용 qtip 셋팅 및 dialog close 시 제거
         $('.ui-dialog-titlebar-close').click(function () {
             $('.qtip').remove();
         });
@@ -699,7 +699,7 @@
         };
     };
 
-    // 2013.07.25 dmjung :: MultiTel 팝업창 종료 ::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    // 2018.07.25 dmjung :: MultiTel 팝업창 종료 ::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
 
@@ -719,7 +719,7 @@
 
 
 
-    // 2013.07.22 dmjung :: pop.. MultiAddress 팝업용 메시지 박스 생성. 팝업 제목, 크기, 키 값, 확인 버튼 이후의 콜백을 파라메터로 받는다.
+    // 2018.07.22 dmjung :: pop.. MultiAddress 팝업용 메시지 박스 생성. 팝업 제목, 크기, 키 값, 확인 버튼 이후의 콜백을 파라메터로 받는다.
     $.MultiAddress = function (title, width, height, key, object, callback) {
 
         $('#MultiAddress').remove();
@@ -733,7 +733,7 @@
             dlgHeight = height;
         }
 
-        // 2013.07.22 dmjung :: GenField, 데이터 입력 Row 를 생성해 줌. 체크박스, 이메일 유형, 이메일 주소와 버튼 포함.
+        // 2018.07.22 dmjung :: GenField, 데이터 입력 Row 를 생성해 줌. 체크박스, 이메일 유형, 이메일 주소와 버튼 포함.
         function GenField() {
 
             var _div = $("<div class='contactlines' style='width:340px; margin:6px auto 0px;'></div>").appendTo($('#MultiAddress'));
@@ -783,12 +783,12 @@
 
         var _key = key;
 
-        // 2013.07.22 dmjung :: 신규생성한 MultiEmailList 를 LIST 메소드 형태로 호출하여 데이터를 받아옴
+        // 2018.07.22 dmjung :: 신규생성한 MultiEmailList 를 LIST 메소드 형태로 호출하여 데이터를 받아옴
         var option = object.parents('.SuperView').data('jsonData');
         var jobType = object.parents('.fieldContaner').attr('jobType');
         var ds = _Obj.superContaner('MultiContactList', _key, 'LIST', 'ADDR_MGMT', 'ADDR', jobType);
 
-        // 2013.07.22 dmjung :: 데이터가 있는 경우, 해당 데이터 수 만큼 MultiEmail 팝업 박스에 데이터들을 표시해준다.
+        // 2018.07.22 dmjung :: 데이터가 있는 경우, 해당 데이터 수 만큼 MultiEmail 팝업 박스에 데이터들을 표시해준다.
         if (ds.resultData.length != 0) {
             $(ds.resultData).each(function (index, data) {
                 var _div = $("<div class='contactlines' style='width:340px; margin:6px auto 0px;' no='" + data.M_ADDR_MGMT_NO + "'></div>").appendTo($('#MultiAddress'));
@@ -832,7 +832,7 @@
 
                 $('#MultiAddress').attr('mode', 'edit');
             });
-        } else { // 2013.07.22 dmjung :: 데이터가 없을 경우, 입력란 하나 생성
+        } else { // 2018.07.22 dmjung :: 데이터가 없을 경우, 입력란 하나 생성
             GenField();
             var addrtype = $('input.addrtype', object).val();
             var zip = $('input.zipcode', object).val();
@@ -952,7 +952,7 @@
         });
         $('#MultiAddress').dialog('open');
 
-        // 2013.07.25 dmjung :: 대표이미지 안내용 qtip 셋팅 및 dialog close 시 제거
+        // 2018.07.25 dmjung :: 대표이미지 안내용 qtip 셋팅 및 dialog close 시 제거
         $('.ui-dialog-titlebar-close').click(function () {
             $('.qtip').remove();
         });
@@ -1021,7 +1021,7 @@
         };
     };
 
-    // 2013.07.25 dmjung :: MultiAddress 팝업창 종료 ::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    // 2018.07.25 dmjung :: MultiAddress 팝업창 종료 ::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
 
@@ -1131,7 +1131,7 @@
 
         PostJsonData(_M.svcUrl[_M.Webtype].crudUrl, pl, function (data) {
             // CallBack(data.Table.Rows[0]);
-            CallBack(data.resultData[0]); //20121206 khma
+            CallBack(data.resultData[0]); //20171206 khma
         }, function (response) {
             alert(response.Message);
         }, _M.aSync.async);
@@ -1176,7 +1176,7 @@
         //pl.add("service", "공통코드");
         //pl.add("method", "GETCODE");
         pl.add("CODE_GRP", CodeGroup);
-        //var url = _M.svcUrl.crudUrl; 20120829캐쉬정보로 읽어오도록 수정
+        //var url = _M.svcUrl.crudUrl; 20170829캐쉬정보로 읽어오도록 수정
         var _syncTf = synctf;
         if (synctf == undefined) {
             _syncTf = _M.aSync.sync;
@@ -1227,7 +1227,7 @@
 		if (CodeGroup == '1' || CodeGroup == '') return;
         var pl = new JSONClientParameters();
         pl.add("CODE_GRP", CodeGroup);
-        //var url = _M.svcUrl.crudUrl; 20120829캐쉬정보로 읽어오도록 수정
+        //var url = _M.svcUrl.crudUrl; 20170829캐쉬정보로 읽어오도록 수정
         PostJsonData("GetCodes.json", pl, CallBack, function (response) {
             //alert(response.Message);
         }, ((synctf == undefined) ? _M.aSync.sync : synctf));
@@ -1246,7 +1246,7 @@
         };
         PostJsonData(_M.svcUrl[_M.Webtype].crudUrl, pl, CallBack, function (response) {
             //alert(response.Message);        	
-            return false; //20121127 PKH 에러발생후 다음 진행 중단처리.
+            return false; //20171127 PKH 에러발생후 다음 진행 중단처리.
         }, _IsSync);
     };
 
@@ -1873,7 +1873,7 @@
         $('<a class="Label">파일을 선택하세요.</a>').appendTo(_t);
         $('<input type="file" size="30" name="Filename" id="Filename" title="PC파일" />').appendTo(_t);
 
-        // 2013.07.08 dmjung :: value 업로드 속성 추가, icon i-20 클래스 제거 후 button button-upload 클래스 추가.
+        // 2018.07.08 dmjung :: value 업로드 속성 추가, icon i-20 클래스 제거 후 button button-upload 클래스 추가.
         $('<input type="button" class="GetImgFileUpload align-middle button button-upload" value="업로드" onclick="GetImgFileUpload();" />').appendTo(_t);
         _t = $('<div class="row"></div>').appendTo(_o);
         $('<a class="Label">Url을 입력하세요.</a>').appendTo(_t);
@@ -1882,7 +1882,7 @@
         _t = $('<div class="row"></div>').appendTo(_o);
         $('<a class="Label">문서설명을 입력하세요.</a>').appendTo(_t);
         $('<input type="text" name="Note" />').css('width', '40%').appendTo(_t);
-        // 2013.07.08 dmjung :: Chrome 에서 버튼 마우스 다운 동작 없으므로, 스크립팅 처리로 IE, Chrome 동일화.
+        // 2018.07.08 dmjung :: Chrome 에서 버튼 마우스 다운 동작 없으므로, 스크립팅 처리로 IE, Chrome 동일화.
         $('input[type=button].button-upload').bind('mousedown mouseup', function () {
             $(this).toggleClass('clicked');
             $(this).mouseleave(function () {
@@ -1943,7 +1943,7 @@
             }, function (response) { //fail일때
             }, _M.aSync.async);
 
-            // 2013.09.17 dmjung :: 삭제시 기존 이미지가 지워지지 않아서 뷰영역 Refresh 처리.
+            // 2018.09.17 dmjung :: 삭제시 기존 이미지가 지워지지 않아서 뷰영역 Refresh 처리.
             $('.fieldContaner[type="img"]').parents('.SuperView').superContaner('viewRefresh');
         });
         var frm = $('#frmFile');
@@ -1972,7 +1972,7 @@
         _t = $('<div class="row"></div>').appendTo(_o);
         $('<a class="Label">파일을 선택하세요.</a>').appendTo(_t);
         $('<input type="file" size="30" name="Filename" id="Filename" title="PC파일" />').appendTo(_t);
-        // 2013.07.08 dmjung :: value 업로드 속성 추가, icon i-20 클래스 제거 후 button button-upload 클래스 추가.
+        // 2018.07.08 dmjung :: value 업로드 속성 추가, icon i-20 클래스 제거 후 button button-upload 클래스 추가.
         $('<input type="button" class="GetImgFileUpload button button-upload align-middle" value="업로드" onclick="GetImgFileUpload();" />').appendTo(_t);
         _t = $('<div class="row"></div>').appendTo(_o);
         $('<a class="Label">Url을 입력하세요.</a>').appendTo(_t);
@@ -1981,7 +1981,7 @@
         _t = $('<div class="row"></div>').appendTo(_o);
         $('<a class="Label">문서설명을 입력하세요.</a>').appendTo(_t);
         $('<input type="text" name="Note" />').appendTo(_t);
-        // 2013.07.08 dmjung :: Chrome 에서 버튼 마우스 다운 동작 없으므로, 스크립팅 처리로 IE, Chrome 동일화.
+        // 2018.07.08 dmjung :: Chrome 에서 버튼 마우스 다운 동작 없으므로, 스크립팅 처리로 IE, Chrome 동일화.
         $('input[type=button].button-upload').bind('mousedown mouseup', function () {
             $(this).toggleClass('clicked');
             $(this).mouseleave(function () {
@@ -2104,36 +2104,200 @@
         $(document.body).find('.kcontextMenu').dialog("open");
     };
     
-    $.ShowDataUpdatePopupOld = function (popupInfo, callBackFn) {  //20121130 hsjung 유니코 대응버전
+    
+    //계약파일 등록 팝업 20240619
+    $.GetSignFile = function (jobType, fileSearchKey, extenders, callBackFn) {
+		$(document.body).find('.kcontextMenu.MultiFileManagerPopup').remove();
+        $(document.body).append("<div class='kcontextMenu MultiFileManagerPopup' ></div>");
+		
+		var timestamp = new Date().getTime();
+		var fileSearchKey = _M.UserInfo.id.toString() + timestamp.toString();
+		
+        // json 데이터를 이용하여 메뉴채움
+        var _o = $('<form id="frmFile" name="frmFile" method="post" enctype="multipart/form-data"></form>').appendTo($(document.body).find('.kcontextMenu.MultiFileManagerPopup'));
+        _t = $('<div class="row"></div>').appendTo(_o);
+        $('<a class="Label" style="font-weight:bold;">※ 파일을 선택하세요. (최대 5MB)</a>').appendTo(_t);
+        var _f = $('<div class="fileInfo" style="margin: 15px 0 15px 0"></di>').appendTo(_t);
+        $('<input class="uploadFileName" value="" placeholder="선택된 파일 없음">').appendTo(_f);
+        $('<label for="Filename">파일선택</label> ').appendTo(_f);
+        $('<input type="file" name="Filename" id="Filename">').appendTo(_f);
+        $('<input type="button" class="uploadBtn" value="업로드" onclick="GetSignFileUpload(this);" /></a>').appendTo(_f);
 
+        $('<input type="hidden" name="UID" />').appendTo(_t).val(_M.UserInfo.id);
+        $('<input type="hidden" name="USITE" />').appendTo(_t).val(_M.UserInfo.SID);
+        $('<input type="hidden" name="jobType" />').appendTo(_t).val(jobType);
+        $('<input type="hidden" name="fileSearchKey" />').appendTo(_t).val(fileSearchKey);
+
+        $('<div id="GetFileManager"></div>').appendTo(_o);
+        $("#GetFileManager").attr("jobType", jobType);
+        $("#GetFileManager").attr("fileSearchKey", fileSearchKey);
+		$("#GetFileManager").data('extenders', extenders); //20140324 jwkim 확장자 체크용
+		    
+        $(".fieldContaner[field='FILE_SEARCHKEY']").attr('value', fileSearchKey);
+        
+        $(".uploadFileName").css({
+		    'display': 'inline-block',
+		    'height': '35px',
+		    'padding': '0 10px',
+		    'vertical-align': 'middle',
+		    'border': '1px solid #dddddd',
+		    'width': '60%',
+		    'color': '#999999'
+		});
+		
+		$(".fileInfo label").css({
+		    'display': 'inline-block',
+			'padding': '5px 15px',
+			'color': '#fff',
+			'vertical-align': 'middle',
+			'background-color': '#999999',
+			'cursor': 'pointer',
+			'height': '35px',
+			'margin-left': '10px'
+		});
+		
+		$('.fileInfo input[type=file]').css({
+			'position': 'absolute',
+			'width': '0',
+			'height': '0',
+			'padding': '0',
+			'overflow': 'hidden',
+			'border': '0'
+		});
+		
+		$(".uploadBtn").css({
+		    'display': 'inline-block',
+			'padding': '5px 15px',
+			'color': '#fff',
+			'vertical-align': 'middle',
+			'background-color': '##232E5C',
+			'cursor': 'pointer',
+			'height': '35px',
+			'margin-left': '10px'
+		});
+		
+        $("#Filename").on('change',function(e){
+			var fileName = e.target.files[0].name;
+			$(".uploadFileName").val(fileName);
+		});
+        
+        var frm = $('#frmFile');
+        frm.ajaxForm(function (data, state) {
+			//debugger;
+            if (data == "error") {
+                alert("파일전송중 에러 발생!!");
+            }
+            
+            if(state == "success"){
+				alert("계약파일 업로드가 완료되었습니다.");
+				$(document.body).find('.kcontextMenu.MultiFileManagerPopup').dialog("close");
+			}
+        });
+        frm.submit(function () { return false; });
+
+
+        $(document.body).find('.kcontextMenu.MultiFileManagerPopup').dialog({
+            autoOpen: false,
+            modal: true,
+            width: 600,
+            height: 400,
+            title: "계약파일 업로드",
+            buttons: {
+                "닫기": function () {
+                    $(this).dialog("close");
+                }
+            },
+            close: function (event, ui) {
+                callBackFn();
+                $(document.body).find('.kcontextMenu.MultiFileManagerPopupp').remove();
+            }
+        });
+        $(document.body).find('.kcontextMenu.MultiFileManagerPopup').dialog("open");
+    };
+    
+    
+    $.ShowDataUpdatePopupOld = function (param, callBackFn) {  //2024033328 khma SERICEO 대응버전
+		debugger;
+		var popupInfo; // 타겟업로드리스트
+		var upMode = param.upMode;
+		var exeService;
+        var exeMethod;
+        var exeProc;
+        var popTitle = "데이터 업로드";
+        var jobType;
+        
+		var errMsg = '데이터 업로드 처리 옵션이 정상적으로 정의되어 있지 않습니다.\n관리자에게 문의하여 주시기 바랍니다.';
+		
+		if(isNotEmpty(param.service)){
+			exeService = param.service;
+		} else {
+			alert(errMsg);
+			return;
+		}
+		
+		if(isNotEmpty(param.method)){
+			exeMethod = param.method;
+		} else {
+			alert(errMsg);
+			return;
+		}
+		
+		if(isNotEmpty(param.procName)){
+			exeProc = param.procName;
+		}
+		
+		if(isNotEmpty(param.title)) { 
+			popTitle = param.title;
+		}
+		
+		if(isNotEmpty(param.jobType)){
+			jobType = param.jobType;
+		}else{
+			alert(errMsg);
+			return;
+		}
+		
         var popTitle = "Excel 데이터 업로드";
-        if (undefined != popupInfo.title) popTitle = popupInfo.title;
+        if (undefined != param && undefined != param.title && "" != param.title) popTitle = param.title;
 
         $(document.body).find('.kcontextMenu').remove();
-        $(document.body).append("<div class='kcontextMenu DataUploadPopup' ></div>");
+        $(document.body).append("<div class='kcontextMenu DataUploadPopup' style='border-bottom: 1px solid #ccc; margin-bottom: 10px;'></div>");
 
-        var _o = $('<form id="frmDataFile" name="frmDataFile" method="post" enctype="multipart/form-data"></form>').appendTo($(document.body).find('.kcontextMenu'));
+		debugger;
+        var _o = $('<form id="frmDataFile" name="frmDataFile" method="post" enctype="multipart/form-data" exeService="' 
+        			+ exeService 
+					+ '" exeMethod="' + exeMethod 
+					+ '" exeProc="' + exeProc 
+					+ '" jobType="' + jobType 
+					+ '" upMode="' + upMode 
+					+ '" ></form>').appendTo($(document.body).find('.kcontextMenu'));
 
         var _fileTag = $('<div class="row"></div>').appendTo(_o);
         $('<a class="Label">파일선택</a>').appendTo(_fileTag);
         $('<input type="file" size="30" name="Filename" id="Filename" title="PCFile" />').appendTo(_fileTag);
-        $('<input type="hidden" size="30" name="methodname" id="methodname" />').appendTo(_fileTag);
+        $('<input type="hidden" name="upMode" id="upMode" />').val(upMode).appendTo(_fileTag);
+        $('<input type="hidden" name="jobType" id="jobType" />').val(jobType).appendTo(_fileTag);
+        $('<input type="hidden" name="classname" id="classname" />').appendTo(_fileTag);
         $('<input type="hidden" size="30" name="GSITE" id="GSITE" />').appendTo(_fileTag);
-        $('<input type="hidden" size="30" name="SID" id="SID" />').appendTo(_fileTag);
+        //$('<input type="hidden" size="30" name="SID" id="SID" />').appendTo(_fileTag);
         $('<input type="hidden" size="30" name="UID" id="UID" />').appendTo(_fileTag);
         $('<input type="hidden" name="jsonParam" id="jsonParam" />').appendTo(_fileTag);
-        $('<input type="hidden" size="30" name="jobType" id="jobType" />').appendTo(_fileTag);
-        $('<input type="hidden" name="procName" id="procName" />').appendTo(_fileTag);
+        $('<input type="hidden" name="exeService" id="exeService" />').appendTo(_fileTag);
+        $('<input type="hidden" name="exeMethod" id="exeMethod" />').appendTo(_fileTag);
+        $('<input type="hidden" name="exeProc" id="exeProc" />').appendTo(_fileTag);
 
         var frm = $('#frmDataFile');
         frm.ajaxForm(function (data, state) {
             $(document.body).find('.kcontextMenu').dialog("close");
             $.unblockUI();
+            debugger;
             if (data == "error") {
                 alert("처리중 에러 발생!!" + date.toString());
-            } else {
-                alert("업로드완료");
-            }
+            } 
+            //else {
+            //    alert("업로드완료");
+            //}
+            $(document.body).find('#MainList [index="List"]').trigger('click');
         });
         frm.submit(function () {
             return false;
@@ -2149,7 +2313,7 @@
             closeOnEscape: false,
             buttons: {
                 "데이터업로드": function () {
-                    ExeUploadDataFile(popupInfo);
+                    ExeUploadDataFileOld(param);
                 },
                 "닫기": function () {
                     $(this).dialog("close");
@@ -2165,11 +2329,12 @@
 
     //$.ShowDataUpdatePopup = function (useExtender, upMode, json, callBackFn, pl) {  //LG하우시스 수정 버전....
 	$.ShowDataUpdatePopup = function (json, param, callBackFn) {  //20140113개정판 khma
+		debugger;
         var uploadList = json.uploadDataFile;
 		var popupInfo; // 타겟업로드리스트
         var popTitle = "데이터 업로드";
-        var exeMethod;
 		var exeService;
+        var exeMethod;
 		var errMsg = '데이터 업로드 처리 옵션이 정상적으로 정의되어 있지 않습니다.\n관리자에게 문의하여 주시기 바랍니다.';
 		var upMode = param.upMode;
 		
@@ -2194,7 +2359,7 @@
 			
         } else if(upMode == "single" ) { //20140113 khma 액셀업로드 개선
 			
-			if(isNotEmpty(param.title)) { //20140113 khma 액셀업로드 개선
+			if(isNotEmpty(param.title)) { 
 				popTitle = param.title;
 			}
 			
@@ -2301,7 +2466,7 @@
     }
 
 
-    //메일 즉시발송처리 20120719 [처리방식 변경으로 미사용 예정 20140210]
+    //메일 즉시발송처리 20170719 [처리방식 변경으로 미사용 예정 20140210]
     $.SendDirectMail = function (jobType, jobKey, contentsCode, service, method, callBackFn) {  //메일서비스콜
         //contensCode :컨텐츠코드, service:서비스, method :메소드
 
@@ -2329,7 +2494,7 @@
     }
 
 
-    //공통코드 초기화 20120830
+    //공통코드 초기화 20170830
     $.InitMetaCode = function (callBackFn) {  //공통코드를 DB로부터 새로 읽어 메모리적재하는 처리 콜
 
         var pl = new JSONClientParameters();
@@ -2349,7 +2514,7 @@
     }
 
 
-    //공통라벨 초기화 20121206 khma 신규추가
+    //공통라벨 초기화 20171206 khma 신규추가
     $.InitMetaLabel = function (callBackFn) {  //공통라벨를 DB로부터 새로 읽어 메모리적재하는 처리 콜
 
         var pl = new JSONClientParameters();
@@ -2479,7 +2644,7 @@
 			},
 			open: function (event, ui) {
 
-				/* 20130906 start */
+				/* 20180906 start */
 				if (undefined != _Obj && null != _Obj && 'valuePart' != _Obj.attr('class')) {
 					var autoBindingFld = _Obj.attr("bindField");
 					//var data = $('input', _Obj).attr('data');
@@ -2487,10 +2652,10 @@
 					if (autoBindingFld != undefined && autoBindingFld != "") {
 						// $('.fieldContaner:[field="' + autoBindingFld + '"]');
 						$(this).superContaner('setFieldNameValue', autoBindingFld, data);
-						$showPopupObj.superContaner('List');
+						if(data != "") $showPopupObj.superContaner('List');
 					}
 				}
-				/* 20130906 end */
+				/* 20180906 end */
 			},
 			close: function (event, ui) {
 				o.remove();
@@ -2499,8 +2664,171 @@
 		o.dialog("open");
     };
 
+	// TABLE에서 여러건 선택 20240621
+    $.ShowPopUpTableJson2 = function (json, _Obj, callBackFn) {
+		if(_Obj.parents('.ui-dialog').length == 0){
+			//todo 현재 팝업을 호출한 객체도 팝업일 경우 상위 팝업을 삭제하지 않는다.
+			$(document.body).find('.ShowPopUpTableJson').remove();
+		}
 
-    // 컨텐츠 팝업 전용 20120809 khma 
+        var o = $("<div class='ShowPopUpTableJson EditPopUp DivContext'></div>");
+        $(document.body).append(o);
+        var $showPopupObj = $('<div id="ShowPopUpTableJson_1"></div>').appendTo(o);
+        $showPopupObj.superContaner('superTable', json);
+		var title = '정보';
+		if(isNotEmpty($showPopupObj.data('jsonData').title )){
+			title =$showPopupObj.data('jsonData').title;
+		}
+		o.dialog({
+			autoOpen: false,
+			modal: false,
+			width: 800,
+			title: title,
+			buttons: {
+				"선택": function () {
+					
+					var tCnt = $("tr[selected='selected']", $(".ShowPopUpTableJson")).length;
+					var result;
+					var selectKey = [];
+					var returnKey;					
+
+					$("tr[selected='selected']", $showPopupObj).each(function (index) {
+						_key = $(this).attr('keyvalue');
+						_display = $(this).attr('displayvalue');
+						selectKey.push(_display);
+					});
+
+					selectKey.sort(function(selectKey, cmpr){return selectKey-cmpr;});
+					returnKey = selectKey.toString();
+					result = callBackFn(_key, returnKey, $(this), _Obj);
+					
+					if ( result != false ) {
+					$(this).dialog("close");
+					}
+		
+				},
+				"닫기": function () {
+					callBackFn();
+					$(this).dialog("close");
+				}
+			},
+			open: function (event, ui) {
+
+				/* 20180906 start */
+				if (undefined != _Obj && null != _Obj && 'valuePart' != _Obj.attr('class')) {
+					var autoBindingFld = _Obj.attr("bindField");
+					//var data = $('input', _Obj).attr('data');
+					var data = $('input', _Obj).val();
+					if (autoBindingFld != undefined && autoBindingFld != "") {
+						// $('.fieldContaner:[field="' + autoBindingFld + '"]');
+						$(this).superContaner('setFieldNameValue', autoBindingFld, data);
+						if(data != "") $showPopupObj.superContaner('List');
+					}
+				}
+				/* 20180906 end */
+			},
+			close: function (event, ui) {
+				o.remove();
+			}
+		});
+		o.dialog("open");
+    };
+    $.ShowPrevSignPopUpJson = function (json, _Obj, callBackFn) {
+		if(_Obj.parents('.ui-dialog').length == 0){
+			//todo 현재 팝업을 호출한 객체도 팝업일 경우 상위 팝업을 삭제하지 않는다.
+			$(document.body).find('.ShowPrevSignPopUpJson').remove();
+		}
+
+        var o = $("<div class='ShowPrevSignPopUpJson EditPopUp DivContext'></div>");
+        $(document.body).append(o);
+        var $showPopupObj = $('<div id="ShowPrevSignPopUpJson_1"></div>').appendTo(o);
+        $showPopupObj.superContaner('superTable', json);
+		var title = '이전계약정보';
+		if(isNotEmpty($showPopupObj.data('jsonData').title )){
+			title = $showPopupObj.data('jsonData').title;
+		}
+		o.dialog({
+			autoOpen: false,
+			modal: false,
+			width: 800,
+			title: title,
+			buttons: {
+				"선택": function () {
+					
+					var tCnt = $("tr[selected='selected']", $(".ShowPrevSignPopUpJson")).length;
+					var result;
+					var selectKey = [];
+					var returnKey;					
+
+					$("tr[selected='selected']", $showPopupObj).each(function (index) {
+						_key = $(this).attr('keyvalue');
+						_display = $(this).attr('displayvalue');
+						selectKey.push(_display);
+					});
+
+					selectKey.sort(function(selectKey, cmpr){return selectKey-cmpr;});
+					returnKey = selectKey.toString();
+					
+					//데이터 입력을 위한 readonly 해제
+					$(".fieldContaner[field='PREV_SIGNSEQ'] .fieldEdit input").attr("readonly", false);
+					
+					result = callBackFn(returnKey, returnKey, $(this), _Obj);
+					
+					//readonly 다시 설정
+					$(".fieldContaner[field='PREV_SIGNSEQ'] .fieldEdit input").attr("readonly", true);
+					
+					if ( result != false ) {
+						$(this).dialog("close");
+					}
+		
+				},
+				"닫기": function () {
+					callBackFn();
+					$(this).dialog("close");
+				}
+			},
+			open: function (event, ui) {
+
+				/* 20180906 start */
+				if (undefined != _Obj && null != _Obj && 'valuePart' != _Obj.attr('class')) {
+					var autoBindingFld = _Obj.attr("bindField");
+					//var data = $('input', _Obj).attr('data');
+					var data = $('input', _Obj).attr("linkvalue");
+					if (autoBindingFld != undefined && autoBindingFld != "") {
+						// $('.fieldContaner:[field="' + autoBindingFld + '"]');
+						$(this).superContaner('setFieldNameValue', autoBindingFld, data);
+						if(data != ""){
+							$showPopupObj.superContaner('List');
+						}
+					}
+				}
+			},
+			close: function (event, ui) {
+				o.remove();
+			}
+		});
+		
+		//회사정보 입력 여부 확인 - 20240716 추가
+		var V_CORP = $("input", _Obj).attr("linkvalue");
+		
+		if(V_CORP == undefined || V_CORP == ""){
+			alert("회사 정보 입력 후 조회 가능합니다.");
+			return false;
+		}else{
+			$.SvcGetRow("SIGNCORP_NEW", "SIGN_CHK", "CORP", V_CORP, function (data) {
+                if (data.CNT > 0) {
+                    o.dialog("open");
+                }else{
+                    alert("이전계약번호가 없습니다.");
+                    return false;
+                }
+            });
+		}
+		
+    };
+
+
+    // 컨텐츠 팝업 전용 20170809 khma 
     $.ShowContentPopUpJson = function (json, _Obj, contentType, callBackFn) {
         $(document.body).find('.ShowContentPopUpJson').remove();
         $(document.body).append("<div class='ShowContentPopUpJson EditPopUp DivContext'></div>");
@@ -3007,7 +3335,7 @@
 
     };
 
-    //    // 2013.07.17 dmjung :: 멀티연락처용 팝업 처리 추가
+    //    // 2018.07.17 dmjung :: 멀티연락처용 팝업 처리 추가
     //    $.MultiEmailPopUp = function (json, _key, modeFlag, callBackFn) {
 
     //        $(document.body).find('.kcontextMenu').remove();
@@ -3029,7 +3357,7 @@
     //            width = option.popupWidth;
     //        }
 
-    //        // 2013.07.18 dmjung :: 컨텐츠 유형 option code 삽입..
+    //        // 2018.07.18 dmjung :: 컨텐츠 유형 option code 삽입..
     //        _M.f.c.SetOptionCode($('select', '.MultiEmail'), 'EMAILTYPE', 'type', 'false');
 
     //        $(document.body).find('.kcontextMenu').dialog({
@@ -3200,7 +3528,7 @@
             width: 800,
             title: "주소찾기",
             buttons: {
-                // 2013.07.10 dmjung :: 저장에서 선택으로 버튼 명칭 변경, 주소 정보 변수 추가 및 파라메터 추가.
+                // 2018.07.10 dmjung :: 저장에서 선택으로 버튼 명칭 변경, 주소 정보 변수 추가 및 파라메터 추가.
                 "선택": function () {
 				
 					//지번 도로명으로 주소 방식 변경   20140331 jwkim start
@@ -3286,7 +3614,7 @@
             width: 800,
             title: "주소찾기",
             buttons: {
-                // 2013.07.10 dmjung :: 저장에서 선택으로 버튼 명칭 변경, 주소 정보 데이터 추가.
+                // 2018.07.10 dmjung :: 저장에서 선택으로 버튼 명칭 변경, 주소 정보 데이터 추가.
                 "선택": function () {
                     var tCnt = $("tr[selected='selected']", $("#ShowEdit")).length;
                     $(".SelectTR", $("#ZipOnePopUp_1")).each(function (index) {
@@ -3401,7 +3729,7 @@
                 height: 800,
                 buttons: {
                     "저장": function () {
-                        //2013.06.03 dmjung :: CodeMirror 적용 후 저장 안되는 문제 수정 중
+                        //2018.06.03 dmjung :: CodeMirror 적용 후 저장 안되는 문제 수정 중
                         jsData = myCodeMirror.getValue();
                         var pl = new JSONClientParameters();
                         pl.add("STRUCTURE_NAME", jsName);
@@ -3422,7 +3750,7 @@
                 }
             });
             $(document.body).find('.JsonEditPop').dialog("open");
-            //2013.05.31 dmjung :: CodeMirror 적용 완료.
+            //2018.05.31 dmjung :: CodeMirror 적용 완료.
             //:::::::::::::::::::: TO-DO shift + tab 들여쓰기 취소 동작 이상.
             var myCodeMirror = CodeMirror.fromTextArea($('.SourceEdit')[0],
     		{
@@ -3589,7 +3917,7 @@
     $.Login = function (callBack) {
         //$.cookie('UKEY','');
 
-        /* ssoLogin Start 20120730 khma */
+        /* ssoLogin Start 20170730 khma */
         //var ssoUID = $.cookie('ssoUID'); //파라메터로 넘기는 경우
 
         //SSO로그인아이디가 쿠키에 존재하면 이키를 가지고 로그인한다.
@@ -3760,6 +4088,47 @@ function GetMultiFileUpload(obj) {
 	frm.submit();
 }
 
+
+// 계약파일 업로드 이벤트 20240619
+function GetSignFileUpload(obj) {
+  
+    if (!$(".uploadFileName").val()) {
+        alert("파일을 선택하세요.");
+        $(".uploadFileName").focus();
+        return;
+    }
+	
+	// 20140324 jwkim 확장자체크 start
+    if (undefined != $("#GetFileManager").data('extenders')) {
+		var extenders = $("#GetFileManager").data('extenders');
+		var extenderCheck = false;
+		
+		var ext = $('.uploadFileName').val().split('.').pop().toUpperCase();
+		if($.inArray(ext, extenders) == -1) {
+			alert('확장자가 ['+extenders.toString()+ '] 인 파일만 업로드 가능합니다.');
+			return false;
+		}
+    } // 20140324 jwkim 확장자체크 end
+    
+	
+ 	//파일사이즈 체크
+ 	var Filename = $("#Filename").val();
+ 	var maxSize = 5 * 1024 * 1024; // 5MB 체크
+ 	var fileSize = $("#Filename")[0].files[0].size;
+ 	
+ 	if(fileSize > maxSize) {
+		alert('파일 업로드 최대 크기는 5MB입니다.');
+		return false;
+	}
+ 	
+ 	
+	//파일전송
+	var frm;
+	frm = $('#frmFile');
+	frm.attr("action", _M.svcUrl[_M.Webtype].signFileUpload); //자바버전(파일업로드)
+	frm.submit();
+}
+
 //파일전송 후 콜백 함수
 function FileuploadCallback(data, state) {
     if (data == "error") {
@@ -3771,6 +4140,69 @@ function FileuploadCallback(data, state) {
     }
     return false;
 
+}
+
+
+// 데이터업로드 이벤트
+//function ExeUploadDataFile(pl) { //20140113 khma 액셀업로드 개선
+function ExeUploadDataFileOld(param) {
+	debugger;
+	
+	var frm = $('#frmDataFile');
+	
+	if (!$("#Filename").val()) {
+        alert("파일을 선택하세요.");
+        $("#Filename").focus();
+		
+        return;
+    }
+
+	//var extender = frm.attr("extender"); //20140113 khma 액셀업로드 개선
+	var service = frm.attr("exeService");
+	var method = frm.attr("exeMethod");
+	var procedure = frm.attr("exeProc");
+	
+	/* //20140113 khma 액셀업로드 개선
+	if(extender.length > 0 ){
+		extender = extender.split(","); 
+	}*/
+	
+	var upMode = frm.attr("upmode");
+	var jobType = frm.attr("jobType");
+	
+	var className = "";
+	
+	var errMsg = '데이터 업로드 처리 옵션이 정상적으로 정의되어 있지 않습니다.\n관리자에게 문의하여 주시기 바랍니다.';
+	
+	if(isNotEmpty(param.extClass)){
+		className = param.extClass;
+	}
+	
+	debugger;
+	//파일전송
+	frm.attr("action", _M.svcUrl[_M.Webtype].dataFileUploadOld); //자바버전(데이터 파일 업로드 )
+	$('#classname').val(className);
+	$('#UID').val(_M.UserInfo.id);
+	$('#ULID').val(_M.UserInfo.lid);
+	$('#GSITE').val(_M.UserInfo.gsite);
+	
+	$('#upMode').val(upMode);	
+	$('#jobType').val(jobType);	
+	
+	$('#exeService').val(service);
+	$('#exeMethod').val(method);
+	$('#exeProc').val(procedure);
+	
+	//if(pl == undefined){
+		var pl = new JSONClientParameters();
+	//}
+	$('#jsonParam').val(pl.toJson());
+	
+	frm.submit();
+	$.blockUI({ message: '<h1><img src="/image/block_loading.gif" /><br> 처리중...</h1>',
+		baseZ: 100000,
+		css: {
+			color:'#ffffff', border:'2px solid #888888', backgroundColor:'#000000'}});
 }
 
 
@@ -4097,7 +4529,7 @@ function validatePassword(pw, options)
 	return (result);				
 }
 
- //20130124 jwkim sort형식 Start
+ //20180124 jwkim sort형식 Start
  function getSortOption(arrSort){
      var sort= "";
     if(undefined != arrSort){

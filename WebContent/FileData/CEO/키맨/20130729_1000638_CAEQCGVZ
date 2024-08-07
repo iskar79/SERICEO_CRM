@@ -1,0 +1,4160 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html lang="ko-KR" XMLNS:IE><head><title>G마켓 - 대한민국 1등 온라인 쇼핑</title><meta http-equiv='Content-Type' content='text/html; charset=euc-kr'><meta name='description' content='인터넷쇼핑, 오픈마켓, 패션/뷰티, 디지털, 식품/유아, 스포츠/자동차, 생활용품 , 도서/DVD, 여행/항공권, e쿠폰/티켓, 만화/게임, 공동구매, 경매, 중고, 글로벌쇼핑, 브랜드샵, 베스트셀러, 방문쇼핑몰, G스탬프, 할인쿠폰, 동영상, 이벤트 등 G마켓'><meta name='keywords' content='경매,할인쿠폰,베스트셀러,공동구매,컴퓨터/핸드폰,에어컨/TV/디카,MP3/게임,패션/명품/브랜드,여성의류/속옷,남성의류/정장/빅사이즈,분유/기저귀/식품/생리대/임부복,유아동/장난감,쌀/과일/한우/생선,건강식품/음료,화장품/자동차,스포츠/다이어트,골프/등산/스키/낚시,운동화,네비게이션,리빙/침구/인테리어,애완/성인/공구,꽃배달,도서/여행/항공권,만화'><meta name='p:domain_verify' content='f439a07b31c110a1a16c9a468a630af9' ><meta property='fb:admins' content='100000991027914' /><link rel='shortcut icon' href='http://image.gmarket.co.kr/favicon/gmarket.ico'><meta name='msapplication-starturl' content='http://www.gmarket.co.kr/?jaehuid=200004313'><meta name='msapplication-task' content='name=G마켓 베스트; action-uri=http://promotion.gmarket.co.kr/bestseller/BestSeller.asp?jaehuid=200004313; icon-uri=http://image.gmarket.co.kr/favicon/bestseller.ico'><meta name='msapplication-task' content='name=이벤트/쿠폰; action-uri=http://promotion.gmarket.co.kr/eventzone/Info.asp?jaehuid=200004313; icon-uri=http://image.gmarket.co.kr/favicon/eventcoupon.ico'><meta name='msapplication-task' content='name=플러스존; action-uri=http://pluszone.gmarket.co.kr/default.asp?jaehuid=200004313; icon-uri=http://image.gmarket.co.kr/favicon/pluszone.ico'><meta name='msapplication-task' content='name=최근구매내역; action-uri=http://www.gmarket.co.kr/challenge/neo_my_gd/order_contract_list.asp?jaehuid=200004313; icon-uri=http://image.gmarket.co.kr/favicon/orderlist.ico'><meta name='msapplication-task' content='name=나의 장바구니; action-uri=http://www.gmarket.co.kr/payment/Basket.asp?jaehuid=200004313; icon-uri=http://image.gmarket.co.kr/favicon/basket.ico'><script type='text/javascript' src='http://www.gmarket.co.kr/challenge/neo_include/favicon.js'></script></head><script type='text/javascript' src='/challenge/neo_include/neverdie.js'></script><!--[if IE 6]>
+<script type='text/javascript' defer='defer' src='/challenge/neo_include/ie6.js'></script>
+<![endif]-->
+<script type='text/javascript' defer='defer' src='/challenge/neo_include/js/impression.js'></script>
+<script type='text/javascript' src='http://script.gmarket.co.kr/jQuery/1.6.4/jquery-1.6.4.min.js'></script>
+<script type='text/javascript'>$j=jQuery.noConflict();</script>
+
+
+
+
+
+
+<link rel="stylesheet" type="text/css" href="http://script.gmarket.co.kr/css/www/Index.css">
+<!--[if IE 6]>
+	 <script src="http://script.gmarket.co.kr/js/www/main/DD_belatedPNG.js"></script>
+	<script>
+	  DD_belatedPNG.fix('#header');
+	</script>
+	<![endif]-->
+
+<script Language='JavaScript' type="text/javascript" src="/challenge/neo_include/gmkt.js"></script>
+<script type="text/javascript" src="http://script.gmarket.co.kr/js/www/main/Main.js"></script>
+<script type="text/javascript" src="/IndexAdData.js"></script>
+<script type="text/javascript" src="/IndexCommonData.js"></script>
+<script type="text/javascript" src="/IndexBestSellerAllData.js"></script>
+<script type="text/javascript" src="/IndexBestSellerGroupData.js"></script>
+<script type="text/javascript" src="/IndexCategoryLayerData.js"></script><!--2013-01-16 [HP 카테고리 리뉴얼 작업]//-->
+<script type="text/javascript" src="/IndexToDayData.js"></script>
+<script type="text/javascript" src="/IndexMTBanner.js"></script>
+<script type="text/javascript" src="/challenge/neo_include/js/StatSNA.js"></script>
+<script type="text/javascript" src="http://promotion.gmarket.co.kr/daycalendar/DayCalendarData.js"></script>
+<script language="javascript" type="text/javascript" src="/challenge/neo_include/js/AutoCompleteMain.js"></script>
+<script Language='JavaScript' type="text/javascript" src='http://www.gmarket.co.kr/challenge/neo_include/menu_top_import.js'></script>
+<script type="text/javascript" src="http://script.gmarket.co.kr/js/www/main/CommonTop.js"></script>
+<script type='text/javascript' src='/challenge/neo_include/sns/js/snsHelper.js?date=20130416'></script>
+<script type='text/javascript' src='/challenge/neo_include/sns/js/snsUtil.js?date=20130416'></script>
+<script type="text/javascript">
+var constBanNo = 0;
+var startMarketYn = false;
+var startCategory1Yn = false;
+var startCategory2Yn = false;
+var startCategory3Yn = false;
+var startCategory4Yn = false;
+var startBrandYn = false;
+var startLotteYn = false;
+var startGlobalYn = false;
+var gmktMainIsIE = (navigator.userAgent.toLowerCase().indexOf('msie') != -1) ? true : false;
+
+$j(document).ready(function () {
+
+	$j('#btnShareSNS').hover(
+		function () {
+		    $j('#shareMenu').stop(true, true).slideDown(100);
+			$j("#imgShareBtn").attr("src", "http://image.gmarket.co.kr/main/2013/03/21/btn_share_on.gif");
+		}, 
+		function () {
+			$j('#shareMenu').stop(true, true).slideUp(100);		
+			$j("#imgShareBtn").attr("src", "http://image.gmarket.co.kr/main/2013/03/21/btn_share_off.gif");
+		}
+	);
+
+	$j("img").hover(
+		function () {
+			var tmpThis = this; //2013-02-04
+			var selId = $j(this).attr("id");
+			$j("#Layer" + selId).show();
+			$j("#Layer" + selId).hover(
+				function () {
+					$j("#Layer" + selId).show();
+
+					//2013-02-04
+					var imgHeight = parseInt($j(tmpThis).css("height")) / 2;
+					$j(tmpThis).css("margin-top", "-" + imgHeight + "px");
+					//2013-02-04
+				},
+				function () {
+					$j("#Layer" + selId).hide();
+					//2013-01-16 [HP 카테고리 리뉴얼 작업]
+					$j("img.imgCategoryMenu").css("margin-top", "0px");
+					//2013-01-16 [HP 카테고리 리뉴얼 작업]
+				}
+			);
+
+			//2013-01-16 [HP 카테고리 리뉴얼 작업]
+			var objCateList = $j("ul.cate-bn-list", $j("#Layer" + selId));
+			if (objCateList.length > 0) {
+				var objCateListLi = $j("li", objCateList);
+
+				if (objCateListLi.length > 0) {
+					var selectedIndex = Math.floor(Math.random() * 10) % objCateListLi.length;
+
+					// ie에서는 event precess 중 dom control문제
+					if ($j.browser.msie) {
+						var tmpHtml = objCateList.html();
+						objCateList.empty();
+						objCateList.html(tmpHtml);
+						objCateListLi = $j("li", objCateList);
+					}
+
+					fnCategoryLayerDataBanner(selectedIndex, objCateListLi);
+				}
+
+				$j("img.imgCategoryMenu").css("margin-top", "0px");
+
+				var imgHeight = parseInt($j(this).css("height")) / 2;
+				$j(this).css("margin-top", "-" + imgHeight + "px");
+			}
+			//2013-01-16 [HP 카테고리 리뉴얼 작업]
+
+		}, function () {
+			var selId = $j(this).attr("id");
+			$j("#Layer" + selId).hide();
+
+			//2013-02-04
+			var objCateList = $j("ul.cate-bn-list", $j("#Layer" + selId));
+			if (objCateList.length > 0)
+				$j(this).css("margin-top", "0px");
+			//2013-02-04
+		}
+	);
+
+
+	$btn = $j("#gnb > ul > li");
+
+	$j($btn).hover(
+		function () {
+			$j("#gnb > ul > li").removeClass("selected");
+
+
+			var classId = $j(this).attr("id");
+			BigBanner2(classId, "T");
+			$j("#gnb > ul > li").removeClass("on");
+			$j(this).addClass("selected");
+
+			bigBanPage("", "")
+			BigBannerText(classId);
+
+
+			var tempSplitGubun = 7;
+			if (currMainEventBannerRow == 4 || currMainEventBannerRow == 5) {
+				$j("#btnShareSNS").hide();
+				tempSplitGubun = 5;
+			} else {
+				$j("#btnShareSNS").show();
+				tempSplitGubun = 7;
+			}
+			$j("#UbannerTitle" + currMainEventBannerRow + " li > a:eq(" + (currMainEventBannerCol % tempSplitGubun) + ")").hover();
+			$j("#UbannerTitle" + currMainEventBannerRow + " li > a:eq(" + (currMainEventBannerCol % tempSplitGubun) + ")").css("text-decoration", "none");
+			$j("#UbannerTitle" + currMainEventBannerRow + " li > a:eq(" + (currMainEventBannerCol % tempSplitGubun) + ")").css("color", "#fff");
+
+		}, function () {
+			var classId = $j(this).attr("id");
+
+			$j(this).addClass("on");
+			$j("#" + classId).removeClass("selected");
+
+		}
+
+	);
+
+	try {
+		$j.each(BigBannerTitle, function (index, item) {
+			$btn = $j("#gnb > ul.menus > li > a > img");
+			$btn[index].src = this["titleImg"];
+			$btn[index].alt = this["title"];
+		});
+	} catch (e) { }
+
+
+	$j("#focusRoll").hover(
+		function () {
+
+			stopFocusRoll()
+		}, function () {
+			sTartFocusRoll()
+		}
+
+	);
+
+	BigBanner2("", "");
+	ShowTodaySpecialPrice("");
+	todayEvent(0);
+	showBestSellerTab(0);
+	ShowBestSeller("All", 0);
+	showBrandLotteGlobal(0, "")
+	showBrandLotteGlobal(1, "")
+	showBrandLotteGlobal(2, "")
+	showBrandLotteGlobalEvent(0, "")
+	showBrandLotteGlobalEvent(1, "")
+	showBrandLotteGlobalEvent(2, "")
+	ShowFocusItem("");
+	showCategoryBanner(0, "");
+	showCategoryBanner(1, "");
+	showCategoryBanner(2, "");
+	showCategoryBanner(3, "");
+	showCategoryItemTab(0, 0);
+	showCategoryItemTab(1, 0);
+	showCategoryItemTab(2, 0);
+	showCategoryItemTab(3, 0);
+	showCategoryItem(0, 0, "Y");
+	showCategoryItem(1, 0, "Y");
+	showCategoryItem(2, 0, "Y");
+	showCategoryItem(3, 0, "Y");
+	htmlBannerTab("");
+	ShowSpecialMarket("");
+	ShowTodayPower("");
+	ShowPowerMiniShop("");
+	showBottomBanner1();
+	showBottomBanner2();
+	showBottomBanner3();
+	showBottomBanner4();
+	showBottomBanner5();
+	showBottomGSpecialBenefit();
+	showBottomNotice("");
+
+	ShowMarkettingBenefit("");
+	$j("#currpnNewService").html(1);
+	ShowNewService();
+	showLotteCategoryBanner()
+	timerA = window.setInterval('sTartFocusRoll()', 4000);
+	timerB = window.setInterval("sTartBestSellerRoll()", 4000);
+	//ShowMainLeftTopLogo();	//기존 배너
+	
+
+	//--지구닷컴 배너 3/29 09:00 ~ 04/07 24:00 이후 삭제&기존배너원복
+	
+		ShowMainLeftTopLogo();		
+	
+	//!--지구닷컴 배너
+
+
+	//2013-01-16 [HP 카테고리 리뉴얼 작업]
+	fnCategoryLayerDataInit();
+});
+
+function htmlBannerTab(gb){
+	try{
+		if (gb=="")
+		{
+			rndNoBan = Math.floor(Math.random() * 9) +1;
+		}else{
+			rndNoBan = gb;
+		}
+		$j.each(HtmlBannerTab, function(index,item) {
+			$j("#htmlTabImg"+(index+1)).attr("src",this["tabImg"]);
+			$j("#IndexHtmlBanner"+(index+1)).removeClass("selected");
+
+		});
+		$j("#styleHtmlIfm").attr("src","/IndexHtmlBanner" + rndNoBan +".html");
+
+
+		document.getElementById("styleHtmlIfm").src = "/IndexHtmlBanner" + rndNoBan +".html";
+		if(gb=="1"){
+			document.getElementById("IndexHtmlBanner"+rndNoBan).className = "fir selected";
+		}else{
+			document.getElementById("IndexHtmlBanner"+rndNoBan).className = "selected";
+		}
+	}catch(e){}
+
+}
+
+var curSelTab = "";
+var selBestSellerTabNo = 0;
+function showBestSellerTab(selNo){
+
+	try{
+
+		selBestSellerTabNo = selBestSellerTabNo + selNo;
+		var addNo = 0;
+		var totCnt = BestSellerTab.length;
+		var limitCnt = 5;
+		var snaCd = 0;
+        var snaChannelCd = 0;
+
+
+		for( i = (selBestSellerTabNo) ; i < (selBestSellerTabNo + limitCnt) ; i++){
+
+			if(i>=totCnt){i=0;}
+			if(selBestSellerTabNo>=totCnt){selBestSellerTabNo=0;}
+			if(i<0){i=totCnt-1;selBestSellerTabNo=totCnt-1}
+			if(addNo>limitCnt){break;}
+			snaCd = snaCode("G"+ BestSellerTab[i]["groupCd"]);
+            snaChannelCd = snaChannelCode("G"+ BestSellerTab[i]["groupCd"]);
+            $j("#bestTab"+addNo).html("<a href=\"javascript:GoSNAChannel('" + snaChannelCd + "', '" + BestSellerTab[i]["link"] + "');\" id='tabIdG"+ BestSellerTab[i]["groupCd"]+"' onmouseover=\nShowBestSeller('G"+ BestSellerTab[i]["groupCd"] +"',0)\n>"+ BestSellerTab[i]["title"] +"</a>");
+			addNo = addNo +1;
+
+		}
+		$j("#"+curSelTab).addClass("on");
+	}catch(e){}
+
+}
+
+var rollBest;
+
+function stopBestSellerRoll(){
+
+window.clearTimeout(rollBest);
+}
+function sTartBestSellerRoll(){
+	try{
+		window.clearInterval(timerB)
+		rollBest = window.setTimeout("sTartBestSellerRoll()", 4000);
+		ShowBestSeller('All',1)
+	}catch(e){}
+}
+
+var selBestSellerGroup = "All";
+var selBestSellerNo = 0;
+var startNo = 0;
+function ShowBestSeller(groupCd, selTab){
+
+try{
+
+
+
+	if(selTab!=0){
+		selBestSellerNo = selBestSellerNo + selTab;
+	}else if(selTab==2){
+		selBestSellerNo = selBestSellerNo + selTab;
+	}else{
+		selBestSellerNo = selTab;
+	}
+
+
+	if(groupCd!=""){selBestSellerGroup = groupCd;}
+	var selGroupTab = eval("BestSeller" + selBestSellerGroup);
+	$indexNo = 0;
+	$indexAltNo = "";
+	$htmlStr = "";
+
+	if (selBestSellerNo == selGroupTab.length){
+		selBestSellerNo = 0;
+	}else if (selBestSellerNo < 0){
+		selBestSellerNo = selGroupTab.length - 1;
+	}
+
+	if(curSelTab==""){
+		$j("#tabIdAll").removeClass("on");
+	}else{
+		$j("#"+curSelTab).removeClass("on");
+	}
+
+	$j.each(selGroupTab[selBestSellerNo], function(index,item) {
+
+		if(selBestSellerNo!=0){
+			$indexNo = (index + 1)+(selBestSellerNo*5);
+			$indexAltNo = $indexNo;
+			if($indexNo<10){$indexNo = "0"+$indexNo};
+		}else{
+			$indexNo = (index + 1);
+			$indexAltNo = $indexNo;
+			if($indexNo<10){$indexNo = "0"+$indexNo};
+		}
+		$htmlStr += " <li>"
+		$htmlStr += " 	<span class='num num"+ $indexAltNo +"'>" + $indexAltNo +"위'</span>"
+		$htmlStr += "	<div class='prd'>"
+		$htmlStr += "		<div class='img'><a href=\""+ this["link"] +"\"><img src='"+ this["imgUrl"] +"' alt='"+this["gdNm"]+"'></a></div>"
+		$htmlStr += "		<div class='cont'>"
+		$htmlStr += "			<p class='info'><a href=\""+ this["link"] +"\">"+ this["gdNm"] +"</a></p>"
+		$htmlStr += "			<p class='price'>"+ this["price"] +"</p>"
+		$htmlStr += "		</div>"
+		$htmlStr += "	</div>"
+		$htmlStr += "</li>"
+
+		$j("#rollingFrame").html($htmlStr);
+		$j("#tabId"+selBestSellerGroup).addClass("on");
+		curSelTab = "tabId"+selBestSellerGroup
+
+	});
+}catch(e){}
+}
+
+
+
+function showBrandLotteGlobalEvent(selTab,selIndex){
+var rndNoBan = 0;
+var divNm = "brandonLotteGlobalEvent" + selTab;
+	try{
+		if (selIndex=="")
+		{
+			rndNoBan = Math.floor(Math.random() * (brandonLotteGlobalEvent[selTab].length));
+		}else{
+			rndNoBan = selIndex;
+		}
+
+		$j.each(brandonLotteGlobalEvent[selTab], function(index,item) {
+			if(index==rndNoBan){
+
+				//$j("#" + divNm + "E").html("<a href=\"javascript:GoSNA('"+ snaCodeBlg(selTab, 5) +"','','"+ this["linkUrl"] +"','','"+ snaChannelCodeBlg(selTab, 5) +"');\"><img src='"+ this["imgUrl"] +"' border='0' alt='"+ this["alt"] +"' width='214' height='92'></a>");
+                $j("#" + divNm + "E").html("<a href=\"javascript:GoSNAChannel('"+ snaChannelCodeBlg(selTab, 5) +"','"+ this["linkUrl"] +"');\"><img src='"+ this["imgUrl"] +"' alt='"+ this["alt"] +"' ></a>");
+
+			}
+		});
+	}catch(e){}
+}
+
+function showBrandLotteGlobal(selTab,selIndex){
+
+	try{
+
+		$selBtn = "";
+		$dotImg = "";
+		var rndNoBan = 0;
+		var divNm = "brandonLotteGlobal" + selTab;
+
+		if(selTab==1){
+			$dotImg = "_2";
+		}else if(selTab==2){
+			$dotImg = "_1";
+		}
+
+
+		if (typeof(selIndex)=="string")
+		{
+			rndNoBan = Math.floor(Math.random() * (brandonLotteGlobal[selTab].length));
+		}else{
+			rndNoBan = selIndex;
+		}
+
+		$j.each(brandonLotteGlobal[selTab], function(index,item) {
+			$j("#blg"+selTab+"Dot"+index).removeClass("selected");
+
+			if(index==rndNoBan){
+				$selBtn += "<a id='blg"+selTab+"Dot"+index+"' onmouseover='showBrandLotteGlobal("+ selTab +","+ index +");' class='selected'><img src='http://image.gmarket.co.kr/main/2013/04/03/btn_select"+ $dotImg +".png' class='png24' alt='" + (index + 1) + "번 배너'></a>";
+				$j("#BrandLotteGlobalHref" + selTab +""+ index).addClass = "selected";
+				if(selTab==0){
+					//$j("#" + divNm + "B").html("<a href=\"javascript:GoSNA('"+ snaCodeBlg(selTab, index) +"','','"+ this["linkUrl"] +"','','"+ snaChannelCodeBlg(selTab, index) +"');\"><img src='"+ this["imgUrl"] +"' border='0' alt='"+ this["alt"] +"' width='214' height='214'></a>");
+                    $j("#" + divNm + "B").html("<a href=\"javascript:GoSNAChannel('" + snaChannelCodeBlg(selTab, index) + "', '" + this["linkUrl"] + "');\"><img src='"+ this["imgUrl"] +"' alt='"+ this["alt"] +"' ></a>");
+				}else{
+					//$j("#" + divNm + "B").html("<a href=\"javascript:GoSNA('"+ snaCodeBlg(selTab, index) +"','','"+ this["linkUrl"] +"','','"+ snaChannelCodeBlg(selTab, index) +"');\"><img src='"+ this["imgUrl"] +"' border='0' alt='"+ this["alt"] +"' width='213' height='214'></a>");
+                    $j("#" + divNm + "B").html("<a href=\"javascript:GoSNAChannel('" + snaChannelCodeBlg(selTab, index) + "', '" + this["linkUrl"] + "');\"><img src='"+ this["imgUrl"] +"' alt='"+ this["alt"] +"' ></a>");
+				}
+			}else{
+				$selBtn += "<a id='blg"+selTab+"Dot"+index+"' onmouseover='showBrandLotteGlobal("+ selTab +","+ index +");'><img src='http://image.gmarket.co.kr/main/2013/04/03/btn_select"+ $dotImg +".png' class='png24'  alt='" + (index + 1) + "번 배너'></a>";
+			}
+
+
+
+		});
+
+		$j("#blg"+selTab+"Dot"+selIndex).addClass("selected");
+
+		if(selTab==0 && startBrandYn == false){
+			$j("#fashionBrand").html($selBtn)
+			startBrandYn = true;
+		}else if(selTab==1 && startLotteYn == false){
+			$j("#fashionLotte").html($selBtn)
+			startLotteYn = true;
+		}else if(selTab==2 && startGlobalYn == false){
+			$j("#fashionGlobal").html($selBtn)
+			startGlobalYn = true
+		}
+
+	}catch(e){}
+}
+
+
+function showCategoryBanner(selTab,selIndex){
+$selBtn = ""
+	try{
+		var rndNoBan = 0;
+		var divNm = "categoryBanner" + selTab;
+
+
+		if (typeof(selIndex)=="string")
+		{
+			rndNoBan = Math.floor(Math.random() * (CategoryBanner[selTab].length));
+		}else{
+			rndNoBan = selIndex;
+		}
+
+		$j.each(CategoryBanner[selTab], function(index,item) {
+			$j("#cate"+selTab+"Dot"+index).removeClass("selected");
+			if(index==rndNoBan){
+				//$j("#" + divNm).html("<a href=\"javascript:GoSNA('"+ snaCodeCategoryBanner(selTab, index) +"','','"+ this["linkUrl"] +"','','"+ snaChannelCodeCategoryBanner(selTab, index) +"');\"><img src='"+ this["imgUrl"] +"' border='0' alt='"+ this["alt"] +"' width='170' height='209'></a>");
+                $j("#" + divNm).html("<a href=\"javascript:GoSNAChannel('"+ snaChannelCodeCategoryBanner(selTab, index) +"','"+ this["linkUrl"] +"');\"><img src='"+ this["imgUrl"] +"' alt='"+ this["alt"] +"'></a>");
+				$selBtn += "<a id='cate"+selTab+"Dot"+index+"' onmouseover='showCategoryBanner("+ selTab +","+ index +");' class='selected'><img src='http://image.gmarket.co.kr/main/2013/04/03/btn_select_cate.png'  alt='" + (index + 1) + "번 배너' class='png24' ></a>";
+			}else{
+				$selBtn += "<a id='cate"+selTab+"Dot"+index+"' onmouseover='showCategoryBanner("+ selTab +","+ index +");'><img src='http://image.gmarket.co.kr/main/2013/04/03/btn_select_cate.png'   alt='" + (index + 1) + "번 배너' class='png24' ></a>";
+			}
+
+		});
+
+			if(selTab==0 && startCategory1Yn == false){
+				$j("#categoryBannerDot0").html($selBtn)
+				startCategory1Yn = true
+			}else if(selTab==1 && startCategory2Yn == false){
+				$j("#categoryBannerDot1").html($selBtn)
+				startCategory2Yn = true
+			}else if(selTab==2 && startCategory3Yn == false){
+				$j("#categoryBannerDot2").html($selBtn)
+				startCategory3Yn = true
+			}else if(selTab==3 && startCategory4Yn == false){
+				$j("#categoryBannerDot3").html($selBtn)
+				startCategory4Yn = true
+			}
+
+		$j("#cate"+ selTab +"Dot"+selIndex).addClass("selected");
+
+	}catch(e){}
+}
+
+
+function showCategoryItemTab(selTab, selTitleNo){
+
+try{
+
+	$htmlStr = "";
+	var rndNoBan = 0;
+	var itemNm = eval("CategoryItem" + selTab);
+
+		$j.each(CategoryItemTab[selTab], function(index,item) {
+
+				if (index==0)
+				{
+					if(index==selTitleNo){
+						$htmlStr += "<li class='fir'><a style='cursor:default;' id='cateItem"+selTab+""+index+"' href=\"javascript:showCategoryItem("+ selTab +", "+ index +",'N');\" onmouseover=\"showCategoryItem("+ selTab +", "+ index +",'N');\" class='on'>"+ this["tabNm"] +"</a></li>"
+					}else{
+						$htmlStr += "<li class='fir'><a style='cursor:default;' id='cateItem"+selTab+""+index+"' href=\"javascript:showCategoryItem("+ selTab +", "+ index +",'N');\" onmouseover=\"showCategoryItem("+ selTab +", "+ index +",'N');\">"+ this["tabNm"] +"</a></li>"
+					}
+				}else{
+					if(index==selTitleNo){
+						$htmlStr += "<li><a style='cursor:default;' id='cateItem"+selTab+""+index+"' href=\"javascript:showCategoryItem("+ selTab +", "+ index +",'N');\" class='on' onmouseover=\"showCategoryItem("+ selTab +", "+ index +",'N');\">"+ this["tabNm"] +"</a></li>"
+					}else{
+						$htmlStr += "<li><a style='cursor:default;' id='cateItem"+selTab+""+index+"' href=\"javascript:showCategoryItem("+ selTab +", "+ index +",'N');\" onmouseover=\"showCategoryItem("+ selTab +", "+ index +",'N');\">"+ this["tabNm"] +"</a></li>"
+					}
+				}
+
+			$j("#categoryItemTab"+ selTab).html($htmlStr);
+		});
+	}catch(e){}
+}
+
+function showCategoryItem(cateCd, selTab, firstYn){
+
+	try{
+		$htmlStr = "";
+		var cateSection = eval("CategoryItem" + cateCd);
+
+		$j("#categoryItemTab"+ cateCd +" > li  a").removeClass("on");
+
+		$j.each(cateSection[selTab], function(index,item) {
+
+				$htmlStr += "<li>"
+				$htmlStr += "	<div class='prd'>"
+				//$htmlStr += "		<div class='img'><a href=\"javascript:GoSNA('"+ snaCodeCategoryItem(cateCd, selTab) +"','','http://item.gmarket.co.kr/detailview/Item.asp?goodscode="+ this["gdNo"] +"','','"+ snaChannelCodeCategoryItem(cateCd, selTab) +"')\"><img src='"+ this["imgUrl"] +"' alt='"+this["gdNm"]+"' border='0'></a></div>"
+                $htmlStr += "		<div class='img'><a href=\"javascript:GoSNAChannel('"+ snaChannelCodeCategoryItem(cateCd, selTab) +"','http://item.gmarket.co.kr/detailview/Item.asp?goodscode="+ this["gdNo"] +"');\"><img src='"+ this["imgUrl"] +"' alt='"+this["gdNm"]+"' ></a></div>"
+				$htmlStr += "		<div class='info'>"
+				$htmlStr += "			<span><a href='http://item.gmarket.co.kr/detailview/Item.asp?goodscode="+ this["gdNo"] +"'>"+ this["gdNm"] +"</a></span>"
+				$htmlStr += "			<strong>"+ this["price"] +"</strong>"
+				$htmlStr += "		</div>"
+				$htmlStr += "	</div>"
+				$htmlStr += "</li>"
+
+				$j("#categoryItem"+ cateCd).html($htmlStr);
+		});
+		$j("#cateItem"+cateCd+""+selTab).addClass("on");
+	}catch(e){}
+}
+
+var bottomNoticeCurTab = 0;
+function showBottomNotice(selTab) {
+
+	var ItemLen = notice.length - 1;
+	var rndNoNotice = 0;
+
+	if (selTab != 0) {
+		bottomNoticeCurTab = bottomNoticeCurTab + selTab;
+	} else if (selTab == "" || selTab == "undefined") {
+		bottomNoticeCurTab = rndNoNotice = Math.floor(Math.random() * (ItemLen))
+	}
+	if (bottomNoticeCurTab > ItemLen) { bottomNoticeCurTab = 0 }
+	if (bottomNoticeCurTab < 0) { bottomNoticeCurTab = ItemLen }
+
+	document.getElementById("bottomNotice").innerHTML = "<li><a href=\"" + notice[bottomNoticeCurTab].link + "\">" + notice[bottomNoticeCurTab].title + "</a><span>" + notice[bottomNoticeCurTab].date.substring(0,10) + "</span></li>";
+	
+}
+
+
+function showBottomBanner1() {
+
+	//document.getElementById("bottomBannerTitle1").href = "javascript:GoSNA('126000020', '', '" + banner1[0].link2 + "', '', 'CHM1L020');";
+    document.getElementById("bottomBannerTitle1").href = "javascript:GoSNAChannel('CHM1L020', '" + banner1[0].link2 + "');";
+	document.getElementById("bottomBannerTitleImg1").src = banner1[0].img2;
+	document.getElementById("bottomBannerTitleImg1").alt = banner1[0].title;
+	//document.getElementById("bottomBanner1").href = "javascript:GoSNA('126000025', '', '" + banner1[0].link + "', '', 'CHM1L025');";
+    document.getElementById("bottomBanner1").href = "javascript:GoSNAChannel('CHM1L025','" + banner1[0].link + "');";
+	document.getElementById("bottomBannerImg1").src = banner1[0].img;
+	document.getElementById("bottomBannerImg1").alt = banner1[0].alt;
+}
+
+function showBottomBanner2() {
+
+	//document.getElementById("bottomBannerTitle2").href = "javascript:GoSNA('126000021', '', '" + banner2[0].link2 + "', '', 'CHM1L021');";
+    document.getElementById("bottomBannerTitle2").href = "javascript:GoSNAChannel('CHM1L021', '" + banner2[0].link2 + "');";
+	document.getElementById("bottomBannerTitleImg2").src = banner2[0].img2;
+	document.getElementById("bottomBannerTitleImg2").alt = banner2[0].title;
+	//document.getElementById("bottomBanner2").href = "javascript:GoSNA('126000026', '', '" + banner2[0].link + "', '', 'CHM1L026');";
+    document.getElementById("bottomBanner2").href = "javascript:GoSNAChannel('CHM1L026', '" + banner2[0].link + "');";
+	document.getElementById("bottomBannerImg2").src = banner2[0].img;
+	document.getElementById("bottomBannerImg2").alt = banner2[0].alt;
+}
+
+function showBottomBanner3() {
+
+	//document.getElementById("bottomBannerTitle3").href = "javascript:GoSNA('126000022', '', '" + banner3[0].link2 + "', '', 'CHM1L022');";
+    document.getElementById("bottomBannerTitle3").href = "javascript:GoSNAChannel('CHM1L022','" + banner3[0].link2 + "');";
+	document.getElementById("bottomBannerTitleImg3").src = banner3[0].img2;
+	document.getElementById("bottomBannerTitleImg3").alt = banner3[0].title;
+	//document.getElementById("bottomBanner3").href = "javascript:GoSNA('126000027', '', '" + banner3[0].link + "', '', 'CHM1L027');";
+    document.getElementById("bottomBanner3").href = "javascript:GoSNAChannel('CHM1L027','" + banner3[0].link + "');";
+	document.getElementById("bottomBannerImg3").src = banner3[0].img;
+	document.getElementById("bottomBannerImg3").alt = banner3[0].alt;
+	document.getElementById("bottomDonation").innerHTML = banner3[0].money + '원';
+}
+
+function showBottomBanner4() {
+
+	//document.getElementById("bottomBannerTitle4").href = "javascript:GoSNA('126000023', '', '" + banner4[0].link2 + "', '', 'CHM1L023');";
+    document.getElementById("bottomBannerTitle4").href = "javascript:GoSNAChannel('CHM1L023', '" + banner4[0].link2 + "');";
+	document.getElementById("bottomBannerTitleImg4").src = banner4[0].img2;
+	document.getElementById("bottomBannerTitleImg4").alt = banner4[0].title;
+	//document.getElementById("bottomBanner4").href = "javascript:GoSNA('126000028', '', '" + banner4[0].link + "', '', 'CHM1L028');";
+    document.getElementById("bottomBanner4").href = "javascript:GoSNAChannel('CHM1L028', '" + banner4[0].link + "');";
+	document.getElementById("bottomBannerImg4").src = banner4[0].img;
+	document.getElementById("bottomBannerImg4").alt = banner4[0].alt;
+}
+
+function showBottomBanner5() {
+
+	//document.getElementById("bottomBannerTitle5").href = "javascript:GoSNA('126000024', '', '" + banner5[0].link2 + "', '', 'CHM1L024');";
+    document.getElementById("bottomBannerTitle5").href = "javascript:GoSNAChannel('CHM1L024', '" + banner5[0].link2 + "');";
+	document.getElementById("bottomBannerTitleImg5").src = banner5[0].img2;
+	document.getElementById("bottomBannerTitleImg5").alt = banner5[0].title;
+	//document.getElementById("bottomBanner5").href = "javascript:GoSNA('126000029', '', '" + banner5[0].link + "', '', 'CHM1L029');";
+    document.getElementById("bottomBanner5").href = "javascript:GoSNAChannel('CHM1L029', '" + banner5[0].link + "');";
+	document.getElementById("bottomBannerImg5").src = banner5[0].img;
+	document.getElementById("bottomBannerImg5").alt = banner5[0].alt;
+}
+
+var markettingBenefitCurItem = 0;
+
+function ShowMarkettingBenefit(selTab){
+
+	try{
+		var markettingBenefitCnt = markettingBenefit[0].length;
+		$selBtn = "";
+		var rndNoBan = 0;
+
+		if (typeof(selTab)=="string")
+		{
+			rndNoBan = Math.floor(Math.random() * markettingBenefitCnt);
+			markettingBenefitCurItem = rndNoBan;
+		}else{
+			markettingBenefitCurItem = selTab;
+		}
+
+		if (markettingBenefitCurItem>=markettingBenefitCnt){markettingBenefitCurItem=0}
+		if (markettingBenefitCurItem==-1){markettingBenefitCurItem=markettingBenefitCnt}
+
+		$j.each(markettingBenefit[0], function(index,item) {
+		$j("#marketDot"+index).removeClass("selected");
+			if (markettingBenefitCurItem==index){
+
+				$j("#markettingBanner > div.o-btn").css("display","");
+				if(this["extendType"]=="H"){
+					$j("#markettingBanner > a").attr('href', "javascript:showMarkettingBenefitHtml("+index+",'H');");
+					$j("#markettingBanner > a > img").attr('src', this["img1"]);
+					$j("#markettingBanner > a > img").attr('alt', this["alt1"]);
+					$j("#markettingBanner > div.o-btn > a").attr("href","javascript:showMarkettingBenefitHtml("+index+",'H');");
+				}else if(this["extendType"]=="B"){
+					$j("#markettingBanner > a").attr('href', "javascript:showMarkettingBenefitHtml("+index+",'B');");
+					$j("#markettingBanner > a > img").attr('src', this["img1"]);
+					$j("#markettingBanner > a > img").attr('alt', this["alt1"]);
+					$j("#markettingBanner > div.o-btn > a").attr("href","javascript:showMarkettingBenefitHtml("+index+",'B');");
+				}else{
+					//$j("#markettingBanner > a").attr('href', "javascript:GoSNA('"+ snaCodeMarketBenefitC(selTab) +"','','"+ this["link1"] +"','', '" + snaChannelCodeMarketBenefitC(selTab) + "');");
+                    $j("#markettingBanner > a").attr('href', "javascript:GoSNAChannel('"+ snaChannelCodeMarketBenefitC(selTab) +"','"+ this["link1"] +"');");
+					$j("#markettingBanner > a > img").attr('src', this["img1"]);
+					$j("#markettingBanner > a > img").attr('alt', this["alt1"]);
+					$j("#markettingBanner > div.o-btn").css("display","none");
+				}
+			$selBtn += "<a class='selected' href='' id='marketDot"+index+"' onMouseOver='ShowMarkettingBenefit("+index+");'><img class='png24' alt='' src='http://image.gmarket.co.kr/main/2013/04/03/btn_select_cate.png' ></a>"
+			}else{
+			$selBtn += "<a href='' id='marketDot"+index+"' onMouseOver='ShowMarkettingBenefit("+index+");'><img class='png24' src='http://image.gmarket.co.kr/main/2013/04/03/btn_select_cate.png'></a>"
+			}
+
+		});
+		$j("#marketDot"+selTab).addClass("selected");
+		if (startMarketYn == false && markettingBenefitCnt!=1){
+			$j("#markettingBtn").html($selBtn);
+		}
+		$j("#markettingBanner").css("display","");
+		startMarketYn = true;
+
+	}catch(e){}
+}
+
+
+function showBottomGSpecialBenefit() {
+
+	document.getElementById("bottomGSpecialBenefit").href = SpecialBenefit[0].link;
+	document.getElementById("bottomGSpecialBenefitImg").src = SpecialBenefit[0].img;
+	document.getElementById("bottomGSpecialBenefitImg").alt = SpecialBenefit[0].title;
+}
+
+function showMarkettingBenefitHtml(selNo,eType){
+	try{
+		showHideLayer("#markettingExtend");
+
+		$j.each(markettingBenefit[0], function(index,item) {
+			if (selNo==index){
+				if(eType=="H"){
+
+					$j("#markettingExtendHtml").html(this["html"]);
+					showHideLayer("#markettingExtendBanner");
+				}else{
+					//$j("#markettingExtendBanner > a").attr('href', "javascript:GoSNA('"+ snaCodeMarketBenefitE(selNo) +"','','"+ this["link2"] +"','', '" + snaChannelCodeMarketBenefitE(selNo) + "');");
+                    $j("#markettingExtendBanner > a").attr('href', "javascript:GoSNAChannel('"+ snaChannelCodeMarketBenefitE(selNo) +"','"+ this["link2"] +"');");
+					$j("#markettingExtendBanner > a > img").attr('src', this["img2"]);
+					$j("#markettingExtendBanner > a > img").attr('alt', this["alt2"]);
+				}
+
+			}
+		});
+	}catch(e){}
+}
+
+function showHideLayer(objNm){
+	if($j(objNm).css("display") == "block"){
+		$j(objNm).hide();
+	}else{
+		$j(objNm).show();
+	}
+}
+
+function ShowNewService(){
+		
+	var writeIndex;
+    var sna = 0;
+    var snaChannelCode = 0;
+
+	for(var i=0;i<6;i++){
+
+		writeIndex = 0;
+		writeIndex = writeIndex + i;
+		
+		sna = i + 1;
+        snaChannelCode = "CHM1F0" + ((sna > 10) ? sna : "0" + sna);
+
+		$j("#spNewServiceText" + i).html(newService[0][writeIndex]["rImageTitle"]);
+        $j("#aNewService" + i).attr("href", "javascript:GoSNAChannel('"+ snaChannelCode +"','" +newService[0][writeIndex]["rLink1"] +"','','" + sna + "');");
+
+		var tempNewServiceYN = newService[0][writeIndex]["rNewServiceYN"];
+
+		if (tempNewServiceYN == "Y")
+		    $j("#spNewServiceText" + i)[0].innerHTML = "<em>" + newService[0][writeIndex]["rImageTitle"] + "</em><img src='http://image.gmarket.co.kr/main/2013/01/14/ic_new.gif'>";
+		else
+		    $j("#spNewServiceText" + i)[0].innerHTML = "<em>" + newService[0][writeIndex]["rImageTitle"] + "</em>";
+	}
+}
+
+var curEventNo = 0
+function todayEvent(ranNo){
+	try{
+		var todayDt = '20130729';
+		var todayEventCnt = eval("dayCnt_" + todayDt);
+		curEventNo = parseInt(ranNo)+1;
+
+		if(curEventNo>=todayEventCnt)(curEventNo=0)
+
+
+		$j("#todayEvent").html(eval("arrDay_" + todayDt)[ranNo]['TITLE']);
+		window.setTimeout("todayEvent('" + curEventNo + "')", 3000);
+	}catch(e){}
+}
+
+
+var curEventNo = 0
+function showLotteCategoryBanner(){
+	try{
+		$j.each(LotteCategoryBanner, function(index,item) {
+			$j("#lotteCategoryBanner").html("<a href='" +this["sLink"] +"'><img src='" +this["sTabImg"] +"'></a>");
+		});
+	}catch(e){}
+}
+
+
+
+function openTodayEvent(){
+	var todayDt = '20130729';
+	if(document.getElementById("eventCalendar").style.display == ""){
+		document.getElementById("eventCalendar").style.display = "none";
+	}else{
+		document.getElementById("eventCalendar").style.display = "";
+		showCallayer(todayDt,'2013-07-29','Y');
+		showEventCBanner(todayDt,-1);
+	}
+}
+
+
+// AD start
+function BigBanner2(selTab,selIndex){
+var selTabIndex = "";
+var nowTab = 0;
+var rndNoTab = 0;
+var rndNoBan = 0;
+var adSelTab = 0;
+$menuTitle = ""
+
+	try{
+		if (typeof(selTab)=="string")
+		{
+			selTabIndex = selTab.split("_");
+			nowTab = selTabIndex[1];
+
+		}else{
+			nowTab = selTab;
+		}
+
+		if (selIndex=="T")
+		{
+			rndNoTab = nowTab;
+			rndNoBan = Math.floor(Math.random() * (BigBanner[rndNoTab].length));
+		}else{
+
+
+			
+			var tempSplitGubun = 7;
+			if (currMainEventBannerRow == 4 || currMainEventBannerRow == 5) {
+				$j("#btnShareSNS").hide();
+				tempSplitGubun = 5;
+			} else {
+				$j("#btnShareSNS").show();
+				tempSplitGubun = 7;
+			}			
+			$j("#UbannerTitle" + currMainEventBannerRow + " li > a:eq(" + (currMainEventBannerCol % tempSplitGubun) + ")").css("text-decoration", "");
+			$j("#UbannerTitle" + currMainEventBannerRow + " li > a:eq(" + (currMainEventBannerCol % tempSplitGubun) + ")").css("color", "");
+
+
+			rndNoTab = Math.floor(Math.random() * 9);
+			if (rndNoTab == 6) { rndNoTab = 0 };
+			if (rndNoTab == 7) { rndNoTab = 4 };
+			if (rndNoTab == 8) { rndNoTab = 5 };
+			if (selTab != "") { rndNoTab = selTab }
+			rndNoBan = Math.floor(Math.random() * (BigBanner[rndNoTab].length));
+			if (selIndex != "") {
+			    rndNoBan = selIndex
+			} else {
+
+			    $j("#BanTitle_" + rndNoTab).addClass("on");
+			}
+
+		}
+		if(rndNoTab == 4 || rndNoTab == 5) $j("#btnShareSNS").hide();
+		currMainEventBannerRow = rndNoTab;
+		constBanNo = rndNoBan;
+		$j.each(BigBanner[rndNoTab], function(index, item) {
+		    if (index == rndNoBan) {
+				currMainEventBannerCol = rndNoBan;
+		        $j("#MainTab").html(this["BannerImg"]);
+
+				if (typeof (selTab) != "string" && selTab != "") {
+					var tempSplitGubun = 7;
+					if (currMainEventBannerRow == 4 || currMainEventBannerRow == 5) {
+						$j("#btnShareSNS").hide();
+						tempSplitGubun = 5;
+					} else {
+						$j("#btnShareSNS").show();
+						tempSplitGubun = 7;
+					}
+					$j("#UbannerTitle" + currMainEventBannerRow + " li > a:eq(" + (currMainEventBannerCol % tempSplitGubun) + ")").hover(); 
+					$j("#UbannerTitle" + currMainEventBannerRow + " li > a:eq(" + (currMainEventBannerCol % tempSplitGubun) + ")").css("text-decoration", "none");
+					$j("#UbannerTitle" + currMainEventBannerRow + " li > a:eq(" + (currMainEventBannerCol % tempSplitGubun) + ")").css("color", "#fff");
+				}
+
+
+		        if (rndNoTab == 0 || rndNoTab == 1 || rndNoTab == 2 || rndNoTab == 3) {
+						var MWForm = $j("#MainWiseLogForm");
+
+						MWForm.attr("target", "ifrMainWiseLogForm");
+						MWForm.attr("action", "http://promotion.gmarket.co.kr/challenge/neo_sangsul/plan_display_wiselog.asp?" + this["Sid"]);
+						MWForm.submit();
+					
+		        }
+		    }
+		});
+
+	}catch(e){}
+
+}
+
+
+function BigBannerText(selTab){
+var selTabIndex = "";
+var adPageTab = 0;
+$menuTitle = ""
+	try{
+		if (typeof(selTab)=="string")
+		{
+			selTabIndex = selTab.split("_");
+			selTab = selTabIndex[1]
+		}
+
+		if(selTab==4 || selTab==5){
+			adPageTab = parseInt((constBanNo)/5);;
+		}
+
+		$j.each(BigBanner[selTab], function(index,item) {
+			if((selTab==4 || selTab == 5) && ((adPageTab * 5)<= index && index <= ((adPageTab * 5) + 4))){
+
+				$menuTitle += "<li><a href=\""+this["Url"]+"\" onmouseover=\"BigBanner2('"+ selTab +"','"+index+"');\">"+ this["Thumb1"] +"</a></li>";
+			}else if(selTab == 3){
+				$menuTitle += "<li><a href=\""+this["Url"]+"\" onmouseover=\"BigBanner2('"+ selTab +"','"+index+"');\" target=\"_blank\">"+ this["Thumb1"] +"</a></li>";
+			}else if(selTab!=4 && selTab!= 5){
+				$menuTitle += "<li><a href=\""+this["Url"]+"\" onmouseover=\"BigBanner2('"+ selTab +"','"+index+"');\">"+ this["Thumb1"] +"</a></li>";
+			}
+
+			$j("#UbannerTitle"+selTab).html($menuTitle);
+
+
+		});
+	}catch(e){}
+
+}
+
+var curBigBanPage = 0;
+function bigBanPage(selTab, pageNo){
+
+	try{
+
+		if (typeof(selTab) == "string" || selTab =="")
+		{
+		return;
+		}
+		curBigBanPage = curBigBanPage + pageNo;
+		$menuTitle = "";
+		$rndNoBan = 0;
+		$loopCnt = 0;
+		$lastIndex = 0;
+
+		if(curBigBanPage>=BigBanner[selTab].length){
+			curBigBanPage = 0;
+		}else if(curBigBanPage<0){
+			if((parseInt(BigBanner[selTab].length/5)*5)==BigBanner[selTab].length){
+				curBigBanPage = (parseInt(BigBanner[selTab].length/5)*5)-5;
+			}else{
+				curBigBanPage = parseInt(BigBanner[selTab].length/5)*5;
+			}
+		}
+		$j.each(BigBanner[selTab], function(index,item) {
+
+			if(pageNo>0){
+				if(curBigBanPage <= index && (curBigBanPage+pageNo) > index){
+
+				$menuTitle += "<li><a href=\"javascript:BigBanner2('"+ selTab +"','"+index+"');\" onmouseover=\"BigBanner2('"+ selTab +"','"+index+"');\">"+ this["Thumb1"] +"</a></li>"
+
+				$loopCnt +=1;
+				$lastIndex = index;
+				}
+			}else{
+				if(curBigBanPage <= index && (curBigBanPage+5) > index){
+
+				$menuTitle += "<li><a href=\"javascript:BigBanner2('"+ selTab +"','"+index+"');\" onmouseover=\"BigBanner2('"+ selTab +"','"+index+"');\">"+ this["Thumb1"] +"</a></li>"
+				$loopCnt +=1;
+				$lastIndex = index;
+				}
+			}
+		});
+
+		$rndNoBan = $lastIndex - (Math.floor(Math.random() * ($loopCnt-1)))
+		$j("#UbannerTitle"+selTab).html($menuTitle);
+		if(selTab!="" && selTab!="undefind"){BigBanner2(selTab,$rndNoBan);}
+		return;
+	}catch(e){}
+
+}
+
+var todayPreNo = 0
+function ShowTodaySpecialPrice(nextNo){
+var rndNoTab = 0;
+var todayLen = 0;
+
+
+	try{
+		todayLen = TodaySpecialPrice.length;
+		if(nextNo==""){
+			todayPreNo = Math.floor(Math.random() * (todayLen)) ;
+		}else{
+			todayPreNo = todayPreNo + nextNo;
+			if(todayPreNo>=todayLen){todayPreNo=0
+			}else if(todayPreNo<0){todayPreNo=todayLen-1}
+		}
+		$j.each(TodaySpecialPrice, function(index,item) {
+			if(index==todayPreNo){
+			$j("#TodaySpecialPrice").html(this["img"]);
+			if ( this["type"] == "1")
+			{
+				$j("#TodaySpecialTitle").html('<a href="http://promotion.gmarket.co.kr/eventzone/Today.asp"><img src="http://image.gmarket.co.kr/main/2012/04/09/title_oteuk.gif" alt="오늘만 특가"  ></a>');
+			} else {
+				$j("#TodaySpecialTitle").html('<a id="GSTitleLink"><img src="http://image.gmarket.co.kr/main/2012/10/09/title_good.gif" alt="굿시리즈"  ></a>');
+			}
+
+			$j("#TodaySpecialPrice").html(this["img"]);
+			$j("#GSTitleLink").attr("href", this["link"]);
+			}
+		});
+		$j("div.oteuk > div.page > span > span").html(todayLen);	
+		$j("div.oteuk > div.page > span > em").html(todayPreNo+1);	
+	}catch(e){}
+
+}
+
+
+function ShowMainLeftTopLogo(){
+	try {
+
+		$j.each(MLBanner, function() {
+			$j("#imgMLogo").show();
+			$j("#imgMLogo").attr("src",this["img"]);
+			//$j("#aMLogo").attr("href",this['url']);
+
+            // this['url'] = http://sna.gmarket.co.kr/?fcd=116000001&url=http://www.gmarket.co.kr/
+            // http://sna.gmarket.co.kr/?fcd=116000001&url= 이 부분 제거 작업
+            var logoUrl = this['url'].toLowerCase();
+            if (logoUrl.indexOf("&url=") > 0)
+                logoUrl = logoUrl.substring(logoUrl.indexOf("&url=") + 5);
+            
+            $j("#aMLogo").attr("href","javascript:GoSNAChannel('CHM1B001','" + logoUrl + "');");
+			$j("#hMainLogo").removeClass();
+			if(this['type'] == ""){
+				$j("#imgMLogo").width("179");
+				$j("#imgMLogo").height("44");
+			}else if(this['type'] == "A"){
+				$j("#imgMLogo").width("230");
+				$j("#imgMLogo").height("107");
+				$j("#hMainLogo").addClass("type3");
+			}else if(this['type'] == "B"){
+				$j("#imgMLogo").width("325");
+				$j("#imgMLogo").height("107");
+				$j("#hMainLogo").addClass("type2");
+			}else{
+				$j("#imgMLogo").width("179");
+				$j("#imgMLogo").height("44");
+			}
+		});
+
+		if(MTBanner[0]['ismtbanner'] == "0"){
+			$j("#IndexMainLineBanner").hide();
+			$j("#IndexMainLineBanner").height("0");
+		}else{
+			$j("#IndexMainLineBanner").show();
+			$j("#IndexMainLineBanner").height("70");
+		}
+	}catch(e){}
+}
+
+
+
+//지구닷컴 배너
+function ShowMainLeftTopLogoG9() {
+	try {
+		var G9MainLogo = $j('#hMainLogo');
+		$htmlG9Str = "";
+
+		if (getCookie("TqTq") == null) {				
+
+				if (gmktMainIsIE) {							//IE 플래쉬
+					setCookie("TqTq", "Y", 10);	
+					G9MainLogo.addClass("fl_logo");
+					$htmlG9Str += "<div class=\"logoWrap\"><div class=\"logoG9\">"
+
+					$htmlG9Str += "<object type=\"application/x-shockwave-flash\" data=\"http://image.gmarket.co.kr/main/2013/03/27/logo_g9_final_1.swf\" width=\"280\" height=\"177\">"
+					$htmlG9Str += "<param name=\"allowScriptAccess\" value=\"always\" />"
+					$htmlG9Str += "<param name=\"movie\" value=\"http://image.gmarket.co.kr/main/2013/03/27/logo_g9_final_1.swf\"/>"
+					$htmlG9Str += "<param name=\"wmode\" value=\"transparent\"/>"
+					$htmlG9Str += "<p> 해당 컨텐츠를 보려면 <a href=\"http://www.adobe.com/kr/products/flashplayer/\">Flash Player</a>가 필요합니다. </p>"
+					$htmlG9Str += "</object>"
+				}
+				else {										//!IE 플래쉬
+
+					if (navigator.mimeTypes && navigator.mimeTypes["application/x-shockwave-flash"])
+					{
+						setCookie("TqTq", "Y", 10);	
+						G9MainLogo.addClass("fl_logo");
+						$htmlG9Str += "<div class=\"logoWrap\"><div class=\"logoG9\">"
+
+						$htmlG9Str += "<object type=\"application/x-shockwave-flash\" data=\"http://image.gmarket.co.kr/main/2013/03/27/logo_g9_final_1.swf\" width=\"280\" height=\"177\">"
+						$htmlG9Str += "<param name=\"allowScriptAccess\" value=\"always\" />"
+						$htmlG9Str += "<param name=\"movie\" value=\"http://image.gmarket.co.kr/main/2013/03/27/logo_g9_final_1.swf\"/>"
+						$htmlG9Str += "<param name=\"wmode\" value=\"transparent\"/>"
+						$htmlG9Str += "<p> 해당 컨텐츠를 보려면 <a href=\"http://www.adobe.com/kr/products/flashplayer/\">Flash Player</a>가 필요합니다. </p>"
+						$htmlG9Str += "</object>"
+					}
+					else {
+						$htmlG9Str += "<a href=\"http://gmarket.co.kr\"><img src=\"http://image.gmarket.co.kr/main/2013/03/27/logo.gif\" alt=\"Gmarket\"></a>"
+					}
+				}
+		}
+		else {
+			$htmlG9Str += "<a href=\"http://gmarket.co.kr\"><img src=\"http://image.gmarket.co.kr/main/2013/03/27/logo.gif\" alt=\"Gmarket\"></a>"
+		}
+		G9MainLogo.html($htmlG9Str);
+
+
+		if(MTBanner[0]['ismtbanner'] == "0"){
+			$j("#IndexMainLineBanner").hide();
+			$j("#IndexMainLineBanner").height("0");
+		}else{
+			$j("#IndexMainLineBanner").show();
+			$j("#IndexMainLineBanner").height("70");
+		}
+	} catch (e) { }
+}
+
+
+
+var currMainEventBannerRow = 0;
+var currMainEventBannerCol = 0;
+
+function MainTabBefore(){
+
+	$j("#gnb > ul > li").removeClass("on");
+	$j("#gnb > ul > li").removeClass("selected");
+
+
+	currMainEventBannerCol = eval(currMainEventBannerCol) - 1;
+
+	if(currMainEventBannerCol < 0){
+		if(currMainEventBannerRow == 3) currMainEventBannerRow = 6;
+		else if(currMainEventBannerRow == 4) currMainEventBannerRow = 3;
+		else if(currMainEventBannerRow == 0) currMainEventBannerRow = 4;
+		currMainEventBannerRow = eval(currMainEventBannerRow) - 1;
+		if(currMainEventBannerRow < 0){
+			currMainEventBannerRow = 5;
+		}
+		currMainEventBannerCol = BigBanner[currMainEventBannerRow].length - 1;
+	}
+
+	$j("#BanTitle_" + currMainEventBannerRow).addClass("on");
+
+	BigBanner2(currMainEventBannerRow.toString(),currMainEventBannerCol.toString());
+
+	BigBannerText("BanTitle_"+currMainEventBannerRow);
+
+	var tempSplitGubun = 6;
+	if(currMainEventBannerRow == 4 || currMainEventBannerRow == 5){
+		tempSplitGubun = 5;
+	}else{
+		tempSplitGubun = 6;
+	}
+
+	$j("#UbannerTitle" + currMainEventBannerRow + " li > a:eq(" + (currMainEventBannerCol % tempSplitGubun) + ")").hover();
+	$j("#UbannerTitle" + currMainEventBannerRow + " li > a:eq(" + (currMainEventBannerCol % tempSplitGubun) + ")").css("text-decoration", "none");
+	$j("#UbannerTitle" + currMainEventBannerRow + " li > a:eq(" + (currMainEventBannerCol % tempSplitGubun) + ")").css("color", "#fff");
+}
+
+function MainTabNext(){
+
+	$j("#gnb > ul > li").removeClass("on");
+	$j("#gnb > ul > li").removeClass("selected");
+
+	currMainEventBannerCol = eval(currMainEventBannerCol) + 1;
+
+	if(currMainEventBannerCol > BigBanner[currMainEventBannerRow].length - 1){
+		if(currMainEventBannerRow == 2) currMainEventBannerRow = 3;
+		else if(currMainEventBannerRow == 5) currMainEventBannerRow = 2;
+		else if(currMainEventBannerRow == 3) currMainEventBannerRow = -1;
+		currMainEventBannerRow = eval(currMainEventBannerRow) + 1;
+		if(currMainEventBannerRow > 5){
+			currMainEventBannerRow = 0;
+		}
+
+		currMainEventBannerCol = 0;
+	}
+	$j("#BanTitle_" + currMainEventBannerRow).addClass("on");
+
+	BigBanner2(currMainEventBannerRow.toString(),currMainEventBannerCol.toString());
+
+	BigBannerText("BanTitle_"+currMainEventBannerRow);
+
+	var tempSplitGubun = 6;
+	if(currMainEventBannerRow == 4 || currMainEventBannerRow == 5){
+		tempSplitGubun = 5;
+	}else{
+		tempSplitGubun = 6;
+	}
+
+	$j("#UbannerTitle" + currMainEventBannerRow + " li > a:eq(" + (currMainEventBannerCol % tempSplitGubun) + ")").focus();
+	$j("#UbannerTitle" + currMainEventBannerRow + " li > a:eq(" + (currMainEventBannerCol % tempSplitGubun) + ")").css("text-decoration", "none");
+	$j("#UbannerTitle" + currMainEventBannerRow + " li > a:eq(" + (currMainEventBannerCol % tempSplitGubun) + ")").css("color", "#fff");
+
+}
+
+
+var focusCurTab = 0;
+var roll
+function stopFocusRoll(){
+window.clearTimeout(roll);
+}
+function sTartFocusRoll(){
+	try{
+		window.clearInterval(timerA)
+		roll = window.setTimeout("sTartFocusRoll()", 4000);
+		ShowFocusItem(1)
+	}catch(e){}
+}
+function ShowFocusItem(selTab){
+	try{
+		$htmlStr = "";
+		var ItemLen = FocusItem.length-1;
+
+		if (selTab!=0)
+		{
+			focusCurTab = focusCurTab + selTab;
+		}
+
+		if(focusCurTab>ItemLen){focusCurTab=0}
+		if(focusCurTab<0){focusCurTab=ItemLen}
+		$j.each(FocusItem[focusCurTab], function(index,item) {
+
+			$htmlStr += " <li>"
+			$htmlStr += " 	<div class='prd'>"
+			$htmlStr += " 		<div class='img'><a href=" +this["rUrl"] +"><img src='"+ this["rImg"] +"' alt='" + this["rGdNm"] + "' width='58', height='53'></a></div>"
+			$htmlStr += " 		<div class='info'><a href="+ this["rUrl"] +">"+ this["rTxt1"] +"</a></div>"
+			$htmlStr += " 	</div>"
+			$htmlStr += " </li>"
+
+			$j("div.focus > ul").html($htmlStr);
+			$j("div.focus > div.page > span > em").html(focusCurTab+1);	
+			$j("div.focus > div.page > span > span").html(ItemLen+1);		
+		});
+
+
+	}catch(e){}
+
+}
+
+
+var SpecialMarketCurItem = 0;
+function ShowSpecialMarket(selTab){
+
+	try{
+		var specialCnt = SpecialMarket[0].length;
+
+		var rndNoBan = 0;
+		var divNm = "brandonLotteGlobalEvent" + selTab;
+
+		if (selTab=="")
+		{
+			rndNoBan = Math.floor(Math.random() * specialCnt);
+			SpecialMarketCurItem = rndNoBan;
+		}else{
+			SpecialMarketCurItem = SpecialMarketCurItem + selTab;
+		}
+
+		if (SpecialMarketCurItem>=specialCnt){SpecialMarketCurItem=0}
+		if (SpecialMarketCurItem==-1){SpecialMarketCurItem=specialCnt-1}
+
+		$j.each(SpecialMarket[0], function(index,item) {
+			if (SpecialMarketCurItem==index){
+				$j("div.teukga > div.prd > div.img").html("<a href="+ this["rUrl"] +"><img src='"+ this["rImg"] +"' alt='"+this["rGdnm"]+"'></a>");
+				$j("div.teukga > div.prd > div.info > span").html("<a href="+ this["rUrl"] +">"+ this["rGdnm"] +"</a>");
+				$j("div.teukga > div.prd > div.info > strong").html(this["rPrice"]);
+				$j("div.teukga > div.page > span > em").html(SpecialMarketCurItem+1);	
+				$j("div.teukga > div.page > span > span").html(specialCnt);					
+			}
+		});
+
+	}catch(e){}
+}
+
+
+
+var TodayPowerCurTab = 0;
+function ShowTodayPower(selTab){
+	try{
+
+		$htmlStr = "";
+		var ItemLen = TodayPower.length-1;
+
+		if(selTab==""){
+
+		selTab = Math.floor(Math.random() * (ItemLen+1));
+
+		}
+
+		if (selTab!=0)
+		{
+			TodayPowerCurTab = TodayPowerCurTab + selTab;
+		}
+
+
+			if(TodayPowerCurTab>ItemLen){TodayPowerCurTab=0}
+			if(TodayPowerCurTab<0){TodayPowerCurTab=ItemLen}
+			$j.each(TodayPower[TodayPowerCurTab], function(index,item) {
+
+				$htmlStr += " <li>"
+				$htmlStr += " 	<div class='prd'>"
+				$htmlStr += " 		<div class='img'><a href=" +this["rUrl"] +"><img src='"+ this["rImg"] +"' alt='"+this["rGdnm"]+"'></a></div>"
+				$htmlStr += " 		<div class='info'>"
+				$htmlStr += "			<span><a href="+ this["rUrl"] +">"+ this["rGdnm"] +"</a></span>"
+				$htmlStr += "			<strong>"+ this["rPrice"] +"</strong>"
+				$htmlStr += "		</div>"
+				$htmlStr += " 	</div>"
+				$htmlStr += " </li>"
+
+				$j("div.power-item > ul").html($htmlStr);
+				$j("div.power-item > div.page > span> em").html(TodayPowerCurTab+1);	 
+				$j("div.power-item > div.page > span > span").html(ItemLen+1);			
+			});
+
+
+	}catch(e){}
+}
+
+
+var ShowPowerMiniShopCurItem = 0;
+function ShowPowerMiniShop(selTab){
+
+	try{
+
+		var PowerMiniShopCnt = PowerMinishop[0].length;
+		var rndNoBan = 0;
+
+		if (selTab=="")
+		{
+			rndNoBan = Math.floor(Math.random() * PowerMiniShopCnt);
+			ShowPowerMiniShopCurItem = rndNoBan;
+		}else{
+			ShowPowerMiniShopCurItem = ShowPowerMiniShopCurItem + selTab;
+		}
+
+		if (ShowPowerMiniShopCurItem>=PowerMiniShopCnt){ShowPowerMiniShopCurItem=0}
+		if (ShowPowerMiniShopCurItem==-1){ShowPowerMiniShopCurItem=PowerMiniShopCnt-1}
+
+		$j.each(PowerMinishop[0], function(index,item) {
+			if (ShowPowerMiniShopCurItem==index){
+				$j("div.power-shop > div.prd > div.img").html("<a href="+ this["rUrl"] +"><img src='"+ this["rImg"] +"' alt='"+this["rGdnm"]+"'></a>");
+				$j("div.power-shop > div.prd > div.info > span").html("<a href="+ this["rUrl"] +">["+ this["rShopNm"] +"]<br>"+ this["rGdnm"] +"</a>");
+				$j("div.power-shop > div.prd > div.info > strong").html(this["rPrice"]);
+				$j("div.power-shop > div.page > span> em").html(ShowPowerMiniShopCurItem+1);	
+				$j("div.power-shop > div.page > span > span").html(PowerMiniShopCnt);				
+			}
+		});
+
+
+	}catch(e){}
+}
+
+// AD end
+
+function noticePop(url){
+	window.open(url,'newsPopup','width=534,height=450,notoolbars,resizable=yes');
+}
+
+
+var iFrameLoadEnd = 0;
+
+function DetailIframe( objname ) 
+{ 
+	iFrameLoadEnd = iFrameLoadEnd + 1;
+	resize_iframe( objname ); 	
+
+	if(iFrameLoadEnd == 2){
+		window.clearInterval(timeInterval);
+	}
+} 
+
+function resize_iframe( objname ) 
+{ 
+	var agentName = navigator.userAgent; 
+	var tmpHeight = 0;
+	var newHeight = document.getElementById(objname).contentWindow.document.body.scrollHeight + tmpHeight; 
+
+	document.getElementById(objname).height = eval(newHeight) - 70; 
+	document.getElementById(objname).style.height = eval(newHeight) - 70;
+}
+
+//2013-01-16 [HP 카테고리 리뉴얼 작업]
+var CategoryLayerDataFcd = {};
+var CategoryLayerDataFcdInfo = function (defaultFcd, arrayFcd, arrChannelCode) {
+    this.arrayFcd = arrayFcd;
+    this.defaultFcd = defaultFcd;
+    this.arrChannelCode = arrChannelCode;
+}
+
+CategoryLayerDataFcd["ce1"] = new CategoryLayerDataFcdInfo("129000002", new Array("129000002"), new Array("CHM1D014"));    // 패션의류/패션소호
+CategoryLayerDataFcd["ce2"] = new CategoryLayerDataFcdInfo("129000006", new Array("129000006"), new Array("CHM1D023"));    // 잡화/화장품
+CategoryLayerDataFcd["ce3"] = new CategoryLayerDataFcdInfo("129000010", new Array("129000010"), new Array("CHM1D035"));    // 유아동/식품/마트ON
+CategoryLayerDataFcd["ce4"] = new CategoryLayerDataFcdInfo("129000014", new Array("129000014"), new Array("CHM1D046"));    // 가구/리빙/건강
+CategoryLayerDataFcd["ce5"] = new CategoryLayerDataFcdInfo("129000018", new Array("129000018"), new Array("CHM1D057"));    // 스포츠/자동차/중고차
+CategoryLayerDataFcd["ce6"] = new CategoryLayerDataFcdInfo("129000022", new Array("129000022"), new Array("CHM1D069"));    // 컴퓨터/디지털/가전
+CategoryLayerDataFcd["ce7"] = new CategoryLayerDataFcdInfo("129000026", new Array("129000026"), new Array("CHM1D079"));    // 도서/문구/여행/소셜
+CategoryLayerDataFcd["ce8"] = new CategoryLayerDataFcdInfo("129000030", new Array("129000030", "129000031"), new Array("CHM1D113", "CHM1D114"));    // BRAND ON/롯데백화점
+
+CategoryLayerDataFcd["ci1"] = new CategoryLayerDataFcdInfo("129000003", new Array("129000003", "129000004"), new Array("CHM1D015", "CHM1D016"));   // 패션의류/패션소호
+CategoryLayerDataFcd["ci2"] = new CategoryLayerDataFcdInfo("129000007", new Array("129000007", "129000008"), new Array("CHM1D024", "CHM1D025"));   // 잡화/화장품
+CategoryLayerDataFcd["ci3"] = new CategoryLayerDataFcdInfo("129000011", new Array("129000011", "129000012", "129000013"), new Array("CHM1D036", "CHM1D037", "CHM1D038"));   // 유아동/식품/마트ON
+CategoryLayerDataFcd["ci4"] = new CategoryLayerDataFcdInfo("129000015", new Array("129000015", "129000016"), new Array("CHM1D047", "CHM1D048"));   // 가구/리빙/건강
+CategoryLayerDataFcd["ci5"] = new CategoryLayerDataFcdInfo("129000019", new Array("129000019", "129000020"), new Array("CHM1D058", "CHM1D059"));   // 스포츠/자동차/중고차
+CategoryLayerDataFcd["ci6"] = new CategoryLayerDataFcdInfo("129000023", new Array("129000023", "129000024", "129000025"), new Array("CHM1D070", "CHM1D071", "CHM1D072"));   // 컴퓨터/디지털/가전
+CategoryLayerDataFcd["ci7"] = new CategoryLayerDataFcdInfo("129000027", new Array("129000027", "129000028", "129000029"), new Array("CHM1D080", "CHM1D081", "CHM1D082"));   // 도서/문구/여행/소셜
+CategoryLayerDataFcd["ci8"] = new CategoryLayerDataFcdInfo("129000032", new Array("129000032", "129000033"), new Array("CHM1D115", "CHM1D116"));   // BRAND ON/롯데백화점
+
+var fnCategoryLayerDataInit = function () {
+    $j.each($j("ul.cate-bn-list"), function (idx, item) {
+        var idxVal = (idx + 1);
+        var catData = CategoryLayerData["cat" + idxVal];
+
+        if (typeof catData !== "undefined") {
+            var arrHtml = new Array();
+            var ciIndex = 0;
+            var ceIndex = 0;
+
+            $j.each(catData, function (ind, catItem) {
+                if (catItem.disc == "CE") { // 카테고리 레이어-제한
+                    var ceFcd = "";
+
+                    if (typeof CategoryLayerDataFcd["ce" + idxVal] !== "undefined") {
+                        if (CategoryLayerDataFcd["ce" + idxVal].arrayFcd.length > ceIndex)
+                            ceFcd = CategoryLayerDataFcd["ce" + idxVal].arrayFcd[ceIndex];
+                        else
+                            ceFcd = CategoryLayerDataFcd["ce" + idxVal].defaultFcd;
+                    }
+
+                    var ceChannelCode = CategoryLayerDataFcd["ce" + idxVal].arrChannelCode[ceIndex];
+
+                    var objDiv = $j("<div>");
+                    //objDiv.html("<h4 class='brd'><a href='http://sna.gmarket.co.kr/?fcd=" + ceFcd + "&url=" + catItem.linkUrl + "'><span>" + catItem.title + "</span></a></h4>");
+                    objDiv.html("<h4 class='brd'><a href=\"javascript:GoSNAChannel('" + ceChannelCode + "', '" + catItem.linkUrl + "');\"><span>" + catItem.title + "</span></a></h4>");
+
+                    if ($j("div", $j(item).parent()).length == 0)
+                        objDiv.addClass("fir");
+
+                    ceIndex++;
+                    $j("#ulLayerBigCate" + idxVal).append(objDiv);
+                }
+                else if (catItem.disc == "CI") {    // 카테고리 레이어-운영
+                    if (typeof CategoryLayerDataFcd["ci" + idxVal] !== "undefined") {
+                        var liClass = (ciIndex == 0) ? " class='firstBn'" : "";
+                        var objFcd = CategoryLayerDataFcd["ci" + idxVal];
+
+                        if (objFcd.arrayFcd.length > ciIndex && ciIndex < catItem.priority && objFcd.arrayFcd.length >= catItem.priority) {
+                            var ciChannelCode = CategoryLayerDataFcd["ci" + idxVal].arrChannelCode[ciIndex];
+
+                            var strHtml = "<li" + liClass + "><h5><a href='javascript:fnCategoryLayerDataBanner(" + ciIndex + ", " + idx + ");'>" + catItem.title + "</a></h5>"
+						            + "    <div style='display:none;'>"
+						            //+ "	    <a href='http://sna.gmarket.co.kr/?fcd=" + objFcd.arrayFcd[ciIndex] + "&url=" + catItem.linkUrl + "'><img src='" + catItem.imageUrl + "' alt='" + catItem.title + "' /></a>"
+                                    + "	    <a href=\"javascript:GoSNAChannel('" + ciChannelCode + "', '" + catItem.linkUrl + "');\"><img src='" + catItem.imageUrl + "' alt='" + catItem.title + "' /></a>"
+						            + "    </div>"
+					                + "</li>";
+                            arrHtml.push(strHtml);
+
+                            ciIndex++;
+                        }
+                    }
+                }
+            });
+
+            $j(item).html(arrHtml.join(""));
+        }
+    });
+}
+
+var fnCategoryLayerDataBanner = function (ciIndex, obj) {
+    var objLi = (typeof obj === "object") ? obj : $j("li", $j($j("ul.cate-bn-list")[obj]));
+
+    $j.each(objLi, function (ind, item) {
+        var ojbDiv = $j("div", $j(item));
+
+        if (ciIndex == ind) {
+            ojbDiv.show();
+            $j(item).addClass("on");
+        }
+        else {
+            ojbDiv.hide();
+            $j(item).removeClass("on");
+        }
+    });
+}
+//2013-01-16 [HP 카테고리 리뉴얼 작업]
+
+//2013-03-12 [시작페이지 판별 작업] 
+function fnHomepageYN( )
+{
+	if (gmktMainIsIE) {
+				
+		if (GMKTHomePage.isHomePage("http://gmarket.co.kr/") || GMKTHomePage.isHomePage("http://www.gmarket.co.kr/")) {
+			document.getElementById("ifrHomePageForm").src = "http://sna.gmarket.co.kr/?fcd=601000105";							
+		}
+	}
+}
+
+
+function openSNS(snsKind) {
+
+		var userData = snsUtil.UserStatus.isLogin();
+		
+        var msg = BigBanner[currMainEventBannerRow][currMainEventBannerCol]["SnsSidTitle"]; 
+        var link;
+		if(BigBanner[currMainEventBannerRow][currMainEventBannerCol]["SnsShorten"] == ""){
+			link = BigBanner[currMainEventBannerRow][currMainEventBannerCol]["Url"];
+		}else{
+			link = BigBanner[currMainEventBannerRow][currMainEventBannerCol]["SnsShorten"];
+		}
+
+		var sns_thumb = BigBanner[currMainEventBannerRow][currMainEventBannerCol]["SnsThumb"];
+		var big_image = BigBanner[currMainEventBannerRow][currMainEventBannerCol]["SnsImage"];
+		var main_image;
+		var price = "";
+        var sort = "";
+        var maker = "brand";
+        var targetAmt = "3";
+        var cyscrapKind = 'post';
+        var msgObject = snsHelper.createMessage();
+        var useShareUrl = true;
+        var jaehuID;
+        var fromKind = 'event';
+        var tag = 'G마켓';
+
+        msgObject.link          = link; 
+        msgObject.fixmsg        = msg;
+        msgObject.url           = link; 
+        msgObject.useShareUrl   = useShareUrl;
+        msgObject.tag           = tag;
+        msgObject.cyscrapKind   = cyscrapKind;
+        msgObject.from          = fromKind;
+		if(sns_thumb == "") main_image = big_image;
+		else main_image = sns_thumb;
+        msgObject.picture       = main_image;
+
+
+        msgObject.feedRoot      = getFeedRoot(snsKind);  
+        msgObject.message       = BigBanner[currMainEventBannerRow][currMainEventBannerCol]["SnsSidTitle"];
+        msgObject.name          = BigBanner[currMainEventBannerRow][currMainEventBannerCol]["SnsSidTitle"];
+        msgObject.description   = BigBanner[currMainEventBannerRow][currMainEventBannerCol]["SnsSidTitle"];
+
+        switch (snsKind) {
+            case snsUtil.SNS.FACEBOOK:
+            case snsUtil.SNS.CYSCRAP:
+            case snsUtil.SNS.ME2DAY:
+            case snsUtil.SNS.CLOG:
+            case snsUtil.SNS.TWITTER:
+                snsHelper.sendAuto(snsKind, msgObject)
+                break;
+            case snsUtil.SNS.MYPEOPLE:
+                snsHelper.sendShare(snsKind, msgObject)
+                break;
+            default:
+                break;
+        }
+    }
+    
+    function getFeedRoot(snsKind) {
+        var feedRoot = '';             
+
+        switch(snsKind) {
+            case snsUtil.SNS.FACEBOOK:
+            case snsUtil.SNS.TWITTER:
+            case snsUtil.SNS.CYSCRAP:
+            case snsUtil.SNS.CLOG:
+            case snsUtil.SNS.ME2DAY:
+                feedRoot = 'layer'; 
+                break;
+            case snsUtil.SNS.MYPEOPLE:
+                feedRoot = 'layer';
+            default: 
+                break;
+        }
+        return feedRoot;
+    }
+
+function MainSNSShare() { }
+
+MainSNSShare.Facebook = function(){
+    //129000035
+	var MSForm = $j("#MainSNSFcdForm");
+	MSForm.attr("target", "ifrMainSNSFcdForm");
+	//MSForm.attr("action", "http://sna.gmarket.co.kr/?fcd=129000035").submit();
+    MSForm.attr("action", "http://sna.gmarket.co.kr/?cc=CHM1O003").submit();
+    setChannelcodeCookie("CHM1O003");
+
+	openSNS(snsUtil.SNS.FACEBOOK);
+}
+
+MainSNSShare.Twitter = function(){
+    //129000036
+    var MSForm = $j("#MainSNSFcdForm");
+	MSForm.attr("target", "ifrMainSNSFcdForm");
+	//MSForm.attr("action", "http://sna.gmarket.co.kr/?fcd=129000036").submit();
+    MSForm.attr("action", "http://sna.gmarket.co.kr/?cc=CHM1O004").submit();
+    setChannelcodeCookie("CHM1O004");
+    
+	openSNS(snsUtil.SNS.TWITTER);
+}
+
+MainSNSShare.Cyworld = function(){
+    //129000037
+	var MSForm = $j("#MainSNSFcdForm");
+	MSForm.attr("target", "ifrMainSNSFcdForm");
+	//MSForm.attr("action", "http://sna.gmarket.co.kr/?fcd=129000037").submit();
+    MSForm.attr("action", "http://sna.gmarket.co.kr/?cc=CHM1O005").submit();
+    setChannelcodeCookie("CHM1O005");
+
+	openSNS(snsUtil.SNS.CLOG);
+}
+
+MainSNSShare.Metoday = function(){
+    //129000038
+	var MSForm = $j("#MainSNSFcdForm");
+	MSForm.attr("target", "ifrMainSNSFcdForm");
+	//MSForm.attr("action", "http://sna.gmarket.co.kr/?fcd=129000038").submit();
+    MSForm.attr("action", "http://sna.gmarket.co.kr/?cc=CHM1O006").submit();
+    setChannelcodeCookie("CHM1O006");
+
+	openSNS(snsUtil.SNS.MYPEOPLE);
+}
+</script>
+
+
+<body>
+<div id="skipnavi"><a href="#gnb">메뉴 바로가기</a><a href="#oteuk">오늘만 특가 바로가기</a><a href="#best">GMARKET BEST 바로가기</a></div>
+<STYLE>
+@media all {
+   IE\:homePage {behavior:url(#default#homepage)}
+}   
+</STYLE>
+<IE:HOMEPAGE ID="GMKTHomePage"/> <!--2013-03-12 [시작페이지 판별 작업] -->
+	<div id="wrap">
+			
+
+
+			<div id="topcommon">
+				<!-- join -->
+				<ul class="join">
+					
+					<li class="access">
+						<a href="#" onclick="return false" onmouseover="overLayer(this, 'plusLayer');"><img src="http://image.gmarket.co.kr/main/2012/04/09/btn_baro_off.gif" alt="바로접속 OFF"></a>
+						<div id="plusLayer" class="layerBox" style="display:none;">
+							<p class="tit"><span><img alt="바로접속 OFF" src="http://image.gmarket.co.kr/main/2012/10/15/btn_baro_off.gif"></span><span class="txt">바로접속 이란? 다른 사이트를 거치지 않고 직접 G마켓에 접속하는 것을 의미합니다.</span></p>
+							<div class="cont">
+								<p class="info1"><strong>바로접속 ON</strong> 고객님께 드리는 <br />G스탬프/쿠폰/G마일리지 적립 혜택을 챙겨가세요~!</p>
+								<div class="change-baro">
+									<h6>바로접속ON 으로 변경하기</h6>
+									<div class="cont">
+										<p>아래 방법 중 고객님이 원하시는 방법으로 다시 접속해 주세요.</p>
+										<ul class="baro">
+											<li><a href="javascript:fncGmktAddressCopy('http://www.gmarket.co.kr/');"><img src="http://image.gmarket.co.kr/main/2012/10/15/btn_baro_01.gif" alt="주소창에URL 입력"></a></li><li><a href="javascript:addBookmark_eventmain();"><img src="http://image.gmarket.co.kr/main/2012/10/15/btn_baro_02.gif" alt="즐겨찾기 추가하기"></a></li><li><a href="javascript:OpenActiveDesktop('1');"><img src="http://image.gmarket.co.kr/main/2012/10/15/btn_baro_03.gif" alt="바로가기 설치하기"></a></li>
+										</ul>
+									</div>
+								</div>
+								<p class="info2">계속해서 바로접속OFF로 표시되면, <br /> 바로접속 도움말을 참고하세요.</p>
+								<p class="btn"><a href="javascript:GoSNAChannel('CHM1A020', 'http://promotion.gmarket.co.kr/eventzone/popup/PopupBaroHelp.asp');"><img src="http://image.gmarket.co.kr/main/2012/10/15/btn_baro_view.gif" alt="바로접속 도움말 보기"></a></p>
+							</div>
+							<div class="close"><img src="http://image.gmarket.co.kr/main/2012/04/09/btn_layer_close.gif" alt="닫기" onclick="closeLay('plusLayer');return false;"/></div>
+						</div>
+
+					</li>					
+					
+                   
+					<li class="search">
+						<a href="javascript:GoSNAChannel('CHM1A002', 'http://www.gmarket.co.kr/QuickIndex.asp');">간편검색</a>
+					</li>
+					<li class="service">
+						<a href="javascript:GoSNAChannel('CHM1A003', 'http://www.gmarket.co.kr/AllService.asp');">전체서비스</a>
+					</li>					
+				</ul>
+				<!-- //join -->
+				<!-- utill : 3차 수정 -->
+				<ul class="utill">
+
+<script type="text/javascript">
+<!--
+    function goLoginPromotion(url) {
+        if (typeof url === "undefined")
+            document.location.href = CommonTopGoodsdaqUrl + "challenge/login.asp?prmtdisp=Y&url=" + location.href;
+        else
+            document.location.href = CommonTopGoodsdaqUrl + "challenge/login.asp?prmtdisp=Y&url=" + url + '&referURL=http://www.gmarket.co.kr/?redirect=1';
+    }
+-->
+</script>
+					<li class="login"><a href="javascript:goLoginPromotion('http://www.gmarket.co.kr/?redirect=1');GoSNAChannel('CHM1A007','', 'stat');">로그인</a></li>
+					<li><a href="javascript:GoSNAChannel('CHM1A009', 'http://www.gmarket.co.kr/challenge/neo_member/default.asp');">회원가입</a></li>
+                    <li class="myshopmenu">
+						<p onclick="return false" onmouseover="overLayer(this, 'myshop');">나의쇼핑정보</p>
+						<ul style="display:none;" id="myshop">
+							<li><a href="javascript:goLoginPromotion('http://myg.gmarket.co.kr/');GoSNAChannel('CHM1A010','', 'stat');">나의쇼핑정보</a></li>
+							<li><a href="javascript:goLoginPromotion('http://myg.gmarket.co.kr/ContractList/ContractList');GoSNAChannel('CHM1A011','', 'stat');">주문내역</a></li>
+							<li><a href="javascript:goLoginPromotion('http://myg.gmarket.co.kr/ContractList/ContractList');GoSNAChannel('CHM1A012','', 'stat');">취소/반품</a></li>
+							<li><a href="javascript:goLoginPromotion('http://gbank.gmarket.co.kr/Home/GBankCash');GoSNAChannel('CHM1A013','', 'stat');">G통장</a></li>
+							<li><a href="javascript:goLoginPromotion('http://diary2.gmarket.co.kr/Favorite/MyFavoriteItems');GoSNAChannel('CHM1A014','', 'stat');">관심상품/매장</a></li>
+							<li><a href="javascript:showMyCouponPopupLayer();GoSNAChannel('CHM1A015','','stat');">내쿠폰함</a></li>
+							<li class="last"><a href="javascript:goLoginPromotion('https://sslmember2.gmarket.co.kr/MYInfo/memberinfo');GoSNAChannel('CHM1A016','', 'stat');">나의설정</a></li>
+						</ul>
+					</li>
+		
+					<li><a href="javascript:GoSNAChannel('CHM1A017', 'http://www.gmarket.co.kr/pay/Basket.asp');">장바구니</a></li>
+					<!-- <li><a href="javascript:GoSNAChannel('CHM1A018', 'http://www.gmarket.co.kr/challenge/neo_my_gd/order_contract_list.asp');">주문/배송</a></li> //-->
+					<li><a href="javascript:GoSNAChannel('CHM1A021', 'http://www.gmarket.co.kr/challenge/neo_bbs/default.asp');">고객센터</a></li>
+					<!--li><a href="javascript:GoSNAChannel('CHM1A019', 'http://english.gmarket.co.kr');">English</a></li>
+					<li><a href="javascript:GoSNAC('115000022', '', 'http://sna.gmarket.co.kr/?fcd=115000022&url=http://www.esmplus.com', '_blank', 'CHM1A022');">판매관리</a></li//-->
+                    <li class="lang"><a href="javascript:GoSNAChannel('CHM1A019', 'http://english.gmarket.co.kr/');">English</a></li><!-- 2013-04-26 -->
+					<li class="g9"><a href="javascript:GoSNAChannel('CHM1A024', 'http://www.g9.co.kr/', '_blank');">G9</a></li><!-- 2013-04-26 -->
+				</ul>
+				<!-- //utill : 3차 수정 -->
+				<iframe id="statsIframe" src="about:blank" frameborder="0" width="0" height="0" style="display:none;"></iframe>
+			</div>
+			<hr />
+			<div id="header">
+				<div class="inner">
+					<h1 id="hMainLogo" name="hMainLogo"><a id="aMLogo" name="aMLogo" href="javascript:GoSNAChannel('CHM1B001', 'http://www.gmarket.co.kr/');"><img id="imgMLogo" name="imgMLogo" alt="Gmarket" style="display:none;"></a></h1>
+					<!--2013-03-12 [시작페이지 판별 작업] -->					
+					<iframe id="ifrHomePageForm" name="ifrHomePageForm" height="0" width="0" style="display:none;"></iframe>
+					<script language="javascript">
+					    fnHomepageYN();
+					</script>
+					<div class="search">
+						<div id="AutoBox" class="search-area">
+							<div style="display:none">
+							<form name="Sform_direct" method="get" action="http://search.gmarket.co.kr/search.aspx">
+								<input type="hidden" name="keyword" value="">
+							</form>
+							<form name="menusearchform" onSubmit="chk_menusrch_val(); return;" method="get">
+							<input name="selecturl" type="hidden" value="total">
+							<input name="sheaderkey" type="hidden" value="">
+							<input type="hidden" name="SearchClassFormWord" value="goodsSearch">
+							<input id="keywordOrg" name="keywordOrg" type="hidden" value="">
+							<input id="keywordCVT" name="keywordCVT" type="hidden" value="">
+							<input id="keywordCVTi" name="keywordCVTi" type="hidden" value="">
+							</div>
+							<fieldset>
+								<legend>검색</legend>
+								<div class="bar">
+									<input type="text" id='keyword' name='keyword' value=""   class="sch ad" onfocus='return gmkt_ac(0,event);' onmousedown='this.className="sch";this.focus();return gmkt_ac(1,event);' onkeydown='this.focus();return gmkt_ac(1,event);'>
+									<input type="image" onclick="GoSNAChannel('CHM1B002', '', 'stat');event_go();" src="http://image.gmarket.co.kr/main/2012/04/09/btn_search.gif" alt="검색" class="btn" >
+								</div>
+							</fieldset>
+							<div style="display:none">
+							</form>
+							</div>
+						</div>
+						<div id="autoSearch" class="search-auto" style="display:none;">
+							<p class="txt">검색어 자동완성</p>
+							<div id="powerDiv" class="powerItem">
+								<ul id="autoFillData"></ul>
+								<div id='autoAdGoods' style="display:none;" class="power">
+									<h4 class="tit">파워상품</h4>
+									<div class="prd">
+										<div class="img"><a id="autoAdGoods_URL1"><img id="autoAdGoods_IMG" src="http://gdimg5.gmarket.co.kr/goods_image2/middle_img/213/809/213809291.jpg" alt=""></a></div>
+										<div class="info">
+											<span><a class="itemname" id="autoAdGoods_URL2"></a></span>
+											<strong id="autoAdGoods_TXT"></strong>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div><!-- //search -->
+					<script language="javascript">
+					    shBannerChange();
+					</script>
+					<!--지구닷컴 Header 노출 시작 시간-->
+					
+						<div class="link">			
+							<span><a href="javascript:GoSNAChannel('CHM1B003', 'http://promotion.gmarket.co.kr/bestseller/BestSeller.asp');"><img src="http://image.gmarket.co.kr/main/2012/04/09/link_head_01.gif" alt="G마켓 베스트" ></a></span>
+							<span><a href="javascript:GoSNAChannel('CHM1B004', 'http://promotion.gmarket.co.kr/eventzone/Info.asp');"><img src="http://image.gmarket.co.kr/main/2012/04/09/link_head_02.gif" alt="이벤트/쿠폰" ></a></span>
+							<span><a href="javascript:GoSNAChannel('CHM1B005', 'http://pluszone.gmarket.co.kr/');"><img src="http://image.gmarket.co.kr/main/2012/04/09/link_head_03.gif" alt="플러스존" ></a></span>
+							<span><a href="javascript:GoSNAChannel('CHM1B006', 'http://lotte.gmarket.co.kr/');"><img src="http://image.gmarket.co.kr/main/2012/04/09/link_head_04.gif" alt="롯데백화점" ></a></span>
+							<span class="bgN"><a href="javascript:GoSNAChannel('CHM1B007', 'http://promotion.gmarket.co.kr/planview/plan.asp?sid=115844');"><img src="http://image.gmarket.co.kr/main/2013/03/27/link_head_05.gif" alt="프로야구" ></a></span><!-- 2013-03-22 프로야구 추가 -->
+							<!--<span class="bgN"><a href="javascript:GoSNAChannel('CHM1B008', 'http://www.g9.co.kr/');" target="_blank"><img src="http://image.gmarket.co.kr/main/2013/03/27/link_head_06.gif" alt="G9" ></a></span--><!-- 2013-03-22 G9 추가 -->
+						</div><!-- //link -->
+					
+					<div class="banner">
+						<iframe src="http://adscript.gmarket.co.kr/js/adscript/ad_center_iframe.asp?total_ad_no=AD007" frameborder="0" scrolling="no" marginwidth="0" marginheight="0" width="190" height="107" title="광고배너"></iframe>
+					</div><!-- //banner -->
+				</div>
+				<div class="top-banner">
+					<iframe id="IndexMainLineBanner" name="IndexMainLineBanner" src="IndexMainLineBanner.html" scrolling="no" frameborder="0" style="width:980px; height:70px; margin:0; padding:0;" title="배너"></iframe>
+				</div>
+			</div>
+			<hr />
+
+			<!-- contents -->
+			<div id="contents">
+				
+<script Language='JavaScript' src='/challenge/neo_include/js/IndexWing.js'></script>
+<script type="text/javascript">
+	var WingGoodsDomain = "http://item.gmarket.co.kr/";
+</script>
+
+<script type="text/javascript" src="http://www.gmarket.co.kr/challenge/neo_include/gmktLocal.js"></script>
+<script language="JavaScript" type="text/JavaScript">
+<!--
+	wing.loadRecentGoods(true);
+//-->
+</script>
+
+<script language="JavaScript" type="text/JavaScript">
+<!--
+var startFloatFlag;
+
+var memberWay = 3;
+
+-->
+</script>
+<!-- Floating -->
+<div class="floating">
+	<div class="bnr" id="wingLeft">
+		
+	    <iframe class="main" src="http://adscript.gmarket.co.kr/js/adscript/ad_center_iframe.asp?total_ad_no=AD006" topmargin="0" leftmargin="0" marginwidth="0" marginheight="0" frameborder="0" scrolling="no" width="85" height="205"></iframe>
+
+		 
+	</div>
+	<!-- 로그인후(플러스상품) -->
+	<div id="wing" class="quick">
+		<iframe id="FminiDivView" scrolling="no"  frameborder="0" style="position:absolute; top:0px; left:0px; display:none;"></iframe>
+        
+		<div class="inner login" id="WingPlusGoodsDiv" style="display:none"><!-- 로그인 후 class="login" 추가 -->
+			<div id="cartLayer" style="display:none">
+            <div id="cartLayerInner"></div>
+            <a href="javascript:new_mini_Layer_hidden();" onfocus="this.blur()">미니장바구니 닫기</a>
+			</div>
+			
+			<div class="quick-btn"><a href="javascript:GoSNAChannel('CHM1N001', 'http://www.gmarket.co.kr/pay/Basket.asp');"><img style="margin-left:18px;" src="http://image.gmarket.co.kr/main/2012/04/09/txt_wing_cart.gif" alt="장바구니"></a></div>
+			<div class="quick-btn"><a href="javascript:showMyCouponPopupLayer();GoSNAChannel('CHM1N002', '', 'stat');"><img style="margin-left:18px;" src="http://image.gmarket.co.kr/main/2012/04/09/txt_wing_coupon.gif" alt="내쿠폰함"></a></div>
+							
+			<div class="quick-btn" id="RecentNoneDiv">
+				<a class="taC" onmouseout="setLayerDisplay('todayNone', 'none');" onmouseover="setLayerDisplay('todayNone', 'block');"><img src="http://image.gmarket.co.kr/main/2012/04/09/txt_wing_item.gif" alt="최근본상품"></a>
+				<!-- 최근본 상품 없을때 -->
+				<div id="todayNone" style="display:none;" class="lay-none" onmouseout="setLayerDisplay('todayNone', 'none');" onmouseover="setLayerDisplay('todayNone', 'block');">
+					<p>최근 보신 상품이 없습니다</p>
+				</div>
+				<!-- //최근본 상품 없을때 -->
+			</div>
+			<div class="quick-btn" id="RecentExistDiv">
+				<a href="javascript:wing.openTodayGoods();GoSNAChannel('CHM1N003', '','stat');" class="taC"><img id="recentMargin" src="http://image.gmarket.co.kr/main/2012/04/09/txt_wing_item.gif" alt="최근본상품" ></a>				
+			</div>
+			<script type="text/javascript" src='http://www.gmarket.co.kr/challenge/neo_include/data_js/WingAdGoods.js'></script>
+			<div class="quick-item">
+				<div class="quick-btn" style="display:none;" id="plusOpen"><img src="http://image.gmarket.co.kr/main/2012/04/09/txt_wing_plus.gif" alt="플러스상품"><a href="javascript:plusOpen('0');GoSNAChannel('CHM1N012','','stat');"><img alt="펼침" src="http://image.gmarket.co.kr/main/2012/04/09/btn_cont_openB.gif"></a></div>
+				
+				<div class="quick-btn" id="plusClose2">플러스상품<a href="javascript:plusClose('0');GoSNAChannel('CHM1N012','','stat');"><img alt="닫힘" src="http://image.gmarket.co.kr/main/2012/04/09/btn_cont_close.gif"></a></div>
+				<div class="quick-cont" id="plusClose">
+					<ul class="plus">
+						<li id="float_mov0">							
+						</li>
+						<li id="float_mov1">							
+						</li>
+						<li id="float_mov2">							
+						</li>
+						<li id="float_mov3">							
+						</li>
+					</ul>
+					<div class="btn">
+						<a id="up_banner" href=""><img src="http://image.gmarket.co.kr/main/2012/04/09/btn_quick_prev.gif" alt="이전"></a>
+						<a id="up_banner2" href=""><img src="http://image.gmarket.co.kr/main/2012/04/09/btn_quick_next.gif" alt="다음"></a>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="inner login" id="WingTodayGoodsDiv" style="display:"><!-- 로그인 후 class="login" 추가 -->
+			<!-- 로그인후(최근 본 상품)  -->
+			
+			<div class="quick-btn"><a href="javascript:GoSNAChannel('CHM1N001', 'http://www.gmarket.co.kr/pay/Basket.asp');"><img style="margin-left:18px;" src="http://image.gmarket.co.kr/main/2012/04/09/txt_wing_cart.gif" alt="장바구니"></a></div>
+			<div class="quick-btn"><a href="javascript:showMyCouponPopupLayer();GoSNAChannel('CHM1N002', '', 'stat');"><img style="margin-left:18px;" src="http://image.gmarket.co.kr/main/2012/04/09/txt_wing_coupon.gif" alt="내쿠폰함"></a></div>
+				
+			<div class="quick-btn"><a href="javascript:wing.openPlusGoods();GoSNAChannel('CHM1N008','','stat');" class="taC"><img id="plusMargin" src="http://image.gmarket.co.kr/main/2012/04/09/txt_wing_plus.gif" alt="플러스상품" ></a></div>
+			
+			<div class="quick-item">
+				<div class="quick-btn" style="display:none;" id="recentOpen"><img src="http://image.gmarket.co.kr/main/2012/04/09/txt_wing_item.gif" alt="플러스상품"><a href="javascript:recentOpen('0');GoSNAChannel('CHM1N007', '','stat');"><img alt="펼침" src="http://image.gmarket.co.kr/main/2012/04/09/btn_cont_openB.gif"></a></div>
+				
+				<div class="quick-btn" id="recentClose2">최근본상품<a href="javascript:recentClose('0');GoSNAChannel('CHM1N007','','stat');"><img alt="닫힘" src="http://image.gmarket.co.kr/main/2012/04/09/btn_cont_close.gif"></a></div>
+				<div class="quick-cont" id="recentClose">
+					<ul class="item">
+						<li id="RVI1_LI" onMouseOver="wing.showGoodsDetail(1)" onMouseOut="wing.hideGoodsDetail(1)" style="display:none">
+							<a id="RVI1_URL1"><img id="RVI1_IMG1" src="http://image.gmarket.co.kr/challenge/neo_image/no_image.gif" onError="ImgLoadFirst(this);"  alt="">
+							<div id="RVI1_CODE" style="display:none"></div></a>
+							<div id= "RVI1_DIV1" class="overlyr">
+								<a id="RVI1_TAG1" href="#"></a>
+								<strong id="RVI1_TXT1"></strong>
+								<a class="del"><input type="image" src="http://image.gmarket.co.kr/main/2012/04/09/btn_lay_delete.gif" alt="닫기" onClick="wing.deleteRecentGoods(1)"></a>								
+							</div>
+						</li>
+						<li id="RVI2_LI" onMouseOver="wing.showGoodsDetail(2)" onMouseOut="wing.hideGoodsDetail(2)" style="display:none">
+							<a id="RVI2_URL1"><img id="RVI2_IMG1" src="http://image.gmarket.co.kr/challenge/neo_image/no_image.gif" onError="ImgLoadFirst(this);"  alt=""><div id="RVI2_CODE" style="display:none"></div></a>
+							<div id= "RVI2_DIV1" class="overlyr" style="display:;">
+								<a id="RVI2_TAG1" href="#"></a>
+								<strong id="RVI2_TXT1"></strong>
+								<a class="del"><input type="image" src="http://image.gmarket.co.kr/main/2012/04/09/btn_lay_delete.gif" alt="닫기" onClick="wing.deleteRecentGoods(2)"></a>
+							</div>
+						</li>
+						<li id="RVI3_LI" onMouseOver="wing.showGoodsDetail(3)" onMouseOut="wing.hideGoodsDetail(3)" style="display:none">
+							<a id="RVI3_URL1"><img id="RVI3_IMG1" src="http://image.gmarket.co.kr/challenge/neo_image/no_image.gif" onError="ImgLoadFirst(this);"  alt=""><div id="RVI3_CODE" style="display:none"></div></a>
+							<div id= "RVI3_DIV1" class="overlyr" style="display: none;">
+								<a id="RVI3_TAG1" href="#"></a>
+								<strong id="RVI3_TXT1"></strong>
+								<a class="del"><input type="image" src="http://image.gmarket.co.kr/main/2012/04/09/btn_lay_delete.gif" alt="닫기" onClick="wing.deleteRecentGoods(3)"></a>
+							</div>
+						</li>
+						<li id="RVI4_LI" onMouseOver="wing.showGoodsDetail(4)" onMouseOut="wing.hideGoodsDetail(4)" style="display:none">
+							<a id="RVI4_URL1"><img id="RVI4_IMG1" src="http://image.gmarket.co.kr/challenge/neo_image/no_image.gif" onError="ImgLoadFirst(this);"  alt=""><div id="RVI4_CODE" style="display:none"></div></a>
+							<div id= "RVI4_DIV1" class="overlyr" style="display: none;">
+								<a id="RVI4_TAG1" href="#"></a>
+								<strong id="RVI4_TXT1"></strong>
+								<a class="del"><input type="image" src="http://image.gmarket.co.kr/main/2012/04/09/btn_lay_delete.gif" alt="닫기" onClick="wing.deleteRecentGoods(4)"></a>
+							</div>
+						</li>
+					</ul>
+					<div class="btn vat" id="RecentPageLink">
+						<a href="javascript:wing.printRecentGoodsView(-1);GoSNAChannel('CHM1N006', '','stat');"><img src="http://image.gmarket.co.kr/main/2012/04/09/btn_item_prev.gif" alt="이전"></a><span id="WingRecentPage"><em></em> /</span><a href="javascript:wing.printRecentGoodsView(1);GoSNAChannel('CHM1N005', '','stat');"><img src="http://image.gmarket.co.kr/main/2012/04/09/btn_item_next.gif" alt="다음"></a>
+					</div>
+				</div>
+			</div>
+			<!-- 로그인후(최근 본 상품)  -->
+		</div>
+		
+		<div class="ani-btn"><a id="animatedImgStat" href="javascript:animatedImgStatChgMain('move');GoSNAChannel('CHM1N014', '','stat');"><img  id="animatedImgTxt" src="http://image.gmarket.co.kr/main/2012/04/09/btn_animation.gif" alt="이미지동작"></a></div>
+		<div class="auction">
+			<div>
+				<iframe id="ifiacitem" scrolling="no" frameborder="0" marginheight="0" marginwidth="0" src="/challenge/neo_include/RecentViewAuction.asp" width="90" height="0" title="최근본옥션"></iframe><!-- 2012-04-19 iframe 으로 변경 -->
+			</div>
+		</div>
+		<div class="top"><a href="javascript:scroll(0,0);GoSNAChannel('CHM1N017','','stat');"><img src="http://image.gmarket.co.kr/main/2012/04/09/btn_quick_top.gif" alt="TOP"></a></div>
+        
+	</div>
+	<!-- //로그인후 -->
+</div>
+<!-- //Floating -->
+<script language="JavaScript" type="text/JavaScript">
+var standardTop = 0;
+if ( eval(total_cnt2)!=null && total_cnt2 > 0 )
+	startFloatFlag=true;
+
+
+
+gInitHelper().addHandler(function()
+{
+	WindScroll();
+});
+
+
+gmkt.onload(animatedImgStatChgStop);
+gmkt.onload(InitWingRecentGoods);
+-->
+</script>
+				<!-- 1.section : 카테고리/이벤트/오늘만특가 -->
+				<div class="section">
+
+					<div class="gnb">
+						<div class="cateWarp">
+							<h2><a href="#"><img src="http://image.gmarket.co.kr/main/2012/04/09/gnb_totalview.gif" alt="전체카테고리 보기"  onclick="openCate(this, '#cateAll');return false;" ></a></h2>
+							<div id="cateAll" class="allCate">
+								<div class="cateTop">
+									<div class="cate">
+										<h3><span class="fir">패션</span><span>브랜드</span><span>소호</span></h3>
+										<div>
+											<h4>패션의류</h4>
+											<ul>
+												<li><a href="javascript:GoSNAChannel('CHM1C001', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000003');">여성의류/패션</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1C002', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000046');">남성의류/정장</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1C003', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000063');">빅사이즈/미시/커리어</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1C004', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000070');">언더웨어/잠옷/보정속옷</a></li>
+											</ul>
+											<div class="corner">
+												<a href="javascript:GoSNAChannel('CHM1C005', 'http://brandon.gmarket.co.kr/');" class="brand">BRAND ON</a>
+												<a href="javascript:GoSNAChannel('CHM1C006', 'http://lotte.gmarket.co.kr/');" class="lotte">LOTTE 롯데백화점</a>
+												<a href="javascript:GoSNAChannel('CHM1C007', 'http://soho.gmarket.co.kr/');" class="soho">패션소호</a>
+												<a href="javascript:GoSNAChannel('CHM1C008', 'http://shop.gmarket.co.kr/globalshop/GlobalShop.aspx');" class="global">글로벌쇼핑</a>
+											</div>
+										</div>
+									</div>
+									<div class="cate sec">
+										<h3><span class="fir">잡화</span><span>화장품</span></h3>
+										<div>
+											<h4>신발/잡화</h4>
+											<ul>
+												<li><a href="javascript:GoSNAChannel('CHM1C009', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000049');">여성화/남성화/패션화</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1C010', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000064');">가방/지갑/패션잡화</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1C011', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000027');">쥬얼리/시계/선글라스</a></li>
+											</ul>
+											<h4>화장품/헤어</h4>
+											<ul class="bdN">
+												<li><a href="javascript:GoSNAChannel('CHM1C012', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000005');">화장품/향수/이미용</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1C013', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000071');">바디/헤어/목욕/위생</a></li>
+											</ul>
+										</div>
+									</div>
+									<div class="cate">
+										<h3><span class="fir">유아동</span><span>식품</span></h3>
+										<div>
+											<h4>유아동/출산</h4>
+											<ul>
+												<li><a href="javascript:GoSNAChannel('CHM1C014', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000057');">기저귀/분유/이유식</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1C015', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000073');">물티슈/생리대/성인패드</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1C016', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000006');">출산/유아용품/임부복</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1C017', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000035');">유아동의류/신발/가방</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1C018', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000042');">장난감/교육완구/인형</a></li>
+											</ul>
+											<h4>식품</h4>
+											<ul>
+												<li><a href="javascript:GoSNAChannel('CHM1C019', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000020');">쌀/과일/정육/수산물</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1C020', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000036');">차/음료/과자/가공식품</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1C021', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000068');">건강식품/다이어트/홍삼</a></li>
+											</ul>
+										</div>
+										<div class="corner">
+											<a href="javascript:GoSNAChannel('CHM1C022', 'http://marton.gmarket.co.kr/');" class="mart">마트 ON</a>
+										</div>
+									</div>
+									<div class="cate">
+										<h3><span class="fir">가구</span><span>리빙</span><span>건강</span></h3>
+										<div>
+											<h4>가구/침구/인테리어</h4>
+											<ul>
+												<li><a href="javascript:GoSNAChannel('CHM1C023', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000031');">가구/DIY</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1C024', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000039');">침구/커튼/인테리어</a></li>
+											</ul>
+											<h4>생활/주방/건강용품</h4>
+											<ul>
+												<li><a href="javascript:GoSNAChannel('CHM1C025', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000014');">생활/수납/욕실/청소</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1C026', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000085');">주방/조리기구/식기</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1C027', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000074');" class="lsm2">세제/세면/제지/일용잡화</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1C028', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000076');">철물/공구/안전/산업</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1C029', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000083');" class="lsm2">건강/안마/비데/의료용품</a></li>
+											</ul>
+										</div>
+										<div class="corner">
+											<a href="javascript:GoSNAChannel('CHM1C071', 'http://bizon.gmarket.co.kr/');" class="bizon">사업자 구매 전문몰</a>
+										</div>
+									</div>
+									<div class="cate">
+										<h3><span class="fir">스포츠</span><span>자동차</span><span>중고차</span></h3>
+										<div>
+											<h4>스포츠/레저</h4>
+											<ul>
+												<li><a href="javascript:GoSNAChannel('CHM1C030', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000058');">골프클럽/의류/용품</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1C031', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000017');">등산/낚시/캠핑/스키</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1C032', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000037');" class="lsm2">스포츠/헬스/수영/자전거</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1C033', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000043');">스포츠의류/운동화</a></li>
+											</ul>
+											<h4>자동차</h4>
+											<ul>
+												<li><a href="javascript:GoSNAChannel('CHM1C034', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000030');">자동차용품/모터싸이클</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1C035', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000079');">블랙박스/네비/하이패스</a></li>
+											</ul>
+										</div>
+										<div class="corner">
+											<a href="javascript:GoSNAChannel('CHM1C036', 'http://carsdaq.gmarket.co.kr/');" class="car">중고차</a>
+										</div>
+									</div>
+                                    <!-- 2013-01-16 [HP 카테고리 리뉴얼 작업]-->
+									<div class="cate">
+										<h3><span class="fir">디지털</span><span>가전</span></h3>
+										<div>
+											<h4>컴퓨터</h4>
+											<ul>
+												<li><a href="javascript:GoSNAChannel('CHM1C037', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000002');">노트북/데스크탑</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1C038', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000055');">PC부품/액세서리</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1C039', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000082');">모니터/프린터/잉크</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1C040', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000075');">저장장치/메모리</a></li>
+											</ul>
+                                            <h4>디지털</h4>
+											<ul>
+                                                <li><a href="javascript:GoSNAChannel('CHM1C041', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000056');">휴대폰/액세서리</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1C042', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000033');">디카/DSLR/미러리스</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1C043', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000072');">태블릿/MP3/이어폰/게임</a></li>
+											</ul>
+											<h4>가전</h4>
+											<ul>
+												<li><a href="javascript:GoSNAChannel('CHM1C045', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000032');" class="lsm2">TV/냉장고/세탁기/음향가전</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1C046', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000008');">밥솥/믹서/오븐/주방가전</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1C047', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000077');" class="lsm2">선풍기/에어컨/제습/여름가전</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1C029', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000083');" class="lsm2">건강/안마/비데/의료용품</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1C074', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000092');" class="lsm2">청소기/이미용/생활가전</a></li>
+											</ul>
+                                            <div class="corner">
+												<a href="javascript:GoSNAChannel('CHM1C049', 'http://www.gmarket.co.kr/used_buyin/index.asp');" class="oneclick">원클릭 중고매입</a>
+											</div>
+										</div>
+									</div>
+                                    <!-- 2013-01-16 [HP 카테고리 리뉴얼 작업]-->
+									<div class="cate last">
+										<h3><span class="fir">도서</span><span>문구</span><span>여행</span><span>e쿠폰</span></h3>
+										<div>
+											<h4>도서/티켓/e쿠폰/상품권</h4>
+											<ul>
+												<li><a href="javascript:GoSNAChannel('CHM1C050', 'http://category.gmarket.co.kr/listview/html/L100000028.asp');">도서/음반/DVD</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1C051', 'http://category.gmarket.co.kr/listview/LTicket.asp');">공연/스포츠/영화티켓</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1C056', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000048');">e쿠폰/외식/생활쿠폰</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1C055', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000084');">백화점/제화/기타 상품권</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1C057', 'http://category.gmarket.co.kr/challenge/neo_category/large_category_gen_100000052.asp');" class="lsm2">연금복권/게임/모바일상품권</a></li>
+											</ul>
+											<h4>문구/애완/꽃/악기</h4>
+											<ul>
+												<li><a href="javascript:GoSNAChannel('CHM1C052', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000045');">문구/학용품/사무/용지</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1C053', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000038');">애견/사료/애완용품</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1C054', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000041');">꽃/원예/팬시/이벤트용품</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1C073', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000091');">피아노/악기/취미/프라모델</a></li>
+											</ul>
+											<h4>여행</h4>
+											<ul>
+												<li><a href="javascript:GoSNAChannel('CHM1C058', 'http://category.gmarket.co.kr/listview/LTour.asp');">여행/레저/호텔/항공권</a></li>
+											</ul>
+										</div>
+									</div>
+								</div>
+								<div class="cateBtm">
+									<ul>
+										<li><a href="javascript:GoSNAChannel('CHM1C066', 'http://www.gmarket.co.kr/challenge/neo_sangsul/HiSeoul_Brand.asp');">하이서울브랜드관</a></li>
+										<li><a href="javascript:GoSNAChannel('CHM1C067', 'http://www.gmarket.co.kr/challenge/neo_food_market/food_localpr/foodmk_localpr.asp');">프리미엄지역관</a></li>
+										<li><a href="javascript:GoSNAChannel('CHM1C068', 'http://category.gmarket.co.kr/listview/L100000051.aspx');">중고/재고시장</a></li>
+										<li><strong><a href="javascript:GoSNAChannel('CHM1C069', 'http://category.gmarket.co.kr/listview/GTourRealtimeAirSearchMain.asp');">항공권가격비교</strong></a></li><!-- 2012-04-10 strong 추가 -->
+										<li><strong><a href="javascript:GoSNAChannel('CHM1C070', 'http://shop.gmarket.co.kr/BeforeG/BeforeGMain.asp');">장보기전G마켓</strong></a></li>
+									    <li><strong><a href="javascript:GoSNAChannel('CHM1C071', 'http://ebay.gmarket.co.kr/');">eBay쇼핑</a></strong></li>
+										<li><strong><a href="javascript:GoSNAChannel('CHM1C072', 'http://www.gmarket.co.kr/challenge/neo_photo/general_photo.asp');">사진인화</a></strong></li>
+									</ul>
+								</div>
+								<div class="close"><a href="#"><img src="http://image.gmarket.co.kr/main/2012/04/09/btn_allCate_close.gif" alt="닫기" onclick="openCate(this, '#cateAll', 'close');return false;" ></a></div>
+							</div>
+						</div>
+
+						<!-- 2013-01-16 [HP 카테고리 리뉴얼 작업]-->
+						<div class="menu">
+							<ul>
+								<li>
+                                    <a href="#" class="btn"><img id="BigCateFashion" class="imgCategoryMenu" src="http://image.gmarket.co.kr/main/2012/04/09/gnb_menu01.gif" alt="패션의류/패션소호"></a>
+									<div class="smenu" id="LayerBigCateFashion" style="display:none;">
+										<div class="fir">
+											<h4>패션의류</h4>
+											<ul>
+												<li><a href="javascript:GoSNAChannel('CHM1D001', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000003');">여성의류/패션</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1D002', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000046');">남성의류/정장</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1D003', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000063');">빅사이즈/미시/커리어</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1D004', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000070');">언더웨어/잠옷/보정속옷</a></li>
+											</ul>
+										</div>
+                                        <p id="ulLayerBigCate1"></p>
+                                        <ul class="cate-bn-list"></ul>
+									</div>
+                                </li>
+								<li>
+									<a href="#" class="btn"><img id="BigCateCosmetic" class="imgCategoryMenu" src="http://image.gmarket.co.kr/main/2012/04/09/gnb_menu02.gif" alt="잡화/화장품"></a>
+									<div class="smenu" id="LayerBigCateCosmetic" style="display:none;">
+										<div class="fir">
+											<h4>신발/잡화</h4>
+											<ul>
+												<li><a href="javascript:GoSNAChannel('CHM1D018', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000049');">여성화/남성화/패션화</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1D019', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000064');">가방/지갑/패션잡화</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1D020', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000027');">쥬얼리/시계/선글라스</a></li>
+											</ul>
+										</div>
+										<div>
+											<h4>화장품/헤어</h4>
+											<ul>
+												<li><a href="javascript:GoSNAChannel('CHM1D021', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000005');">화장품/향수/이미용</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1D022', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000071');">바디/헤어/목욕/위생</a></li>
+											</ul>
+										</div>
+                                        <p id="ulLayerBigCate2"></p>
+                                        <ul class="cate-bn-list"></ul>
+									</div>
+								</li>
+								<li>
+									<a href="#" class="btn"><img id="BigCateBaby" class="imgCategoryMenu" src="http://image.gmarket.co.kr/main/2012/04/09/gnb_menu03.gif" alt="유아동/식품/마트ON"></a>
+									<div class="smenu" id="LayerBigCateBaby" style="display:none;">
+                                        <div class="fir">
+											<h4>유아동/출산</h4>
+											<ul>
+												<li><a href="javascript:GoSNAChannel('CHM1D027', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000057');">기저귀/분유/이유식</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1D028', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000073');">물티슈/생리대/성인패드</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1D029', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000006');">출산/유아용품/임부복</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1D030', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000035');">유아동의류/신발/가방</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1D031', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000042');">장난감/교육완구/인형</a></li>
+											</ul>
+										</div>
+										<div>
+											<h4>식품</h4>
+											<ul>
+												<li><a href="javascript:GoSNAChannel('CHM1D032', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000020');">쌀/과일/정육/수산물</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1D033', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000036');">차/음료/과자/가공식품</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1D034', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000068');">건강식품/다이어트/홍삼</a></li>
+											</ul>
+										</div>
+                                        <p id="ulLayerBigCate3"></p>
+                                        <ul class="cate-bn-list"></ul>
+									</div>
+								</li>
+								<li>
+									<a href="#" class="btn"><img id="BigCateLiving" class="imgCategoryMenu" src="http://image.gmarket.co.kr/main/2012/04/09/gnb_menu04.gif" alt="가구/리빙/건강"></a>
+									<div class="smenu" id="LayerBigCateLiving" style="display:none;">
+										<div class="fir">
+											<h4>가구/침구 <br />/인테리어</h4>
+											<ul>
+												<li><a href="javascript:GoSNAChannel('CHM1D039', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000031');">가구/DIY</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1D040', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000039');">침구/커튼/인테리어</a></li>
+											</ul>
+										</div>
+										<div>
+											<h4>생활/주방 <br />/건강용품</h4>
+											<ul>
+												<li><a href="javascript:GoSNAChannel('CHM1D041', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000014');">생활/수납/욕실/청소</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1D042', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000085');">주방/조리기구/식기</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1D043', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000074');">세제/세면/제지/일용잡화</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1D044', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000076');">철물/공구/안전/산업</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1D045', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000083');">건강/안마/비데/의료용품</a></li>
+											</ul>
+										</div>
+                                        <p id="ulLayerBigCate4"></p>
+                                        <ul class="cate-bn-list"></ul>
+									</div>
+								</li>
+								<li>
+									<a href="#" class="btn"><img id="BigCateCar" class="imgCategoryMenu" src="http://image.gmarket.co.kr/main/2012/04/09/gnb_menu05.gif" alt="스포츠/자동차/중고차"></a>
+									<div class="smenu" id="LayerBigCateCar" style="display:none;">
+										<div class="fir">
+											<h4>스포츠/레저</h4>
+											<ul>
+												<li><a href="javascript:GoSNAChannel('CHM1D050', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000058');">골프클럽/의류/용품</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1D051', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000017');">등산/낚시/캠핑/스키</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1D052', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000037');">스포츠/헬스/수영/자전거</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1D053', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000043');">스포츠의류/운동화</a></li>
+											</ul>
+										</div>
+										<div>
+											<h4>자동차</h4>
+											<ul>
+												<li><a href="javascript:GoSNAChannel('CHM1D054', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000030');">자동차용품/모터싸이클</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1D055', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000079');">블랙박스/네비/하이패스</a></li>
+												<!--li><a href="javascript:GoSNAChannel('CHM1D056', 'http://carsdaq.gmarket.co.kr/');">중고차	</a></li-->
+											</ul>
+										</div>
+                                        <p id="ulLayerBigCate5"></p>
+                                        <ul class="cate-bn-list"></ul>
+									</div>
+								</li>
+								<li>
+									<a href="#" class="btn"><img id="BigCateDigital" class="imgCategoryMenu" src="http://image.gmarket.co.kr/main/2013/01/15/gnb_menu06.gif" alt="디지털/가전"></a>
+									<div class="smenu" id="LayerBigCateDigital" style="display:none;">
+										<div class="fir">
+											<h4>컴퓨터</h4>
+											<ul>
+												<li><a href="javascript:GoSNAChannel('CHM1D061', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000002');">노트북/데스크탑</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1D062', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000055');">PC부품/액세서리</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1D063', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000082');">모니터/프린터/잉크</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1D064', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000075');">저장장치/메모리</a></li>
+											</ul>
+										</div>
+                                        <div>
+											<h4>디지털</h4>
+											<ul>
+												<li><a href="javascript:GoSNAChannel('CHM1D065', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000056');">휴대폰/액세서리</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1D066', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000033');">디카/DSLR/미러리스</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1D067', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000072');">태블릿/MP3/이어폰/게임</a></li>
+											</ul>
+										</div>
+										<div>
+											<h4>가전</h4>
+											<ul>
+												<li><a href="javascript:GoSNAChannel('CHM1D073', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000032');">TV/냉장고/세탁기/음향가전</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1D074', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000008');">밥솥/믹서/오븐/주방가전</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1D075', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000077');" class="lsm2">선풍기/에어컨/제습/여름가전</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1D076', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000083');" class="lsm2">건강/안마/비데/의료용품</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1C075', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000092');" class="lsm2">청소기/이미용/생활가전</a></li>
+											</ul>
+										</div>
+                                        <p id="ulLayerBigCate6"></p>
+                                        <ul class="cate-bn-list"></ul>
+									</div>
+								</li>
+								<li>
+									<a href="#" class="btn"><img id="BigCateBook" class="imgCategoryMenu" src="http://image.gmarket.co.kr/main/2013/01/29/gnb_menu07.gif" alt="도서/문구/여행/소셜"></a>
+									<div class="smenu" id="LayerBigCateBook" style="display:none;">
+                                        <div class="fir">
+											<h4>도서/티켓<br/>/e쿠폰/상품권</h4>
+											<ul>
+												<li><a href="javascript:GoSNAChannel('CHM1D077', 'http://category.gmarket.co.kr/listview/html/L100000028.asp');">도서/음반/DVD</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1D078', 'http://category.gmarket.co.kr/listview/LTicket.asp');">공연/스포츠/영화티켓</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1D087', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000048');">e쿠폰/외식/생활쿠폰</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1D086', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000084');">백화점/제화/기타상품권</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1D088', 'http://category.gmarket.co.kr/challenge/neo_category/large_category_gen_100000052.asp');" class="ltx">연금복권/게임/모바일상품권</a></li>
+											</ul>
+										</div>
+										<div>
+											<h4>문구/애완 <br />/꽃/악기</h4>
+											<ul>
+												<li><a href="javascript:GoSNAChannel('CHM1D083', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000045');">문구/학용품/사무/용지</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1D084', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000038');">애견/사료/애완용품</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1D085', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000041');">꽃/원예/팬시/이벤트용품</a></li>
+												<li><a href="javascript:GoSNAChannel('CHM1C076', 'http://category.gmarket.co.kr/listview/LList.aspx?gdlc_cd=100000091');">피아노/악기/취미/프라모델</a></li>
+											</ul>
+										</div>
+										<div>
+											<h4>여행</h4>
+											<ul>
+												<li><a href="javascript:GoSNAChannel('CHM1D089', 'http://category.gmarket.co.kr/listview/LTour.asp');">여행/레저/호텔/항공권</a></li>
+											</ul>
+										</div>
+                                        <p id="ulLayerBigCate7"></p>
+                                        <ul class="cate-bn-list"></ul>
+									</div>
+								</li>
+								<li>
+									<a href="#" class="lotte"><img id="BigCateBrandOn" class="imgCategoryMenu" src="http://image.gmarket.co.kr/main/2012/04/09/gnb_menu08.gif" alt="브랜드온/롯데백화점"></a>
+									<div class="smenu lotte-cate" id="LayerBigCateBrandOn" style="display:none;">
+                                        <p id="ulLayerBigCate8"></p>
+                                        <ul class="cate-bn-list"></ul>
+									</div>
+								</li>
+							</ul>
+						</div>
+                        <!-- 2013-01-16 [HP 카테고리 리뉴얼 작업]-->
+					</div>
+					<div class="event">
+						<div class="nav" id="gnb">
+							<ul class="menus">
+								<li id="BanTitle_0">
+									<a href="javascript:;" style="cursor:default"><img src="http://image.gmarket.co.kr/challenge/neo_image/1pixel.gif" class="png24" alt=""/></a>
+									<ul class="menu fir" id="UbannerTitle0"></ul>
+								</li>
+								<li id="BanTitle_1">
+									<a href="javascript:;" style="cursor:default"><img src="http://image.gmarket.co.kr/challenge/neo_image/1pixel.gif" class="png24" alt=""/></a>
+									<ul class="menu" id="UbannerTitle1"></ul>
+								</li>
+								<li id="BanTitle_2">
+									<a href="javascript:;" style="cursor:default"><img src="http://image.gmarket.co.kr/challenge/neo_image/1pixel.gif" class="png24" alt=""/></a>
+									<ul class="menu" id="UbannerTitle2"></ul>
+								</li>
+								<li id="BanTitle_4">
+									<a href="javascript:;" style="cursor:default"><img src="http://image.gmarket.co.kr/challenge/neo_image/1pixel.gif" class="png24" alt=""/></a>
+									<div class="btn">
+										<a href="javascript:bigBanPage(4,-5);" class="prev">이전</a>
+										<a href="javascript:bigBanPage(4,5);" class="next">다음</a>
+									</div>
+									<ul class="menu" id="UbannerTitle4"></ul>
+								</li>
+								<li id="BanTitle_5">
+									<a href="javascript:;" style="cursor:default"><img src="http://image.gmarket.co.kr/challenge/neo_image/1pixel.gif" class="png24" alt=""/></a>
+									<div class="btn">
+										<a href="javascript:bigBanPage(5,-5);" class="prev">이전</a>
+										<a href="javascript:bigBanPage(5,5);" class="next">다음</a>
+									</div>
+									<ul class="menu" id="UbannerTitle5"></ul>
+								</li>
+								<li id="BanTitle_3">
+									<a href="javascript:;" style="cursor:default"><img src="http://image.gmarket.co.kr/challenge/neo_image/1pixel.gif" class="png24" alt=""/></a>
+									<ul class="menu" id="UbannerTitle3"></ul>
+								</li>
+							</ul>
+						</div>
+						<div class="image">
+							<span id="MainTab"></span>
+							<dl class="btnShareSNS" id="btnShareSNS" style="display:none;">
+								<dt><a onclick="return false;">SNS공유하기</a></dt>
+								<dd id="shareMenu" style="display:none;">
+									<ul id="ulShareMenu">
+										<li class="facebook"><a href="javascript:MainSNSShare.Facebook();">페이스북</a></li>
+										<li class="twitter"><a href="javascript:MainSNSShare.Twitter();">트위터</a></li>
+										<li class="cyworld"><a href="javascript:MainSNSShare.Cyworld();">싸이월드</a></li>
+										<li class="mypeople"><a href="javascript:MainSNSShare.Metoday();">마이피플</a></li>
+									</ul>
+								</dd>
+							</dl>
+							<a href="javascript:MainTabBefore();" class="prev">이전</a>
+							<a href="javascript:MainTabNext();" class="next">다음</a>
+						</div>
+                        <div style="display:none;"><img id="ea_check_img" name="ea_check_img" src="http://image.gmarket.co.kr/challenge/neo_image/1pixel.gif" ></div>
+					</div>
+
+					<div class="sale">
+						<div class="today on"> <!-- 달력 펼쳐질때 class="on" 추가 -->
+							<div class="date"><a href="javascript:openTodayEvent();">07.29</a></div>
+							<div class="kind">
+								<ul>
+									<li><a href="javascript:openTodayEvent();" class="new" id="todayEvent"></a></li>
+								</ul>
+							</div>
+							
+<script language="javascript">
+
+var todayDt = '20130729';
+
+function hideCallayer(selDt, curDt){
+
+var weekDt =  curDt.split("-")
+var mydate=new Date(weekDt[0], weekDt[1]-1, weekDt[2]);
+var wkdy=mydate.getDay();
+
+	if(wkdy==0){
+		document.getElementById("Callayer_"+ selDt).className = "" ;
+		$j("#Callayer_"+ selDt).addClass("sun") ;
+	}else if(wkdy==6){
+		document.getElementById("Callayer_"+ selDt).className = "" ;
+		$j("#Callayer_"+ selDt).addClass("sat") ;
+	}else{
+		document.getElementById("Callayer_"+ selDt).className = "" ;
+	}
+	//showCallayer(todayDt,"2013-07-29","N");
+}
+
+function hideCallayer2(selDt, curDt){
+var weekDt =  curDt.split("-")
+var mydate=new Date(weekDt[0], weekDt[1]-1, weekDt[2]);
+var wkdy=mydate.getDay();
+	
+	if(wkdy==0){
+		document.getElementById("Callayer_"+ selDt).className = "" ;
+		$j("#Callayer_"+ selDt).addClass("sun") ;
+	}else if(wkdy==6){
+		document.getElementById("Callayer_"+ selDt).className = "" ;
+		$j("#Callayer_"+ selDt).addClass("sat") ;
+	}else{
+		document.getElementById("Callayer_"+ selDt).className = "" ;
+	}
+	
+	//hideCallayer2(todayDt,"2013-07-29");
+
+}
+
+function showCallayer(selDt, curDt, showYn){
+var eventstr = "";
+var todayEventCnt = eval("dayCnt_" + selDt);
+
+	if(document.getElementById("pastSetDt").value !="" && document.getElementById("pastCurDt").value != "")
+	{
+
+		hideCallayer(document.getElementById("pastSetDt").value, document.getElementById("pastCurDt").value);
+	}
+	
+	
+	$j("#Callayer_"+ selDt).addClass("selected") ;	
+
+	if(selDt != todayDt){
+		hideCallayer2(todayDt,"2013-07-29");
+	}
+	document.getElementById("pastSetDt").value = selDt;
+	document.getElementById("pastCurDt").value = curDt;
+}
+
+function showEventCBanner(setDate, selNo){
+
+var todayEventCnt = eval("dayCnt_" + setDate);
+var ranNo = 0 ;
+if(selNo < 0){
+	ranNo  =  Math.floor(Math.random() * todayEventCnt) ;
+
+}else{
+	ranNo = selNo
+}
+
+	//$j("#eventBannerImg").attr("src",eval("arrDay_" + setDate)[ranNo]['MainBanner']);
+	if(todayDt==setDate){
+		$j("#eventBannerImg").html("<a href='"+ eval("arrDay_" + setDate)[ranNo]['URL'] +"'><img src='"+ eval("arrDay_" + setDate)[ranNo]['MainBanner']+"' ></a>");
+		//$j("#eventBannerLink").attr("href",eval("arrDay_" + setDate)[ranNo]['URL']);
+	}else{
+		$j("#eventBannerImg").html("<img src='"+ eval("arrDay_" + setDate)[ranNo]['MainBanner']+"' >");
+	}
+}
+$j(document).ready(function () {
+
+showEventCBanner(todayDt,-1);
+showCallayer(todayDt,"2013-07-29","Y")
+});
+</script>
+<input type="hidden" id="pastSetDt">
+<input type="hidden" id="pastCurDt">
+<div class="calendar" style="display:none;" id="eventCalendar">
+	<h4><img src="http://image.gmarket.co.kr/main/2012/04/09/stit_calendar.gif" alt="EVENT calendar" ></h4>
+	<div class="btn">
+		<span class="txt" style="margin-left:13px">2013.07</span>
+	</div>
+	<div class="cont">
+		<!-- 레이어 띄우실때 <div class="layCal">안에 이중으로 클래스를 넣어주셔야 layer위치/edge 위치 조정이 됩니다.
+			1번째칸 <div class="layCal b1"> 추가
+			2번째칸 <div class="layCal b2"> 추가
+			3번째칸 <div class="layCal b3"> 추가 
+			4번째칸 <div class="layCal b4"> 추가
+			5번째칸 <div class="layCal b5"> 추가 
+			6번째칸 <div class="layCal b6"> 추가
+			7번째칸 <div class="layCal b7"> 추가
+		-->
+		<ol>
+			<li><a class="txt">일</a></li>
+			<li><a class="txt">월</a></li>
+			<li><a class="txt">화</a></li>
+			<li><a class="txt">수</a></li>
+			<li><a class="txt">목</a></li>
+			<li><a class="txt">금</a></li>
+			<li><a class="txt">토</a></li>
+
+			<li class="sun">
+				<a href="#"></a>
+			</li>
+
+
+			<li id="Callayer_20130701"  >
+				<a href="#" onclick="showCallayer('20130701','2013-07-01','N');showEventCBanner('20130701',-1)">1</a>
+				<div class="layCal b2">
+					<div class="layCon">
+						<table>
+							<tr>
+								<td id="CallayerTd_20130701">
+								<script language="javascript">
+								var todayEventCnt2 = eval("dayCnt_20130701");
+								
+								for(i=0; i<todayEventCnt2; i++){	
+									if(todayDt == "20130701"){
+									
+										document.write("<p><a id='eventTitle' onMouseOver=\"showEventCBanner('20130701',"+i+")\" href='"+ eval("arrDay_20130701")[i]['URL'] +"'>"+ eval("arrDay_20130701")[i]['TITLE'] +"</a><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_ing.gif' alt='진행중'></span></p>")
+									}else if(todayDt < "20130701"){
+										document.write("<p onMouseOver=\"showEventCBanner('20130701',"+i+")\"><span class='end'>"+ eval("arrDay_20130701")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_yet.gif' alt='오픈예정'></span></p>")
+									}else{
+										document.write("<p onMouseOver=\"showEventCBanner('20130701',"+i+")\"><span class='end'>"+ eval("arrDay_20130701")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_end.gif' alt='종료'></span></p>")
+									}
+								}
+								</script>
+								<div class="close">
+									<input type="image" onclick='hideCallayer(document.getElementById("pastSetDt").value, document.getElementById("pastCurDt").value);' src="http://image.gmarket.co.kr/main/2012/06/btn_cal_close2.gif" alt="닫기">
+								</div>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<p class="layBtm"></p>
+					<div class="layEdge"></div>
+				</div>
+			</li>
+
+
+
+			<li id="Callayer_20130702"  >
+				<a href="#" onclick="showCallayer('20130702','2013-07-02','N');showEventCBanner('20130702',-1)">2</a>
+				<div class="layCal b3">
+					<div class="layCon">
+						<table>
+							<tr>
+								<td id="CallayerTd_20130702">
+								<script language="javascript">
+								var todayEventCnt2 = eval("dayCnt_20130702");
+								
+								for(i=0; i<todayEventCnt2; i++){	
+									if(todayDt == "20130702"){
+									
+										document.write("<p><a id='eventTitle' onMouseOver=\"showEventCBanner('20130702',"+i+")\" href='"+ eval("arrDay_20130702")[i]['URL'] +"'>"+ eval("arrDay_20130702")[i]['TITLE'] +"</a><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_ing.gif' alt='진행중'></span></p>")
+									}else if(todayDt < "20130702"){
+										document.write("<p onMouseOver=\"showEventCBanner('20130702',"+i+")\"><span class='end'>"+ eval("arrDay_20130702")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_yet.gif' alt='오픈예정'></span></p>")
+									}else{
+										document.write("<p onMouseOver=\"showEventCBanner('20130702',"+i+")\"><span class='end'>"+ eval("arrDay_20130702")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_end.gif' alt='종료'></span></p>")
+									}
+								}
+								</script>
+								<div class="close">
+									<input type="image" onclick='hideCallayer(document.getElementById("pastSetDt").value, document.getElementById("pastCurDt").value);' src="http://image.gmarket.co.kr/main/2012/06/btn_cal_close2.gif" alt="닫기">
+								</div>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<p class="layBtm"></p>
+					<div class="layEdge"></div>
+				</div>
+			</li>
+
+
+
+			<li id="Callayer_20130703"  >
+				<a href="#" onclick="showCallayer('20130703','2013-07-03','N');showEventCBanner('20130703',-1)">3</a>
+				<div class="layCal b4">
+					<div class="layCon">
+						<table>
+							<tr>
+								<td id="CallayerTd_20130703">
+								<script language="javascript">
+								var todayEventCnt2 = eval("dayCnt_20130703");
+								
+								for(i=0; i<todayEventCnt2; i++){	
+									if(todayDt == "20130703"){
+									
+										document.write("<p><a id='eventTitle' onMouseOver=\"showEventCBanner('20130703',"+i+")\" href='"+ eval("arrDay_20130703")[i]['URL'] +"'>"+ eval("arrDay_20130703")[i]['TITLE'] +"</a><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_ing.gif' alt='진행중'></span></p>")
+									}else if(todayDt < "20130703"){
+										document.write("<p onMouseOver=\"showEventCBanner('20130703',"+i+")\"><span class='end'>"+ eval("arrDay_20130703")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_yet.gif' alt='오픈예정'></span></p>")
+									}else{
+										document.write("<p onMouseOver=\"showEventCBanner('20130703',"+i+")\"><span class='end'>"+ eval("arrDay_20130703")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_end.gif' alt='종료'></span></p>")
+									}
+								}
+								</script>
+								<div class="close">
+									<input type="image" onclick='hideCallayer(document.getElementById("pastSetDt").value, document.getElementById("pastCurDt").value);' src="http://image.gmarket.co.kr/main/2012/06/btn_cal_close2.gif" alt="닫기">
+								</div>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<p class="layBtm"></p>
+					<div class="layEdge"></div>
+				</div>
+			</li>
+
+
+
+			<li id="Callayer_20130704"  >
+				<a href="#" onclick="showCallayer('20130704','2013-07-04','N');showEventCBanner('20130704',-1)">4</a>
+				<div class="layCal b5">
+					<div class="layCon">
+						<table>
+							<tr>
+								<td id="CallayerTd_20130704">
+								<script language="javascript">
+								var todayEventCnt2 = eval("dayCnt_20130704");
+								
+								for(i=0; i<todayEventCnt2; i++){	
+									if(todayDt == "20130704"){
+									
+										document.write("<p><a id='eventTitle' onMouseOver=\"showEventCBanner('20130704',"+i+")\" href='"+ eval("arrDay_20130704")[i]['URL'] +"'>"+ eval("arrDay_20130704")[i]['TITLE'] +"</a><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_ing.gif' alt='진행중'></span></p>")
+									}else if(todayDt < "20130704"){
+										document.write("<p onMouseOver=\"showEventCBanner('20130704',"+i+")\"><span class='end'>"+ eval("arrDay_20130704")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_yet.gif' alt='오픈예정'></span></p>")
+									}else{
+										document.write("<p onMouseOver=\"showEventCBanner('20130704',"+i+")\"><span class='end'>"+ eval("arrDay_20130704")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_end.gif' alt='종료'></span></p>")
+									}
+								}
+								</script>
+								<div class="close">
+									<input type="image" onclick='hideCallayer(document.getElementById("pastSetDt").value, document.getElementById("pastCurDt").value);' src="http://image.gmarket.co.kr/main/2012/06/btn_cal_close2.gif" alt="닫기">
+								</div>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<p class="layBtm"></p>
+					<div class="layEdge"></div>
+				</div>
+			</li>
+
+
+
+			<li id="Callayer_20130705"  >
+				<a href="#" onclick="showCallayer('20130705','2013-07-05','N');showEventCBanner('20130705',-1)">5</a>
+				<div class="layCal b6">
+					<div class="layCon">
+						<table>
+							<tr>
+								<td id="CallayerTd_20130705">
+								<script language="javascript">
+								var todayEventCnt2 = eval("dayCnt_20130705");
+								
+								for(i=0; i<todayEventCnt2; i++){	
+									if(todayDt == "20130705"){
+									
+										document.write("<p><a id='eventTitle' onMouseOver=\"showEventCBanner('20130705',"+i+")\" href='"+ eval("arrDay_20130705")[i]['URL'] +"'>"+ eval("arrDay_20130705")[i]['TITLE'] +"</a><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_ing.gif' alt='진행중'></span></p>")
+									}else if(todayDt < "20130705"){
+										document.write("<p onMouseOver=\"showEventCBanner('20130705',"+i+")\"><span class='end'>"+ eval("arrDay_20130705")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_yet.gif' alt='오픈예정'></span></p>")
+									}else{
+										document.write("<p onMouseOver=\"showEventCBanner('20130705',"+i+")\"><span class='end'>"+ eval("arrDay_20130705")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_end.gif' alt='종료'></span></p>")
+									}
+								}
+								</script>
+								<div class="close">
+									<input type="image" onclick='hideCallayer(document.getElementById("pastSetDt").value, document.getElementById("pastCurDt").value);' src="http://image.gmarket.co.kr/main/2012/06/btn_cal_close2.gif" alt="닫기">
+								</div>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<p class="layBtm"></p>
+					<div class="layEdge"></div>
+				</div>
+			</li>
+
+
+
+			<li class='sat' id="Callayer_20130706"  >
+				<a href="#" onclick="showCallayer('20130706','2013-07-06','N');showEventCBanner('20130706',-1)">6</a>
+				<div class="layCal b7">
+					<div class="layCon">
+						<table>
+							<tr>
+								<td id="CallayerTd_20130706">
+								<script language="javascript">
+								var todayEventCnt2 = eval("dayCnt_20130706");
+								
+								for(i=0; i<todayEventCnt2; i++){	
+									if(todayDt == "20130706"){
+									
+										document.write("<p><a id='eventTitle' onMouseOver=\"showEventCBanner('20130706',"+i+")\" href='"+ eval("arrDay_20130706")[i]['URL'] +"'>"+ eval("arrDay_20130706")[i]['TITLE'] +"</a><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_ing.gif' alt='진행중'></span></p>")
+									}else if(todayDt < "20130706"){
+										document.write("<p onMouseOver=\"showEventCBanner('20130706',"+i+")\"><span class='end'>"+ eval("arrDay_20130706")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_yet.gif' alt='오픈예정'></span></p>")
+									}else{
+										document.write("<p onMouseOver=\"showEventCBanner('20130706',"+i+")\"><span class='end'>"+ eval("arrDay_20130706")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_end.gif' alt='종료'></span></p>")
+									}
+								}
+								</script>
+								<div class="close">
+									<input type="image" onclick='hideCallayer(document.getElementById("pastSetDt").value, document.getElementById("pastCurDt").value);' src="http://image.gmarket.co.kr/main/2012/06/btn_cal_close2.gif" alt="닫기">
+								</div>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<p class="layBtm"></p>
+					<div class="layEdge"></div>
+				</div>
+			</li>
+
+
+
+			<li id="Callayer_20130707"  class='sun' >
+				<a href="#" onclick="showCallayer('20130707','2013-07-07','N');showEventCBanner('20130707',-1)">7</a>
+				<div class="layCal b1">
+					<div class="layCon">
+						<table>
+							<tr>
+								<td id="CallayerTd_20130707">
+								<script language="javascript">
+								var todayEventCnt2 = eval("dayCnt_20130707");
+								
+								for(i=0; i<todayEventCnt2; i++){	
+									if(todayDt == "20130707"){
+									
+										document.write("<p><a id='eventTitle' onMouseOver=\"showEventCBanner('20130707',"+i+")\" href='"+ eval("arrDay_20130707")[i]['URL'] +"'>"+ eval("arrDay_20130707")[i]['TITLE'] +"</a><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_ing.gif' alt='진행중'></span></p>")
+									}else if(todayDt < "20130707"){
+										document.write("<p onMouseOver=\"showEventCBanner('20130707',"+i+")\"><span class='end'>"+ eval("arrDay_20130707")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_yet.gif' alt='오픈예정'></span></p>")
+									}else{
+										document.write("<p onMouseOver=\"showEventCBanner('20130707',"+i+")\"><span class='end'>"+ eval("arrDay_20130707")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_end.gif' alt='종료'></span></p>")
+									}
+								}
+								</script>
+								<div class="close">
+									<input type="image" onclick='hideCallayer(document.getElementById("pastSetDt").value, document.getElementById("pastCurDt").value);' src="http://image.gmarket.co.kr/main/2012/06/btn_cal_close2.gif" alt="닫기">
+								</div>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<p class="layBtm"></p>
+					<div class="layEdge"></div>
+				</div>
+			</li>
+
+
+
+			<li id="Callayer_20130708"  >
+				<a href="#" onclick="showCallayer('20130708','2013-07-08','N');showEventCBanner('20130708',-1)">8</a>
+				<div class="layCal b2">
+					<div class="layCon">
+						<table>
+							<tr>
+								<td id="CallayerTd_20130708">
+								<script language="javascript">
+								var todayEventCnt2 = eval("dayCnt_20130708");
+								
+								for(i=0; i<todayEventCnt2; i++){	
+									if(todayDt == "20130708"){
+									
+										document.write("<p><a id='eventTitle' onMouseOver=\"showEventCBanner('20130708',"+i+")\" href='"+ eval("arrDay_20130708")[i]['URL'] +"'>"+ eval("arrDay_20130708")[i]['TITLE'] +"</a><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_ing.gif' alt='진행중'></span></p>")
+									}else if(todayDt < "20130708"){
+										document.write("<p onMouseOver=\"showEventCBanner('20130708',"+i+")\"><span class='end'>"+ eval("arrDay_20130708")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_yet.gif' alt='오픈예정'></span></p>")
+									}else{
+										document.write("<p onMouseOver=\"showEventCBanner('20130708',"+i+")\"><span class='end'>"+ eval("arrDay_20130708")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_end.gif' alt='종료'></span></p>")
+									}
+								}
+								</script>
+								<div class="close">
+									<input type="image" onclick='hideCallayer(document.getElementById("pastSetDt").value, document.getElementById("pastCurDt").value);' src="http://image.gmarket.co.kr/main/2012/06/btn_cal_close2.gif" alt="닫기">
+								</div>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<p class="layBtm"></p>
+					<div class="layEdge"></div>
+				</div>
+			</li>
+
+
+
+			<li id="Callayer_20130709"  >
+				<a href="#" onclick="showCallayer('20130709','2013-07-09','N');showEventCBanner('20130709',-1)">9</a>
+				<div class="layCal b3">
+					<div class="layCon">
+						<table>
+							<tr>
+								<td id="CallayerTd_20130709">
+								<script language="javascript">
+								var todayEventCnt2 = eval("dayCnt_20130709");
+								
+								for(i=0; i<todayEventCnt2; i++){	
+									if(todayDt == "20130709"){
+									
+										document.write("<p><a id='eventTitle' onMouseOver=\"showEventCBanner('20130709',"+i+")\" href='"+ eval("arrDay_20130709")[i]['URL'] +"'>"+ eval("arrDay_20130709")[i]['TITLE'] +"</a><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_ing.gif' alt='진행중'></span></p>")
+									}else if(todayDt < "20130709"){
+										document.write("<p onMouseOver=\"showEventCBanner('20130709',"+i+")\"><span class='end'>"+ eval("arrDay_20130709")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_yet.gif' alt='오픈예정'></span></p>")
+									}else{
+										document.write("<p onMouseOver=\"showEventCBanner('20130709',"+i+")\"><span class='end'>"+ eval("arrDay_20130709")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_end.gif' alt='종료'></span></p>")
+									}
+								}
+								</script>
+								<div class="close">
+									<input type="image" onclick='hideCallayer(document.getElementById("pastSetDt").value, document.getElementById("pastCurDt").value);' src="http://image.gmarket.co.kr/main/2012/06/btn_cal_close2.gif" alt="닫기">
+								</div>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<p class="layBtm"></p>
+					<div class="layEdge"></div>
+				</div>
+			</li>
+
+
+
+			<li id="Callayer_20130710"  >
+				<a href="#" onclick="showCallayer('20130710','2013-07-10','N');showEventCBanner('20130710',-1)">10</a>
+				<div class="layCal b4">
+					<div class="layCon">
+						<table>
+							<tr>
+								<td id="CallayerTd_20130710">
+								<script language="javascript">
+								var todayEventCnt2 = eval("dayCnt_20130710");
+								
+								for(i=0; i<todayEventCnt2; i++){	
+									if(todayDt == "20130710"){
+									
+										document.write("<p><a id='eventTitle' onMouseOver=\"showEventCBanner('20130710',"+i+")\" href='"+ eval("arrDay_20130710")[i]['URL'] +"'>"+ eval("arrDay_20130710")[i]['TITLE'] +"</a><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_ing.gif' alt='진행중'></span></p>")
+									}else if(todayDt < "20130710"){
+										document.write("<p onMouseOver=\"showEventCBanner('20130710',"+i+")\"><span class='end'>"+ eval("arrDay_20130710")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_yet.gif' alt='오픈예정'></span></p>")
+									}else{
+										document.write("<p onMouseOver=\"showEventCBanner('20130710',"+i+")\"><span class='end'>"+ eval("arrDay_20130710")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_end.gif' alt='종료'></span></p>")
+									}
+								}
+								</script>
+								<div class="close">
+									<input type="image" onclick='hideCallayer(document.getElementById("pastSetDt").value, document.getElementById("pastCurDt").value);' src="http://image.gmarket.co.kr/main/2012/06/btn_cal_close2.gif" alt="닫기">
+								</div>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<p class="layBtm"></p>
+					<div class="layEdge"></div>
+				</div>
+			</li>
+
+
+
+			<li id="Callayer_20130711"  >
+				<a href="#" onclick="showCallayer('20130711','2013-07-11','N');showEventCBanner('20130711',-1)">11</a>
+				<div class="layCal b5">
+					<div class="layCon">
+						<table>
+							<tr>
+								<td id="CallayerTd_20130711">
+								<script language="javascript">
+								var todayEventCnt2 = eval("dayCnt_20130711");
+								
+								for(i=0; i<todayEventCnt2; i++){	
+									if(todayDt == "20130711"){
+									
+										document.write("<p><a id='eventTitle' onMouseOver=\"showEventCBanner('20130711',"+i+")\" href='"+ eval("arrDay_20130711")[i]['URL'] +"'>"+ eval("arrDay_20130711")[i]['TITLE'] +"</a><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_ing.gif' alt='진행중'></span></p>")
+									}else if(todayDt < "20130711"){
+										document.write("<p onMouseOver=\"showEventCBanner('20130711',"+i+")\"><span class='end'>"+ eval("arrDay_20130711")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_yet.gif' alt='오픈예정'></span></p>")
+									}else{
+										document.write("<p onMouseOver=\"showEventCBanner('20130711',"+i+")\"><span class='end'>"+ eval("arrDay_20130711")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_end.gif' alt='종료'></span></p>")
+									}
+								}
+								</script>
+								<div class="close">
+									<input type="image" onclick='hideCallayer(document.getElementById("pastSetDt").value, document.getElementById("pastCurDt").value);' src="http://image.gmarket.co.kr/main/2012/06/btn_cal_close2.gif" alt="닫기">
+								</div>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<p class="layBtm"></p>
+					<div class="layEdge"></div>
+				</div>
+			</li>
+
+
+
+			<li id="Callayer_20130712"  >
+				<a href="#" onclick="showCallayer('20130712','2013-07-12','N');showEventCBanner('20130712',-1)">12</a>
+				<div class="layCal b6">
+					<div class="layCon">
+						<table>
+							<tr>
+								<td id="CallayerTd_20130712">
+								<script language="javascript">
+								var todayEventCnt2 = eval("dayCnt_20130712");
+								
+								for(i=0; i<todayEventCnt2; i++){	
+									if(todayDt == "20130712"){
+									
+										document.write("<p><a id='eventTitle' onMouseOver=\"showEventCBanner('20130712',"+i+")\" href='"+ eval("arrDay_20130712")[i]['URL'] +"'>"+ eval("arrDay_20130712")[i]['TITLE'] +"</a><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_ing.gif' alt='진행중'></span></p>")
+									}else if(todayDt < "20130712"){
+										document.write("<p onMouseOver=\"showEventCBanner('20130712',"+i+")\"><span class='end'>"+ eval("arrDay_20130712")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_yet.gif' alt='오픈예정'></span></p>")
+									}else{
+										document.write("<p onMouseOver=\"showEventCBanner('20130712',"+i+")\"><span class='end'>"+ eval("arrDay_20130712")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_end.gif' alt='종료'></span></p>")
+									}
+								}
+								</script>
+								<div class="close">
+									<input type="image" onclick='hideCallayer(document.getElementById("pastSetDt").value, document.getElementById("pastCurDt").value);' src="http://image.gmarket.co.kr/main/2012/06/btn_cal_close2.gif" alt="닫기">
+								</div>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<p class="layBtm"></p>
+					<div class="layEdge"></div>
+				</div>
+			</li>
+
+
+
+			<li class='sat' id="Callayer_20130713"  >
+				<a href="#" onclick="showCallayer('20130713','2013-07-13','N');showEventCBanner('20130713',-1)">13</a>
+				<div class="layCal b7">
+					<div class="layCon">
+						<table>
+							<tr>
+								<td id="CallayerTd_20130713">
+								<script language="javascript">
+								var todayEventCnt2 = eval("dayCnt_20130713");
+								
+								for(i=0; i<todayEventCnt2; i++){	
+									if(todayDt == "20130713"){
+									
+										document.write("<p><a id='eventTitle' onMouseOver=\"showEventCBanner('20130713',"+i+")\" href='"+ eval("arrDay_20130713")[i]['URL'] +"'>"+ eval("arrDay_20130713")[i]['TITLE'] +"</a><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_ing.gif' alt='진행중'></span></p>")
+									}else if(todayDt < "20130713"){
+										document.write("<p onMouseOver=\"showEventCBanner('20130713',"+i+")\"><span class='end'>"+ eval("arrDay_20130713")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_yet.gif' alt='오픈예정'></span></p>")
+									}else{
+										document.write("<p onMouseOver=\"showEventCBanner('20130713',"+i+")\"><span class='end'>"+ eval("arrDay_20130713")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_end.gif' alt='종료'></span></p>")
+									}
+								}
+								</script>
+								<div class="close">
+									<input type="image" onclick='hideCallayer(document.getElementById("pastSetDt").value, document.getElementById("pastCurDt").value);' src="http://image.gmarket.co.kr/main/2012/06/btn_cal_close2.gif" alt="닫기">
+								</div>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<p class="layBtm"></p>
+					<div class="layEdge"></div>
+				</div>
+			</li>
+
+
+
+			<li id="Callayer_20130714"  class='sun' >
+				<a href="#" onclick="showCallayer('20130714','2013-07-14','N');showEventCBanner('20130714',-1)">14</a>
+				<div class="layCal b1">
+					<div class="layCon">
+						<table>
+							<tr>
+								<td id="CallayerTd_20130714">
+								<script language="javascript">
+								var todayEventCnt2 = eval("dayCnt_20130714");
+								
+								for(i=0; i<todayEventCnt2; i++){	
+									if(todayDt == "20130714"){
+									
+										document.write("<p><a id='eventTitle' onMouseOver=\"showEventCBanner('20130714',"+i+")\" href='"+ eval("arrDay_20130714")[i]['URL'] +"'>"+ eval("arrDay_20130714")[i]['TITLE'] +"</a><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_ing.gif' alt='진행중'></span></p>")
+									}else if(todayDt < "20130714"){
+										document.write("<p onMouseOver=\"showEventCBanner('20130714',"+i+")\"><span class='end'>"+ eval("arrDay_20130714")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_yet.gif' alt='오픈예정'></span></p>")
+									}else{
+										document.write("<p onMouseOver=\"showEventCBanner('20130714',"+i+")\"><span class='end'>"+ eval("arrDay_20130714")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_end.gif' alt='종료'></span></p>")
+									}
+								}
+								</script>
+								<div class="close">
+									<input type="image" onclick='hideCallayer(document.getElementById("pastSetDt").value, document.getElementById("pastCurDt").value);' src="http://image.gmarket.co.kr/main/2012/06/btn_cal_close2.gif" alt="닫기">
+								</div>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<p class="layBtm"></p>
+					<div class="layEdge"></div>
+				</div>
+			</li>
+
+
+
+			<li id="Callayer_20130715"  >
+				<a href="#" onclick="showCallayer('20130715','2013-07-15','N');showEventCBanner('20130715',-1)">15</a>
+				<div class="layCal b2">
+					<div class="layCon">
+						<table>
+							<tr>
+								<td id="CallayerTd_20130715">
+								<script language="javascript">
+								var todayEventCnt2 = eval("dayCnt_20130715");
+								
+								for(i=0; i<todayEventCnt2; i++){	
+									if(todayDt == "20130715"){
+									
+										document.write("<p><a id='eventTitle' onMouseOver=\"showEventCBanner('20130715',"+i+")\" href='"+ eval("arrDay_20130715")[i]['URL'] +"'>"+ eval("arrDay_20130715")[i]['TITLE'] +"</a><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_ing.gif' alt='진행중'></span></p>")
+									}else if(todayDt < "20130715"){
+										document.write("<p onMouseOver=\"showEventCBanner('20130715',"+i+")\"><span class='end'>"+ eval("arrDay_20130715")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_yet.gif' alt='오픈예정'></span></p>")
+									}else{
+										document.write("<p onMouseOver=\"showEventCBanner('20130715',"+i+")\"><span class='end'>"+ eval("arrDay_20130715")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_end.gif' alt='종료'></span></p>")
+									}
+								}
+								</script>
+								<div class="close">
+									<input type="image" onclick='hideCallayer(document.getElementById("pastSetDt").value, document.getElementById("pastCurDt").value);' src="http://image.gmarket.co.kr/main/2012/06/btn_cal_close2.gif" alt="닫기">
+								</div>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<p class="layBtm"></p>
+					<div class="layEdge"></div>
+				</div>
+			</li>
+
+
+
+			<li id="Callayer_20130716"  >
+				<a href="#" onclick="showCallayer('20130716','2013-07-16','N');showEventCBanner('20130716',-1)">16</a>
+				<div class="layCal b3">
+					<div class="layCon">
+						<table>
+							<tr>
+								<td id="CallayerTd_20130716">
+								<script language="javascript">
+								var todayEventCnt2 = eval("dayCnt_20130716");
+								
+								for(i=0; i<todayEventCnt2; i++){	
+									if(todayDt == "20130716"){
+									
+										document.write("<p><a id='eventTitle' onMouseOver=\"showEventCBanner('20130716',"+i+")\" href='"+ eval("arrDay_20130716")[i]['URL'] +"'>"+ eval("arrDay_20130716")[i]['TITLE'] +"</a><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_ing.gif' alt='진행중'></span></p>")
+									}else if(todayDt < "20130716"){
+										document.write("<p onMouseOver=\"showEventCBanner('20130716',"+i+")\"><span class='end'>"+ eval("arrDay_20130716")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_yet.gif' alt='오픈예정'></span></p>")
+									}else{
+										document.write("<p onMouseOver=\"showEventCBanner('20130716',"+i+")\"><span class='end'>"+ eval("arrDay_20130716")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_end.gif' alt='종료'></span></p>")
+									}
+								}
+								</script>
+								<div class="close">
+									<input type="image" onclick='hideCallayer(document.getElementById("pastSetDt").value, document.getElementById("pastCurDt").value);' src="http://image.gmarket.co.kr/main/2012/06/btn_cal_close2.gif" alt="닫기">
+								</div>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<p class="layBtm"></p>
+					<div class="layEdge"></div>
+				</div>
+			</li>
+
+
+
+			<li id="Callayer_20130717"  >
+				<a href="#" onclick="showCallayer('20130717','2013-07-17','N');showEventCBanner('20130717',-1)">17</a>
+				<div class="layCal b4">
+					<div class="layCon">
+						<table>
+							<tr>
+								<td id="CallayerTd_20130717">
+								<script language="javascript">
+								var todayEventCnt2 = eval("dayCnt_20130717");
+								
+								for(i=0; i<todayEventCnt2; i++){	
+									if(todayDt == "20130717"){
+									
+										document.write("<p><a id='eventTitle' onMouseOver=\"showEventCBanner('20130717',"+i+")\" href='"+ eval("arrDay_20130717")[i]['URL'] +"'>"+ eval("arrDay_20130717")[i]['TITLE'] +"</a><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_ing.gif' alt='진행중'></span></p>")
+									}else if(todayDt < "20130717"){
+										document.write("<p onMouseOver=\"showEventCBanner('20130717',"+i+")\"><span class='end'>"+ eval("arrDay_20130717")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_yet.gif' alt='오픈예정'></span></p>")
+									}else{
+										document.write("<p onMouseOver=\"showEventCBanner('20130717',"+i+")\"><span class='end'>"+ eval("arrDay_20130717")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_end.gif' alt='종료'></span></p>")
+									}
+								}
+								</script>
+								<div class="close">
+									<input type="image" onclick='hideCallayer(document.getElementById("pastSetDt").value, document.getElementById("pastCurDt").value);' src="http://image.gmarket.co.kr/main/2012/06/btn_cal_close2.gif" alt="닫기">
+								</div>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<p class="layBtm"></p>
+					<div class="layEdge"></div>
+				</div>
+			</li>
+
+
+
+			<li id="Callayer_20130718"  >
+				<a href="#" onclick="showCallayer('20130718','2013-07-18','N');showEventCBanner('20130718',-1)">18</a>
+				<div class="layCal b5">
+					<div class="layCon">
+						<table>
+							<tr>
+								<td id="CallayerTd_20130718">
+								<script language="javascript">
+								var todayEventCnt2 = eval("dayCnt_20130718");
+								
+								for(i=0; i<todayEventCnt2; i++){	
+									if(todayDt == "20130718"){
+									
+										document.write("<p><a id='eventTitle' onMouseOver=\"showEventCBanner('20130718',"+i+")\" href='"+ eval("arrDay_20130718")[i]['URL'] +"'>"+ eval("arrDay_20130718")[i]['TITLE'] +"</a><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_ing.gif' alt='진행중'></span></p>")
+									}else if(todayDt < "20130718"){
+										document.write("<p onMouseOver=\"showEventCBanner('20130718',"+i+")\"><span class='end'>"+ eval("arrDay_20130718")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_yet.gif' alt='오픈예정'></span></p>")
+									}else{
+										document.write("<p onMouseOver=\"showEventCBanner('20130718',"+i+")\"><span class='end'>"+ eval("arrDay_20130718")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_end.gif' alt='종료'></span></p>")
+									}
+								}
+								</script>
+								<div class="close">
+									<input type="image" onclick='hideCallayer(document.getElementById("pastSetDt").value, document.getElementById("pastCurDt").value);' src="http://image.gmarket.co.kr/main/2012/06/btn_cal_close2.gif" alt="닫기">
+								</div>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<p class="layBtm"></p>
+					<div class="layEdge"></div>
+				</div>
+			</li>
+
+
+
+			<li id="Callayer_20130719"  >
+				<a href="#" onclick="showCallayer('20130719','2013-07-19','N');showEventCBanner('20130719',-1)">19</a>
+				<div class="layCal b6">
+					<div class="layCon">
+						<table>
+							<tr>
+								<td id="CallayerTd_20130719">
+								<script language="javascript">
+								var todayEventCnt2 = eval("dayCnt_20130719");
+								
+								for(i=0; i<todayEventCnt2; i++){	
+									if(todayDt == "20130719"){
+									
+										document.write("<p><a id='eventTitle' onMouseOver=\"showEventCBanner('20130719',"+i+")\" href='"+ eval("arrDay_20130719")[i]['URL'] +"'>"+ eval("arrDay_20130719")[i]['TITLE'] +"</a><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_ing.gif' alt='진행중'></span></p>")
+									}else if(todayDt < "20130719"){
+										document.write("<p onMouseOver=\"showEventCBanner('20130719',"+i+")\"><span class='end'>"+ eval("arrDay_20130719")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_yet.gif' alt='오픈예정'></span></p>")
+									}else{
+										document.write("<p onMouseOver=\"showEventCBanner('20130719',"+i+")\"><span class='end'>"+ eval("arrDay_20130719")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_end.gif' alt='종료'></span></p>")
+									}
+								}
+								</script>
+								<div class="close">
+									<input type="image" onclick='hideCallayer(document.getElementById("pastSetDt").value, document.getElementById("pastCurDt").value);' src="http://image.gmarket.co.kr/main/2012/06/btn_cal_close2.gif" alt="닫기">
+								</div>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<p class="layBtm"></p>
+					<div class="layEdge"></div>
+				</div>
+			</li>
+
+
+
+			<li class='sat' id="Callayer_20130720"  >
+				<a href="#" onclick="showCallayer('20130720','2013-07-20','N');showEventCBanner('20130720',-1)">20</a>
+				<div class="layCal b7">
+					<div class="layCon">
+						<table>
+							<tr>
+								<td id="CallayerTd_20130720">
+								<script language="javascript">
+								var todayEventCnt2 = eval("dayCnt_20130720");
+								
+								for(i=0; i<todayEventCnt2; i++){	
+									if(todayDt == "20130720"){
+									
+										document.write("<p><a id='eventTitle' onMouseOver=\"showEventCBanner('20130720',"+i+")\" href='"+ eval("arrDay_20130720")[i]['URL'] +"'>"+ eval("arrDay_20130720")[i]['TITLE'] +"</a><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_ing.gif' alt='진행중'></span></p>")
+									}else if(todayDt < "20130720"){
+										document.write("<p onMouseOver=\"showEventCBanner('20130720',"+i+")\"><span class='end'>"+ eval("arrDay_20130720")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_yet.gif' alt='오픈예정'></span></p>")
+									}else{
+										document.write("<p onMouseOver=\"showEventCBanner('20130720',"+i+")\"><span class='end'>"+ eval("arrDay_20130720")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_end.gif' alt='종료'></span></p>")
+									}
+								}
+								</script>
+								<div class="close">
+									<input type="image" onclick='hideCallayer(document.getElementById("pastSetDt").value, document.getElementById("pastCurDt").value);' src="http://image.gmarket.co.kr/main/2012/06/btn_cal_close2.gif" alt="닫기">
+								</div>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<p class="layBtm"></p>
+					<div class="layEdge"></div>
+				</div>
+			</li>
+
+
+
+			<li id="Callayer_20130721"  class='sun' >
+				<a href="#" onclick="showCallayer('20130721','2013-07-21','N');showEventCBanner('20130721',-1)">21</a>
+				<div class="layCal b1">
+					<div class="layCon">
+						<table>
+							<tr>
+								<td id="CallayerTd_20130721">
+								<script language="javascript">
+								var todayEventCnt2 = eval("dayCnt_20130721");
+								
+								for(i=0; i<todayEventCnt2; i++){	
+									if(todayDt == "20130721"){
+									
+										document.write("<p><a id='eventTitle' onMouseOver=\"showEventCBanner('20130721',"+i+")\" href='"+ eval("arrDay_20130721")[i]['URL'] +"'>"+ eval("arrDay_20130721")[i]['TITLE'] +"</a><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_ing.gif' alt='진행중'></span></p>")
+									}else if(todayDt < "20130721"){
+										document.write("<p onMouseOver=\"showEventCBanner('20130721',"+i+")\"><span class='end'>"+ eval("arrDay_20130721")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_yet.gif' alt='오픈예정'></span></p>")
+									}else{
+										document.write("<p onMouseOver=\"showEventCBanner('20130721',"+i+")\"><span class='end'>"+ eval("arrDay_20130721")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_end.gif' alt='종료'></span></p>")
+									}
+								}
+								</script>
+								<div class="close">
+									<input type="image" onclick='hideCallayer(document.getElementById("pastSetDt").value, document.getElementById("pastCurDt").value);' src="http://image.gmarket.co.kr/main/2012/06/btn_cal_close2.gif" alt="닫기">
+								</div>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<p class="layBtm"></p>
+					<div class="layEdge"></div>
+				</div>
+			</li>
+
+
+
+			<li id="Callayer_20130722"  >
+				<a href="#" onclick="showCallayer('20130722','2013-07-22','N');showEventCBanner('20130722',-1)">22</a>
+				<div class="layCal b2">
+					<div class="layCon">
+						<table>
+							<tr>
+								<td id="CallayerTd_20130722">
+								<script language="javascript">
+								var todayEventCnt2 = eval("dayCnt_20130722");
+								
+								for(i=0; i<todayEventCnt2; i++){	
+									if(todayDt == "20130722"){
+									
+										document.write("<p><a id='eventTitle' onMouseOver=\"showEventCBanner('20130722',"+i+")\" href='"+ eval("arrDay_20130722")[i]['URL'] +"'>"+ eval("arrDay_20130722")[i]['TITLE'] +"</a><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_ing.gif' alt='진행중'></span></p>")
+									}else if(todayDt < "20130722"){
+										document.write("<p onMouseOver=\"showEventCBanner('20130722',"+i+")\"><span class='end'>"+ eval("arrDay_20130722")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_yet.gif' alt='오픈예정'></span></p>")
+									}else{
+										document.write("<p onMouseOver=\"showEventCBanner('20130722',"+i+")\"><span class='end'>"+ eval("arrDay_20130722")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_end.gif' alt='종료'></span></p>")
+									}
+								}
+								</script>
+								<div class="close">
+									<input type="image" onclick='hideCallayer(document.getElementById("pastSetDt").value, document.getElementById("pastCurDt").value);' src="http://image.gmarket.co.kr/main/2012/06/btn_cal_close2.gif" alt="닫기">
+								</div>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<p class="layBtm"></p>
+					<div class="layEdge"></div>
+				</div>
+			</li>
+
+
+
+			<li id="Callayer_20130723"  >
+				<a href="#" onclick="showCallayer('20130723','2013-07-23','N');showEventCBanner('20130723',-1)">23</a>
+				<div class="layCal b3">
+					<div class="layCon">
+						<table>
+							<tr>
+								<td id="CallayerTd_20130723">
+								<script language="javascript">
+								var todayEventCnt2 = eval("dayCnt_20130723");
+								
+								for(i=0; i<todayEventCnt2; i++){	
+									if(todayDt == "20130723"){
+									
+										document.write("<p><a id='eventTitle' onMouseOver=\"showEventCBanner('20130723',"+i+")\" href='"+ eval("arrDay_20130723")[i]['URL'] +"'>"+ eval("arrDay_20130723")[i]['TITLE'] +"</a><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_ing.gif' alt='진행중'></span></p>")
+									}else if(todayDt < "20130723"){
+										document.write("<p onMouseOver=\"showEventCBanner('20130723',"+i+")\"><span class='end'>"+ eval("arrDay_20130723")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_yet.gif' alt='오픈예정'></span></p>")
+									}else{
+										document.write("<p onMouseOver=\"showEventCBanner('20130723',"+i+")\"><span class='end'>"+ eval("arrDay_20130723")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_end.gif' alt='종료'></span></p>")
+									}
+								}
+								</script>
+								<div class="close">
+									<input type="image" onclick='hideCallayer(document.getElementById("pastSetDt").value, document.getElementById("pastCurDt").value);' src="http://image.gmarket.co.kr/main/2012/06/btn_cal_close2.gif" alt="닫기">
+								</div>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<p class="layBtm"></p>
+					<div class="layEdge"></div>
+				</div>
+			</li>
+
+
+
+			<li id="Callayer_20130724"  >
+				<a href="#" onclick="showCallayer('20130724','2013-07-24','N');showEventCBanner('20130724',-1)">24</a>
+				<div class="layCal b4">
+					<div class="layCon">
+						<table>
+							<tr>
+								<td id="CallayerTd_20130724">
+								<script language="javascript">
+								var todayEventCnt2 = eval("dayCnt_20130724");
+								
+								for(i=0; i<todayEventCnt2; i++){	
+									if(todayDt == "20130724"){
+									
+										document.write("<p><a id='eventTitle' onMouseOver=\"showEventCBanner('20130724',"+i+")\" href='"+ eval("arrDay_20130724")[i]['URL'] +"'>"+ eval("arrDay_20130724")[i]['TITLE'] +"</a><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_ing.gif' alt='진행중'></span></p>")
+									}else if(todayDt < "20130724"){
+										document.write("<p onMouseOver=\"showEventCBanner('20130724',"+i+")\"><span class='end'>"+ eval("arrDay_20130724")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_yet.gif' alt='오픈예정'></span></p>")
+									}else{
+										document.write("<p onMouseOver=\"showEventCBanner('20130724',"+i+")\"><span class='end'>"+ eval("arrDay_20130724")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_end.gif' alt='종료'></span></p>")
+									}
+								}
+								</script>
+								<div class="close">
+									<input type="image" onclick='hideCallayer(document.getElementById("pastSetDt").value, document.getElementById("pastCurDt").value);' src="http://image.gmarket.co.kr/main/2012/06/btn_cal_close2.gif" alt="닫기">
+								</div>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<p class="layBtm"></p>
+					<div class="layEdge"></div>
+				</div>
+			</li>
+
+
+
+			<li id="Callayer_20130725"  >
+				<a href="#" onclick="showCallayer('20130725','2013-07-25','N');showEventCBanner('20130725',-1)">25</a>
+				<div class="layCal b5">
+					<div class="layCon">
+						<table>
+							<tr>
+								<td id="CallayerTd_20130725">
+								<script language="javascript">
+								var todayEventCnt2 = eval("dayCnt_20130725");
+								
+								for(i=0; i<todayEventCnt2; i++){	
+									if(todayDt == "20130725"){
+									
+										document.write("<p><a id='eventTitle' onMouseOver=\"showEventCBanner('20130725',"+i+")\" href='"+ eval("arrDay_20130725")[i]['URL'] +"'>"+ eval("arrDay_20130725")[i]['TITLE'] +"</a><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_ing.gif' alt='진행중'></span></p>")
+									}else if(todayDt < "20130725"){
+										document.write("<p onMouseOver=\"showEventCBanner('20130725',"+i+")\"><span class='end'>"+ eval("arrDay_20130725")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_yet.gif' alt='오픈예정'></span></p>")
+									}else{
+										document.write("<p onMouseOver=\"showEventCBanner('20130725',"+i+")\"><span class='end'>"+ eval("arrDay_20130725")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_end.gif' alt='종료'></span></p>")
+									}
+								}
+								</script>
+								<div class="close">
+									<input type="image" onclick='hideCallayer(document.getElementById("pastSetDt").value, document.getElementById("pastCurDt").value);' src="http://image.gmarket.co.kr/main/2012/06/btn_cal_close2.gif" alt="닫기">
+								</div>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<p class="layBtm"></p>
+					<div class="layEdge"></div>
+				</div>
+			</li>
+
+
+
+			<li id="Callayer_20130726"  >
+				<a href="#" onclick="showCallayer('20130726','2013-07-26','N');showEventCBanner('20130726',-1)">26</a>
+				<div class="layCal b6">
+					<div class="layCon">
+						<table>
+							<tr>
+								<td id="CallayerTd_20130726">
+								<script language="javascript">
+								var todayEventCnt2 = eval("dayCnt_20130726");
+								
+								for(i=0; i<todayEventCnt2; i++){	
+									if(todayDt == "20130726"){
+									
+										document.write("<p><a id='eventTitle' onMouseOver=\"showEventCBanner('20130726',"+i+")\" href='"+ eval("arrDay_20130726")[i]['URL'] +"'>"+ eval("arrDay_20130726")[i]['TITLE'] +"</a><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_ing.gif' alt='진행중'></span></p>")
+									}else if(todayDt < "20130726"){
+										document.write("<p onMouseOver=\"showEventCBanner('20130726',"+i+")\"><span class='end'>"+ eval("arrDay_20130726")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_yet.gif' alt='오픈예정'></span></p>")
+									}else{
+										document.write("<p onMouseOver=\"showEventCBanner('20130726',"+i+")\"><span class='end'>"+ eval("arrDay_20130726")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_end.gif' alt='종료'></span></p>")
+									}
+								}
+								</script>
+								<div class="close">
+									<input type="image" onclick='hideCallayer(document.getElementById("pastSetDt").value, document.getElementById("pastCurDt").value);' src="http://image.gmarket.co.kr/main/2012/06/btn_cal_close2.gif" alt="닫기">
+								</div>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<p class="layBtm"></p>
+					<div class="layEdge"></div>
+				</div>
+			</li>
+
+
+
+			<li class='sat' id="Callayer_20130727"  >
+				<a href="#" onclick="showCallayer('20130727','2013-07-27','N');showEventCBanner('20130727',-1)">27</a>
+				<div class="layCal b7">
+					<div class="layCon">
+						<table>
+							<tr>
+								<td id="CallayerTd_20130727">
+								<script language="javascript">
+								var todayEventCnt2 = eval("dayCnt_20130727");
+								
+								for(i=0; i<todayEventCnt2; i++){	
+									if(todayDt == "20130727"){
+									
+										document.write("<p><a id='eventTitle' onMouseOver=\"showEventCBanner('20130727',"+i+")\" href='"+ eval("arrDay_20130727")[i]['URL'] +"'>"+ eval("arrDay_20130727")[i]['TITLE'] +"</a><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_ing.gif' alt='진행중'></span></p>")
+									}else if(todayDt < "20130727"){
+										document.write("<p onMouseOver=\"showEventCBanner('20130727',"+i+")\"><span class='end'>"+ eval("arrDay_20130727")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_yet.gif' alt='오픈예정'></span></p>")
+									}else{
+										document.write("<p onMouseOver=\"showEventCBanner('20130727',"+i+")\"><span class='end'>"+ eval("arrDay_20130727")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_end.gif' alt='종료'></span></p>")
+									}
+								}
+								</script>
+								<div class="close">
+									<input type="image" onclick='hideCallayer(document.getElementById("pastSetDt").value, document.getElementById("pastCurDt").value);' src="http://image.gmarket.co.kr/main/2012/06/btn_cal_close2.gif" alt="닫기">
+								</div>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<p class="layBtm"></p>
+					<div class="layEdge"></div>
+				</div>
+			</li>
+
+
+
+			<li id="Callayer_20130728"  class='sun' >
+				<a href="#" onclick="showCallayer('20130728','2013-07-28','N');showEventCBanner('20130728',-1)">28</a>
+				<div class="layCal b1">
+					<div class="layCon">
+						<table>
+							<tr>
+								<td id="CallayerTd_20130728">
+								<script language="javascript">
+								var todayEventCnt2 = eval("dayCnt_20130728");
+								
+								for(i=0; i<todayEventCnt2; i++){	
+									if(todayDt == "20130728"){
+									
+										document.write("<p><a id='eventTitle' onMouseOver=\"showEventCBanner('20130728',"+i+")\" href='"+ eval("arrDay_20130728")[i]['URL'] +"'>"+ eval("arrDay_20130728")[i]['TITLE'] +"</a><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_ing.gif' alt='진행중'></span></p>")
+									}else if(todayDt < "20130728"){
+										document.write("<p onMouseOver=\"showEventCBanner('20130728',"+i+")\"><span class='end'>"+ eval("arrDay_20130728")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_yet.gif' alt='오픈예정'></span></p>")
+									}else{
+										document.write("<p onMouseOver=\"showEventCBanner('20130728',"+i+")\"><span class='end'>"+ eval("arrDay_20130728")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_end.gif' alt='종료'></span></p>")
+									}
+								}
+								</script>
+								<div class="close">
+									<input type="image" onclick='hideCallayer(document.getElementById("pastSetDt").value, document.getElementById("pastCurDt").value);' src="http://image.gmarket.co.kr/main/2012/06/btn_cal_close2.gif" alt="닫기">
+								</div>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<p class="layBtm"></p>
+					<div class="layEdge"></div>
+				</div>
+			</li>
+
+
+
+			<li id="Callayer_20130729"  >
+				<a href="#" onclick="showCallayer('20130729','2013-07-29','N');showEventCBanner('20130729',-1)">29</a>
+				<div class="layCal b2">
+					<div class="layCon">
+						<table>
+							<tr>
+								<td id="CallayerTd_20130729">
+								<script language="javascript">
+								var todayEventCnt2 = eval("dayCnt_20130729");
+								
+								for(i=0; i<todayEventCnt2; i++){	
+									if(todayDt == "20130729"){
+									
+										document.write("<p><a id='eventTitle' onMouseOver=\"showEventCBanner('20130729',"+i+")\" href='"+ eval("arrDay_20130729")[i]['URL'] +"'>"+ eval("arrDay_20130729")[i]['TITLE'] +"</a><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_ing.gif' alt='진행중'></span></p>")
+									}else if(todayDt < "20130729"){
+										document.write("<p onMouseOver=\"showEventCBanner('20130729',"+i+")\"><span class='end'>"+ eval("arrDay_20130729")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_yet.gif' alt='오픈예정'></span></p>")
+									}else{
+										document.write("<p onMouseOver=\"showEventCBanner('20130729',"+i+")\"><span class='end'>"+ eval("arrDay_20130729")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_end.gif' alt='종료'></span></p>")
+									}
+								}
+								</script>
+								<div class="close">
+									<input type="image" onclick='hideCallayer(document.getElementById("pastSetDt").value, document.getElementById("pastCurDt").value);' src="http://image.gmarket.co.kr/main/2012/06/btn_cal_close2.gif" alt="닫기">
+								</div>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<p class="layBtm"></p>
+					<div class="layEdge"></div>
+				</div>
+			</li>
+
+
+
+			<li id="Callayer_20130730"  >
+				<a href="#" onclick="showCallayer('20130730','2013-07-30','N');showEventCBanner('20130730',-1)">30</a>
+				<div class="layCal b3">
+					<div class="layCon">
+						<table>
+							<tr>
+								<td id="CallayerTd_20130730">
+								<script language="javascript">
+								var todayEventCnt2 = eval("dayCnt_20130730");
+								
+								for(i=0; i<todayEventCnt2; i++){	
+									if(todayDt == "20130730"){
+									
+										document.write("<p><a id='eventTitle' onMouseOver=\"showEventCBanner('20130730',"+i+")\" href='"+ eval("arrDay_20130730")[i]['URL'] +"'>"+ eval("arrDay_20130730")[i]['TITLE'] +"</a><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_ing.gif' alt='진행중'></span></p>")
+									}else if(todayDt < "20130730"){
+										document.write("<p onMouseOver=\"showEventCBanner('20130730',"+i+")\"><span class='end'>"+ eval("arrDay_20130730")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_yet.gif' alt='오픈예정'></span></p>")
+									}else{
+										document.write("<p onMouseOver=\"showEventCBanner('20130730',"+i+")\"><span class='end'>"+ eval("arrDay_20130730")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_end.gif' alt='종료'></span></p>")
+									}
+								}
+								</script>
+								<div class="close">
+									<input type="image" onclick='hideCallayer(document.getElementById("pastSetDt").value, document.getElementById("pastCurDt").value);' src="http://image.gmarket.co.kr/main/2012/06/btn_cal_close2.gif" alt="닫기">
+								</div>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<p class="layBtm"></p>
+					<div class="layEdge"></div>
+				</div>
+			</li>
+
+
+
+			<li id="Callayer_20130731"  >
+				<a href="#" onclick="showCallayer('20130731','2013-07-31','N');showEventCBanner('20130731',-1)">31</a>
+				<div class="layCal b4">
+					<div class="layCon">
+						<table>
+							<tr>
+								<td id="CallayerTd_20130731">
+								<script language="javascript">
+								var todayEventCnt2 = eval("dayCnt_20130731");
+								
+								for(i=0; i<todayEventCnt2; i++){	
+									if(todayDt == "20130731"){
+									
+										document.write("<p><a id='eventTitle' onMouseOver=\"showEventCBanner('20130731',"+i+")\" href='"+ eval("arrDay_20130731")[i]['URL'] +"'>"+ eval("arrDay_20130731")[i]['TITLE'] +"</a><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_ing.gif' alt='진행중'></span></p>")
+									}else if(todayDt < "20130731"){
+										document.write("<p onMouseOver=\"showEventCBanner('20130731',"+i+")\"><span class='end'>"+ eval("arrDay_20130731")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_yet.gif' alt='오픈예정'></span></p>")
+									}else{
+										document.write("<p onMouseOver=\"showEventCBanner('20130731',"+i+")\"><span class='end'>"+ eval("arrDay_20130731")[i]['TITLE'] +"</span><span><img src='http://image.gmarket.co.kr/main/2012/06/ico_end.gif' alt='종료'></span></p>")
+									}
+								}
+								</script>
+								<div class="close">
+									<input type="image" onclick='hideCallayer(document.getElementById("pastSetDt").value, document.getElementById("pastCurDt").value);' src="http://image.gmarket.co.kr/main/2012/06/btn_cal_close2.gif" alt="닫기">
+								</div>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<p class="layBtm"></p>
+					<div class="layEdge"></div>
+				</div>
+			</li>
+
+
+			<li class="sun">
+				<a href="#"></a>
+			</li>
+
+			<li class="sun">
+				<a href="#"></a>
+			</li>
+
+			<li class="sun">
+				<a href="#"></a>
+			</li>
+
+
+		</ol>
+		<p class="bnr" id="eventBannerImg"></p>
+	</div>
+	<span class="close"><a href="javascript:openTodayEvent();"><img src="http://image.gmarket.co.kr/main/2012/04/09/btn_cal_close.gif" alt="닫기"></a></span>
+</div>
+						</div>
+						<div class="oteuk">
+							<h3 id="TodaySpecialTitle" class="sprite_title"><a href="http://promotion.gmarket.co.kr/eventzone/Today.asp"><span>오늘만 특가</span></a></h3>
+							<div class="page">
+								<span class="num">
+								<em></em>/<span></span>
+								</span>
+								<a href="javascript:ShowTodaySpecialPrice(-1);" class="prev">이전</a><a href="javascript:ShowTodaySpecialPrice(1);" class="next">다음</a>
+							</div>
+							<div class="bnr" id="TodaySpecialPrice"></div>
+						</div>
+					</div>
+
+				</div>
+				<!-- //1.section : 카테고리/이벤트/오늘만특가 -->
+
+				<!-- 2.section : 서비스/베스트/광고  -->
+				<div class="section">					
+					<!--신규 서비스-->
+					<div class="service">
+						<h3 class="sprite_title"><span>G마켓 서비스</span></h3>
+						<ul>
+							<li class="first"><a id="aNewService0" href=""><span id="spNewServiceText0"></span></a></li>
+							<li><a id="aNewService1" href=""><span id="spNewServiceText1"></span></a></li>
+							<li><a id="aNewService2" href=""><span id="spNewServiceText2"></span></a></li>
+							<li><a id="aNewService3" href=""><span id="spNewServiceText3"></span></a></li>
+							<li><a id="aNewService4" href=""><span id="spNewServiceText4"></span></a></li>
+							<li class="last"><a id="aNewService5" href=""><span id="spNewServiceText5"></span></a></li>
+						</ul>
+						<a href="javascript:GoSNAChannel('CHM1A003', 'http://www.gmarket.co.kr/AllService.asp','_blank');" class="btnAll" title="[새창]">전체보기</a>
+					</div>
+					<!-- 베스트 셀러-->
+					<div class="best">
+						<h3 class="sprite_title"><a href="javascript:GoSNAChannel('CHM1G001','http://promotion.gmarket.co.kr/bestseller/BestSeller.asp');"><span class="label">GMARKET BEST</span></a></h3>
+						<div class="best_tab">
+							<ul>
+								<li class="fir"><a id="tabIdAll" href="javascript:GoSNAChannel('CHM1G002','http://promotion.gmarket.co.kr/bestseller/BestSeller.asp');" class="on" onmouseover="ShowBestSeller('All',0);stopBestSellerRoll();">전체</a></li>
+								<li id="bestTab0"></li><li id="bestTab1"></li><li id="bestTab2"></li><li id="bestTab3"></li><li id="bestTab4"></li>
+							</ul>
+							<div class="page">
+								<a href="javascript:showBestSellerTab(-1);stopBestSellerRoll();" class="prev">이전</a><a href="javascript:showBestSellerTab(1);;stopBestSellerRoll();" class="next">다음</a>
+							</div>
+						</div>
+						<div class="best_cont">
+							<div class="rolling" id="scroller">
+								<span id="prev"><a href="javascript:ShowBestSeller('',-1);;stopBestSellerRoll();">이전</a></span>
+								<div class="rollingBox" onmouseover="+stopBestSellerRoll();">
+									<ul id="rollingFrame">
+									</ul>
+								</div>
+								<span id="next"><a href="javascript:ShowBestSeller('',1);;stopBestSellerRoll();">다음</a></span>
+							</div>
+
+
+						</div>
+					</div>
+
+					<!-- ad :  : 3차 수정 -->
+					<div class="ad">
+						<div id="markettingBanner" style="display:none;">
+							<a href=""><img alt="" ></a>
+							<div class="c-btn" id="markettingBtn"></div>
+							<div class="o-btn">
+								<a href="about:blank;"><img src="http://image.gmarket.co.kr/main/2012/04/09/btn_ad_open.png" alt="" class="png24"></a>
+							</div>
+						</div>
+						<div class="ad-b" id="markettingExtend" style="display:none;"><!-- 혜택배너 : 확장형 -->
+							<div id="markettingExtendHtml"></div>
+							<div id="markettingExtendBanner"><a><img></a></div>
+							<span class="close"><img src="http://image.gmarket.co.kr/main/2012/04/09/btn_ad_close2.png" class="png24" alt="닫기" onclick="showHideLayer('#markettingExtend')"></span>
+						</div>
+					</div>
+					<!-- //ad :  : 3차 수정 -->
+
+				</div>
+				<!-- //2.section : 서비스/베스트/광고 -->
+
+				<!-- 3.section : 광고/패션샵/포커스아이템 -->
+				<div class="section">
+
+					<div class="mod-ad" id="AdBrandingBoardDiv">
+						<div class="cont" align="right"><script language=javascript src="http://adscript.gmarket.co.kr/js/adscript/ad_center_AD227.js"></script></div>
+						<div class="ad-expanded" style="display:none;" id="AdBrandingBoard"></div>
+					</div>
+					<div class="fashion">
+						<div class="brand">
+							<h3 class="sprite_title"><a href="http://brandon.gmarket.co.kr/"><span>BRAND ON</span></a></h3>
+							<div class="c-btn" id="fashionBrand"></div>
+							<div class="bnr_top" id="brandonLotteGlobal0B"></div>
+							<div class="bnr_btm" id="brandonLotteGlobalEvent0E"></div>
+						</div>
+						<div class="lotte">
+							<h3 class="sprite_title"><a href="http://lotte.gmarket.co.kr/"><span>롯데백화점</span></a></h3>
+							<div class="c-btn" id="fashionGlobal"></div>
+							<div class="bnr_top" id="brandonLotteGlobal2B"></div>
+							<div class="bnr_btm" id="brandonLotteGlobalEvent2E"></div>
+						</div>
+						<div class="global">
+							<h3 class="sprite_title"><a href="http://shop.gmarket.co.kr/globalshop/GlobalShop.aspx"><span>글로벌쇼핑</span></a></h3>
+							<div class="c-btn" id="fashionLotte"></div>
+							<div class="bnr_top" id="brandonLotteGlobal1B"></div>
+							<div class="bnr_btm" id="brandonLotteGlobalEvent1E"></div>
+						</div>
+					</div>
+
+					<div class="focus" id="focusRoll">
+						<h3 class="sprite_title"><span>포커스 아이템</span></h3>
+						<div class="page">
+							<span class="num">
+							<em></em>/<span></span>
+							</span>
+							<a href="javascript:ShowFocusItem(-1);" class="prev">이전</a><a href="javascript:ShowFocusItem(1);" class="next">다음</a>
+						</div>
+						<ul>
+						</ul>
+					</div>
+
+				</div>
+				<!-- //3.section : 광고/패션샵/포커스아이템 -->
+
+				<!-- 4.section : 카테고리 영역 -->
+				<div class="section">
+
+					<div class="cate">
+						<div class="lft">
+							<div class="bnr">
+								<div id="categoryBanner0"></div>
+								<div class="c-btn" id="categoryBannerDot0"></div>
+							</div><!-- //bnr -->
+							<div class="cont">
+								<ul class="cate_tab" id="categoryItemTab0">
+								</ul>
+								<ul class="cate_cont" id="categoryItem0">
+								</ul>
+							</div><!-- //cont -->
+						</div>
+						<div class="rgh">
+							<div class="cont">
+								<ul class="cate_tab" id="categoryItemTab1">
+								</ul>
+								<ul class="cate_cont" id="categoryItem1">
+								</ul>
+							</div><!-- //cont -->
+							<div class="bnr">
+								<div id="categoryBanner1"></div>
+								<div class="c-btn" id="categoryBannerDot1"></div>
+							</div><!-- //bnr -->
+						</div>
+						<div class="lft">
+							<div class="bnr">
+								<div id="categoryBanner2"></div>
+								<div class="c-btn" id="categoryBannerDot2"></div>
+							</div><!-- //bnr -->
+							<div class="cont">
+								<ul class="cate_tab" id="categoryItemTab2">
+								</ul>
+								<ul class="cate_cont" id="categoryItem2">
+								</ul>
+							</div><!-- //cont -->
+						</div>
+						<div class="rgh">
+							<div class="cont">
+								<ul class="cate_tab" id="categoryItemTab3">
+								</ul>
+								<ul class="cate_cont" id="categoryItem3">
+								</ul>
+							</div><!-- //cont -->
+							<div class="bnr">
+								<div id="categoryBanner3"></div>
+								<div class="c-btn" id="categoryBannerDot3"></div>
+							</div><!-- //bnr -->
+						</div>
+					</div>
+
+				</div>
+				<!-- //4.section : 카테고리 영역 -->
+
+				<!-- 5.section : 테마이벤트 영역 3차 수정 -->
+				<div class="section">
+					<div class="thema">
+						<ul class="tab">
+							<li id="IndexHtmlBanner1" class="fir" onmouseout="htmlBannerTab(1);" onmouseover="htmlBannerTab(1);"><a><img id="htmlTabImg1" src="http://image.gmarket.co.kr/main/2012/04/09/c_menu_01.gif" alt="BRAND ON"></a></li>
+							<li id="IndexHtmlBanner2" onmouseout="htmlBannerTab(2);" onmouseover="htmlBannerTab(2);"><a><img id="htmlTabImg2"  alt="LOTTE롯데백화점"></a></li>
+							<li id="IndexHtmlBanner3" onmouseout="htmlBannerTab(3);" onmouseover="htmlBannerTab(3);"><a><img id="htmlTabImg3"  alt="패션소호"></a></li>
+							<li id="IndexHtmlBanner4" onmouseout="htmlBannerTab(4);" onmouseover="htmlBannerTab(4);"><a><img id="htmlTabImg4"  alt="G-WOMEN"></a></li>
+							<li id="IndexHtmlBanner5" onmouseout="htmlBannerTab(5);" onmouseover="htmlBannerTab(5);"><a><img id="htmlTabImg5"  alt="G-MEN"></a></li>
+							<li id="IndexHtmlBanner6" onmouseout="htmlBannerTab(6);" onmouseover="htmlBannerTab(6);"><a><img id="htmlTabImg6"  alt="G-BEAUTY"></a></li>
+							<li id="IndexHtmlBanner8" onmouseout="htmlBannerTab(8);" onmouseover="htmlBannerTab(8);"><a><img id="htmlTabImg8"  alt="G-SPORTS"></a></li>
+							<li id="IndexHtmlBanner9" onmouseout="htmlBannerTab(9);" onmouseover="htmlBannerTab(9);"><a><img id="htmlTabImg9"  alt="G-LEISURE"></a></li>
+							<li id="IndexHtmlBanner7" onmouseout="htmlBannerTab(7);" onmouseover="htmlBannerTab(7);"><a><img id="htmlTabImg7"  alt="G-KID"></a></li>
+						</ul>
+						<div class="cont">
+						<iframe id="styleHtmlIfm" src="about:blank" height="298" width="810" scrolling="no" marginwidth="0" marginheight="0" frameborder="0" title="배너"></iframe></div>
+
+					</div>
+				</div>
+				<!-- //5.section : 테마이벤트 영역 3차 수정 -->
+
+				<!-- 6.section : 특가/파워상품/미니샵/웹진 -->
+				<div class="section">
+
+					<div class="item">
+						<div class="teukga">
+							<h3 class="sprite_title"><span>특가마켓</span></h3>
+							<div class="page">
+								<span class="num">
+								<em></em>/<span></span>
+								</span>
+								<a href="javascript:ShowSpecialMarket(-1);" class="prev">이전</a><a href="javascript:ShowSpecialMarket(1);" class="next">다음</a>
+							</div>
+							<div class="prd">
+								<div class="img"></div>
+								<div class="info">
+									<span></span>
+									<strong></strong>
+								</div>
+							</div>
+						</div><!-- //teukga -->
+						<div class="power-item">
+							<h3 class="sprite_title"><span>오늘의 파워상품</span></h3>
+							<div class="page">
+								<span class="num">
+								<em>1</em>/<span>12</span>
+								</span>
+								<a href="javascript:ShowTodayPower(-1);" class="prev">이전</a><a href="javascript:ShowTodayPower(1);" class="next">다음</a>
+							</div>
+							<ul></ul>
+						</div><!-- //power-item -->
+						<div class="power-shop">
+							<h3 class="sprite_title"><span>파워미니샵</span></h3>
+							<div class="page">
+								<span class="num">
+								<em></em>/<span></span>
+								</span>
+								<a href="javascript:ShowPowerMiniShop(-1);" class="prev">이전</a><a href="javascript:ShowPowerMiniShop(1);" class="next">다음</a>
+							</div>
+							<div class="prd">
+								<div class="img"></div>
+								<div class="info">
+									<span></span>
+									<strong></strong>
+								</div>
+							</div>
+						</div><!-- //power-shop -->
+					</div>
+
+				</div>
+				<!-- //6.section : 특가/파워상품/미니샵/웹진 -->
+
+				<!-- 7.section : 원클릭택배신청서비스/전세계배송관/후원쇼핑/페이스북/G마켓Mobile : 4차 수정 -->
+				<div class="section section7_new">
+					
+					<div class="parcelNew"><!-- //parcel 2013-03-11 -->
+						<h3 class="tit"><a href="" id="bottomBannerTitle1"><img src="" id="bottomBannerTitleImg1"></a></h3>
+						<p><a href="" id="bottomBanner1"><img src="" id="bottomBannerImg1" alt=""></a></p>
+					</div>
+
+					<div class="globalNew"><!-- //global -->
+						<h3 class="tit"><a href="" id="bottomBannerTitle2"><img src="" id="bottomBannerTitleImg2"></a></h3>
+						<p><a href="" id="bottomBanner2"><img src="" id="bottomBannerImg2" alt=""></a></p>
+					</div>
+
+					<div class="sponsorNew">
+						<div class="tit">
+							<h3><a href="" id="bottomBannerTitle3"><img src="" id="bottomBannerTitleImg3"></a></h3>
+							<span><em id="bottomDonation"></em></span>
+						</div>
+						<p><a href="" id="bottomBanner3"><img src="" id="bottomBannerImg3" alt="" ></a></p>
+					</div>
+
+					<div class="snsNew"><!-- //sns -->
+						<h3 class="tit"><a href="" id="bottomBannerTitle4"><img src="" id="bottomBannerTitleImg4"></a></h3>
+						<p><a href="" id="bottomBanner4"><img src="" id="bottomBannerImg4" alt="" ></a></p>
+					</div>
+					
+					<div class="mobileNew"><!-- //mobile 2013-03-11 -->
+						<h3 class="tit"><a href="" id="bottomBannerTitle5"><img src="" id="bottomBannerTitleImg5"></a></h3>
+						<p><a href="" id="bottomBanner5"><img src="" id="bottomBannerImg5" alt="" ></a></p>
+					</div>
+
+				</div>
+				<!-- //7.section : 원클릭택배신청서비스/전세계배송관/후원쇼핑/페이스북/G마켓Mobile : 4차 수정 -->
+
+				<!-- 7-1.section : 알립니다/전체서비스 -->
+				<div class="section section7_1">
+					
+					<div class="noticeNew"><!-- //notice -->
+						<h3 class="sprite_title"><span>알립니다</span></h3>
+						<ul class="listNew" id="bottomNotice">							
+						</ul>
+						<div class="btnsNew">
+							<a href="javascript:showBottomNotice(1);" class="prev">이전</a>
+							<a href="javascript:showBottomNotice(-1);" class="next">다음</a><!-- scroll height:18px; -->
+						</div>
+					</div>
+
+					<div class="all-serviceNew"><!-- //all-service -->
+						<a href="http://www.gmarket.co.kr/AllService.asp" class="allservice">전체서비스</a>
+					</div>
+					
+				</div>
+				<!-- //7-1.section : 알립니다/전체서비스 -->
+
+				<!-- 8.section : G마켓 특별혜택 -->
+				<div class="section">
+					<div class="cardNew">
+						<a href="" id="bottomGSpecialBenefit"><img src="" id="bottomGSpecialBenefitImg" alt=""></a>
+					</div>
+				</div>
+				<!-- //8.section : G마켓 특별혜택 -->
+
+				<!--  modalPop 2012-04-20 추가 -->
+				
+				<script language="javascript">
+				    function allBrowserClose() {
+				        if (document.getElementById("chkboxpopup").checked == true) {
+				            setCookie("mainallBrowserYN", "Y", 1);
+				        }
+				        document.getElementById('allBrowser').style.display = 'none';
+				    }
+
+				    function allBrowserOpen() {
+				        if (getCookie("mainallBrowserYN") == null) {
+				            document.getElementById('allBrowser').style.display = '';
+				        }
+				    }
+				</script>
+				<!--div class="modalPop" id="allBrowser" style="display:none;">
+					<img src="http://image.gmarket.co.kr/main/2012/04/09/modalPop_bnr_02.png" alt="No.1 G마켓 오픈마켓 최초 모든 브라우저 신용카드 결제 서비스 open 익스플로러 뿐아니라 구글크롬, 파이어폯, 사파리, 오페라에서도 이제 신용카드 결제가 가능해졌습니다. "/>
+					<div class="layer-close">
+						<label>
+							<input type="checkbox" id="chkboxpopup" /><a>오늘은 그만보기</a>
+						</label>
+						<a class="close" href="javascript:allBrowserClose();">닫기</a>
+					</div>
+				</div-->
+				<!-- //modalPop 2012-04-20 추가 -->
+			</div>
+			
+			<div id="modGlobalPopup" class="modalPop3" style="display:none;">
+				<div class="layer_modal_pop_bg"></div>
+				<div class="pop3_modal">
+					<div class="top">
+						<p class="ko"><img src="http://image.gmarket.co.kr/main/2013/04/11/choose_ko.gif" alt="" usemap="#ko_map" /></p>
+						<map name="ko_map">
+						 <area shape="rect" coords="40,151,189,175" href="javascript:fnClickGlobalPopup('KO');" target="_self">
+						 <area shape="rect" coords="40,218,189,238" href="http://shop.gmarket.co.kr/oversea/OverseaMain.asp" target="_self">
+						 <area shape="rect" coords="64,245,166,258" href="http://www.gmarket.co.kr/challenge/neo_help/oversea/oversea_help.asp" target="_self">
+						</map>
+						<p class="en"><img src="http://image.gmarket.co.kr/main/2013/04/11/choose_en.gif" alt="" usemap="#en_map" /></p>
+						<map name="en_map">
+						 <area shape="rect" coords="40,151,189,175" href="javascript:fnClickGlobalPopup('EN');" target="_self">
+						 <area shape="rect" coords="77,206,181,220" href="http://shop.gmarket.co.kr/oversea/OverseaMain.asp" target="_self">
+						 <area shape="rect" coords="74,245,149,258" href="http://english.gmarket.co.kr/planview/plan.asp?sid=107104" target="_self">
+						</map>
+					</div>
+					<div class="bot">
+						<label><input id="cbIsGlobalPopupClose" type="checkbox"> Do not open this window again</label>
+						<a class="close" href="javascript:fnGlobalPopupClose();"><img src="http://image.gmarket.co.kr/main/2013/04/11/pop_close.gif" alt="close"></a>
+					</div>
+				</div>
+			</div>
+			<!--// 2012.10.29 수정 -->
+			<!-- //contents -->
+
+			<hr />
+
+			<!-- footer -->
+			<div id="footer">
+			<div class="inner">
+				<ul class="link">
+					<li><a href="javascript:GoSNAChannel('CHM1M001', 'http://company.gmarket.co.kr/company/Intro.asp');">회사소개</a></li>
+					<li><a href="javascript:GoSNAChannel('CHM1M002', 'https://recruit.ebaykorea.com/');"><strong>채용정보</strong></a></li>
+					<li><a href="javascript:GoSNAChannel('CHM1M003', 'http://adcenter.gmarket.co.kr/adcentermain.asp');">제휴·광고</a></li>
+					<li><a href="javascript:GoSNAChannel('CHM1M004', 'http://gmc.gmarket.co.kr');">판매자광고</a></li>
+					<li><a href="javascript:GoSNAChannel('CHM1M005', 'http://www.gmarket.co.kr/challenge/neo_help/agreement01.asp');">이용약관</a></li>
+					<li><a href="javascript:GoSNAChannel('CHM1M006', 'http://www.gmarket.co.kr/challenge/neo_help/agreement04.asp');">전자금융거래약관</a></li>
+					<li><a href="javascript:GoSNAChannel('CHM1M007', 'http://www.gmarket.co.kr/challenge/neo_help/policy01.asp');"><strong>개인정보취급방침</strong></a>· <a href="javascript:GoSNAChannel('CHM1M008', 'http://www.gmarket.co.kr/challenge/neo_help/policy02.asp');">청소년보호정책</a></li>
+					<li><a href="javascript:GoSNAChannel('CHM1M009', 'http://www.esmplus.com/', '_blank');">판매관리</a></li>
+				</ul>
+				<address>
+					<div class="cscenter">
+						<a href="javascript:GoSNAChannel('CHM1M010', 'http://www.gmarket.co.kr/challenge/neo_bbs/default.asp');">고객센터</a>
+						<p>
+						<a href="http://www.gmarket.co.kr/challenge/neo_bbs/default.asp " class="cs">상담가능시간 : 오전 9시~오후 6시 (토요일 및 공휴일은 휴무) <br>경기도 부천시 원미구 부일로 223 (상동) 투나빌딩 6층<br><span class="lsc0">Tel : <strong>1566-5701</strong> <img src="http://image.gmarket.co.kr/main/2012/07/btn_telclick.gif" alt="전화전 Click" class="click"> <span class="fax">Fax : 02-589-8842</span></a> <br>Mail : <a href="http://www.gmarket.co.kr/challenge/neo_bbs/say.asp" class="mail">gmarket@corp.gmarket.co.kr</a> </p>
+					</div>
+					<div class="ebaykorea">
+						<em>(주)이베이코리아</em>
+						<p>서울시 강남구 테헤란로 152 (역삼동 강남파이낸스센터) <br>대표이사 : 변광윤<br>사업자등록번호 : <span class="lsc0">220-81-83676</span> <a href="javascript:GoSNAChannel('CHM1M012', 'http://www.ftc.go.kr/info/bizinfo/communicationList.jsp');"><img src="http://image.gmarket.co.kr/main/2012/04/09/btn_footer.gif" alt="사업자정보확인"></a><br>통신판매업신고 :강남 <span class="lsc0">10630호</span> <span class="fax">Fax : 02-589-8842</span></p>
+					</div>
+					<div class="e-banking">
+						<a href="http://sna.gmarket.co.kr/?cc=CHM1M013&url=http://www.gmarket.co.kr/include/popup/05_pop.htm" onclick="window.open(this.href, 'csWin', 'width=720, height=585'); return false;" >전자금융분쟁처리</a><!-- 2012-04-23 수정 -->
+						<p class="lsc0">Tel : 1566-5701 <span class="fax">Fax : 02-589-8844</span><br>Mail : <a class="mail" href="mailto:gmk_cs@corp.gmarket.co.kr">gmk_cs@corp.gmarket.co.kr</a> </p>
+						<p><a href="http://sna.gmarket.co.kr/?fcd=90100002&url=http://www.gmarket.co.kr/securitycenter/sc_03_1.asp?skind=27">저작권침해 신고</a></p>
+					</div>
+				</address>
+				<!-- 2012-04-23 수정 -->
+				<div class="award"> 
+					<a href="javascript:showAward(-1);" id="prevAward" class="prev"><span>이전</span></a> <!-- 버튼 활성일 경우 더블클래스(on) -->
+					<ul id="awardList">
+						<li class="link1">생산성본부 선정 국가고객만족지수1위(2011)</li>
+						<li class="link2">생산성본부 선정 국가브랜드경쟁력지수 6년연속 1위(2007~2012)</li>
+						<li class="link3">한국능률협회 선정 한국산업의 브랜드파워 3년연속 1위(2011~2013)</li>
+						<li class="link4">포브스 선정 최고의 브랜드대상 2년연속 1위 (2012~2013)</li>
+						<li class="link5">한국지속경영평가원 선정 지속가능 경영 대상 1위 (2012)</li>
+					</ul>
+					<a href="javascript:showAward(1);" id="nextAward" class="next_on"><span>다음</span></a>
+				</div>
+
+				<div class="company">
+					<div class="marks">
+						<a href="javascript:openCcms();" class="link1"></a>
+						<a href="javascript:openGoodSite();" class="link2"></a>
+						<a class="link3"></a>
+						<a class="link4" id="BottomBan22" href="#" target="_blank"></a>
+
+					</div>
+					<div class="svcs wide980">
+						<a href="javascript:openCustHelp();"  class="link1"></a>
+						<span>
+							<a href="javascript:openReportCenter();" class="link2"></a>						
+							<a href="javascript:GoSNAChannel('CHM1M023', 'http://www.gmarket.co.kr/er/er01.asp','_blank');" class="link6"></a>
+						</span>
+						<a href="javascript:GoSNAChannel('CHM1M020', 'https://www.gmarket.co.kr/gmap/vero_main.asp','_blank');" class="link3"></a>
+						<a href="javascript:GoSNAChannel('CHM1M021', 'http://www.gmarket.co.kr/securitycenter/sc_main.asp?inflow=01','_blank');" class="link4"></a>
+						<a href="javascript:GoSNAChannel('CHM1M022', 'http://net-durumi.netan.go.kr/main.do?tg=gmarket','_blank');" class="link5"></a>
+						<!-- 2012-07-18 수정 -->
+						<a href="http://gmarket.co.kr/gmap/gmap_cp.asp" class="link7" target="_blank"></a>
+					</div>
+				</div>
+				<div style="display:none">
+				<form name="etrust" method="POST" action="http://www.kiec.or.kr/jsp/open/eTrust_info.jsp" target="_blank">
+					<input name="etrust_id" type="hidden" value="2006-0410">
+					<input name="unique_id" type="hidden" value="470139">
+				</form>
+				</div>
+				<script language="javascript" type="text/javascript">
+				    gInitHelper().addHandler(function () {
+				        showBottomBanner();
+				    });
+				</script>
+				<div class="logo-caution">
+					<p class="caution">(주)이베이코리아의 사전 서면 동의 없이 G마켓사이트의 일체의 정보, 콘텐츠 및 UI등을 상업적 목적으로 전재, 전송, 스크래핑 등 무단 사용할 수 없습니다.<br/><strong class="point-blue">G마켓은 통신판매중개자이며 통신판매의 당사자가 아닙니다. 따라서 G마켓은 상품ㆍ거래정보 및 거래에 대하여 책임을 지지 않습니다.</strong></p>
+					<div class="foot-log">
+						<a href="http://www.gmarket.co.kr/"><img src="http://image.gmarket.co.kr/main/2013/03/18/foot_ebay_gmarket.gif" alt="ebay Gmarket" /></a>
+					</div>
+				</div>
+				<p class="copy">Copyright &copy; <strong>eBay Korea Co., Ltd</strong>. All rights reserved. </p>
+			</div>
+		</div>
+			<!-- //footer -->
+		<!-- mobile go -->
+
+		<!-- //mobile go -->
+
+	</div>
+<script language="JavaScript" type="text/JavaScript">
+<!--
+function openPopunder() {
+    if (getCookie("mainPopunderYN") == null) {
+        window.open("/popup/indexPopunder.html", "popunder", "width=370,height=430,top=350,left=300,title=no,menubar=no,location=no,toolbars=no,scroll=no,status=no,scrollbars=no,resizable=no");
+    }
+}
+
+gInitHelper().addHandler(function() {
+    gmktMain_init();
+	openPopunder();
+
+
+	
+});
+//-->
+</script>
+
+
+
+<div id="EngToastDiv" style="display:none;position:absolute; right:0; bottom:0; width:298px; height:246px; background:url(http://image.gmarket.co.kr/challenge/neo_include/EngToast/bg-toast.gif) no-repeat; overflow:hidden; z-index:9999; text-align:left;">
+	<a style="display:block; width:282px; height:211px; margin:8px 8px 7px 8px;" href="#" id="_EngToast_A" target="_blank"><img id="_EngToast_IMG" width="282" height="211" alt="" border="0"></a>
+	<label style="font:11px/11px dotum; color:#FFF; letter-spacing:-1px;"><input type="checkbox" style="width:12px; height:12px; margin:0 5px 0 8px; padding:0; vertical-align:middle;" onclick="fnEngToastClose();">오늘은 그만 보기</label>
+</div>
+<script language="javascript" type="text/javascript" src="/challenge/neo_include/EngToastPopup.js"></script>
+<script language="javascript" type="text/javascript">
+    gmkt.onload(fnEngToastInit);
+
+
+</script>
+
+<!-- Google Code for &#48169;&#47928;&#51088; &#47532;&#49828;&#53944; Remarketing List -->
+<script type="text/javascript">
+/* <![CDATA[ */
+var google_conversion_id = 1002883803;
+var google_conversion_language = "en";
+var google_conversion_format = "3";
+var google_conversion_color = "ffffff";
+var google_conversion_label = "_nokCLWuxAIQ25Wb3gM";
+var google_conversion_value = 0;
+/* ]]> */
+</script>
+<script type="text/javascript" src="http://www.googleadservices.com/pagead/conversion.js">
+</script>
+<noscript>
+<div style="display:inline;">
+<img height="1" width="1" style="border-style:none;" alt="" src="http://www.googleadservices.com/pagead/conversion/1002883803/?label=_nokCLWuxAIQ25Wb3gM&amp;guid=ON&amp;script=0"/>
+</div>
+</noscript>
+
+<!--Bring-back 스크립트 : 2013-06-24 -->
+<script type="text/javascript" src="http://cpcmall.bringback.co.kr/js/bringback.js"></script> 
+
+<!--제휴코드 판별 쿠키 생성 : 2013-07-05-->
+	
+		<script type="text/javascript">
+
+
+			if (getCookie("jaehu_200004796_id") == null || getCookie("jaehu_200004796_id") == undefined) {
+				//set cookie
+				var today = new Date();
+				today.setDate(today.getDate() + parseInt(1));
+				document.cookie = "jaehu_200004796_id" + "=" + escape("0zD4LEL2D4LNLZL7UZ") + ";path=/;domain=gmarket.co.kr ; expires=" + today.toGMTString() + ";";
+			}
+			else {
+
+				if ((getCookie("jaehu_200004796_id") != "0zD4LEL2D4LNLZL7UZ") && ("0zD4LEL2D4LNLZL7UZ" != "")) {
+					
+					//delete cookie
+					var expireDate = new Date();
+					expireDate.setDate(expireDate.getDate() - 1);
+					document.cookie = "jaehu_200004796_id" + "= " + "; expires=" + expireDate.toGMTString() + "; path=/;domain=gmarket.co.kr";
+
+					//set cookie
+					var today = new Date();
+					today.setDate(today.getDate() + parseInt(1));
+					document.cookie = "jaehu_200004796_id" + "=" + escape("0zD4LEL2D4LNLZL7UZ") + ";path=/;domain=gmarket.co.kr ; expires=" + today.toGMTString() + ";";
+				}
+			}	
+
+		</script>
+	 
+
+
+<!--//제휴코드 판별 쿠키 생성>
+
+
+<!--메인 사이트오버레이 스크립트-->
+<script type="text/javascript" src="http://www.gmarket.co.kr/siteoverlay.js"></script>
+<script type="text/javascript">
+    wn_so_pid(2);
+</script>
+<form id="MainWiseLogForm" name="MainWiseLogForm" method="post">
+<iframe id="ifrMainWiseLogForm" name="ifrMainWiseLogForm" src="/challenge/neo_include/dummy.html" height="0" width="0" style="display:none;"></iframe>
+</form>
+<form id="MainSNSFcdForm" name="MainSNSFcdForm" method="post">
+<iframe id="ifrMainSNSFcdForm" name="ifrMainSNSFcdForm" src="/challenge/neo_include/dummy.html" height="0" width="0" style="display:none;"></iframe>
+</form>
+<script type="text/javascript">
+    document.write('<div style="display:none;"><img src="http://www.gmarket.co.kr/weblog/nethruscriptlog.html?script-url=http://www.gmarket.co.kr/index_wiselog.asp' + document.location.search + '^^user-agent=' + navigator.userAgent + '^^referer=' + document.referrer + '^^cookie=' + document.cookie + '^^" width="0" height="0" border="0"></div>');
+</script>
+<script type='text/javascript' src='/challenge/neo_include/GlobalGuidePopup.js'></script>	
+<script language="JavaScript" src="http://j.maxmind.com/app/country.js" type="text/javascript"></script>
+<script>    fnGLOBALPageInit();</script>	
+</body>
+
+</html>

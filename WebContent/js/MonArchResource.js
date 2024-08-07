@@ -159,7 +159,8 @@ function setUserInfo(data){
     _M.UserInfo.name = data["userName"];
     _M.UserInfo.depart = data["deptNo"];
     _M.UserInfo.departnm = data["deptName"];
-    _M.UserInfo.level = data["LEVEL"];
+    //_M.UserInfo.level = data["LEVEL"];
+    _M.UserInfo.level = data["excelAuth"];
     _M.UserInfo.lang = data["userLang"];
     _M.UserInfo.dvl = data["dvLevel"];
     

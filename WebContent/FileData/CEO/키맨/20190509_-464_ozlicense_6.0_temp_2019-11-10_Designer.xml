@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OZ-LICENSE>
+  <OZ-REPORT-DESIGNER
+    PRODUCT-VERSION="6.0"
+    OS-NAME="any"
+    IP="any"
+    EXPIRE-DATE="2019-11-10"
+    COMPANY="세리시이오_OZD"
+    KEY="862d29ad79ef49a189cd2355e3541b5eab50dad7"
+  />
+  <OZ-QUERY-DESIGNER
+    PRODUCT-VERSION="6.0"
+    OS-NAME="any"
+    IP="any"
+    EXPIRE-DATE="2019-11-10"
+    COMPANY="세리시이오_OZD"
+    KEY="99cfc83e659fa2e1ea2477bdd18501a23a63cccc"
+  />
+  <OZ-ENTERPRISE-MANAGER
+    PRODUCT-VERSION="6.0"
+    OS-NAME="any"
+    IP="any"
+    EXPIRE-DATE="2019-11-10"
+    COMPANY="세리시이오_OZD"
+    KEY="595f288473d457aa563ea4bca8556c9ce9e38f86"
+  />
+  <OZ-REPOSITORY-MANAGER
+    PRODUCT-VERSION="6.0"
+    OS-NAME="any"
+    IP="any"
+    EXPIRE-DATE="2019-11-10"
+    COMPANY="세리시이오_OZD"
+    KEY="8c9f770c5e512e657db87978a6a49d6fbaa08504"
+  />
+</OZ-LICENSE>

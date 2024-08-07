@@ -90,7 +90,7 @@
 input[for="calicon"] 	{ width:640px; margin-left:2px; padding-left:6px; }
 input[type="radio"] 	{ border:1px; }
 input[type="file"] 		{ border:0px; }
-#Footer                 { position:fixed; bottom:0px; width:100%; /* z-index:50; */ }
+#Footer                 { position:fixed; bottom:0px; width:100%; z-index:10; }
 .Wraper                 { margin-bottom:36px; } /* Footer 하단 고정하면서 최하단 컨텐츠 올바르게 볼 수 있도록 표준 마진 6px + footer height 30px 만큼 부여함 */
 .fldfiledown li 		{ float:none; }
 .fldfiledown li a 		{ }
@@ -865,7 +865,7 @@ a.icon:hover 		{background-position:inherit; }
 .jobAreaTR .jobArea		{ height:38px; }
 .jobAreaTR .buttonset 	{ /* float:right; */ padding-right:0px; margin-top:0px; position:static; } /* Change : static to position it in the middle of the row */
 .jobAreaTR .cmdspan 	{ line-height:24px; }
-.cmdspan	            { height:24px; line-height:22px; padding:0px 15px; margin-right:7px; display:inline-block; border-radius:2px; display:inline-block !important; } /* Change : sets size */
+.cmdspan	            { height:26px; line-height:24px; padding:0px 15px; margin-right:7px; display:inline-block; border-radius:2px; display:inline-block !important; } /* Change : sets size */
 .cmdspan:hover			{ transition:0.2s; }
 .cmdspan-block			{ height:10px; line-height:10px; margin:0px 6px; display:inline-block; border-left:1px solid #A7A7A7; display:none!important; }
 .cmdicon	            { width:20px; height:20px; display:inline-block; vertical-align:middle; margin-top:-1px; }
@@ -891,7 +891,7 @@ a.icon:hover 		{background-position:inherit; }
 
 .SuperView      {}
 
-.havta	        { font-weight:bold; margin-right:10px; float:right; color:#FF6F05; }
+.havta	        { font-weight:bold; margin-left:3px; color:#FF6F05; }
 
 .ScrollableView { border-top:2px solid #333; }
 .viewGroup	{ position:relative; border-left:1px solid #B0B0B0; border-right:1px solid #B0B0B0; }
@@ -1113,7 +1113,7 @@ input[type=button].button-upload.clicked    { border-width:1px 0px 0px 1px; bord
 .th-bg 				{ background-color:#E7E7E7; }
 .tabGroup-bg		{ }
 .body-bg			{ background-color:#FFFFFF; }
-.SelectTR			{ background-color:#A0DDFF; }
+										 
 .jobArea-bg			{ background-color:transparent; }
 
 .cmdspan:hover	    {  }

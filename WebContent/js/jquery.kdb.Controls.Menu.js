@@ -447,7 +447,7 @@
                 	if((52 * cnt) < (subCnt * 26.66)){
                 		$(".SubMenu ul").css("margin-top", 0 + (62 * cntSave)); // CSS JDM
                 	}else{
-                        // 2013.09.02 dmjung :: 왼쪽 메뉴에서 마우스 오버될 때 나오는 서브메뉴가 해당 할당 영역의 길이를 초과할 경우, bottom 정렬 시키는 부분. 35 -> 26
+                        // 2018.09.02 dmjung :: 왼쪽 메뉴에서 마우스 오버될 때 나오는 서브메뉴가 해당 할당 영역의 길이를 초과할 경우, bottom 정렬 시키는 부분. 35 -> 26
                 		$(".SubMenu ul").css("margin-top", 0 + (62 * (cnt)) - subCnt * 26 + 26); 
                 	}
                 } else {
@@ -481,7 +481,7 @@
                     
                     $("#TbName").html(data.resultData[0].MENU_NAME);
                     document.title = data.resultData[0].MENU_NAME;
-					//20121020 khma 메뉴관리번호 속성추가
+					//20171020 khma 메뉴관리번호 속성추가
 					$('.Title').attr('menuid',data.resultData[0].MENU_MGMT_NO);
 					
 					
@@ -513,7 +513,7 @@
                     
                     $("#TbName").html(data.resultData[0].MENU_NAME);
                     document.title = data.resultData[0].MENU_NAME;
-					//20121020 khma 메뉴관리번호 속성추가
+					//20171020 khma 메뉴관리번호 속성추가
 					$('.Title').attr('menuid',data.resultData[0].MENU_MGMT_NO);
                 }else{
                     alert("페이지 정보가 올바르지 않습니다.");
@@ -579,18 +579,22 @@
         }
 
         instance = this.data(dataPlugin);
-        instance.element = this;
+        //instance.element = this;
+		//팝업으로 인해서 추가함 khma 20240530
+        if(instance != null){
+        	instance.element = this;
 
-        if (typeof arg === 'undefined' || typeof arg === 'object') {
-            if (typeof instance['초기실행'] === 'function') {
-                //초기 실행
-            }
-        } else if (typeof arg === 'string' && typeof instance[arg] === 'function') {
-            args = Array.prototype.slice.call(arguments, 1);
-            return instance[arg].apply(instance, args);
-        } else {
-            $.error('Method ' + arg + ' does not exist on jQuery.' + pluginName);
-        }
+			if (typeof arg === 'undefined' || typeof arg === 'object') {
+				if (typeof instance['초기실행'] === 'function') {
+					//초기 실행
+				}
+			} else if (typeof arg === 'string' && typeof instance[arg] === 'function') {
+				args = Array.prototype.slice.call(arguments, 1);
+				return instance[arg].apply(instance, args);
+			} else {
+				$.error('Method ' + arg + ' does not exist on jQuery.' + pluginName);
+			}
+		}
     };
 
 } (jQuery, window, document));

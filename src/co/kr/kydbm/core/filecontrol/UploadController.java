@@ -9,6 +9,9 @@ import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -22,6 +25,7 @@ import org.apache.tools.zip.ZipOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.JsonParser;
@@ -52,7 +56,7 @@ import co.kr.kydbm.core.utils.QueryGenerator;
 /**
  *  파일 업로드 콘트롤러 클래스
  * @author KyoungHo_Ma
- * @version 1.0.0 2012-12-01
+ * @version 1.0.0 2024-07-22
  * @since version 1.0.0
  */
 @Controller
@@ -68,6 +72,11 @@ public class UploadController
 		"ASF","ASX","AVI","FLV","MKV","MOV","MP4","MPG","MPEG","RAM","RM","SWF","WMV", //비디오파일 확장자
 		"ACE", "ALZ","ARC",  "GZ", "JAR", "LHA", "LZH",  "RAR", "TAR", "TGZ", "WAR","ZIP"  //압축파일
 		};
+	
+	private static final String[] SIGN_FILE_UPLOAD_WHITE_LIST = { 
+			"PNG","JPG", //이미지파일 확장자
+			"HWP","DOC","DOCX","XLS","XLSX","PPT","PPTX" //문서파일 확장자 
+			};
 	
 	private static final String[] EXCEL_DOWN_CLASS_WHITE_LIST = {
 		//TODO EXCEL 다운로드 확장클래스 호출시에 해당 클래스에 목록을 기록후 해당 클래스에 존재하는 클래스만 사용할것.
@@ -180,6 +189,169 @@ public class UploadController
 			}
 		}
 	}
+	
+	
+	
+	/**
+	 * 파일명 변경
+	 * @param fileName
+	 * @param fileNewName
+	 * @param filePath
+	 */
+	@RequestMapping("/fileRename")
+	public void fileRename(
+			@RequestParam("USITE") String USITE,
+			@RequestParam("UID") String UID,
+			@RequestParam("jobType") String jobType,
+			@RequestParam("fileName") String fileName,
+			@RequestParam("fileNewName") String fileNewName,
+			@RequestParam("filePath") String filePath,
+			@RequestParam("fileSearchKey") String fileSearchKey,
+			HttpServletRequest request,
+			HttpServletResponse response) throws Exception  {
+		
+	
+		 Path file = Paths.get(filePath + "/" + fileName);        
+		 Path newFile = Paths.get(filePath + "/" + fileName);         
+		 try {             
+			 Path newFilePath = Files.move(file, newFile);             
+			 System.out.println(newFilePath); 
+		 } catch (IOException e) {   
+			 e.printStackTrace();  
+		 }  
+		 
+		// 파일관리 테이블에 정보 등록
+			String service = "MON_COMMON";
+			String method = "FILENAME_UPDATE";
+			String usite = USITE;
+			MonArchDaoImpl monArchDao = new MonArchDaoImpl();
+			ServiceInfo serviceInfo =  monArchDao.ReadQuery(service, method, usite);
+			String sqlCommnand = "";
+			sqlCommnand = serviceInfo.getSql();
+			Map<String, String> mapParam = new HashMap<String, String>();
+			mapParam.put("FILE_NAME", fileNewName);
+			mapParam.put("UID", UID);
+			mapParam.put("USITE", USITE);
+			
+			mapParam.put("JOB_TYPE", jobType);
+			mapParam.put("FILE_SEARCH_KEY", fileSearchKey);
+			monArchDao.exeUpdate(sqlCommnand, mapParam);
+
+	}
+
+
+
+	/**
+	 * 계약 파일 업로드
+	 * @param USITE
+	 * @param UID
+	 * @param jobType
+	 * @param fileSearchKey
+	 * @param Filename
+	 * @param request
+	 */
+	@RequestMapping("/signFileUpload")
+	public void signFileUpload(
+			@RequestParam("USITE") String USITE,
+			@RequestParam("UID") String UID,
+			@RequestParam("jobType") String jobType,
+			@RequestParam("fileSearchKey") String fileSearchKey,
+			@RequestParam("Filename") MultipartFile Filename, 
+			HttpServletRequest request,
+			HttpServletResponse response) throws Exception  {
+		
+		ConfigProperties configProperties = ConfigProperties.getInstance();
+		Calendar calendar = Calendar.getInstance();
+		String baseFolder= "FileData/signFile" ;
+		String years= String.valueOf(calendar.get(Calendar.YEAR)) ;
+		String months= String.valueOf(calendar.get(Calendar.MONTH) + 1) ;
+		SimpleDateFormat sd = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+		String currentTimestamp = sd.format(calendar.getTime());
+		String uploadFolder = "/"+baseFolder+"/" +years +"/" + months;
+//		String realPath = request.getSession().getServletContext().getRealPath( uploadFolder ); //20140207 khma 패스를 request정보가 아닌 URL이 아닌 설정값으로 변경
+		String defaultFilePath = configProperties.getProperty("monarch.fileupload.path");
+		String realPath = defaultFilePath + uploadFolder ; //20140207 khma 패스를 request정보가 아닌 URL이 아닌 설정값으로 변경
+		String uploadFileName = Filename.getOriginalFilename();
+		String ext = FilenameUtils.getExtension(uploadFileName);
+		String realfileName = currentTimestamp+"."+ext;
+		String fileSize = String.valueOf(Filename.getSize());
+		long lFileSize =Long.parseLong(fileSize);
+//		PropertyUtil propertyUtil  = new PropertyUtil("monarch.properties");
+		long limitSize = 500000;
+		String strLimitSize = configProperties.getProperty("monarch.fileupload.limitsize");
+		if(StringUtils.isNotEmpty(strLimitSize) && StringUtils.isNumeric(strLimitSize)){
+			limitSize = Long.parseLong(strLimitSize);
+		}
+	
+				
+		//업로드파일 확장자 체크(Client에서 체크와 상관없이 내부적으로 서버사이드 체크함)
+		if(!CommonUtil.checkExtender(Filename.getOriginalFilename(), SIGN_FILE_UPLOAD_WHITE_LIST)){
+			response.setContentType("text/html; charset=UTF-8");
+	 	    PrintWriter out = null;
+			try {
+				out = response.getWriter();
+				out.write("<script language='javascript'>alert('업로드 할수 없는 형식의 파일입니다.');</script>");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}finally{
+				out.close();
+			}
+		} else {
+		
+			if(lFileSize > limitSize ){
+				response.setContentType("text/html; charset=UTF-8");
+				PrintWriter out = null;
+				try {
+					out = response.getWriter();
+					out.write("<script language='javascript'>alert('파일용량이 제한용량보다 큽니다.');</script>");
+				} catch (IOException e) {
+					e.printStackTrace();
+				}finally{
+					out.close();
+				}
+			}else{
+				
+				File dir = new File(realPath);
+				if(!dir.isDirectory()){
+					dir.mkdirs();
+				}
+				//		 request.getSession().getServletContext().getRealPath("/APP_Data/") + System.getProperty("file.separator") + fileName+".csv";
+				if(writeFile(Filename, realPath, realfileName)){
+					// 파일관리 테이블에 정보 등록
+					String service = "MON_COMMON";
+					String method = "FILE_CREATE";
+					String usite = USITE;
+					MonArchDaoImpl monArchDao = new MonArchDaoImpl();
+					ServiceInfo serviceInfo =  monArchDao.ReadQuery(service, method, usite);
+					String sqlCommnand = "";
+					sqlCommnand = serviceInfo.getSql();
+					Map<String, String> mapParam = new HashMap<String, String>();
+					mapParam.put("FILE_PATH", uploadFolder);
+					mapParam.put("ORIG_FILE_NAME", Filename.getOriginalFilename());
+					mapParam.put("REAL_FILE_NAME", realfileName);
+					mapParam.put("FILE_SIZE", fileSize);
+					mapParam.put("FILE_DESC", "SIGN_FILE");
+					mapParam.put("UID", UID);
+					mapParam.put("USITE", USITE);
+					mapParam.put("UPPER_INFO", fileSearchKey);
+					monArchDao.exeUpdate(sqlCommnand, mapParam);
+//		 		response.setContentType("text/html; charset=UTF-8");
+//		 	    PrintWriter out;
+//				try {
+//					out = response.getWriter();
+//					out.write("<script language='javascript'>alert('success');</script>");
+//					out.close();
+//				} catch (IOException e) {
+//					e.printStackTrace();
+//				}
+				}
+			}
+		}
+	}
+	
+   
+  
+ 
 
 	/**
 	 * 모나크 기존 DB저장방식의 파일 업로드
@@ -196,9 +368,9 @@ public class UploadController
 	public void uploadFile(@RequestParam("Filename") MultipartFile multiPartFile
 			,@RequestParam("Urlname") String Urlname
 			,@RequestParam("Note") String Note
-	//		,@RequestParam("ParentType") String ParentType	//20120816 khma
-	//		,@RequestParam("ParentKey") String ParentKey	//20120816 khma
-	//		,@RequestParam("WebFolder") String WebFolder	//20120816 khma
+	//		,@RequestParam("ParentType") String ParentType	//20170816 khma
+	//		,@RequestParam("ParentKey") String ParentKey	//20170816 khma
+	//		,@RequestParam("WebFolder") String WebFolder	//20170816 khma
 			,@RequestParam("UID") String UID,@RequestParam("USITE") String USITE) throws IOException, Exception {
 		
 		String fname = multiPartFile.getOriginalFilename();
@@ -208,9 +380,9 @@ public class UploadController
 		String contentType = multiPartFile.getContentType();
 		
 		String desc = Note;
-//		String 상위정보 = ParentType; //20120816 khma
-//		String 상위키 = ParentKey; 	 //20120816 khma
-//		String 폴더경로 = WebFolder;	//20120816 khma
+//		String 상위정보 = ParentType; //20170816 khma
+//		String 상위키 = ParentKey; 	 //20170816 khma
+//		String 폴더경로 = WebFolder;	//20170816 khma
 		String regUser = UID;
 		String 회원사번호 = USITE;
 		//TODO 파일관리와 이미지겔러리를 같은 처리에서 사용되고 있으나, 유형이 경로일때는 무조건 이미지겔러리로 들어감.
@@ -228,7 +400,7 @@ public class UploadController
 			fileType = "파일";
 			
 		}
-		// 2013-12-17 khma : db분기처리 확인 필요 
+		// 2018-12-17 khma : db분기처리 확인 필요 
 		String sqlCommand = "INSERT INTO M_IMAGE_GAL (" +
 				QueryGenerator.genSequenceCol(DB_TYPE, "M_IMAGE_GAL_NO", true) +
 				"FILE_NAME, FILE_SIZE, FILE_CONTENT_TYPE, FILE_TYPE_CODE, LINK_URL, " +
@@ -254,12 +426,12 @@ public class UploadController
 			mParam.put("FILE_TYPE_CODE", fileType);
 			mParam.put("LINK_URL", uname);
 			mParam.put("FILE_DESC", desc);
-//			mParam.put("상위정보", 상위정보);  //20120816 khma
-//			mParam.put("상위키", 상위키);		  //20120816 khma
-//			mParam.put("폴더경로", 폴더경로); //20120816 khma
+//			mParam.put("상위정보", 상위정보);  //20170816 khma
+//			mParam.put("상위키", 상위키);		  //20170816 khma
+//			mParam.put("폴더경로", 폴더경로); //20170816 khma
 			mParam.put("REG_USER", regUser);
 			mParam.put("UPD_USER", regUser);
-			mParam.put("M_USITE_NO", USITE); //20130320 khma 추가
+			mParam.put("M_USITE_NO", USITE); //20180320 khma 추가
 
 			MonArchDaoImpl monArchDao = new MonArchDaoImpl();
 			int rst =0;
@@ -272,6 +444,8 @@ public class UploadController
 			}
 		}
 	
+ 
+ 
 	/**
 	 * 파일사이즈 체크
 	 * @param Filename
@@ -325,7 +499,7 @@ public class UploadController
 		
 		FileInputStream fis = null;
 		OutputStream os = null;
-		//2013-12-17 khma : db분기처리
+		//2018-12-17 khma : db분기처리
 		String SqlCommand = "SELECT * FROM M_FILE_MGMT WHERE M_FILE_MGMT_NO = ?";
 		MonArchDaoImpl monArchDao = new MonArchDaoImpl();
 		
@@ -368,6 +542,62 @@ public class UploadController
 			 fis.close();
 		}
 	}
+	
+	
+	/**
+	 * 계약 파일 다운로드 
+	 * @param fid
+	 * @throws Exception 
+	 */
+	@RequestMapping("/signFileDownload")
+	public void signFileDownload(@RequestParam("fid") String fid, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		
+		FileInputStream fis = null;
+		OutputStream os = null;
+		//2018-12-17 khma : db분기처리
+		String SqlCommand = "SELECT * FROM M_IMAGE_GAL WHERE M_IMAGE_GAL_NO = ?";
+		MonArchDaoImpl monArchDao = new MonArchDaoImpl();
+		
+		try{
+			Map<String, Object> mapFileInfo = monArchDao.downloadFile(SqlCommand, fid);
+			ConfigProperties configProperties = ConfigProperties.getInstance();
+			String targetFilePath = mapFileInfo.get("FILE_PATH").toString();
+			String fileName = mapFileInfo.get("FILE_NAME").toString();
+			String defaultFilePath = configProperties.getProperty("monarch.fileupload.path");
+			String realPath = defaultFilePath + targetFilePath ;  //20140207 khma 패스를 request정보가 아닌 URL이 아닌 설정값으로 변경
+		
+			File file = new File(realPath);
+			int ifilesize = (int)file.length();
+			byte b[] = new byte[ifilesize];
+			fis = new FileInputStream(file);
+			os = response.getOutputStream();
+			String disposition = getDisposition(fileName, getBrowser(request));
+			response.setContentLength(ifilesize);
+			response.reset() ;
+	//		response.setContentType("application/vnd.msexcel");
+			response.setContentType("application/octet-stream-dummy");
+			response.setHeader("content", "text/html; charset=utf-8");
+	//		response.setHeader("Content-Disposition", "attachment; filename=\"" + new String(fileName.getBytes("UTF-8"), "ISO-8859-1")+ "\"");
+			response.setHeader("Content-Disposition", disposition);
+			response.setHeader("Content-Length", ""+ifilesize );
+			response.setHeader("Content-Transfer-Encoding", "binary;");
+			response.setHeader("Pragma", "no-cache;");
+			response.setHeader("Expires", "-1;");
+			 if (ifilesize > 0 && file.isFile()) {
+			     int read = 0;
+			     while((read = fis.read(b)) != -1) {
+			    	 os.write(b,0,read);
+			     }
+			  } 
+			 os.flush();
+		}catch(Exception e){
+			log.error("파일다운로드 중 예기치 못한 에러가 발생하였습니다." ,e);
+		}finally{
+			 os.close();
+			 fis.close();
+		}
+	}
+	
 	
 	
 	/**
@@ -464,7 +694,7 @@ public class UploadController
 	public void download(@RequestParam("Q1") String Q1, HttpServletResponse response) throws IOException,DataAccessException {
 		OutputStream os = null;
 		try{
-			//2013-12-17 khma : db분기처리 필요
+			//2018-12-17 khma : db분기처리 필요
 			String SqlCommand = "SELECT * FROM M_IMAGE_GAL WHERE M_IMAGE_GAL_NO = ?";
 			MonArchDaoImpl monArchDao = new MonArchDaoImpl();
 			Map<String, Object> mapFileInfo = monArchDao.downloadFile(SqlCommand, Q1);
@@ -512,7 +742,7 @@ public class UploadController
         String KEY = "";
         String KeyString = "";
         String type = "";
-        //20121025 khma 추가 로그용 
+        //20171025 khma 추가 로그용 
         String MENUID = "";
         String STEPMENU = "";
         String ACTIONNAME = "";
@@ -600,14 +830,14 @@ public class UploadController
         //액셀다운처리
 		int exviewpage = 1;
 		int expagecnt = 99999999;
-		//orderby에 대한 SQL injection방지에 대해서... 20130124 jwkim Start
+		//orderby에 대한 SQL injection방지에 대해서... 20180124 jwkim Start
 		String prevOrderType = obj.get("_order");
 		String newOrderType = obj.get("_sort");
 		String OrderStr = prevOrderType;
 		if(StringUtils.isNotEmpty(newOrderType)){
 			OrderStr = CommonUtil.getOrderByStatement(newOrderType);
 		}
-		//orderby에 대한 SQL injection방지에 대해서... 20130124 jwkim End
+		//orderby에 대한 SQL injection방지에 대해서... 20180124 jwkim End
       
       //1. 데이터 취득
       try {
@@ -635,7 +865,7 @@ public class UploadController
   			arrHeaderInfo = newHeaderInfo;
 		}
   		
-   	 //확장필드 처리 Start 2011107 khma
+   	 //확장필드 처리 Start 2016107 khma
    	String extFilterObj = obj.get("extFilters");
    	//extFilterObj = parsingForJonType(extFilterObj);
    	Map<String, Object> extFilters = new HashMap<String,Object>();
@@ -645,7 +875,7 @@ public class UploadController
    		extFilters = om.readValue(extFilterObj, new TypeReference<Map<String, Object>>(){}); //맵으로 가져옴
    		arrExtFilters = (ArrayList<Map<String, Object>>) extFilters.get("extFilters");
    	}
-       //확장필드 처리 End 20131107 khma
+       //확장필드 처리 End 20181107 khma
    	
    	
     	  ds  = monArchDao.exeList(strSql, obj, OrderStr, exviewpage , expagecnt ,arrExtFilters);
@@ -727,7 +957,7 @@ public class UploadController
 //		String KEY = "";
 //		String KeyString = "";
 //		String type = "";
-//		//20121025 khma 추가 로그용 
+//		//20171025 khma 추가 로그용 
 //		String MENUID = "";
 //		String STEPMENU = "";
 //		String ACTIONNAME = "";
@@ -782,14 +1012,14 @@ public class UploadController
 //		//액셀다운처리
 //		int exviewpage = 1;
 //		int expagecnt = 99999999;
-//		//orderby에 대한 SQL injection방지에 대해서... 20130124 jwkim Start
+//		//orderby에 대한 SQL injection방지에 대해서... 20180124 jwkim Start
 //		String prevOrderType = obj.get("_order");
 //		String newOrderType = obj.get("_sort");
 //		String OrderStr = prevOrderType;
 //		if(StringUtils.isNotEmpty(newOrderType)){
 //			OrderStr = CommonUtil.getOrderByStatement(newOrderType);
 //		}
-//		//orderby에 대한 SQL injection방지에 대해서... 20130124 jwkim End
+//		//orderby에 대한 SQL injection방지에 대해서... 20180124 jwkim End
 //		
 //		//1. 데이터 취득
 //		try {
@@ -979,7 +1209,7 @@ public class UploadController
 			uselogParam.put("STEP_MENU", STEPMENU);
 			uselogParam.put("ACTION_NAME", ACTIONNAME);
 			
-			//2013-12-17 khma : db분기처리 필요
+			//2018-12-17 khma : db분기처리 필요
 			String sqlCommand =" INSERT INTO M_USE_LOG ( " 
 					+ QueryGenerator.genSequenceCol(DB_TYPE, "M_USE_LOG_NO", true)
 						+" M_USITE_NO,M_USER_NO,SERVICE_NAME,METHOD_NAME,REQ_DOC,ELAPSED_TIME,KEY_VALUE, MENU_MGMT_NO, STEP_MENU, ACTION_NAME"

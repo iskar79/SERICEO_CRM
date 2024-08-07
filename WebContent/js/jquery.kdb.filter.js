@@ -1,6 +1,6 @@
 ﻿/* jQuery monarch fiter component: 
-* version 1.0 2013-09-23
-* Authors: Kim Jungwon
+* version 1.0 2018-09-23
+* Authors: KyoungHo Ma
 * Company : Kongyoung DB
 */
 
@@ -435,6 +435,9 @@
             case 'linkkey':
                 tdTags = makeLinkFilter(filter,trTag);
                 break;
+            case 'linkkey2': //20240621
+                tdTags = makeLinkFilter2(filter,trTag);
+                break;
             default:
                 alert('존재하지 않는  확장필터 타입이 존재합니다.');
                 break;
@@ -725,6 +728,51 @@
         rstTag = rstTag.append(spanTag);
         return rstTag;
     }
+    
+    /* linkkey 다건 선택 메소드 */ //20240621
+    function makeLinkFilter2(filter, trTag) {
+
+        var rstTag = makeCommTag(filter);
+        var spanTag = $('<span></span>');
+        var operatorTag = makeOperatorTag(filter);
+        var linkKeyTag = $('<span class="valuePart"></span>');
+
+        var linkJson = filter.linkJson;
+
+        //var filterIcon = filter.icon; //todo 차후 추가
+        linkKeyTag.attr('linkJson', linkJson);
+
+        
+        //버튼을 클릭하면 해당 팝업 표시.    
+        linkKeyTag.click(function(e) {
+            var valuePart = $(this);
+            $.ShowPopUpTableJson2(linkJson ,  valuePart, function(key, display, trobj, valuePart) {
+                if (key != undefined) {
+					debugger;
+                    //value값 셋팅
+                    valuePart.find('input').val(display);
+                    valuePart.parents('tr').attr('value', key);
+                }
+                
+            });
+        });
+        linkKeyTag.append('<input class="value01 input-bg input-ft b-t b-r b-b b-l b-co b-co-basic align-middle" type="text" style="width:150px" readonly /><span class="icon i-20 icon-search align-middle"></span>');
+        
+
+        //todo value값을 설정하는 처리 추가
+        //valTag.val(filter.values);
+        if(undefined != filter.linkDispVal){
+            linkKeyTag.find('input').val(filter.linkDispVal);
+        }
+
+        if(undefined != filter.values){
+            trTag.attr('value', filter.values);
+        }
+
+        spanTag = spanTag.append(operatorTag).append(linkKeyTag);
+        rstTag = rstTag.append(spanTag);
+        return rstTag;
+    }
 
     /* 확장필터 공통 preTag 생성 메소드 */
     function makeCommTag(filter) {
@@ -802,6 +850,9 @@
                 }
                 break;
             case 'linkkey':
+                rstVal = filterTr.attr('value');
+                break;
+            case 'linkkey2': //20240621
                 rstVal = filterTr.attr('value');
                 break;
             case 'user':
@@ -948,7 +999,7 @@
     /* superExtFilter 확장필터 저장하기                        */
     /* ------------------------------------------------------- */
     function savePreset(crudType, obj) {
-        //확장필터 저장 팝업 호출...20130923 khma
+        //확장필터 저장 팝업 호출...20180923 khma
         //var superExtFilter = $('.head', $(this)).data('superExtFilter');
         var methodNm = '';
 
@@ -1226,5 +1277,3 @@
         //todo 포멧이 yyyymmdd 인경우 yyyy-mm-dd의 형태로 포멧을 변경하여 value에 재설정한다.
     }
 })(jQuery);
-
-

@@ -1,7 +1,7 @@
 ﻿﻿/*!
 * jQuery grid plugin: 
 * 
-* version 0.1 2011-07-21
+* version 0.1 2016-07-21
 * Requires jQuery v1.6.2 or later
 * Dual licensed under the MIT and GPL licenses:
 * http://www.opensource.org/licenses/mit-license.php
@@ -61,9 +61,12 @@ var _M = {
 			imgUpload:"upload.mon", //DB 바이너리 저장방식
 			fileUpload:"fileupload.mon", //물리파일 저장방식
             fileDownload : "filedownload.mon", //물리파일 다운로드
+            signFileUpload:"signFileUpload.mon", //계약파일 업로드 20240619
+            signFileDownload:"signFileDownload.mon", //계약파일 다운로드 20240619
 			exceldown: "exceldown.mon",	
 			exceldownOld: "exceldownOld.mon",	
 			dataFileUpload:"doUploadDataFile.mon", //데이터파일 업로드
+			dataFileUploadOld:"doUploadDataFileOld.mon", //데이터파일 업로드
 			GetHtml: "GetHtml.json", //속도개선을 위한 html파싱후다운처리시 사용.
 			sendIndvEmail: "sendIndvEmail.json", //개별 이메일 처리 요청
 			extSvc: "extSvc.json", // 외부에서 처리 요청시 사용(crudUrl과 동일)
@@ -134,6 +137,10 @@ var _M = {
 		docs :["TXT","XLS","XLSX","DOC","DOCX","PDF","PPT","DOTX","DOT","DPC","RTF","HWP","HWT","XML"],
 		audios : ["MP3","WAV","OGG","WMA","FLAC","MID","MIDI","AC3","AAC","RA"],
 		videos :["AVI","MPG","MPEG","MP4","RM","RAM","ASF","ASX","WMV","MOV","SWF","FLV","MKV"]
+	},
+	SignFileExtenders:  //계약파일 확장자 종류 20240620
+	{			
+		ext : ["JPG","PNG","HWP","DOC","DOCX","XLS","XLSX","PPT","PPTX"]
 	},
     Jsons: {},
 
@@ -700,7 +707,7 @@ var _M = {
 						   var length = seObj.get(0).options.length;
 							if ( parentKey!= undefined ) {
 								if ( row['UPCODE'] == parentKey ) {
-									seObj.get(0).options[length] = new Option( $.decHTML(row['DECODE']), $.decHTML(row['UPCODE']) );
+									seObj.get(0).options[length] = new Option( $.decHTML(row['DECODE']), $.decHTML(row['CODE']) );
 								}
 							} else {
 								seObj.get(0).options[length] = new Option( $.decHTML(row['DECODE']), $.decHTML(row['CODE']) );
