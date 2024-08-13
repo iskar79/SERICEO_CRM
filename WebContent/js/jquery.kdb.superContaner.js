@@ -12028,17 +12028,69 @@ $(document).on("blur", ".t_Money", function (e) {
     /* update 수정동작시에 데이터를 저장함 */
     /* ------------------------------------------------------- */
     Update: function (pl, callBackFn) {
-      var _Obj = $(this);
-      _key = _Obj.attr("keyvalue");
-      option = $(this).data("jsonData");
-      pl.add("service", option.service);
-      pl.add("method", option.method.Update);
-      pl.add("key", _key);
-      pl.add(option.keyName, _key);
-      PostJsonData(
-        _M.svcUrl[_M.Webtype].crudUrl,
-        pl,
-        function (_data) {
+		var _Obj = $(this);
+		_key = _Obj.attr("keyvalue");
+		option = $(this).data("jsonData");
+	  
+		// khma 20240806 수정이력 추가 시작
+		//var _pcode = "";			
+		//_Obj.find("table:eq(0) .fieldContaner:.fldChange").each(function(e) {
+		//	var _pfield = $(this).attr('field');
+		//	if(_pfield == "PCODE"){
+		//		_pcode = $(this).superContaner('getFieldValue', pl);
+		//	}
+		//});
+		// khma 20240806 수정이력 추가 종료
+	  
+		pl.add("service", option.service);
+		pl.add("method", option.method.Update);
+		pl.add("key", _key);
+		pl.add(option.keyName, _key);
+
+		PostJsonData(_M.svcUrl[_M.Webtype].crudUrl, pl, function (_data) {
+        
+		// khma 20240806 수정이력 추가 시작
+			// 수정기록이 있으면 수정기록 로그를 관리한다        
+			_Obj.find(".fieldContaner.fldChange").each(function(e) {
+				var _logfield = $(this).attr('field');
+				var _logval = $(this).superContaner('getFieldValue', pl);
+				var _logOld = $(this).attr('oldvalue');
+				//alert('fld:' + _logfield +' - old:' + _logOld+' - new:' + _logval);
+				if (option.jobKey != undefined) {
+					option.UpdateLogName = option.jobKey;
+				}
+				if (option.UpdateLogName == undefined) { 
+					option.UpdateLogName = option.service;
+				}
+				if ($(this).attr('label') != undefined) { 
+					_logfield = $(this).attr('label');
+				}
+				
+				if (option.UpdateLogName != '') {
+					var pl = new JSONClientParameters();
+					pl.add("service", "데이터수정이력");
+					pl.add("method", "CREATE");
+					pl.add("데이터명", option.UpdateLogName);
+					pl.add("키번호", _key);
+					pl.add("필드명", _logfield);
+					pl.add("이전값", _logOld.substring(0,500));
+					pl.add("이후값", _logval.substring(0,500));
+					
+					//if(_pcode != ""){
+					//	pl.add("수정메모", _pcode);
+					//}
+					
+					if(_logOld.substring(0,500) != _logval.substring(0,500) ){
+						PostJsonData(_M.svcUrl[_M.Webtype].crudUrl, pl, function(_data) {}, function(response) {
+							//alert(response);
+						}, _M.aSync.sync);
+						
+					}
+					
+				}
+			});
+		// khma 20240806 수정이력 추가 종료
+			
           $(".fieldContaner.fldChange", _Obj).removeClass("fldChange");
           if (option.showMessage) {
             if (option.updateMessage) {

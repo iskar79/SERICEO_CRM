@@ -11,7 +11,7 @@ request.setCharacterEncoding("UTF-8");
 	content="width=device-width, initial-scale=0.7, minimum-scale=0.4, maximum-scale=3">
 
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta http-equiv="X-FRAME-OPTIONS" content="DENY" />
+<!-- <meta http-equiv="X-FRAME-OPTIONS" content="DENY" /> -->
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <link rel="apple-touch-icon" href="MonArch-blue57x57.ico" />
 <link rel="shortcut icon" href="favicon.ico" />

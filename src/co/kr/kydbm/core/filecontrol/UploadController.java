@@ -56,7 +56,7 @@ import co.kr.kydbm.core.utils.QueryGenerator;
 /**
  *  파일 업로드 콘트롤러 클래스
  * @author KyoungHo_Ma
- * @version 1.0.0 2024-07-22
+ * @version 1.0.0 2023-12-01
  * @since version 1.0.0
  */
 @Controller
@@ -191,6 +191,7 @@ public class UploadController
 	}
 	
 	
+
 	
 	/**
 	 * 파일명 변경
@@ -241,6 +242,10 @@ public class UploadController
 
 
 
+	
+	
+	
+	
 	/**
 	 * 계약 파일 업로드
 	 * @param USITE
@@ -262,15 +267,14 @@ public class UploadController
 		
 		ConfigProperties configProperties = ConfigProperties.getInstance();
 		Calendar calendar = Calendar.getInstance();
-		String baseFolder= "FileData/signFile" ;
-		String years= String.valueOf(calendar.get(Calendar.YEAR)) ;
-		String months= String.valueOf(calendar.get(Calendar.MONTH) + 1) ;
+		String years = String.valueOf(calendar.get(Calendar.YEAR)) ;
+		String months = String.valueOf(calendar.get(Calendar.MONTH) + 1) ;
 		SimpleDateFormat sd = new SimpleDateFormat("yyyyMMddHHmmssSSS");
 		String currentTimestamp = sd.format(calendar.getTime());
-		String uploadFolder = "/"+baseFolder+"/" +years +"/" + months;
+		String uploadFolder = years + "/" + months;
 //		String realPath = request.getSession().getServletContext().getRealPath( uploadFolder ); //20140207 khma 패스를 request정보가 아닌 URL이 아닌 설정값으로 변경
 		String defaultFilePath = configProperties.getProperty("monarch.fileupload.path");
-		String realPath = defaultFilePath + uploadFolder ; //20140207 khma 패스를 request정보가 아닌 URL이 아닌 설정값으로 변경
+		String realPath = defaultFilePath + "/" + uploadFolder ; //20140207 khma 패스를 request정보가 아닌 URL이 아닌 설정값으로 변경
 		String uploadFileName = Filename.getOriginalFilename();
 		String ext = FilenameUtils.getExtension(uploadFileName);
 		String realfileName = currentTimestamp+"."+ext;
@@ -349,9 +353,6 @@ public class UploadController
 		}
 	}
 	
-   
-  
- 
 
 	/**
 	 * 모나크 기존 DB저장방식의 파일 업로드
@@ -368,9 +369,9 @@ public class UploadController
 	public void uploadFile(@RequestParam("Filename") MultipartFile multiPartFile
 			,@RequestParam("Urlname") String Urlname
 			,@RequestParam("Note") String Note
-	//		,@RequestParam("ParentType") String ParentType	//20170816 khma
-	//		,@RequestParam("ParentKey") String ParentKey	//20170816 khma
-	//		,@RequestParam("WebFolder") String WebFolder	//20170816 khma
+	//		,@RequestParam("ParentType") String ParentType	//20230816 khma
+	//		,@RequestParam("ParentKey") String ParentKey	//20230816 khma
+	//		,@RequestParam("WebFolder") String WebFolder	//20230816 khma
 			,@RequestParam("UID") String UID,@RequestParam("USITE") String USITE) throws IOException, Exception {
 		
 		String fname = multiPartFile.getOriginalFilename();
@@ -380,9 +381,9 @@ public class UploadController
 		String contentType = multiPartFile.getContentType();
 		
 		String desc = Note;
-//		String 상위정보 = ParentType; //20170816 khma
-//		String 상위키 = ParentKey; 	 //20170816 khma
-//		String 폴더경로 = WebFolder;	//20170816 khma
+//		String 상위정보 = ParentType; //20230816 khma
+//		String 상위키 = ParentKey; 	 //20230816 khma
+//		String 폴더경로 = WebFolder;	//20230816 khma
 		String regUser = UID;
 		String 회원사번호 = USITE;
 		//TODO 파일관리와 이미지겔러리를 같은 처리에서 사용되고 있으나, 유형이 경로일때는 무조건 이미지겔러리로 들어감.
@@ -426,9 +427,9 @@ public class UploadController
 			mParam.put("FILE_TYPE_CODE", fileType);
 			mParam.put("LINK_URL", uname);
 			mParam.put("FILE_DESC", desc);
-//			mParam.put("상위정보", 상위정보);  //20170816 khma
-//			mParam.put("상위키", 상위키);		  //20170816 khma
-//			mParam.put("폴더경로", 폴더경로); //20170816 khma
+//			mParam.put("상위정보", 상위정보);  //20230816 khma
+//			mParam.put("상위키", 상위키);		  //20230816 khma
+//			mParam.put("폴더경로", 폴더경로); //20230816 khma
 			mParam.put("REG_USER", regUser);
 			mParam.put("UPD_USER", regUser);
 			mParam.put("M_USITE_NO", USITE); //20180320 khma 추가
@@ -444,8 +445,8 @@ public class UploadController
 			}
 		}
 	
- 
- 
+	
+	
 	/**
 	 * 파일사이즈 체크
 	 * @param Filename
@@ -742,7 +743,7 @@ public class UploadController
         String KEY = "";
         String KeyString = "";
         String type = "";
-        //20171025 khma 추가 로그용 
+        //20231025 khma 추가 로그용 
         String MENUID = "";
         String STEPMENU = "";
         String ACTIONNAME = "";
@@ -957,7 +958,7 @@ public class UploadController
 //		String KEY = "";
 //		String KeyString = "";
 //		String type = "";
-//		//20171025 khma 추가 로그용 
+//		//20231025 khma 추가 로그용 
 //		String MENUID = "";
 //		String STEPMENU = "";
 //		String ACTIONNAME = "";
@@ -1220,5 +1221,4 @@ public class UploadController
 			MonArchDaoImpl monArchDao = new MonArchDaoImpl();
 			monArchDao.exeCreate(sqlCommand, uselogParam);
 		}
-		
 }

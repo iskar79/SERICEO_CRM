@@ -17,6 +17,7 @@
 .Tabs .ui-tabs-panel { border-top:3px solid #4A4DAA; }
 .ui-tabs-nav .ui-state-default.ui-tabs-active a	 { background-color:#4A4DAA; }
 .icon-able { background-color:#5945c3; }
+.SelectTR  { background-color:#eae6ff; }
 
 .ui-dialog.ui-draggable { border:1px solid #28247B; }
 .ui-dialog-titlebar { background-color:#28247B; }

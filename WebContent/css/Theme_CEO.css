@@ -10,13 +10,14 @@
 
 
 .title-bg						{ background-color:#232E5C; }
-.progress li.on	a				{ color:#232E5C; }
+.progress li.on	a				{ color:#232E5C; }"//26.2.121.55/공유드라이브/시스템개발그룹/#개인폴더/공ㅇㅇ/운영소스백업_폴더/ROOT_20240722/css/Theme_CEO.css"
 .progress li.on:after			{ background:#232E5C; }
 .cmdspan						{ background:#0095C3 !important; border:1px solid #006b8c !important; }
 .cmdspan:hover					{ background:#006b8c !important; }
 .Tabs .ui-tabs-panel { border-top:3px solid #232E5C; }
 .ui-tabs-nav .ui-state-default.ui-tabs-active a	 { background-color:#232E5C; }
 .icon-able { background-color:#185de0; }
+.SelectTR  { background-color:#d1efff; }
 
 .ui-dialog.ui-draggable { border:1px solid #232e5c; }
 .ui-dialog-titlebar { background-color:#232E5C; }
