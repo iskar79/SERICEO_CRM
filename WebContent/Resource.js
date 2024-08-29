@@ -140,7 +140,7 @@ var _M = {
 	},
 	SignFileExtenders:  //계약파일 확장자 종류 20240620
 	{			
-		ext : ["JPG","PNG","HWP","DOC","DOCX","XLS","XLSX","PPT","PPTX"]
+		ext : ["JPG","PNG","HWP","DOC","DOCX","XLS","XLSX","PPT","PPTX","PDF"]
 	},
     Jsons: {},
 
@@ -371,14 +371,14 @@ var _M = {
 				var nd = new Date();
                 //var d = new Date();
                 
-                let stndDate = changeDate.substring(0,2).toLowerCase();
+                let stndDate = changeDate.substring(1,2).toLowerCase();
 				let regex = /[^-\0-9]/g;
                 let chgeDate = changeDate.substring(2).replace(regex, "") * 1;
                 
                 if(!isNaN(chgeDate) && isNotEmpty(chgeDate)) {
-	                if(stndDate == 'fy') {
+	                if(stndDate == 'y') {
 						nd.setFullYear(nd.getFullYear() + chgeDate);
-					} else if (stndDate == 'fm') {
+					} else if (stndDate == 'm') {
 						nd.setMonth(nd.getMonth() + chgeDate);
 					}
 				}

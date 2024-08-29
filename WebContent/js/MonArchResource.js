@@ -80,6 +80,7 @@ var _Biz = {
             
         },*/
         SITE목록: function (id, mngrflag) {
+			debugger;
             // 2024.02.19 khma 관리자 기능 (SERICEO 특화된 기능) -- 기존의 기능을 추가         
             var pl = new JSONClientParameters();
             pl.add('id', id);
@@ -89,6 +90,7 @@ var _Biz = {
 					if (data.resultData.length > 1) {
                         var _o = $(".ui-site", $(document.body));
                         var _sel = $("<select class='selsite'></select>").appendTo(_o);
+                        //var _sel = $(".selsite", $(document.body));
                         var _selected = "";
 						$.each(data.resultData, function (index, row){
                             if (_M.UserInfo.gsite == row["CODE"]) {
@@ -102,6 +104,90 @@ var _Biz = {
 				}, _M.aSync.sync);
             } else {
                 $(".ui-site", $(document.body)).hide();
+            }
+
+            //if (mngrflag == "1" || mngrflag == "2") {
+            if (_M.UserInfo.gsite == "MS") {
+                //SERI담당자
+                var _objCorp = $(".ui-corp", $(document.body));
+
+                //$(".ui-top-label", $(document.body)).html(" 법인:");
+                $(".ui-top-label", $(document.body)).html("<span class='fldTdLabel fldTdLabel-bg fldTdLabel-ft' title='법인'>법인: </span>");
+				
+				var _oHstr = "";
+				_oHstr += "<div class='fieldContaner' type='linkKey' field='GGCORP' oldvalue='' value='' linkfield='거래처명' linkjson='거래처ListJsonPopUp' bindfield='거래처명' style='width: 100%;'>";
+				_oHstr += "	<div class='fieldView' style='display: none;'></div>";
+				_oHstr += "	<div class='fieldEdit'>";
+				_oHstr += "	</div>";
+				_oHstr += "</div>";
+				
+				var _obj = $(_oHstr).appendTo(_objCorp);
+                var _fieldEdit = $(".fieldContaner[field='GGCORP'] .fieldEdit", _objCorp);
+				var _span = $("<span class='pinset'></span>").appendTo(_fieldEdit);
+				
+				var _iHstr = "<input  class='input-bg input-ft b-t b-r b-b b-l b-co b-co-basic align-middle' type='text' value='' for='linkkey' />";				
+				var _o = $(_iHstr).appendTo(_span).change(function () {
+								_o.attr("data", $(this).val());
+							});
+
+				var _img = $("<span class='icon i-20 icon-search align-middle'></span>").appendTo(_span);
+				_img.click(function (e) {
+					var _fieldContaner = $(this).parents(".fieldContaner");
+					$.ShowPopUpTableJson(
+						_fieldContaner.attr("linkJson"),_fieldContaner,function (key, display, trobj) {
+							if (key != undefined) {
+								$("input", _fieldContaner).val($.decHTML(display));
+								$("input", _fieldContaner).attr("data", $.decHTML(display));
+								_fieldContaner.attr("linkvalue", key);
+								_fieldContaner.trigger("change");
+							}
+						}
+					);
+				});
+				
+				_o.keydown(function (e) {
+					var _fieldContaner = $(this).parents(".fieldContaner");
+					if (e.keyCode == "13") {
+						// var _inputval = _o.val();
+						e.preventDefault();
+						$.ShowPopUpTableJson(
+							_fieldContaner.attr("linkJson"),_fieldContaner,function (key, display, trobj) {
+								if (key != undefined) {
+									$("input", _fieldContaner).val(display);
+									_fieldContaner.attr("linkvalue", key);
+									_fieldContaner.trigger("change");
+								}
+							}
+						);
+					}
+				});
+
+                //$(".ui-corpsave", $(document.body)).html("<div class='cmdspanwrap'><input type='button' class='cmdbtn cmdspan-ft' value='GCORP' index='GCORP' incomm='GCORP'></div>");
+				$(".ui-corpsave", $(document.body)).html("<a class='ActionCmd'>저장</a>");
+				//$(".ui-corpsave", $(document.body)).html("[저장]");
+                var _obtn = $(".ui-corpsave", $(document.body));
+
+                $(".fieldContaner[field='GGCORP']", _objCorp).val(_M.UserInfo.gcorp);
+                _o.val(_M.UserInfo.gcorpnm);
+                _obtn.click(function () {
+                    var ans = confirm("저장 하시겠습니까?");
+                    if (!ans) {return false;}
+
+                    //var v_corp = $(".fieldContaner[field='GGCORP']", _objCorp).attr("value");
+                    var v_corp = $(".fieldContaner[field='GGCORP']", _objCorp).attr("linkvalue");
+                    //alert("v_corp:" + v_corp);
+					debugger;
+					$.cookie("gCorp", v_corp);
+                    var pl = new JSONClientParameters();
+                    pl.add('ID', _M.UserInfo.id);
+                    pl.add('CORP', v_corp);
+                    $.SvcCallPl("MON_COMMON", "UPDATE_GCORP", pl, function (data) { }, false);
+
+                    location.reload();
+                });
+            } else {
+                $(".ui-corp", $(document.body)).hide();
+                $(".ui-corpsave", $(document.body)).hide();
             }
         },
         /* Start  LG하우시스 전용 SSO 로그인 처리 20120730 khma */
@@ -153,6 +239,9 @@ function setUserInfo(data){
 	
 	let gSite = $.cookie('gSite');
 	 if($.cookie('gSite') == "") {  gSite = data["gsite"]; }
+	let gCorp = $.cookie('gCorp');
+	 if($.cookie('gCorp') == "") {  gSite = data["gcorp"]; }
+	 
 	_M.UserInfo.id = data["userNo"];
     _M.UserInfo.lid = data["userCode"];
     _M.UserInfo.SID = data["usiteNo"];
@@ -177,7 +266,12 @@ function setUserInfo(data){
     
     //_M.UserInfo.gsite = data["gsite"];
     _M.UserInfo.gsite = gSite;
-	_M.UserInfo.gcorp = (data["CORP"] == null) ? "" : data["CORP"];
+	//_M.UserInfo.gcorp = (data["CORP"] == null) ? "" : data["CORP"];
+    if(_M.UserInfo.gsite == "MS"){
+		_M.UserInfo.gcorp = gCorp;
+	} else {
+		_M.UserInfo.gcorp = "";
+	}
 	_M.UserInfo.gcorpnm = (data["CORPNM"] == null) ? "" : data["CORPNM"];
 	_M.UserInfo.tcorp = (data["TCORP"] == null) ? "" : data["TCORP"];
 	_M.UserInfo.tcorpnm = (data["TCORPNM"] == null) ? "" : data["TCORPNM"];

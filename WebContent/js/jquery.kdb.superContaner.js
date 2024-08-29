@@ -1135,6 +1135,7 @@ $(document).on("blur", ".t_Money", function (e) {
                   if (
                     value.type == "select" &&
                     value.codes != undefined &&
+                    value.codes != "" &&
                     value.codes.split(".").length == 1 &&
                     _M.Codes[value.codes] == undefined
                   ) {
@@ -1782,6 +1783,7 @@ $(document).on("blur", ".t_Money", function (e) {
                       if (
                         value.type == "select" &&
                         value.codes != undefined &&
+                        value.codes != "" &&
                         value.codes.split(".").length == 1 &&
                         _M.Codes[value.codes] == undefined
                       ) {
@@ -5689,6 +5691,7 @@ $(document).on("blur", ".t_Money", function (e) {
                       if (
                         value.type == "select" &&
                         value.codes != undefined &&
+                        value.codes != "" &&
                         value.codes.split(".").length == 1 &&
                         _M.Codes[value.codes] == undefined
                       ) {
@@ -12056,6 +12059,9 @@ $(document).on("blur", ".t_Money", function (e) {
 				var _logval = $(this).superContaner('getFieldValue', pl);
 				var _logOld = $(this).attr('oldvalue');
 				//alert('fld:' + _logfield +' - old:' + _logOld+' - new:' + _logval);
+				if (option.jobType != undefined) {
+					option.UpdateLogName = option.jobKey;
+				}
 				if (option.jobKey != undefined) {
 					option.UpdateLogName = option.jobKey;
 				}
@@ -12743,7 +12749,17 @@ $(document).on("blur", ".t_Money", function (e) {
           if (_from.val().length <= 1 && _to.val().length <= 1) {
             _retVal = "";
           } else {
-            _retVal = _from.val() + "," + _to.val();
+//			  if(_from.val().length > 0 && _to.val().length > 0){
+//				  if(_from.val() <= _to.val()){
+//					_retVal = _from.val() + "," + _to.val();
+//				  } else {
+//					_from.val(_to.val());
+//					_retVal = _to.val() + "," + _to.val();
+//				  }
+//			  } else {
+//				  _retVal = _from.val() + "," + _to.val();
+//			  }
+			  _retVal = _from.val() + "," + _to.val();
           }
           _Obj.attr("Value", _retVal);
           if (apl != undefined) {
@@ -14934,6 +14950,12 @@ $(document).on("blur", ".t_Money", function (e) {
 					) {
 					_Obj.superContaner("changeValue", $(this), _M.f.d.getFDateChange(_value), 0, pl);
 					_Obj.superContaner("changeValue", $(this), _M.f.d.getDate(), 1, pl);
+					
+				} else if (_value.substring(0,2).toLowerCase() == "by"
+					|| _value.substring(0,2).toLowerCase() == "bm"
+					) {
+					_Obj.superContaner("changeValue", $(this), _M.f.d.getDate(), 0, pl);
+					_Obj.superContaner("changeValue", $(this), _M.f.d.getDateChange(_value.substring(1,4).toLowerCase()), 1, pl);
 				} 
 			} else {
 			  _Obj.superContaner("changeValue", $(this), _value, 0, pl);

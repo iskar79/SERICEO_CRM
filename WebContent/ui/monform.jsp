@@ -139,6 +139,9 @@ request.setCharacterEncoding("UTF-8");
 					<div class=logo-wrap>
 						<a href="/"><h1 class="logo"><em class="blind">SERICEO</em></h1></a>
 						<span class="ui-site"></span>
+						<span class="ui-top-label"></span>
+						<span class="ui-corp"></span>
+						<span class="ui-corpsave"></span>
 					</div>
 					<div class="logoutarea">
 						<span class="ui-username"></span>
