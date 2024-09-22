@@ -8926,18 +8926,6 @@ $(document).on("blur", ".t_Money", function (e) {
              * _inputval = _o.attr("data"); }
              */ // 20180909
             var _fieldContaner = $(this).parents(".fieldContaner");
-            $.ShowPopUpTableJson2(
-              _fieldContaner.attr("linkJson"),
-              _fieldContaner,
-              function (key, display, trobj) {
-                if (key != undefined) {
-                  $("input", _fieldContaner).val($.decHTML(display));
-                  $("input", _fieldContaner).attr("data", $.decHTML(display));
-                  _fieldContaner.attr("linkvalue", key);
-                  _fieldContaner.trigger("change");
-                }
-              }
-            );
             $.ShowPrevSignPopUpJson(
               _fieldContaner.attr("linkJson"),
               _fieldContaner,
@@ -9715,7 +9703,9 @@ $(document).on("blur", ".t_Money", function (e) {
 				  _phoneNumber = "82-" + _phoneNumber.substr(2).replace(/^(02|\d{3})(\d+)(\d{4})$/, "$1-$2-$3").replace(/(\-{1,2})$/g, "");
 			  } else if(_phoneNumber.length > 8 && _phoneNumber.length < 12) {
 				  _phoneNumber = _phoneNumber.replace(/^(02|\d{3})(\d+)(\d{4})$/, "$1-$2-$3").replace(/(\-{1,2})$/g, "");
-			  } else {
+			  } else if(_phoneNumber.length == 0) {
+				  _phoneNumber = _phoneNumber.replace(/^(02|\d{3})(\d+)(\d{4})$/, "$1-$2-$3").replace(/(\-{1,2})$/g, "");
+			  }else {
 				   alert('번호가 부정확합니다.');
 				  _phoneNumber = "";
 			  }
@@ -12055,9 +12045,13 @@ $(document).on("blur", ".t_Money", function (e) {
 		// khma 20240806 수정이력 추가 시작
 			// 수정기록이 있으면 수정기록 로그를 관리한다        
 			_Obj.find(".fieldContaner.fldChange").each(function(e) {
+				var _fieldType = $(this).attr('type');
 				var _logfield = $(this).attr('field');
+				var _logLabel = $(this).parent().prev().text();
 				var _logval = $(this).superContaner('getFieldValue', pl);
+				if(_logval == undefined || _logval == "") _logval = $(this).attr('value');
 				var _logOld = $(this).attr('oldvalue');
+				if(_fieldType == "date" || _fieldType == "dateBetween") _logOld = _M.f.d.DateGetDate(getDateIE8Compatible(_logOld));
 				//alert('fld:' + _logfield +' - old:' + _logOld+' - new:' + _logval);
 				if (option.jobType != undefined) {
 					option.UpdateLogName = option.jobKey;
@@ -12072,7 +12066,7 @@ $(document).on("blur", ".t_Money", function (e) {
 					_logfield = $(this).attr('label');
 				}
 				
-				if (option.UpdateLogName != '') {
+				if (option.UpdateLogName != "" && _logval != undefined && _logval != "") {
 					var pl = new JSONClientParameters();
 					pl.add("service", "데이터수정이력");
 					pl.add("method", "CREATE");
@@ -12081,6 +12075,14 @@ $(document).on("blur", ".t_Money", function (e) {
 					pl.add("필드명", _logfield);
 					pl.add("이전값", _logOld.substring(0,500));
 					pl.add("이후값", _logval.substring(0,500));
+					
+					
+					pl.add("jobType", option.UpdateLogName);
+					pl.add("jobKey", _key);
+					pl.add("Targ_Field", _logfield);
+					pl.add("Field_Name", _logLabel);
+					pl.add("Prev_Value", _logOld.substring(0,500));
+					pl.add("Aftr_value", _logval.substring(0,500));
 					
 					//if(_pcode != ""){
 					//	pl.add("수정메모", _pcode);
@@ -14685,7 +14687,7 @@ $(document).on("blur", ".t_Money", function (e) {
               .css("margin-top", "6px")
               .css("width", "350px");
             _htm =
-              "<input id ='fileSearchKey' name='fileSearchKey' mode='modify' type='hidden' value='' />";
+              "<input id ='fileSearchKey' name='fileSearchKey' mode='modify' type='hidden' value='' /><input id ='uploadYn' name='' type='hidden' value='' />";
             _o.append(_htm);
             $(".fieldView input", _Obj).remove();
             $(".fieldView .fldfiledown", _Obj).append(_htm);
@@ -15249,16 +15251,19 @@ $(document).on("blur", ".t_Money", function (e) {
 								+ "'><span class='icon i-20 icon-downward align-middle'></span> <label class='align-middle' style='height:20px; line-height:20px; font-weight:bold; color:initial; cursor:pointer;'>"
 								+ f.FILE_NAME
 								+ "</label></a><label class='align-middle' style='height:20px; line-height:20px; font-weight:normal; font-size:10px;'> ("
-								+ _M.f.c.setComma((f.FILE_SIZE / 1024)
-										.toString().substring(0, 5))
-								+ "kb)</label></li>";
+								+ _M.f.c.setComma((f.FILE_SIZE / 1024).toString().substring(0, 5))
+									  
+								+ "kb)</label>"
+								//+ "<a href='"+ _M.svcUrl[_M.Webtype].signFileDelete + "?fid=" + f.M_IMAGE_GAL_NO + "&uid=" + _M.UserInfo.id +"'>"
+								//+ "<span class='icon i-20 icon-cancel align-middle'></span></a>"
+								+ "</li>";
 					}
 
 					if (undefined == rstData || rstData.length <= 0) {
 						// liTag +="<li class='filelist'>파일없음</li>";
-						$('.tempdiv').css('padding', '0px 0px').css(
-								'border-top', '0px solid transparent').css(
-								'margin-top', '0px');
+						$('.tempdiv').css('padding', '0px 0px').css('border-top', '0px solid transparent').css('margin-top', '0px');
+												   
+							 
 					}
 			}, function() {
 				alert("예상하지 못한 에러가 발생하였습니다.");

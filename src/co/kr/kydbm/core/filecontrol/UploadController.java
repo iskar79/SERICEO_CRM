@@ -34,6 +34,7 @@ import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -67,7 +68,7 @@ public class UploadController
 	private static final String DB_TYPE = prop.getProperty("monarch.db.type");
 	private static final String[] FILE_UPLOAD_WHITE_LIST = { 
 		"BMP","GIF","JPG","PCX","PNG","SVG","SVGZ","TIF", //이미지파일 확장자
-		"DOC","DOCX","DOTX","DOT","DPC","HWP","HWT","PDF","PPT","PPTX","RTF","TXT","XLS","XLSX","XML", //문서파일 확장자 
+		"DOC","DOCX","DOTX","DOT","DPC","HWP","HWT","PDF","PPT","PPTX","RTF","TXT","XLS","XLSX","XML","PDF", //문서파일 확장자 
 		"AAC","AC3","FLAC","MID","MIDI","MP3","OGG","RA","WAV","WMA", //오디오파일 확장자
 		"ASF","ASX","AVI","FLV","MKV","MOV","MP4","MPG","MPEG","RAM","RM","SWF","WMV", //비디오파일 확장자
 		"ACE", "ALZ","ARC",  "GZ", "JAR", "LHA", "LZH",  "RAR", "TAR", "TGZ", "WAR","ZIP"  //압축파일
@@ -75,7 +76,7 @@ public class UploadController
 	
 	private static final String[] SIGN_FILE_UPLOAD_WHITE_LIST = { 
 			"PNG","JPG", //이미지파일 확장자
-			"HWP","DOC","DOCX","XLS","XLSX","PPT","PPTX" //문서파일 확장자 
+			"HWP","DOC","DOCX","XLS","XLSX","PPT","PPTX","PDF" //문서파일 확장자 
 			};
 	
 	private static final String[] EXCEL_DOWN_CLASS_WHITE_LIST = {
@@ -274,12 +275,12 @@ public class UploadController
 		String uploadFolder = years + "/" + months;
 //		String realPath = request.getSession().getServletContext().getRealPath( uploadFolder ); //20140207 khma 패스를 request정보가 아닌 URL이 아닌 설정값으로 변경
 		String defaultFilePath = configProperties.getProperty("monarch.fileupload.path");
-		String realPath = defaultFilePath + "/" + uploadFolder ; //20140207 khma 패스를 request정보가 아닌 URL이 아닌 설정값으로 변경
+		String realPath = defaultFilePath + "/" +uploadFolder ; 
 		String uploadFileName = Filename.getOriginalFilename();
 		String ext = FilenameUtils.getExtension(uploadFileName);
-		String realfileName = currentTimestamp+"."+ext;
+		String realfileName = currentTimestamp;
 		String fileSize = String.valueOf(Filename.getSize());
-		long lFileSize =Long.parseLong(fileSize);
+		long lFileSize = Long.parseLong(fileSize);
 //		PropertyUtil propertyUtil  = new PropertyUtil("monarch.properties");
 		long limitSize = 500000;
 		String strLimitSize = configProperties.getProperty("monarch.fileupload.limitsize");
@@ -333,6 +334,7 @@ public class UploadController
 					mapParam.put("FILE_PATH", uploadFolder);
 					mapParam.put("ORIG_FILE_NAME", Filename.getOriginalFilename());
 					mapParam.put("REAL_FILE_NAME", realfileName);
+					mapParam.put("FILE_CONTENT_TYPE", ext);
 					mapParam.put("FILE_SIZE", fileSize);
 					mapParam.put("FILE_DESC", "SIGN_FILE");
 					mapParam.put("UID", UID);
@@ -351,6 +353,70 @@ public class UploadController
 				}
 			}
 		}
+	}
+	
+	/**
+	 * 계약 파일 삭제
+	 * @param fid
+	 * @param uid
+	 * @param request
+	 */
+	@RequestMapping("/signFileDelete")
+	public void signFileDelete(
+			@RequestParam("fid") String fid, 
+			@RequestParam("uid") String uid) throws Exception  {
+		
+		ConfigProperties configProperties = ConfigProperties.getInstance();
+		String defaultFilePath = configProperties.getProperty("monarch.fileupload.path");
+
+		try{
+			
+			//파일 정보 조회
+			String SqlCommand = "SELECT FILE_PATH, UPPER_KEY FROM M_IMAGE_GAL WHERE M_IMAGE_GAL_NO = ?";
+			MonArchDaoImpl monArchDao = new MonArchDaoImpl();
+		
+			Map<String, Object> fileInfo =  monArchDao.downloadFile(SqlCommand, fid);
+			String targetFilePath = String.valueOf(fileInfo.get("FILE_PATH"));
+			String upperKey = String.valueOf(fileInfo.get("UPPER_KEY"));
+				   upperKey = upperKey.equals("null") ? "" : upperKey;
+			String realPath = defaultFilePath + targetFilePath;
+		
+			File file = new File(realPath);
+		    
+	    	if(file.exists()){
+	    		if(file.delete()){
+	    			System.out.println("파일삭제 성공");
+	    			
+	    			if(upperKey.length() > 0) {
+		    			//A_SIGN_ACC 파일 정보 업데이트
+		    			String sqlUpdtSignAcc = "UPDATE A_SIGN_ACC SET ";
+		    				   sqlUpdtSignAcc += " CONTRACT_FILENAME = NULL";
+		    				   sqlUpdtSignAcc += " ,CONTRACT_FILEPATH = NULL";
+		    				   sqlUpdtSignAcc += " ,CHGTIME = SYSDATE" ;
+		    				   sqlUpdtSignAcc += " ,CHGUSEQ = @UID@" ;
+		    				   sqlUpdtSignAcc += " WHERE  = @SIGNSEQ@" ;
+
+		    			Map<String, String> parameters = new HashMap<String, String>();
+		    			parameters.clear();
+		    			parameters.put("SIGNSEQ", upperKey);
+		    			parameters.put("UID", uid);
+		    			
+		    			//업데이트
+		    			monArchDao.exeUpdate(sqlUpdtSignAcc, parameters);
+	    			}
+	
+
+	    		}else{
+	    			System.out.println("파일삭제 실패");
+	    		}
+	    	}else{
+	    		log.error("파일이 존재하지 않습니다.");
+	    	}
+		
+		}catch(Exception e){
+			log.error("파일삭제 중 예기치 못한 에러가 발생하였습니다.", e);
+		}
+        	
 	}
 	
 
@@ -1221,4 +1287,5 @@ public class UploadController
 			MonArchDaoImpl monArchDao = new MonArchDaoImpl();
 			monArchDao.exeCreate(sqlCommand, uselogParam);
 		}
+  
 }

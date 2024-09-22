@@ -2191,6 +2191,7 @@
             if(state == "success"){
 				alert("계약파일 업로드가 완료되었습니다.");
 				$(document.body).find('.kcontextMenu.MultiFileManagerPopup').dialog("close");
+				$("#uploadYn").val("Y");
 			}
         });
         frm.submit(function () { return false; });
@@ -2664,75 +2665,6 @@
 		o.dialog("open");
     };
 
-	// TABLE에서 여러건 선택 20240621
-    $.ShowPopUpTableJson2 = function (json, _Obj, callBackFn) {
-		if(_Obj.parents('.ui-dialog').length == 0){
-			//todo 현재 팝업을 호출한 객체도 팝업일 경우 상위 팝업을 삭제하지 않는다.
-			$(document.body).find('.ShowPopUpTableJson').remove();
-		}
-
-        var o = $("<div class='ShowPopUpTableJson EditPopUp DivContext'></div>");
-        $(document.body).append(o);
-        var $showPopupObj = $('<div id="ShowPopUpTableJson_1"></div>').appendTo(o);
-        $showPopupObj.superContaner('superTable', json);
-		var title = '정보';
-		if(isNotEmpty($showPopupObj.data('jsonData').title )){
-			title =$showPopupObj.data('jsonData').title;
-		}
-		o.dialog({
-			autoOpen: false,
-			modal: false,
-			width: 800,
-			title: title,
-			buttons: {
-				"선택": function () {
-					
-					var tCnt = $("tr[selected='selected']", $(".ShowPopUpTableJson")).length;
-					var result;
-					var selectKey = [];
-					var returnKey;					
-
-					$("tr[selected='selected']", $showPopupObj).each(function (index) {
-						_key = $(this).attr('keyvalue');
-						_display = $(this).attr('displayvalue');
-						selectKey.push(_display);
-					});
-
-					selectKey.sort(function(selectKey, cmpr){return selectKey-cmpr;});
-					returnKey = selectKey.toString();
-					result = callBackFn(_key, returnKey, $(this), _Obj);
-					
-					if ( result != false ) {
-					$(this).dialog("close");
-					}
-		
-				},
-				"닫기": function () {
-					callBackFn();
-					$(this).dialog("close");
-				}
-			},
-			open: function (event, ui) {
-
-				/* 20180906 start */
-				if (undefined != _Obj && null != _Obj && 'valuePart' != _Obj.attr('class')) {
-					var autoBindingFld = _Obj.attr("bindField");
-					//var data = $('input', _Obj).attr('data');
-					var data = $('input', _Obj).val();
-					if (autoBindingFld != undefined && autoBindingFld != "") {
-						// $('.fieldContaner:[field="' + autoBindingFld + '"]');
-						$(this).superContaner('setFieldNameValue', autoBindingFld, data);
-						if(data != "") $showPopupObj.superContaner('List');
-					}
-				}
-				/* 20180906 end */
-			},
-			close: function (event, ui) {
-				o.remove();
-			}
-		});
-		o.dialog("open");
-    };
     $.ShowPrevSignPopUpJson = function (json, _Obj, callBackFn) {
 		if(_Obj.parents('.ui-dialog').length == 0){
 			//todo 현재 팝업을 호출한 객체도 팝업일 경우 상위 팝업을 삭제하지 않는다.
@@ -2808,11 +2740,11 @@
 			}
 		});
 		
-		//회사정보 입력 여부 확인 - 20240716 추가
+		//법인정보 입력 여부 확인 - 20240716 추가
 		var V_CORP = $("input", _Obj).attr("linkvalue");
 		
 		if(V_CORP == undefined || V_CORP == ""){
-			alert("회사 정보 입력 후 조회 가능합니다.");
+			alert("법인 정보 입력 후 조회 가능합니다.");
 			return false;
 		}else{
 			$.SvcGetRow("SIGNCORP_NEW", "SIGN_CHK", "CORP", V_CORP, function (data) {
@@ -3292,7 +3224,12 @@
                         });
                     },
                     "닫기": function () {
-                        $(this).dialog("close");
+						var _Pclose = $('[field="PW_CHG_YN"]',$('#ShowEdit[jsonname="MON_COM_사용자정보POPUP_TBL"]')).attr('value');
+						if(_Pclose == "Y"){
+							debugger;
+						} else {
+							$(this).dialog("close");	
+						}
                     }
                 },
                 close: function (event, ui) {

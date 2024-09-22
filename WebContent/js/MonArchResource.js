@@ -80,7 +80,6 @@ var _Biz = {
             
         },*/
         SITE목록: function (id, mngrflag) {
-			debugger;
             // 2024.02.19 khma 관리자 기능 (SERICEO 특화된 기능) -- 기존의 기능을 추가         
             var pl = new JSONClientParameters();
             pl.add('id', id);
@@ -112,7 +111,7 @@ var _Biz = {
                 var _objCorp = $(".ui-corp", $(document.body));
 
                 //$(".ui-top-label", $(document.body)).html(" 법인:");
-                $(".ui-top-label", $(document.body)).html("<span class='fldTdLabel fldTdLabel-bg fldTdLabel-ft' title='법인'>법인: </span>");
+                $(".ui-top-label", $(document.body)).html("<span class='fldTdLabel fldTdLabel-ft' title='법인'>법인: </span>");
 				
 				var _oHstr = "";
 				_oHstr += "<div class='fieldContaner' type='linkKey' field='GGCORP' oldvalue='' value='' linkfield='거래처명' linkjson='거래처ListJsonPopUp' bindfield='거래처명' style='width: 100%;'>";
@@ -175,9 +174,17 @@ var _Biz = {
 
                     //var v_corp = $(".fieldContaner[field='GGCORP']", _objCorp).attr("value");
                     var v_corp = $(".fieldContaner[field='GGCORP']", _objCorp).attr("linkvalue");
+                    var v_corpnm = $(".fieldContaner[field='GGCORP'] input", _objCorp).val();
+					
                     //alert("v_corp:" + v_corp);
 					debugger;
-					$.cookie("gCorp", v_corp);
+					if(v_corp != "" && v_corpnm != ""){
+						$.cookie("gCorp", v_corp);
+						$.cookie("gCorpNm", v_corpnm);
+					} else {
+						$.cookie("gCorp", "");
+						$.cookie("gCorpNm", "");
+					}
                     var pl = new JSONClientParameters();
                     pl.add('ID', _M.UserInfo.id);
                     pl.add('CORP', v_corp);
@@ -241,6 +248,8 @@ function setUserInfo(data){
 	 if($.cookie('gSite') == "") {  gSite = data["gsite"]; }
 	let gCorp = $.cookie('gCorp');
 	 if($.cookie('gCorp') == "") {  gSite = data["gcorp"]; }
+	let gCorpNm = $.cookie('gCorpNm');
+	 if($.cookie('gCorpNm') == "") {  gSite = data["CORPNM"]; }
 	 
 	_M.UserInfo.id = data["userNo"];
     _M.UserInfo.lid = data["userCode"];
@@ -272,7 +281,12 @@ function setUserInfo(data){
 	} else {
 		_M.UserInfo.gcorp = "";
 	}
-	_M.UserInfo.gcorpnm = (data["CORPNM"] == null) ? "" : data["CORPNM"];
+	//_M.UserInfo.gcorpnm = (data["CORPNM"] == null) ? "" : data["CORPNM"];
+    if(_M.UserInfo.gsite == "MS"){
+		_M.UserInfo.gcorpnm = gCorpNm;
+	} else {
+		_M.UserInfo.gcorpnm = "";
+	}
 	_M.UserInfo.tcorp = (data["TCORP"] == null) ? "" : data["TCORP"];
 	_M.UserInfo.tcorpnm = (data["TCORPNM"] == null) ? "" : data["TCORPNM"];
     
