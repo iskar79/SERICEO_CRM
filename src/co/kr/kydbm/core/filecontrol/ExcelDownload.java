@@ -689,8 +689,7 @@ public class ExcelDownload {
 					colNum++;
 				}else{
 					if (null != ds.get(i).get(keyName)) data = ds.get(i).get(keyName).toString();
-					if(NumberUtils.isNumber(data)){
-						
+					if(NumberUtils.isNumber(data) && !data.substring(0,1).equals("0")){ 	//id에 첫글자가 0이포함되어있어도 표기하깅위해 뒷부분 추가
 						
 						try{
 							number = new jxl.write.Number(j-colNum, i+1, Double.parseDouble(data), cellFormat);
