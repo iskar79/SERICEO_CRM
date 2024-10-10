@@ -36,7 +36,7 @@ $(document).on("click", ".opticon-logout", function (e) {
     data: "",
     success: function (data) {
       sessionStorage.removeItem("authValue");
-      alert("로그아웃 되었습니다.");
+      //alert("로그아웃 되었습니다.");
       window.location.href = "http://" + window.location.host + "/"; // 해쉬URL정보
       // 클리어
     },

@@ -288,9 +288,12 @@ var _M = {
         d: {
             DateGetDate: function (d) {
                 /// <summary>오늘날짜를 리턴함</summary>
-                var s = leadingZeros(d.getFullYear(), 4) + '-' +
-						leadingZeros(d.getMonth() + 1, 2) + '-' +
-						leadingZeros(d.getDate(), 2);
+                var s = "";
+                if(d != "" && d != undefined){
+	                s = leadingZeros(d.getFullYear(), 4) + '-' +
+							leadingZeros(d.getMonth() + 1, 2) + '-' +
+							leadingZeros(d.getDate(), 2);	
+				}
 
                 return s;
             },
