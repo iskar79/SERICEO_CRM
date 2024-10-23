@@ -12269,6 +12269,7 @@ $(document).on("blur", ".t_Money", function (e) {
       setTimeout($.unblockUI, 300);
       return pl;
     },
+	/* 20241023 khma - 체인지콜백 타이밍을 위해서 변경함
     ContanerChange: function () {
       var _Obj = $(this);
       var _ViewObj = $(this).parents(".SuperView");
@@ -12282,8 +12283,31 @@ $(document).on("blur", ".t_Money", function (e) {
         _Obj.addClass("fldChange");
       }
       if (option == undefined) return;
-      if (option.ChangeCallBack != undefined)
-        eval(option.ChangeCallBack)(_Obj, _ViewObj);
+      if (option.ChangeCallBack != undefined) {
+        if(_Obj.hasClass("fldChange")) eval(option.ChangeCallBack)(_Obj, _ViewObj);	
+      }
+    },
+	*/
+    ContanerChange: function () {
+      var _Obj = $(this);
+      var _ViewObj = $(this).parents(".SuperView");
+      var option = _ViewObj.data("jsonData");
+
+      var _Value = _Obj.superContaner("getFieldValue");
+      var _oldValue = _Obj.attr("oldValue");
+	  
+      if (_oldValue != _Value) {
+        _Obj.addClass("fldChange");
+      }
+	  
+      if (option == undefined) return;
+      if (option.ChangeCallBack != undefined) {
+        if(_Obj.hasClass("fldChange")) eval(option.ChangeCallBack)(_Obj, _ViewObj);	
+      }
+	  
+      if (_oldValue == _Value) {
+        _Obj.removeClass("fldChange");
+      }
     },
 
     ContanerKeyDown: function () {
