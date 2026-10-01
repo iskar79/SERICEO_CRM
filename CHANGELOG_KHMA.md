@@ -15,6 +15,7 @@ VDI 내부망으로 복사 및 덮어쓰기가 필요한 파일 목록입니다.
 * [ ] `SECUREDB_PLAN2_API.md` (20261001 khma SecureDB 적용 2안 가이드 생성)
 * [ ] `TASK2_EXCEL_DOWNLOAD_PWD.md` (20261001 khma 엑셀 암호화 가이드 생성)
 * [ ] `TASK3_SYSTEM_UPGRADE.md` (20261001 khma 시스템 업그레이드 전략 생성)
+* [ ] `.project` (20261001 khma 최신 이클립스 호환성을 위한 구형 VJET 찌꺼기 제거)
 
 ---
 
@@ -33,6 +34,7 @@ VDI 내부망으로 복사 및 덮어쓰기가 필요한 파일 목록입니다.
 | 20261001 | khma | `TASK2_EXCEL_DOWNLOAD_PWD.md` | 수정 | 전체 | prompt 평문 노출 버그 방지용 HTML 동적 팝업 레이어 로직 및 POI 문법 마이그레이션 1:1 매핑 추가 |
 | 20261001 | khma | `TASK3_SYSTEM_UPGRADE.md` | 수정 | 전체 | VDI 폐쇄망 수동 반입 절차 명시, 17개 jar 다운로드 체크리스트 및 URL 추가, 보안 취약점 3종 패치 권고 추가 |
 | 20261001 | khma | `SECUREDB_PLAN2_API.md` | 수정 | 4번 항목 | 기존 M_SERVICE 원문 무수정 원칙(Java 정규식 런타임 치환 기법) 적용 및 비전문적 용어(개조) 순화 |
+| 20261001 | khma | `.project` | 수정 | 전체 | 최신 이클립스(2024버전 이상) 호환성을 위해 구형 VJET 및 JSDT 찌꺼기 플러그인 설정 제거 |
 
 ---
 
