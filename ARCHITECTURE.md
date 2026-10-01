@@ -8,6 +8,7 @@
 
 * **시스템 명칭**: SERICEO CRM
 * **엔진 프레임워크**: MonArch 8.2.0 (Custom Enterprise CRM Framework)
+* **빌드/의존성 구조 (매우 중요)**: Maven/Gradle 등 자동화된 빌드 도구(`pom.xml` 등)를 **사용하지 않는** 고전적인 `Dynamic Web Project` 방식입니다. 모든 외부 라이브러리는 `WebContent/WEB-INF/lib` 폴더에 직접 `.jar` 파일을 복사하여 관리합니다.
 * **WAS / Runtime**: Apache Tomcat 9 / JDK 11
 * **핵심 라이브러리 (AS-IS 및 TO-BE 고도화 목표)**:
   * Spring Framework `3.1.1.RELEASE` ➡️ **(Task 3: `4.3.30.RELEASE` 업그레이드 예정)**
