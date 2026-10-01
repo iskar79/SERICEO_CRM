@@ -8,14 +8,14 @@
 
 VDI 내부망으로 복사 및 덮어쓰기가 필요한 파일 목록입니다. 반영 완료 시 `[x]`로 체크하여 관리합니다.
 
-* [ ] `0_MASTER_EXECUTION_PLAN.md` (20261001 khma 작업 순서 마스터 플랜 생성)
-* [ ] `AGENTS.md` (20261001 khma 작업 가이드 및 시스템 아키텍처 수립)
-* [ ] `ARCHITECTURE.md` (20261001 khma 시스템 아키텍처 상세 정의서 생성)
-* [ ] `3_ALT_SECUREDB_UDF.md` (20261001 khma SecureDB 적용 1안 가이드 생성)
-* [ ] `3_TASK_SECUREDB_API.md` (20261001 khma SecureDB 적용 2안 가이드 생성)
-* [ ] `2_TASK_EXCEL_DOWNLOAD_PWD.md` (20261001 khma 엑셀 암호화 가이드 생성)
-* [ ] `1_TASK_SYSTEM_UPGRADE.md` (20261001 khma 시스템 업그레이드 전략 생성)
 * [ ] `.project` (20261001 khma 최신 이클립스 호환성을 위한 구형 VJET 찌꺼기 제거)
+* [ ] `0_MASTER_EXECUTION_PLAN.md` (20261001 khma 작업 순서 마스터 플랜 생성)
+* [ ] `1_TASK_SYSTEM_UPGRADE.md` (20261001 khma 시스템 업그레이드 전략 생성)
+* [ ] `2_TASK_EXCEL_DOWNLOAD_PWD.md` (20261001 khma 엑셀 암호화 가이드 생성)
+* [ ] `3_TASK_SECUREDB_API.md` (20261001 khma SecureDB 적용 2안 가이드 생성)
+* [ ] `3_ALT_SECUREDB_UDF.md` (20261001 khma SecureDB 적용 1안 가이드 생성)
+* [ ] `ARCHITECTURE.md` (20261001 khma 시스템 아키텍처 상세 정의서 생성)
+* [ ] `AGENTS.md` (20261001 khma 작업 가이드 및 시스템 아키텍처 수립)
 
 ---
 
