@@ -1,6 +1,6 @@
-# Task 3: 시스템 버전 업그레이드 전략 및 가이드
+# Task 1: 시스템 버전 업그레이드 전략 및 가이드
 
-본 문서는 SERICEO CRM의 구형 라이브러리(Spring, jQuery)를 시스템 붕괴 없이 최소한의 공수로 안전하게 업그레이드하기 위한 전략 지침서입니다.
+본 문서는 SERICEO CRM의 구형 라이브러리(Spring, jQuery, POI)를 시스템 붕괴 없이 최소한의 공수로 안전하게 업그레이드하기 위한 전략 지침서입니다.
 
 ---
 
@@ -110,24 +110,41 @@
 
 ---
 
-## 4. 보안 취약점(CVE) 대응 추가 라이브러리 업그레이드 권고 (선택/권장)
-현재 `WEB-INF/lib` 내부에 있는 써드파티(3rd Party) 라이브러리들을 스캔해 본 결과, 심각한 보안 취약점이 발견되어 즉시 교체(Drop-in Replacement)가 권장되는 파일들이 있습니다. 아래 파일들은 코드를 수정할 필요 없이 **기존 파일을 삭제하고 새 버전의 파일을 넣기만 하면 되는 안전한 업그레이드**입니다.
+## 4. Apache POI 4.1.2 라이브러리 교체 가이드 (Task 2 대비 필수)
+
+과업 2(엑셀 다운로드 암호화) 수행 및 대용량 스트리밍(`SXSSFWorkbook`) 지원을 위해 `WebContent/WEB-INF/lib` 폴더 내 구형 POI를 4.1.2로 교체합니다.
+
+* **[규칙 준수] 대치되는 기존 5개 파일 백업 (물리적 삭제 금지)**:
+  * `poi-3.8-20120326.jar` ➡️ `poi-3.8-20120326.jar_20261001`
+  * `poi-ooxml-3.8-20120326.jar` ➡️ `poi-ooxml-3.8-20120326.jar_20261001`
+  * `poi-ooxml-schemas-3.8-20120326.jar` ➡️ `poi-ooxml-schemas-3.8-20120326.jar_20261001`
+  * `poi-scratchpad-3.8-20120326.jar` ➡️ `poi-scratchpad-3.8-20120326.jar_20261001`
+  * `xmlbeans-2.3.0.jar` ➡️ `xmlbeans-2.3.0.jar_20261001`
+
+* **신규 반입 7개 파일 (동일 폴더 `WebContent/WEB-INF/lib/`에 배치)**:
+  1. `poi-4.1.2.jar`
+  2. `poi-ooxml-4.1.2.jar` (핵심: Agile Encryptor 포함)
+  3. `poi-ooxml-schemas-4.1.2.jar`
+  4. `poi-scratchpad-4.1.2.jar`
+  5. `xmlbeans-3.1.0.jar`
+  6. `commons-collections4-4.4.jar` (POI 4.x 필수 의존성)
+  7. `commons-compress-1.19.jar` (OOXML 스트림 필수 의존성)
+
+---
+
+## 5. 보안 취약점(CVE) 대응 추가 라이브러리 업그레이드 권고 (선택/권장)
+현재 `WEB-INF/lib` 내부에 있는 써드파티 라이브러리 중 심각한 보안 취약점이 발견된 대상입니다. 코드를 수정할 필요 없이 **새 버전 파일로 덮어쓰기만 하면 되는 안전한 교체**입니다.
 
 1. **`commons-fileupload-1.3.1.jar` ➡️ `commons-fileupload-1.5.jar` 로 교체**
-   * 다운로드 링크: [Maven Repository (Fileupload 1.5)](https://repo1.maven.org/maven2/commons-fileupload/commons-fileupload/1.5/commons-fileupload-1.5.jar)
-   * 사유: 구버전은 악의적인 파일 업로드 시 서버가 뻗어버리는 심각한 DoS 취약점(CVE-2016-1000031)이 있습니다. CRM 특성상 엑셀 업로드가 많으므로 반드시 1.5 최신 버전으로 교체해야 합니다.
+   * 사유: 악의적인 파일 업로드 시 DoS 취약점(CVE-2016-1000031) 패치.
 2. **`commons-io-2.2.jar` ➡️ `commons-io-2.15.1.jar` 로 교체**
-   * 다운로드 링크: [Maven Repository (IO 2.15.1)](https://repo1.maven.org/maven2/commons-io/commons-io/2.15.1/commons-io-2.15.1.jar)
-   * 사유: 파일 경로 조작(Directory Traversal) 취약점이 존재합니다. FileUpload와 짝을 이루므로 함께 최신 버전으로 올려야 합니다.
-3. **`poi-3.8-20120326.jar` (관련 파일 5개) ➡️ `poi-4.1.2.jar` 계열로 교체 (엑셀 암호화 시 강력 권장)**
-   * 다운로드 링크: [Maven Repository (POI 4.1.2)](https://mvnrepository.com/artifact/org.apache.poi/poi/4.1.2) (poi, poi-ooxml 등 5개 파일 세트로 다운로드)
-   * 사유: 2012년에 나온 엄청난 구형입니다. 이번 2번 과제(엑셀 다운로드 암호화)를 원활하게 진행하고 최신 엑셀(xlsx) 포맷의 보안을 강화하려면 POI 라이브러리들을 4.1.2 버전으로 묶어서 올리는 것이 좋습니다. (5.x 버전은 JDK 11 이상이 필수이고 호환성이 깨질 수 있어 4.1.2가 가장 안전합니다)
+   * 사유: 파일 경로 조작(Directory Traversal) 취약점 패치. FileUpload와 함께 업그레이드.
 
-> **주의**: `log4j-1.2.16.jar`나 `quartz-all-1.8.3.jar` 같은 파일들도 매우 낡았으나, 이들을 업그레이드하려면 Java 소스 코드 전체를 갈아엎어야 하는 '재앙' 수준의 공수가 들기 때문에 **절대 건드리지 말고 현행 유지**해야 합니다.
+> **주의**: `log4j-1.2.16.jar`나 `quartz-all-1.8.3.jar`는 업그레이드 시 Java 소스 코드 전체 수정이 필요하므로 **절대 건드리지 말고 현행 유지**합니다.
 
-## 5. 🚨 12월 톰캣(Tomcat) 업그레이드 대응 지침
-12월로 예정된 톰캣 업그레이드가 **단순 버전업(Tomcat 9.0.x 패치)인지, 메이저 업그레이드(Tomcat 10)인지 확인이 최우선**입니다.
+---
 
-* **Tomcat 10으로 갈 경우의 치명적 리스크**:
-  * Tomcat 10부터 자바 서블릿 네임스페이스가 `javax`에서 `jakarta`로 강제 변경되었습니다.
-  * 기존 코드를 유지하려면 무조건 Tomcat 9에 머물러야 합니다. Tomcat 10으로 업그레이드를 강행할 경우 JDK 17, Spring 6 마이그레이션이 강제되며 이는 차세대 시스템 재구축(SI) 수준의 초대형 공수가 발생합니다.
+## 6. 🚨 톰캣(Tomcat) 버전 점검 지침
+* **Tomcat 9.0.x 패치**: 적극 권장 (Java 서블릿 네임스페이스 `javax.*` 유지).
+* **Tomcat 10 업그레이드 금지**:
+  * Tomcat 10부터 `jakarta.*` 네임스페이스로 강제 변경되어 Spring 3/4 및 전체 소스가 구동되지 않습니다. 본 CRM은 반드시 **Tomcat 9.0** 환경을 고수해야 합니다.
