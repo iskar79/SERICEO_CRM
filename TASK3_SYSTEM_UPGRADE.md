@@ -64,7 +64,36 @@
 
 **[3-1. 프로젝트 임포트 에러 조치 (필수)]**
 * VDI 내부 또는 로컬에서 이클립스(특히 2024년 이후 최신 버전) 사용 시, 구형 VJET 플러그인 찌꺼기 때문에 프로젝트를 아예 불러오지 못할 수 있습니다.
-* 이를 해결하기 위해 찌꺼기를 제거한 **`.project` 파일**을 VDI로 반입하여 기존 파일 위에 덮어씌워야 합니다.
+* 이를 해결하기 위해 VDI 이클립스에서 프로젝트 최상단에 있는 `.project` 파일을 열고, 아래의 **구형 찌꺼기 노드들을 찾아 통째로 삭제(텍스트 지우기)** 하십시오.
+
+```xml
+<!-- 삭제 대상 1: buildCommand 내의 외부 툴 빌더 (vjet, jsdt) -->
+<buildCommand>
+    <name>org.eclipse.ui.externaltools.ExternalToolBuilder</name>
+    <triggers>full,incremental,</triggers>
+    <arguments>
+        <dictionary>
+            <key>LaunchConfigHandle</key>
+            <value>&lt;project&gt;/.externalToolBuilders/org.ebayopensource.vjet.eclipse.core.builder.launch</value>
+        </dictionary>
+    </arguments>
+</buildCommand>
+<buildCommand>
+    <name>org.eclipse.ui.externaltools.ExternalToolBuilder</name>
+    <triggers>full,incremental,</triggers>
+    <arguments>
+        <dictionary>
+            <key>LaunchConfigHandle</key>
+            <value>&lt;project&gt;/.externalToolBuilders/org.eclipse.wst.jsdt.core.javascriptValidator (1).launch</value>
+        </dictionary>
+    </arguments>
+</buildCommand>
+
+<!-- 삭제 대상 2: natures 내의 vjet 및 jsNature -->
+<nature>org.ebayopensource.vjet.core.nature</nature>
+<nature>org.eclipse.wst.jsdt.core.jsNature</nature>
+```
+* **주의**: 맨 윗부분의 `<name>MonArch821</name>` 도 VDI 프로젝트 폴더명과 동일하게 `<name>sericeo_crm</name>` 등으로 텍스트를 맞춰주시면 완벽하게 에러가 사라집니다.
 
 **[3-2. 컴파일러 버전 1.6 ➡️ 11 상향 조치]**
 * 이클립스 내부에서 `Compiling for Java version '1.6' is no longer supported` 에러가 발생할 경우, 반드시 프로젝트의 Java 컴파일러 버전을 Tomcat 9 런타임 스펙에 맞춰 `11` (또는 최소 `1.8`)로 올려주어야 합니다.
