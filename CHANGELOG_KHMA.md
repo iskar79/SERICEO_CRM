@@ -39,6 +39,7 @@ VDI 내부망으로 복사 및 덮어쓰기가 필요한 파일 목록입니다.
 | 20261001 | khma | `2_TASK_EXCEL_DOWNLOAD_PWD.md` | 수정 | 전체 | POI 4.1.2 SXSSFWorkbook + Agile 스트림 암호화 풀 소스코드, 4단계 Before/After Diff, 임시파일 누수 방지 추가 |
 | 20261001 | khma | `3_TASK_SECUREDB_API.md` | 수정 | 전체 | monarch.properties 설정값, CryptoService.java 전체 싱글턴 구현체 및 쿼리 제어 소스 보강 |
 | 20261001 | khma | `1_TASK_SYSTEM_UPGRADE.md` | 수정 | 전체 | Task 1 번호 정정, POI 4.1.2 라이브러리 교체 및 1:1 대치 표 추가 |
+| 20261001 | khma | `WebContent/WEB-INF/lib/POI 4.1.2 신규 라이브러리/` | 추가 | 전체 | POI 4.1.2 및 의존성 JAR 7종 사전 준비 폴더 반입 |
 
 ---
 
