@@ -16,6 +16,7 @@ VDI 내부망으로 복사 및 덮어쓰기가 필요한 파일 목록입니다.
 * [ ] `3_ALT_SECUREDB_UDF.md` (20261001 khma SecureDB 적용 1안 가이드 생성)
 * [ ] `ARCHITECTURE.md` (20261001 khma 시스템 아키텍처 상세 정의서 생성)
 * [ ] `AGENTS.md` (20261001 khma 작업 가이드 및 시스템 아키텍처 수립)
+* [ ] `WebContent/js/jquery.kdb.superContaner.js` (20261002 khma [주의] VDI 전체 덮어쓰기 금지! DownXls 함수 블록만 정밀 병합 - 20241115 볼드 및 12053L 필드값 수정 보존)
 
 ---
 
@@ -40,10 +41,20 @@ VDI 내부망으로 복사 및 덮어쓰기가 필요한 파일 목록입니다.
 | 20261001 | khma | `3_TASK_SECUREDB_API.md` | 수정 | 전체 | monarch.properties 설정값, CryptoService.java 전체 싱글턴 구현체 및 쿼리 제어 소스 보강 |
 | 20261001 | khma | `1_TASK_SYSTEM_UPGRADE.md` | 수정 | 전체 | Task 1 번호 정정, POI 4.1.2 라이브러리 교체 및 1:1 대치 표 추가 |
 | 20261001 | khma | `WebContent/WEB-INF/lib/POI 4.1.2 신규 라이브러리/` | 추가 | 전체 | POI 4.1.2 및 의존성 JAR 7종 사전 준비 폴더 반입 |
+| 20261002 | khma | `0_MASTER_EXECUTION_PLAN.md` | 수정 | Step 0-2 추가 | VDI 기존 소스(superContaner.js) 변경 이력 대조 및 보존 점검 사전 작업 정의 |
+| 20261002 | khma | `CHANGELOG_KHMA.md` | 수정 | 1, 2, 3장 | superContaner.js VDI 반영 시 주의사항 체크리스트 및 사전 점검 이력 등록 |
 
 ---
 
 ## 🔍 3. 작업 건별 세부 변경 내역 (Diff 요약)
+
+### [20261002] khma - VDI 기존 소스(superContaner.js) 사전 점검 Task 등록
+* **대상 파일**: `0_MASTER_EXECUTION_PLAN.md`, `CHANGELOG_KHMA.md`
+* **작업 구분**: 마스터 실행 계획서 보강 및 VDI 사전 점검 이력 등록
+* **상세 내용**:
+  * `WebContent/js/jquery.kdb.superContaner.js`에 이미 반영되어 있는 기존 운영 소스(218라인 `//페이지 볼드처리 추가 20241115 khma` 및 12053라인 `_logOld` 취득 로직 수정) 보존 조치
+  * `0_MASTER_EXECUTION_PLAN.md`에 **`Step 0-2: VDI 기존 소스 변경 이력 대조 및 보존 점검 (사전 검증)`** 독립 Task 신설
+  * 16,500줄짜리 화면 엔진을 통째로 덮어쓰지 않고, 향후 기능 수정 시 해당 함수 블록만 선별 병합하도록 안전 가이드 확립
 
 ### [20261001] khma - 실무 구현 코드 및 아키텍처 상세 내역 문서 통합 보강
 * **대상 파일**: `ARCHITECTURE.md`, `1_TASK_SYSTEM_UPGRADE.md`, `2_TASK_EXCEL_DOWNLOAD_PWD.md`, `3_TASK_SECUREDB_API.md`, `CHANGELOG_KHMA.md`
