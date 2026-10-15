@@ -215,6 +215,11 @@ $(document).on("change", ".SuperTable .pgLCnt", function (event) {
 $(document).on("click", ".SuperTable .pgnum", function (event) {
   setPrevActGbn(undefined, undefined, "페이지이동"); // 로그용 액션로그데이터 셋팅
   $(this).parents(".SuperTable").superContaner("ChangePage", $(this), event);
+  
+  //페이지 볼드처리 추가 20241115 khma
+  $('.pgn').css('font-weight','');
+  $(this).find('.pgn').css('font-weight','bold');
+  
   var _st = $(".SuperTable .body .trChkAll input").attr(
     "checked",
     $(this).is(":checked")
@@ -12048,13 +12053,23 @@ $(document).on("blur", ".t_Money", function (e) {
 				var _fieldType = $(this).attr('type');
 				var _logfield = $(this).attr('field');
 				var _logLabel = $(this).parent().prev().text();
-				var _logval = $(this).superContaner('getFieldValue', pl);
-				if(_logval == undefined || _logval == "") _logval = $(this).attr('value');
-				var _logOld = $(this).attr('oldvalue');
-				if(_fieldType == "date" || _fieldType == "dateBetween") _logOld = _M.f.d.DateGetDate(getDateIE8Compatible(_logOld));
+				
+				var _logval = $(this).superContaner('getFieldValue', pl);				
+				//var _logOld = $(this).attr('oldvalue');
+				var _logOld = $(this).find('.fieldView').text();
+				
+				
+				if(_logval == undefined || _logval == "") {
+					_logval = $(this).attr('value');
+				}
+				//if(_fieldType == "date" || _fieldType == "dateBetween"){
+				//	if(_logOld != ""){
+				//		_logOld = _M.f.d.DateGetDate(getDateIE8Compatible(_logOld));
+				//	}
+				//}
 				//alert('fld:' + _logfield +' - old:' + _logOld+' - new:' + _logval);
 				if (option.jobType != undefined) {
-					option.UpdateLogName = option.jobKey;
+					option.UpdateLogName = option.jobType;
 				}
 				if (option.jobKey != undefined) {
 					option.UpdateLogName = option.jobKey;

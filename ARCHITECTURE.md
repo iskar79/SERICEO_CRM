@@ -34,7 +34,92 @@
 
 ---
 
-## 2. 전체 요청 / 응답 라이프사이클 (Request Lifecycle)
+## 2. 프로젝트 디렉토리 및 파일 트리 구조 (Project Directory Structure)
+
+본 프로젝트는 Maven/Gradle이 아닌 **순수 이클립스 Dynamic Web Project** 구조이며, 핵심 소스 트리와 담당 역할은 다음과 같습니다.
+
+```text
+sericeo_crm_origin/
+├── src/                                  # [백엔드 Java 소스 코드 (Spring MVC / MonArch)]
+│   ├── monarch.properties                # CRM 환경설정 (DB 연결 정보, 파일업로드 경로, 사이트 설정)
+│   ├── properties/                       # 외부 프로퍼티 설정 폴더
+│   └── co/kr/kydbm/
+│       ├── common/                       # 공통 유틸리티 및 전역 상수 정의
+│       │   ├── CommonConst.java          # 공통 상수 정의
+│       │   ├── CommonExcelUtil.java      # POI 기반 엑셀 유틸리티 (POI 4.1.2 마이그레이션 대상)
+│       │   └── CommonUtil.java           # 문자열/날짜 공통 유틸
+│       ├── core/                         # 시스템 코어 비즈니스 엔진 (MonArch 프레임워크)
+│       │   ├── bean/                     # 데이터 전송 객체 (DTO/VO)
+│       │   │   ├── ExcelImportBean.java
+│       │   │   ├── FilterGeneratorBean.java
+│       │   │   ├── ResultInfo.java       # AJAX 응답 공통 래퍼 (성공여부, 메시지, 데이터셋)
+│       │   │   ├── ServiceInfo.java      # M_SERVICE 메타데이터 캐시 DTO
+│       │   │   └── UserInfo.java         # 세션 로그인 사용자 정보 모델
+│       │   ├── dao/                      # 데이터베이스 접근(JDBC/DAO) 레이어
+│       │   │   ├── DataSourceSupport.java# DBCP DataSource 관리 베이스 클래스
+│       │   │   ├── DataUploadDaoImpl.java# 엑셀 대용량 일괄 등록 최적화 DAO
+│       │   │   ├── MonArchDaoImpl.java   # @PARAM@ 동적 SQL 바인딩 및 실행 메인 DAO
+│       │   │   └── MonArchExtDaoImpl.java# 확장 비즈니스 로직 및 특수 쿼리 DAO
+│       │   ├── exception/                # 공통 예외 처리
+│       │   │   ├── AuthException.java    # 세션 만료 및 권한 오류 (E1000)
+│       │   │   ├── ExceptionResolver.java# 전역 스프링 예외 처리기
+│       │   │   └── LoginException.java   # 로그인 실패 예외
+│       │   ├── filecontrol/              # 파일 업/다운로드 전담 모듈
+│       │   │   ├── CommonExcelUpload.java# 엑셀 업로드 유틸
+│       │   │   ├── DataUploadResultBean.java
+│       │   │   ├── ExcelDownload.java    # 단일/대용량 엑셀 다운로드 엔진 (POI)
+│       │   │   ├── ExcelDownload2.java   # 신규 엑셀 다운로드 엔진 (POI 4.1.2 암호화 적용 대상)
+│       │   │   ├── ExtExcelService.java  # 특수 서식 엑셀 서비스
+│       │   │   ├── UploadController.java # 파일 업/다운로드 통합 컨트롤러
+│       │   │   └── UploadDataController.java
+│       │   ├── interceptor/              # Spring Interceptor
+│       │   │   └── LoginCheckInterceptor.java # 세션 유효성 검증 관문
+│       │   ├── meta/                     # 메타데이터 메모리 로딩/캐싱
+│       │   │   ├── Initializer.java      # WAS 기동 시 공통코드/라벨/메시지 메모리 적재
+│       │   │   ├── MetaCommCode.java     # M_COMM_CODE 캐시
+│       │   │   ├── MetaCommLabel.java    # M_COMM_LABEL 다국어 라벨 캐시
+│       │   │   └── MetaCommMsg.java      # M_COMM_MSG 공통 메시지 캐시
+│       │   ├── service/                  # 코어 서비스 컨트롤러
+│       │   │   ├── LoginController.java  # 사내 로그인 인증 처리
+│       │   │   └── SvcCRUD.java          # 공통 동적 CRUD 게이트웨이 (/DATACRUD.json)
+│       │   └── utils/                    # 코어 프레임워크 유틸리티
+│       │       ├── ConfigProperties.java # monarch.properties 파서
+│       │       ├── FilterGenerator.java  # 그리드 조건절 동적 생성기 (WHERE절 조립)
+│       │       ├── LanguageExchanger.java# 다국어 치환 유틸
+│       │       ├── MappingJacksonJsonViewEx.java # Jackson 1.9 커스텀 JSON 응답 뷰
+│       │       ├── QueryGenerator.java   # DB별 페이징/날짜 함수 동적 조립기
+│       │       └── SetCharacterEncodingFilter.java # UTF-8 인코딩 필터
+│       ├── mail/                         # 메일 발송 서비스 모듈
+│       │   └── MailServiceController.java# 개별/단체 메일 발송 및 큐(Queue) 관리
+│       ├── scheduler/                    # Quartz 1.8.3 배치 스케줄러
+│       │   ├── MonarchCommonJob.java     # 공통 시스템 주기 배치
+│       │   └── SendDirectMailJob.java    # 대량 메일 발송 큐 배치 잡
+│       └── sso/                          # 외부 SSO 연동 모듈
+│           └── SsoLoginService.java      # 그룹사/포털 SSO 인증 연동
+└── WebContent/                           # [프론트엔드 및 웹 정적 리소스]
+    ├── WEB-INF/
+    │   ├── web.xml                       # 서블릿 매핑(Monarch820), 필터, 세션 설정
+    │   ├── dispatcher-servlet.xml        # 스프링 MVC 뷰리졸버, 컨트롤러 스캔, 인터셉터
+    │   ├── applicationContext.xml        # 트랜잭션, 데이터소스(DBCP) 설정
+    │   ├── lib/                          # 외부 JAR 라이브러리 (Spring, POI, Jackson 등)
+    │   └── jsp/                          # 팝업 등 서버 렌더링 보조 JSP
+    ├── ui/
+    │   ├── monform.jsp                   # CRM SPA 메인 컨테이너 (화면 분할 및 hashchange 제어)
+    │   └── index.jsp                     # 진입점 및 리다이렉트
+    ├── js/                               # 프론트엔드 코어 엔진
+    │   ├── Resource.js                   # [기둥 1] 전역 메타 정의서 (_M 객체, 24종 UI 데이터타입)
+    │   ├── jquery.kdb.MonArch800.js      # [기둥 2] 공통 유틸리티, 포맷팅, 베이스 라이브러리
+    │   ├── jquery.kdb.superContaner.js   # [기둥 3] CRM 화면 총괄 렌더링 엔진 (SuperTable 그리드)
+    │   ├── jquery.kdb.soap.2.0.js        # [기둥 4] 백엔드 통신 관문 (JSONClientParameters 직렬화)
+    │   └── MonArch.js                    # 전역 네비게이션 제어 및 테마 관리
+    ├── css/                              # 스타일시트 (Theme_CEO.css 등)
+    ├── FileData/                         # 파일 첨부 및 엑셀 임시 디렉토리 (excelTemp)
+    └── image/                            # UI 아이콘 및 이미지 리소스
+```
+
+---
+
+## 3. 전체 요청 / 응답 라이프사이클 (Request Lifecycle)
 
 ```
 [클라이언트 브라우저 (jQuery 1.10.2 / 1.12.4)]
@@ -79,7 +164,7 @@
 
 ---
 
-## 3. 핵심 비즈니스 데이터 흐름도 (Mermaid Data Flow Diagram)
+## 4. 핵심 비즈니스 데이터 흐름도 (Mermaid Data Flow Diagram)
 
 ### 1) 엑셀 다운로드 암호화 파이프라인
 ```mermaid
@@ -143,7 +228,7 @@ sequenceDiagram
 
 ---
 
-## 4. 프론트엔드 아키텍처 (`WebContent/`)
+## 5. 프론트엔드 아키텍처 (`WebContent/`)
 
 ### ① SPA 기반 메인 컨테이너 (`WebContent/ui/monform.jsp`)
 * 단일 JSP 화면 안에서 전체 CRM 뷰가 전환되는 **SPA(Single Page Application) 컨테이너 구조**.
@@ -183,7 +268,7 @@ sequenceDiagram
 
 ---
 
-## 5. 전체 주요 파일 목록 및 상세 용도 (시스템 파일 사전)
+## 6. 전체 주요 파일 목록 및 상세 용도 (시스템 파일 사전)
 
 ### 1) 파일/엑셀 제어 레이어 (`co.kr.kydbm.core.filecontrol`)
 | 파일명 | 역할 및 세부 용도 |
@@ -229,7 +314,7 @@ sequenceDiagram
 
 ---
 
-## 6. 서버 기동 및 캐싱 (`Initializer.java`)
+## 7. 서버 기동 및 캐싱 (`Initializer.java`)
 
 WAS(Tomcat) 구동 시 `Monarch820-servlet.xml`의 `init-method="init"`에 의해 [`Initializer`](file:///c:/Users/khma7/eclipse-workspace/sericeo_crm/src/co/kr/kydbm/core/meta/Initializer.java)가 실행되어 다음 항목을 메모리에 사전 캐싱합니다:
 
@@ -239,7 +324,7 @@ WAS(Tomcat) 구동 시 `Monarch820-servlet.xml`의 `init-method="init"`에 의�
 
 ---
 
-## 7. 운영 안정성 및 예외 처리를 위한 아키텍처 원칙 (운영 보강)
+## 8. 운영 안정성 및 예외 처리를 위한 아키텍처 원칙 (운영 보강)
 
 ### 1) [백엔드] SXSSFWorkbook 임시 파일 누수(Disk Full) 방지
 * **위험 요소**: 대용량 엑셀 생성을 위해 POI `SXSSFWorkbook`을 사용할 경우, OOM 방지를 위해 디스크에 다수의 임시 파일(`.tmp`)을 생성합니다. 스트림 전송 후 이를 방치하면 서버 디스크 공간 부족(Disk Full) 장애가 발생합니다.

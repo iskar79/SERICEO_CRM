@@ -9,10 +9,13 @@
 
 **[1-1. 프로젝트 임포트 에러 조치 (필수)]**
 * VDI 내부 또는 로컬에서 이클립스(특히 2024년 이후 최신 버전) 사용 시, 구형 VJET 플러그인 찌꺼기 때문에 프로젝트를 아예 불러오지 못할 수 있습니다.
-* 이를 해결하기 위해 VDI 이클립스에서 프로젝트 최상단에 있는 `.project` 파일을 열고, 아래의 **구형 찌꺼기 노드들을 찾아 통째로 삭제(텍스트 지우기)** 하십시오.
+* **[원칙 준수] 물리적 삭제 금지**: 
+  * 방법 ① (권장): 이미 VJET 찌꺼기가 깔끔하게 정리된 로컬의 **`.project`** 파일로 VDI 파일을 덮어쓰기 합니다. (기존 VDI 파일은 `.project_YYYYMMDD`로 백업 보존)
+  * 방법 ② (직접 수정 시): 기존 구형 코드를 완전히 지우지 말고, 아래와 같이 **XML 주석(`<!-- ... -->`) 처리**하여 보존합니다.
 
 ```xml
-<!-- 삭제 대상 1: buildCommand 내의 외부 툴 빌더 (vjet, jsdt) -->
+<!-- 20261001 khma 제외 처리 : 최신 이클립스 호환성을 위해 구형 VJET/JSDT 빌더 주석 보존 -->
+<!--
 <buildCommand>
     <name>org.eclipse.ui.externaltools.ExternalToolBuilder</name>
     <triggers>full,incremental,</triggers>
@@ -34,9 +37,9 @@
     </arguments>
 </buildCommand>
 
-<!-- 삭제 대상 2: natures 내의 vjet 및 jsNature -->
 <nature>org.ebayopensource.vjet.core.nature</nature>
 <nature>org.eclipse.wst.jsdt.core.jsNature</nature>
+-->
 ```
 * **주의**: 맨 윗부분의 `<name>MonArch821</name>` 도 VDI 프로젝트 폴더명과 동일하게 `<name>sericeo_crm</name>` 등으로 텍스트를 맞춰주시면 완벽하게 에러가 사라집니다.
 
@@ -56,8 +59,10 @@
 
 **[작업 순서]**
 1. 이 프로젝트는 Maven(pom.xml) 기반이 아니므로 수동으로 `.jar` 파일을 교체해야 합니다.
-2. 기존 `WebContent/WEB-INF/lib` 폴더에 있는 `org.springframework.*-3.1.1.RELEASE.jar` 파일들(약 20개)을 모두 삭제합니다.
-   * **주의**: `org.springframework.asm-3.1.1`과 `org.springframework.web.struts-3.1.1`은 Spring 4에서 아예 폐기되었으므로 삭제만 하고 새로 받지 않습니다.
+2. **[규칙 준수] 기존 JAR 물리적 삭제 절대 금지 (백업 보존)**:
+   * 기존 `WebContent/WEB-INF/lib` 폴더에 있는 `org.springframework.*-3.1.1.RELEASE.jar` 파일들(약 20개)은 **절대 삭제하지 말고, 파일명 뒤에 `_YYYYMMDD`를 붙여 클래스로더 로딩에서만 제외**합니다.
+     * 예시: `org.springframework.core-3.1.1.RELEASE.jar` ➡️ `org.springframework.core-3.1.1.RELEASE.jar_20261001`
+   * **Spring 4 폐기 모듈**: `org.springframework.asm-3.1.1`과 `org.springframework.web.struts-3.1.1`은 Spring 4에서 영구 폐기되었으므로 새로 받을 필요 없이 동일하게 뒤에 `_YYYYMMDD`를 붙여 제외 보존합니다.
 3. **외부 인터넷 PC에서 아래 17개의 파일(버전: 4.3.30.RELEASE)을 다운로드**하여 망연계 시스템으로 VDI로 반입한 후 `WEB-INF/lib`에 넣습니다.
    
    > 🔗 **공식 다운로드 사이트 (Maven Central)**: [https://mvnrepository.com/](https://mvnrepository.com/) 또는 [https://repo1.maven.org/maven2/org/springframework/](https://repo1.maven.org/maven2/org/springframework/)

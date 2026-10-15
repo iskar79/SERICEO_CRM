@@ -5,10 +5,32 @@
 ---
 
 ## 1. 개요 및 아키텍처 원칙
+* **모듈 구축 현황**: 고객사 DB 및 WAS 서버에 **KSign SecureDB 모듈 구축이 이미 완료**되어 있습니다. (DB Plugin UDF 및 Java API 방식 모두 즉시 사용 가능 상태)
 * **개념**: DB는 암호문과 검색 색인 토큰(NTS)을 보관하며, Java 코어 엔진(`MonArchDaoImpl`, `SvcCRUD`, `FilterGenerator`)이 데이터를 밀어넣기 전과 꺼낸 직후에 **`KSign SecureDB Java API V2`**를 호출하여 암/복호화 및 NTS 토큰 변환을 수행하는 방식입니다.
-* **필요 라이브러리**:
-  * `WebContent/WEB-INF/lib/` 경로에 벤더사 제공 **`ksign-sdb-api-v2.x.x.jar`** 배치.
-* **핵심 장점**: 인덱스를 타는 초고속 검색(NTS 토큰)이 가능하여 DB 부하가 없고, WAS 계층에서 처리하므로 기간계 연계(CEODB)와의 암호화 키/정책 일치도가 완벽합니다.
+* **필요 라이브러리 및 환경 요건 (KSign 공식 V2 가이드)**:
+  * `WebContent/WEB-INF/lib/` 경로에 벤더사 제공 **`ksign-sdb-api-v2.x.x.jar`** 단 1개만 배치 (구형 V1 JAR와 혼용 절대 금지).
+  * 실행 계정에 `$SDB_HOME/conf`, `$SDB_HOME/license` 읽기 권한 및 `$SDB_HOME/logs`, 상태 파일 쓰기 권한 부여.
+* **핵심 장점**: 인덱스를 타는 초고속 검색(NTS 토큰)이 가능하여 DB 부하가 없고, 기존 DB 쿼리(`M_SERVICE`) 원본을 1건도 수정하지 않고 프레임워크 레벨에서 일괄 적용 가능합니다.
+
+### 🔍 [사전 실증 완료] 고객사 DB SecureDB 동작 검증 쿼리 (20261014 khma 확인)
+DBA/보안팀에서 세팅 완료 후 실제 정상 동작을 확인한 쿼리 스펙입니다:
+
+```sql
+-- 1. 대칭키 양방향 암호화 (정책명: AES256_DEV)
+SELECT dbsecnew.sdb_crypto.encrypt('test1234', 'AES256_DEV') FROM dual;
+
+-- 2. 대칭키 양방향 복호화 (암호문 접두어: '$.' 규격)
+SELECT dbsecnew.sdb_crypto.decrypt('$.AAH+eN3yp75bYd6L455l3X0ACA==', 'AES256_DEV') FROM dual;
+
+-- 3. 단방향 HASH 완전 일치 검색 토큰 (정책명: SHA512_DEV)
+SELECT sdb_crypto.nts('SHA512_DEV', '홍길동') FROM dual;
+
+-- 4. 단방향 HASH 전방(접두) 검색 토큰 (LIKE '홍%')
+SELECT sdb_crypto.nts_bsh('SHA512_DEV', '홍') FROM dual;
+
+-- 5. 단방향 HASH 후방(접미) 검색 토큰 (LIKE '%동')
+SELECT sdb_crypto.nts_fsh('SHA512_DEV', '동') FROM dual;
+```
 
 ---
 

@@ -14,7 +14,7 @@ request.setCharacterEncoding("UTF-8");
 <!-- <meta http-equiv="X-FRAME-OPTIONS" content="DENY" /> -->
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <link rel="apple-touch-icon" href="MonArch-blue57x57.ico" />
-<link rel="shortcut icon" href="favicon.ico" />
+<!-- <link rel="shortcut icon" href="favicon.ico" /> -->
 <title>::: SERICEO CRM :::</title>
 <!-- <link id="CSSlink" type="text/css" href="css/Theme_Redwine.css" rel="stylesheet" /> -->
 <link id="CSSlink" type="text/css" href="css/Theme_CEO.css" rel="stylesheet" />

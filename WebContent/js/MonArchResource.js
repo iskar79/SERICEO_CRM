@@ -247,9 +247,9 @@ function setUserInfo(data){
 	let gSite = $.cookie('gSite');
 	 if($.cookie('gSite') == "") {  gSite = data["gsite"]; }
 	let gCorp = $.cookie('gCorp');
-	 if($.cookie('gCorp') == "") {  gSite = data["gcorp"]; }
+	 if($.cookie('gCorp') == "") {  gCorp = data["gcorp"]; }
 	let gCorpNm = $.cookie('gCorpNm');
-	 if($.cookie('gCorpNm') == "") {  gSite = data["CORPNM"]; }
+	 if($.cookie('gCorpNm') == "") {  gCorpNm = data["CORPNM"]; }
 	 
 	_M.UserInfo.id = data["userNo"];
     _M.UserInfo.lid = data["userCode"];

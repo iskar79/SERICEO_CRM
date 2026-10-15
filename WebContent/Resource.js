@@ -1,4 +1,4 @@
-﻿﻿/*!
+﻿/*!
 * jQuery grid plugin: 
 * 
 * version 0.1 2016-07-21
@@ -63,6 +63,7 @@ var _M = {
             fileDownload : "filedownload.mon", //물리파일 다운로드
             signFileUpload:"signFileUpload.mon", //계약파일 업로드 20240619
             signFileDownload:"signFileDownload.mon", //계약파일 다운로드 20240619
+            signFileDelete:"signFileDelete.mon", //계약파일 업로드 20240619
 			exceldown: "exceldown.mon",	
 			exceldownOld: "exceldownOld.mon",	
 			dataFileUpload:"doUploadDataFile.mon", //데이터파일 업로드
@@ -288,9 +289,9 @@ var _M = {
         d: {
             DateGetDate: function (d) {
                 /// <summary>오늘날짜를 리턴함</summary>
-                var s = "";
-                if(d != "" && d != undefined){
-	                s = leadingZeros(d.getFullYear(), 4) + '-' +
+				var s = '';
+				if(d != ""){
+					s = leadingZeros(d.getFullYear(), 4) + '-' +
 							leadingZeros(d.getMonth() + 1, 2) + '-' +
 							leadingZeros(d.getDate(), 2);	
 				}
@@ -374,14 +375,14 @@ var _M = {
 				var nd = new Date();
                 //var d = new Date();
                 
-                let stndDate = changeDate.substring(1,2).toLowerCase();
+                let stndDate = changeDate.substring(0,2).toLowerCase();
 				let regex = /[^-\0-9]/g;
                 let chgeDate = changeDate.substring(2).replace(regex, "") * 1;
                 
                 if(!isNaN(chgeDate) && isNotEmpty(chgeDate)) {
-	                if(stndDate == 'y') {
+	                if(stndDate == 'fy') {
 						nd.setFullYear(nd.getFullYear() + chgeDate);
-					} else if (stndDate == 'm') {
+					} else if (stndDate == 'fm') {
 						nd.setMonth(nd.getMonth() + chgeDate);
 					}
 				}

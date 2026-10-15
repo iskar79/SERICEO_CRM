@@ -3224,12 +3224,7 @@
                         });
                     },
                     "닫기": function () {
-						var _Pclose = $('[field="PW_CHG_YN"]',$('#ShowEdit[jsonname="MON_COM_사용자정보POPUP_TBL"]')).attr('value');
-						if(_Pclose == "Y"){
-							debugger;
-						} else {
-							$(this).dialog("close");	
-						}
+                        $(this).dialog("close");
                     }
                 },
                 close: function (event, ui) {

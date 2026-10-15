@@ -41,7 +41,7 @@
                     }
                     if (value.inComm == 'getJson' && _M.UserInfo.dvl < 1) return true; //시스템개발자인 경우에만 개발버튼 보이도록
                     if (value.inComm == 'DownXls' && _M.UserInfo.xlauth < 1) return true; //엑셀출력관리자인 경우에만 개발버튼 보이도록
-                    
+					
                     if ($('.cmdspan:last .cmdicon', jobsArea).hasClass('btn-block') && value.css == 'btn-block') return;
                     var _butSet = $(jobsArea).find('.buttonset');
                     var _cmdspan = $("<span class='cmdspan cmdspan-bg align-middle b-t b-r b-b b-l b-co b-co-basic'></span>").appendTo(_butSet);
@@ -86,6 +86,18 @@
                     .attr("index", value.index)
                     .attr("inComm", value.inComm != undefined ? value.inComm : "")
                     .attr("display", value.display != undefined ? value.display : null);
+					
+					//khma 엑셀 업로드 관련 속성 추가 옵션 20240404
+					if(value.xlsOption != undefined){
+						//debugger;
+						_cmdwrap.find("input")
+						.attr("upMode", value.xlsOption.upMode != undefined ? value.xlsOption.upMode : "single")
+						.attr("service", value.xlsOption.service != undefined ? value.xlsOption.service : "MON_COMMON")
+						.attr("method", value.xlsOption.method != undefined ? value.xlsOption.method : "")
+						.attr("procName", value.xlsOption.procName != undefined ? value.xlsOption.procName : "")
+						.attr("jobType", value.xlsOption.jobType != undefined ? value.xlsOption.jobType : "")
+						.attr("title", value.xlsOption.title != undefined ? value.xlsOption.title : "");
+					}
 
                 });
             } else {
