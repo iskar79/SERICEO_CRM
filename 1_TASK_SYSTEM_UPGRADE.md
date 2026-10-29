@@ -43,14 +43,15 @@
 ```
 * **주의**: 맨 윗부분의 `<name>MonArch821</name>` 도 VDI 프로젝트 폴더명과 동일하게 `<name>sericeo_crm</name>` 등으로 텍스트를 맞춰주시면 완벽하게 에러가 사라집니다.
 
-**[1-2. 컴파일러 버전 1.6 ➡️ 11 상향 조치]**
-* 이클립스 내부에서 `Compiling for Java version '1.6' is no longer supported` 에러가 발생할 경우, 반드시 프로젝트의 Java 컴파일러 버전을 Tomcat 9 런타임 스펙에 맞춰 `11` (또는 최소 `1.8`)로 올려주어야 합니다.
+**[1-2. 컴파일러 버전 1.6 ➡️ 1.7 (또는 Spring 4.3 교체 후 1.8) 조치]**
+* 이클립스 내부에서 `Compiling for Java version '1.6' is no longer supported` 에러가 발생할 경우, 프로젝트의 Java 컴파일러 버전을 **`1.7`** (Spring 4.3.30 업그레이드 후에는 `1.7` 또는 `1.8`)로 설정합니다.
+  * **주의 (`11` 설정 금지 사유)**: 톰캣 9 서버 런타임은 JDK 11로 구동하더라도, Spring 3.1.1 내장 ASM 파서는 Java `1.7`(클래스 버전 51.0)까지만, Spring 4.3.30 내장 ASM 5.2 파서는 Java `1.8`(클래스 버전 52.0)까지만 바이트코드 스캔(`@Controller` 등)을 지원합니다. 따라서 이클립스 `Compiler compliance level`은 반드시 **`1.7` (또는 Spring 4.3 교체 후 `1.8`)**로 유지해야 정상 구동됩니다. (2026.10.29 VDI 베이스라인 `1.7` 설정으로 정상 구동 확인 완료)
 
 1. 프로젝트 우클릭 ➡️ **Properties (속성)** 클릭
 2. 좌측 메뉴에서 **Java Compiler** 선택
-3. `Compiler compliance level`을 **11**로 변경하고 Apply 클릭
+3. `Compiler compliance level`을 **1.7** (Spring 4.3 교체 후 `1.7` 또는 `1.8`)로 변경하고 Apply 클릭
 4. 좌측 메뉴에서 **Project Facets** 선택
-5. `Java` 항목의 버전을 **1.6 ➡️ 11**로 변경 후 Apply & Close 클릭
+5. `Java` 항목의 버전을 **1.7** (또는 `1.8`)로 변경 후 Apply & Close 클릭
 
 ---
 

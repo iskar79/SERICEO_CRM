@@ -39,11 +39,11 @@
 
 ### 📖 Step 0. 사전 환경 정상화 및 아키텍처 숙지
 > 📘 관련 문서: `ARCHITECTURE.md`, `AGENTS.md`, `0_MASTER_EXECUTION_PLAN.md`
-* [ ] `0_MASTER_EXECUTION_PLAN.md` ➡️ [Step 0] 전체 작업 순서를 강제하는 최상위 마스터 실행 계획서 (작업 착수 전 필독)
-* [ ] `ARCHITECTURE.md` ➡️ [Step 0] CRM 전체 아키텍처 및 소스 디렉토리/파일 트리 구조 정의서
-* [ ] `AGENTS.md` ➡️ [Step 0] 소스 수정 원칙 및 주석 작성 표준 규칙서
-* [ ] `.project` ➡️ [Step 0-1] 구형 VJET 찌꺼기 제거로 이클립스 프로젝트 정상 오픈 조치 (VDI에 최우선 덮어쓰기)
-* [ ] `WebContent/js/jquery.kdb.superContaner.js` ➡️ [Step 0-2 사전검증] 기존 20241115 운영 소스 보존 상태 확인 (덮어쓰기 금지, 대조만 수행)
+* [x] `0_MASTER_EXECUTION_PLAN.md` ➡️ [Step 0] 전체 작업 순서를 강제하는 최상위 마스터 실행 계획서 (작업 착수 전 필독)
+* [x] `ARCHITECTURE.md` ➡️ [Step 0] CRM 전체 아키텍처 및 소스 디렉토리/파일 트리 구조 정의서
+* [x] `AGENTS.md` ➡️ [Step 0] 소스 수정 원칙 및 주석 작성 표준 규칙서
+* [x] `.project` ➡️ [Step 0-1] 구형 VJET 찌꺼기 제거로 이클립스 프로젝트 정상 오픈 조치 완료
+* [x] `sericeo_crm_VDI반입용_20261029.zip` ➡️ [Step 0-2] VDI 반입 및 Java Compiler `1.7` 설정으로 **VDI 베이스라인 톰캣 정상 구동 확인 완료 (2026.10.29)**
 
 ### 🥇 Step 1. 시스템 버전 업그레이드 (기초 공사)
 > 📘 참조 가이드: `1_TASK_SYSTEM_UPGRADE.md`
