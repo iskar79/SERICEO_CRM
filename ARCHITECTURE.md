@@ -23,14 +23,19 @@
   * jQuery `1.10.2` ➡️ **(Task 1: 화면 렌더링 호환성 유지를 위해 `1.12.4`로 업그레이드 예정)**
 * **데이터베이스 및 인프라 연동 환경**:
   * **CRM 자체 DB (`MICRODEV` / `MICRODB`)**:
-    * 개발 DB: `MICRODEV` (`182.198.77.11:1621:MICRODEV`, 계정: `crm`)
-    * 운영 DB: `MICRODB` (`192.168.147.156:1621:MICRODB`, 계정: `crm`)
-    * **보유 테이블**: 시스템 구동 필수 메타(`M_SERVICE`, `M_STRUCTURE`), 사용자/권한/메뉴(`M_USER`, `M_ROLE`, `M_MENU` 및 매핑 테이블), 공통코드(`M_COMM_CODE`), 다국어 라벨(`M_COMM_LABEL`) 등 시스템 필수 관리 테이블
-  * **연계 기간계 DB (`CEODBDEV` / `CEODB`)**:
-    * 개발 DB: `CEODBDEV` / 운영 DB: `CEODB`
-    * **보유 테이블**: **실제 메인 고객 테이블 및 비즈니스 핵심 원천 데이터**가 위치하며, 트리거(Trigger) 또는 DB Link를 통해 CRM과 연동됨. (개인정보 암/복호화 대상 테이블 위치)
-  * **멀티 테넌트 사이트 구분 체계 (`GSITE`)**:
-    * `CEO`(기본), `PRO`, `MS` 등 `GSITE` 코드값으로 사이트별 테마/화면/데이터 접근 권한을 분기하는 구조.
+    * 개발 DB: `MICRODEV` (`182.198.77.35:1622:MICRODEV` / `182.198.77.11:1621:MICRODEV`, 계정: `crm`)
+    * 운영 DB: `MICRODB` (`26.2.51.37:1622:MICRODB`, 구 `192.168.147.156:1621:MICRODB`, 계정: `crm`)
+    * **보유 테이블**:
+      * 시스템 구동 필수 메타(`M_SERVICE`, `M_STRUCTURE`), 내부 관리자/권한/메뉴(`M_USER`, `M_ROLE`, `M_MENU`), 공통코드(`M_COMM_CODE`), 다국어 라벨(`M_COMM_LABEL`), 메시지(`M_COMM_MSG`)
+      * 엑셀 대량업로드 임시 테이블(`M_EXUP_TEMP`), 배치 로그(`M_SCHEDULE_LOG`)
+      * 일일배치 DataMart 및 리포트 집계 테이블(`US_USER`, `M_CONT_SERV`, `M_CONT_LMS`, `M_CONT_RPT`, `M_CONT_VIEW`, `M_CONT_USE_STATUS`, `M_CONT_USE_STATUS_CORP` 등)
+  * **연계 기간계 스키마 (`CEO` 스키마 / `CEODB`)**:
+    * **보유 테이블 (`운영쿼리정보/` 기준 실제 운영 원천 테이블)**:
+      * 회원/가족·담당자: `A_USER`(회원 마스터), `A_FAMILY`(비서 `SEC`, 세금계산서 담당 `TAX`, 추천인 `REC`)
+      * 법인/계약: `A_CORP`(법인 마스터), `A_SIGN`(계약 마스터), `A_SIGN_USER`(계약별 회원 매핑)
+      * 콘텐츠/학습: `A_CONT`(콘텐츠 마스터), `A_CONT_SERV`(서비스 제공 콘텐츠), `A_CONT_LMS`(학습/시청 이력), `A_MENU`/`A_TMENU`(콘텐츠 메뉴), `A_SITE`(사이트 코드)
+  * **멀티 테넌트 사이트 구분 체계 (`GSITE` / `SITE`)**:
+    * `CEO`(기본), `PRO`, `MS`(법인맞춤) 등 `SITE` 코드값으로 사이트별 테마/화면/데이터 접근 권한을 분기하는 구조.
 
 ---
 
@@ -320,7 +325,7 @@ sequenceDiagram
 
 ## 7. 서버 기동 및 캐싱 (`Initializer.java`)
 
-WAS(Tomcat) 구동 시 `Monarch820-servlet.xml`의 `init-method="init"`에 의해 [`Initializer`](file:///c:/Users/khma7/eclipse-workspace/sericeo_crm/src/co/kr/kydbm/core/meta/Initializer.java)가 실행되어 다음 항목을 메모리에 사전 캐싱합니다:
+WAS(Tomcat) 구동 시 `Monarch820-servlet.xml`의 `init-method="init"`에 의해 [`Initializer`](file:///c:/Users/khma7/eclipse-workspace/sericeo_crm_origin/src/co/kr/kydbm/core/meta/Initializer.java)가 실행되어 다음 항목을 메모리에 사전 캐싱합니다:
 
 1. **`MetaCommCode.init()`**: 시스템 공통 코드(`M_COMM_CODE`) 전체 메모리 로드
 2. **`MetaCommLabel.init()`**: 화면 다국어 및 라벨 텍스트(`M_COMM_LABEL`) 메모리 로드
@@ -328,17 +333,60 @@ WAS(Tomcat) 구동 시 `Monarch820-servlet.xml`의 `init-method="init"`에 의�
 
 ---
 
-## 8. 운영 안정성 및 예외 처리를 위한 아키텍처 원칙 (운영 보강)
+## 8. 운영 DB 핵심 테이블 스키마 및 스토어드 프로시저 명세 (`운영쿼리정보/`)
+
+운영 서버 백업본(`sericrm_20261021/q`)에서 추출하여 `운영쿼리정보/` 폴더에 보존된 **실제 운영 사용 테이블(7종 + 연관 테이블) 및 스토어드 프로시저(5종)**의 상세 구조입니다.
+
+### 1) 실제 운영 핵심 테이블 스키마 요약
+
+| 테이블명 (파일) | 구분 | PK / 주요 식별자 | 주요 컬럼 및 개인정보(암호화 검토 대상) 컬럼 |
+| :--- | :--- | :--- | :--- |
+| **`"CEO"."A_USER"`**<br>([`a_user.txt`](file:///c:/Users/khma7/eclipse-workspace/sericeo_crm_origin/%EC%9A%B4%EC%98%81%EC%BF%BC%EB%A6%AC%EC%A0%95%EB%B3%B4/a_user.txt)) | 회원 마스터 | `USEQ` (`NUMBER(18)`),<br>`SITE`, `LOGINID` | • **개인식별/연락처**: `NAME`(성명), `EMAIL`(이메일), `SUBEMAIL`(2차이메일), `TELNO`(직장전화), `MTELNO`(휴대전화), `FAXNO`(팩스), `BIRTHDAY`(생년월일), `SEX`(성별)<br>• **주소**: `POSTGBN`(W/H), `ZIPCODE`, `ADDRESS1`, `ADDRESS2`, `SUBZIPCODE`, `SUBADDRESS1`, `SUBADDRESS2`, `REGIONGBN`<br>• **인증/패스워드**: `PW`(`VARCHAR2(128)`), `ENPW`(`VARCHAR2(40)`), `ENPW2`(`VARCHAR2(128)`, `F_SHA512(FN_MD5_CRIPT(...))` 적용 컬럼)<br>• **소속/계약/수신동의**: `CORP`, `SIGNCORP`, `COMPANY`, `DEPART`, `JIKWI`, `JIKCHAK`, `USERGBN`, `SERVSTIME`, `SERVETIME`, `MANAGER`, `EMAILYN`, `POSTYN`, `SMSYN`, `DMYN` |
+| **`"CEO"."A_FAMILY"`**<br>(프로시저 내 참조) | 회원 부가연락처<br>(비서/세무/추천) | `USEQ`, `GBN`<br>(`'SEC'`, `'TAX'`, `'REC'`) | • `GBN`: `'SEC'`(비서), `'TAX'`(세금계산서 담당자), `'REC'`(추천인)<br>• **개인정보 컬럼**: `NAME`(이름), `JIKWI`(직책), `DEPART`(부서/소속), `TELNO`(전화번호), `MTELNO`(휴대폰), `EMAIL`(이메일) |
+| **`"CEO"."A_CORP"`**<br>([`A_CORP.txt`](file:///c:/Users/khma7/eclipse-workspace/sericeo_crm_origin/%EC%9A%B4%EC%98%81%EC%BF%BC%EB%A6%AC%EC%A0%95%EB%B3%B4/A_CORP.txt)) | 법인 마스터 | `CORP` (`NUMBER(10)`),<br>`SITE` | • `CORPNAME`(법인명), `CORPCODE`, `CORPNO`(사업자번호), `CEONAME`(대표자명), `MANAGER`(담당자)<br>• `ZIPCODE`, `ADDRESS1`, `ADDRESS2`, `TELNO`, `FAXNO`, `SERVSTIME`, `SERVETIME`, `SRVC_NM`, `REPORT_TYPE` |
+| **`"CEO"."A_SIGN"`**<br>([`A_SIGN.txt`](file:///c:/Users/khma7/eclipse-workspace/sericeo_crm_origin/%EC%9A%B4%EC%98%81%EC%BF%BC%EB%A6%AC%EC%A0%95%EB%B3%B4/A_SIGN.txt)) | 계약 마스터 | `SIGNSEQ` (`NUMBER(18)`) | • `SITE`, `CORP`, `USEQ`, `SIGNNO`, `SIGNSTATUS`, `SIGNTIME`, `SIGNSTIME`, `SIGNETIME`, `SERVSTIME`, `SERVETIME`<br>• `SIGNUSERCNT`, `LISTPRICE`, `PRICE`, `SURTAX`, `REFUNDPRICE`, `SALEGBN`, `PREV_SIGNSEQ`, `UNITPRICE` |
+| **`"CEO"."A_SIGN_USER"`**<br>([`A_SIGN_USER.txt`](file:///c:/Users/khma7/eclipse-workspace/sericeo_crm_origin/%EC%9A%B4%EC%98%81%EC%BF%BC%EB%A6%AC%EC%A0%95%EB%B3%B4/A_SIGN_USER.txt)) | 계약별 회원 매핑 | `SIGNUSERSEQ` (`NUMBER(18)`),<br>`SIGNSEQ`, `USEQ` | • `SITE`, `SIGNUSERGBN`, `SIGNSTIME`, `SIGNETIME`, `SERVSTIME`, `SERVETIME`, `CANCELTIME`, `REPLACEUSEQ`, `USEYN` |
+| **`"CEO"."A_CONT"`**<br>([`A_CONT.txt`](file:///c:/Users/khma7/eclipse-workspace/sericeo_crm_origin/%EC%9A%B4%EC%98%81%EC%BF%BC%EB%A6%AC%EC%A0%95%EB%B3%B4/A_CONT.txt)) | 콘텐츠 마스터 | `CSEQ` (`NUMBER(10)`) | • `MENUNAME`, `TITLE`, `SUMMARY`, `RUNTIME`, `MENUCODE`, `GBN`, `USEYN`, `MOBILEYN`<br>• **강사/제작자 정보**: `PR_NAME`, `PR_JIKWI`, `PR_DEPART`, `PR_COMPANY`, `PR_EMAIL`, `PD_NAME`, `VM_NAME`, `VD_NAME` |
+| **`"CEO"."A_CONT_SERV"`**<br>([`A_CONT_SERV.txt`](file:///c:/Users/khma7/eclipse-workspace/sericeo_crm_origin/%EC%9A%B4%EC%98%81%EC%BF%BC%EB%A6%AC%EC%A0%95%EB%B3%B4/A_CONT_SERV.txt)) | 서비스 제공 콘텐츠 | `SITE`, `GMENU`, `CSEQ` | • `CORP`, `MENUNAME`, `GMENUNAME`, `GGMENU`, `GGMENUNAME`, `SERVSTIME`, `SERVETIME`, `TITLE`, `GRADE`, `REPCNT`, `VIEWCNT`, `SHARECNT`, `MYCNT`, `PR_NAME`, `PR_EMAIL` |
+| **`"CEO"."A_CONT_LMS"`**<br>([`A_CONT_LMS.txt`](file:///c:/Users/khma7/eclipse-workspace/sericeo_crm_origin/%EC%9A%B4%EC%98%81%EC%BF%BC%EB%A6%AC%EC%A0%95%EB%B3%B4/A_CONT_LMS.txt)) | 콘텐츠 학습/시청 이력 | `SEQ` (`NUMBER`) | • `USEQ`(회원번호), `CSEQ`(콘텐츠번호), `VIEWDATE`(`VARCHAR2(8)`), `TOTALTIME`, `PLAYTIME`, `COMPLETEYN`, `RT`, `DV`(접속기기: P/M), `SITE`, `CORP` |
+| **`US_USER`**<br>(일일배치 마트 테이블) | CRM 회원 통합 집계 마트 | `USEQ`, `SITE` | • `USP_M_CONT_USE_STATUS` 프로시저가 매일 `A_USER` + `A_FAMILY`(`SEC`/`TAX`) + `A_SIGN` 정보를 조인하여 재구축하는 집계 테이블.<br>• `NAME`, `EMAIL`, `TELNO`, `MTELNO`, `SEC_NAME`, `SEC_TELNO`, `SEC_EMAIL`, `TAX_NAME`, `TAX_TELNO`, `TAX_EMAIL` 등 개인정보 컬럼이 그대로 복제됨. |
+
+### 2) 운영 스토어드 프로시저 아키텍처 (엑셀 대량업로드 & 일일 DataMart 배치)
+
+#### ① 엑셀 대량업로드 프로시저 파이프라인
+웹 화면에서 엑셀 대량업로드 수행 시 Java(`MonArchDaoImpl`)가 직접 업무 테이블을 `INSERT/UPDATE`하지 않고, **`EXUP_TEMP_UPLOAD` 프로시저를 통해 `M_EXUP_TEMP` 임시 테이블(`C01`~`C60`)에 적재한 뒤 `v_JOB_TYPE`별 하위 프로시저를 호출**합니다.
+* **[`EXUP_TEMP_UPLOAD.txt`](file:///c:/Users/khma7/eclipse-workspace/sericeo_crm_origin/%EC%9A%B4%EC%98%81%EC%BF%BC%EB%A6%AC%EC%A0%95%EB%B3%B4/EXUP_TEMP_UPLOAD.txt)**:
+  * `M_EXUP_TEMP`에 `M_EXUP_SEQ.NEXTVAL`로 행 삽입 후 `v_JOB_TYPE`에 따라 분기 실행:
+    1. `'USER_ExUpload'` ➡️ `USP_USER_EXUPLOAD(v_UID, v_KEY)` (회원 대량업로드)
+    2. `'WITHDRAW_USER_ExUpload'` ➡️ `USP_WITHDRAW_USER_EXUPLOAD(v_UID, v_KEY)` (회원 일괄탈퇴)
+    3. `'USER_UPDATE_ExUpload'` ➡️ [`USP_USER_UPDATE_EXUPLOAD(v_UID, v_KEY)`](file:///c:/Users/khma7/eclipse-workspace/sericeo_crm_origin/%EC%9A%B4%EC%98%81%EC%BF%BC%EB%A6%AC%EC%A0%95%EB%B3%B4/USP_USER_UPDATE_EXUPLOAD.txt) (회원정보 일괄수정: `A_USER`, `A_FAMILY`의 `SEC`/`TAX`/`REC`, `A_SIGN_USER` 일괄 갱신)
+    4. `'CORP_MANAGER_ExUpload'` ➡️ `USP_SALES_MNG_UPDATE_EXUPLOAD(v_UID, v_KEY)` (법인담당자 일괄수정)
+    5. `'USER_SIGN_ExUpload'` ➡️ `USP_USER_SIGN_EXUPLOAD(v_UID, v_KEY)` (개인계약 승계처리)
+    6. `'CORP_SIGN_ExUpload'` ➡️ `USP_CORP_SIGN_EXUPLOAD(v_UID, v_KEY)` (법인계약 승계처리)
+    7. `'CORP_USER_SIGN_ExUpload'` ➡️ `USP_CORP_USER_SIGN_EXUPLOAD(v_UID, v_KEY)` (법인 계약회원 대량업로드)
+
+#### ② 일일 DataMart 집계 배치 프로시저 파이프라인
+* **[`USP_M_CONT_DAILY_BATCH.txt`](file:///c:/Users/khma7/eclipse-workspace/sericeo_crm_origin/%EC%9A%B4%EC%98%81%EC%BF%BC%EB%A6%AC%EC%A0%95%EB%B3%B4/USP_M_CONT_DAILY_BATCH.txt)**: 일일 배치 최상위 진입 프로시저
+  1. `USP_M_USER_INFO_BACKUP`: 사용자 정보 일일 백업 캡처
+  2. **[`USP_M_CONT_RPT`](file:///c:/Users/khma7/eclipse-workspace/sericeo_crm_origin/%EC%9A%B4%EC%98%81%EC%BF%BC%EB%A6%AC%EC%A0%95%EB%B3%B4/USP_M_CONT_RPT.txt)**: 오즈(OZ) 리포트 대체 및 현황 메뉴(회원현황/이용현황/콘텐츠현황/구독현황)용 집계 테이블(`M_CONT_SERV`, `M_CONT_MYGRADE`, `M_CONT_MYREP`, `M_CONT_MYCNT`, `M_CONT_MYSHARE`, `M_CONT_LMS`, `M_CONT_RPT`) 갱신
+  3. **[`USP_M_CONT_USE_STATUS`](file:///c:/Users/khma7/eclipse-workspace/sericeo_crm_origin/%EC%9A%B4%EC%98%81%EC%BF%BC%EB%A6%AC%EC%A0%95%EB%B3%B4/USP_M_CONT_USE_STATUS.txt)**: SERICEO REPORT용 마트 테이블(`US_USER`, `M_CONT_MYLOGIND`, `M_FOLDER_ITEM`, `M_CEO_PAYLOG`, `M_CONT_GGMENU`, `M_CONT_PREFER`, `M_CONT_BEST`, `M_CONT_VIEW`, `M_CONT_VIEW_COMB`, `M_CONT_USE_STATUS`, `M_CONT_USE_STATUS_CORP`, `M_CONT_VIEW_YEAR`) 일괄 집계
+
+---
+
+## 9. 운영 안정성 및 예외 처리를 위한 아키텍처 원칙 (운영 보강)
 
 ### 1) [백엔드] SXSSFWorkbook 임시 파일 누수(Disk Full) 방지
 * **위험 요소**: 대용량 엑셀 생성을 위해 POI `SXSSFWorkbook`을 사용할 경우, OOM 방지를 위해 디스크에 다수의 임시 파일(`.tmp`)을 생성합니다. 스트림 전송 후 이를 방치하면 서버 디스크 공간 부족(Disk Full) 장애가 발생합니다.
 * **아키텍처 원칙**: `ExcelDownload.java` 내의 스트림 전송 블록 `finally` 구문에서 **반드시 `((SXSSFWorkbook)workbook).dispose();`를 명시적으로 호출**하여 엑셀 생성 즉시 임시 파일을 디스크에서 완전 삭제하도록 강제합니다.
 
-### 2) [DB/백엔드] 암호화 컬럼의 '검색 필터(Search)' 대응 원칙
-* **위험 요소**: CEODB에서 제공하는 API로 데이터를 암호화하여 저장할 경우, 일반적인 그리드 검색 필터(`%LIKE%`) 부분 일치 검색이 불가능해집니다.
+### 2) [DB/백엔드] 암호화 컬럼의 '검색 필터(Search)' 및 '프로시저/배치' 대응 원칙
+* **위험 요소**:
+  1. `A_USER`, `A_FAMILY` 등의 개인정보 컬럼(`NAME`, `EMAIL`, `SUBEMAIL`, `TELNO`, `MTELNO`, `ADDRESS2` 등)을 암호화할 경우, 일반적인 그리드 검색 필터(`%LIKE%`) 부분 일치 검색이 불가능해집니다.
+  2. 엑셀 대량업로드 프로시저(`USP_USER_UPDATE_EXUPLOAD` 등)와 일일 마트 배치(`USP_M_CONT_USE_STATUS`의 `US_USER` 생성 로직)가 DB 내부에서 직접 `A_USER`, `A_FAMILY`를 읽고 쓰므로, Java DAO만 수정하면 엑셀 업로드 시 평문이 적재되거나 배치에서 암/복호화 누락이 발생할 수 있습니다.
 * **아키텍처 원칙**:
   * **SecureDB NTS 토큰 활용**: KSign SecureDB의 NTS UDF(`nts`, `nts_bsh`, `nts_fsh`)를 사용하여 색인 기반의 부분 일치 검색을 지원합니다.
   * **Exact Match(일치 검색) 적용**: NTS 토큰이 적용되지 않은 중요 개인정보는 일치 검색으로 유도하고, WHERE 절 바인딩 전 파라미터 자체를 사전 암호화하여 `=` 조건으로 비교합니다.
+  * **DB 프로시저(`USP_*_EXUPLOAD`, `USP_M_CONT_USE_STATUS`) 동시 정비**: 엑셀 업로드 프로시저에서 `A_USER`/`A_FAMILY` 적재 시 `dbsecnew.sdb_crypto.encrypt` UDF를 호출하도록 함께 정비하고, `US_USER` 등 마트 테이블 조회 쿼리(`M_SERVICE`)의 복호화 대상 컬럼 매핑을 일원화합니다.
 
 ### 3) [백엔드] 엑셀 업로드(Import) 기능의 연쇄 에러(Side-effect) 차단
 * **위험 요소**: POI 버전을 3.8에서 4.1.2로 상향함에 따라, 엑셀 업로드 모듈(`CommonExcelUpload.java`, `UploadDataController.java`)이 구형 POI 문법에 의존할 경우 런타임 에러가 발생할 수 있습니다.

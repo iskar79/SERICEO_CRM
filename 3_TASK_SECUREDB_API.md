@@ -234,33 +234,51 @@ public class CryptoService {
 
 ---
 
-## 4. [Step 3] Java 공통 쿼리 엔진(`MonArchDaoImpl.java`) 확장
+## 4. [Step 3] 운영 DB 실제 암호화 대상 테이블/컬럼(`운영쿼리정보/` 기준) 및 `MonArchDaoImpl.java` 확장
 
 * **대상 파일**: `src/co/kr/kydbm/core/dao/MonArchDaoImpl.java`
 
+### 0) 실제 운영 테이블별 개인정보 컬럼 매핑 (`운영쿼리정보/` 원문 기준)
+| 운영 테이블 | 구분 | 실제 컬럼명 (`운영쿼리정보/`) | 비고 |
+| :--- | :--- | :--- | :--- |
+| **`"CEO"."A_USER"`** | 회원 마스터 | `NAME`, `EMAIL`, `SUBEMAIL`, `TELNO`, `MTELNO`, `FAXNO`, `ADDRESS1`, `ADDRESS2`, `SUBADDRESS1`, `SUBADDRESS2` | 패스워드는 `ENPW2`에 `F_SHA512(FN_MD5_CRIPT(...))` 단방향 적용 중 |
+| **`"CEO"."A_FAMILY"`** | 비서(`SEC`)/세무(`TAX`)/추천(`REC`) | `NAME`, `TELNO`, `MTELNO`, `EMAIL` | `USEQ` + `GBN` 키 구조 |
+| **`"CEO"."A_CORP"`** | 법인 마스터 | `CEONAME`, `TELNO`, `FAXNO`, `ADDRESS1`, `ADDRESS2` | 법인 대표자 및 연락처 |
+| **`"CEO"."A_CONT"` / `"A_CONT_SERV"`** | 콘텐츠 강사정보 | `PR_NAME`, `PR_EMAIL` | 발표자/강사 성명 및 이메일 |
+| **`US_USER`** | 일일배치 통합 회원 마트 | `NAME`, `EMAIL`, `SUBEMAIL`, `TELNO`, `MTELNO`, `FAXNO`, `ADDRESS1`, `ADDRESS2`, `SUBADDRESS1`, `SUBADDRESS2`, `SEC_NAME`, `SEC_TELNO`, `SEC_MTELNO`, `SEC_EMAIL`, `TAX_NAME`, `TAX_TELNO`, `TAX_MTELNO`, `TAX_EMAIL` | `USP_M_CONT_USE_STATUS` 배치에서 `A_USER` + `A_FAMILY` 조인 생성 |
+
 ### 1) 파라미터 암호화 (INSERT/UPDATE 전처리)
-`SvcCRUD`에서 전달된 파라미터 Map 중 개인정보 대상 컬럼을 가로채 암호화합니다:
+`SvcCRUD`에서 전달된 파라미터 Map 중 개인정보 대상 컬럼(`A_USER`, `A_FAMILY` 등)을 가로채 암호화합니다:
 ```java
-// 20261001 khma : 개인정보 컬럼 암호화 전처리
-for (Map.Entry<String, Object> entry : paramMap.entrySet()) {
-    String key = entry.getKey();
-    Object val = entry.getValue();
-    if (val instanceof String) {
-        String strVal = (String) val;
-        if ("EMAIL".equalsIgnoreCase(key) || "CSTNAME".equalsIgnoreCase(key) || "HP_NO".equalsIgnoreCase(key) || "TEL_NO".equalsIgnoreCase(key)) {
-            paramMap.put(key, CryptoService.getInstance().encrypt(strVal));
-        }
+// 20261001 khma : 개인정보 컬럼 암호화 전처리 (운영 A_USER, A_FAMILY 기준)
+String[] targetParamCols = {
+    "NAME", "EMAIL", "SUBEMAIL", "TELNO", "MTELNO", "FAXNO",
+    "ADDRESS2", "SUBADDRESS2",
+    "SEC_NAME", "SEC_TELNO", "SEC_MTELNO", "SEC_EMAIL",
+    "TAX_NAME", "TAX_TELNO", "TAX_MTELNO", "TAX_EMAIL",
+    "PR_EMAIL"
+};
+for (String col : targetParamCols) {
+    if (paramMap.containsKey(col) && paramMap.get(col) instanceof String) {
+        String strVal = (String) paramMap.get(col);
+        paramMap.put(col, CryptoService.getInstance().encrypt(strVal));
     }
 }
 ```
 
 ### 2) 결과 복호화 (SELECT 후처리)
-DB에서 반환된 `ResultSet` 또는 List<Map>에서 데이터를 추출할 때 복호화합니다:
+DB에서 반환된 `ResultSet` 또는 List<Map>에서 데이터를 추출할 때 복호화합니다 (`decrypt()` 내부에서 `'$.'` 접두어 여부를 먼저 체크하므로 평문/암호문 혼재 시에도 안전하게 동작):
 ```java
-// 20261001 khma : 개인정보 컬럼 복호화 후처리
+// 20261001 khma : 개인정보 컬럼 복호화 후처리 (운영 A_USER, US_USER, A_FAMILY, A_CONT 기준)
 public Map<String, Object> decryptRow(Map<String, Object> rowMap) {
     if (rowMap == null) return null;
-    String[] privacyCols = {"EMAIL", "CSTNAME", "HP_NO", "TEL_NO", "USER_NAME"};
+    String[] privacyCols = {
+        "NAME", "USER_NAME", "EMAIL", "SUBEMAIL", "TELNO", "MTELNO", "FAXNO",
+        "ADDRESS2", "SUBADDRESS2",
+        "SEC_NAME", "SEC_TELNO", "SEC_MTELNO", "SEC_EMAIL",
+        "TAX_NAME", "TAX_TELNO", "TAX_MTELNO", "TAX_EMAIL",
+        "CEONAME", "PR_NAME", "PR_EMAIL"
+    };
     for (String col : privacyCols) {
         if (rowMap.containsKey(col) && rowMap.get(col) != null) {
             String cipherVal = rowMap.get(col).toString();
@@ -277,11 +295,12 @@ public Map<String, Object> decryptRow(Map<String, Object> rowMap) {
 
 * **대상 파일**: `src/co/kr/kydbm/core/utils/FilterGenerator.java`
 
-사용자가 그리드 상단 검색창에 검색어를 입력했을 때, 암호화 대상 컬럼에 대해 NTS 토큰 색인 검색 조건으로 자동 변환합니다:
+사용자가 그리드 상단 검색창에 검색어를 입력했을 때, 암호화 대상 컬럼(`NAME`, `EMAIL`, `TELNO`, `MTELNO` 등)에 대해 NTS 토큰 색인 검색 조건으로 자동 변환합니다:
 
 ```java
-// 20261001 khma : 개인정보 검색 필터 NTS 토큰 변환 적용
-if ("CSTNAME".equalsIgnoreCase(fieldName) || "EMAIL".equalsIgnoreCase(fieldName) || "HP_NO".equalsIgnoreCase(fieldName)) {
+// 20261001 khma : 개인정보 검색 필터 NTS 토큰 변환 적용 (A_USER / US_USER 기준)
+if ("NAME".equalsIgnoreCase(fieldName) || "EMAIL".equalsIgnoreCase(fieldName)
+        || "MTELNO".equalsIgnoreCase(fieldName) || "TELNO".equalsIgnoreCase(fieldName)) {
     // 1. 일반 검색어를 NTS 검색 해시 토큰으로 변환 (후방일치 BSH 또는 완전일치 NTS)
     String ntsToken = CryptoService.getInstance().getNtsBsh(searchValue);
     
@@ -295,19 +314,29 @@ if ("CSTNAME".equalsIgnoreCase(fieldName) || "EMAIL".equalsIgnoreCase(fieldName)
 
 ---
 
-## 6. [Step 5] 핵심: 쿼리 원문(`M_SERVICE`) 무수정 런타임 치환 기법
+## 6. [Step 5] 핵심: 쿼리 원문(`M_SERVICE`) 무수정 런타임 치환 및 운영 프로시저(`운영쿼리정보/`) 연동 주의사항
 
-2안(API)의 최대 장점인 **"기존 DB 쿼리(M_SERVICE) 원본을 1건도 수정하지 않는다"**는 원칙을 위해, 하드코딩된 쿼리의 경우 `MonArchDaoImpl.java`에서 DB 실행 직전 메모리 상에서 정규식(Regex)으로 SQL을 가로채 변환합니다:
+### 1) `M_SERVICE` 쿼리 런타임 치환
+2안(API)의 최대 장점인 **"기존 DB 쿼리(M_SERVICE) 원본을 수정하지 않는다"**는 원칙을 위해, 하드코딩된 조건절의 경우 `MonArchDaoImpl.java`에서 DB 실행 직전 메모리 상에서 정규식(Regex)으로 SQL을 가로채 변환합니다:
 
 ```java
-// 20261001 khma : 기존 M_SERVICE LIKE 쿼리를 NTS 일치 검색으로 런타임 치환
-if (query.contains("CSTNAME") || query.contains("EMAIL")) {
+// 20261001 khma : 기존 M_SERVICE LIKE 쿼리를 NTS 일치 검색으로 런타임 치환 (A_USER.NAME / EMAIL 등)
+if (query.contains("NAME") || query.contains("EMAIL") || query.contains("MTELNO")) {
     query = query.replaceAll(
-        "(?i)UPPER\\(\\w+\\.CSTNAME\\)\\s*LIKE\\s*'%('\\s*\\|\\|\\s*UPPER\\(@CSTNAME@\\)\\s*\\|\\|\\s*')%'", 
-        "CSTNAME_NTS = @CSTNAME_NTS@"
+        "(?i)UPPER\\((\\w+\\.)?NAME\\)\\s*LIKE\\s*'%('\\s*\\|\\|\\s*UPPER\\(@NAME@\\)\\s*\\|\\|\\s*')%'", 
+        "$1NAME_NTS = @NAME_NTS@"
     );
 }
 ```
+
+### 2) 🚨 운영 스토어드 프로시저(`운영쿼리정보/`) 영향도 및 필수 동시 조치 사항
+운영 DB에서는 Java(`MonArchDaoImpl`)를 거치지 않고 **오라클 프로시저가 직접 `A_USER`, `A_FAMILY`, `US_USER`를 읽고 쓰는 배치/업로드 구간**이 존재하므로 반드시 함께 점검해야 합니다:
+1. **엑셀 대량업로드 프로시저 ([`EXUP_TEMP_UPLOAD.txt`](file:///c:/Users/khma7/eclipse-workspace/sericeo_crm_origin/%EC%9A%B4%EC%98%81%EC%BF%BC%EB%A6%AC%EC%A0%95%EB%B3%B4/EXUP_TEMP_UPLOAD.txt), [`USP_USER_UPDATE_EXUPLOAD.txt`](file:///c:/Users/khma7/eclipse-workspace/sericeo_crm_origin/%EC%9A%B4%EC%98%81%EC%BF%BC%EB%A6%AC%EC%A0%95%EB%B3%B4/USP_USER_UPDATE_EXUPLOAD.txt), `USP_USER_EXUPLOAD`)**:
+   * 엑셀 업로드 시 `M_EXUP_TEMP`(`C01` 성명, `C05` 휴대전화, `C15` 직장전화, `C18/C19` 직장주소, `C20` 이메일, `C21~C24` 비서 정보, `C25~C27` TAX 담당자 정보)에서 읽어 `A_USER`와 `A_FAMILY`에 직접 `UPDATE`/`INSERT` 합니다.
+   * 따라서 암호화 적용 시 `UploadDataService.java`에서 `EXUP_TEMP_UPLOAD` 호출 전에 해당 셀을 암호화하거나, 프로시저 내부 `UPDATE A_USER` / `UPDATE A_FAMILY` 구문에서 `dbsecnew.sdb_crypto.encrypt(...)` 및 `sdb_crypto.nts(...)`를 호출하도록 프로시저를 함께 수정해야 합니다. (특히 프로시저 내 `REGEXP_REPLACE(C05, '[^0-9]+')` 전화번호 포맷팅 로직이 있으므로 **프로시저 내부에서 정규식 정제 직후 DB UDF로 암호화**하는 것이 가장 안전합니다.)
+2. **일일 DataMart 집계 배치 ([`USP_M_CONT_USE_STATUS.txt`](file:///c:/Users/khma7/eclipse-workspace/sericeo_crm_origin/%EC%9A%B4%EC%98%81%EC%BF%BC%EB%A6%AC%EC%A0%95%EB%B3%B4/USP_M_CONT_USE_STATUS.txt))**:
+   * 매일 새벽 `A_USER`와 `A_FAMILY`를 조인하여 `US_USER` 테이블을 `TRUNCATE` 후 재생성합니다.
+   * `A_USER`와 `A_FAMILY`에 암호문이 저장되면 `US_USER`의 `NAME`, `EMAIL`, `TELNO`, `MTELNO`, `SEC_*`, `TAX_*` 컬럼에도 암호문이 그대로 적재되므로, `US_USER`의 해당 컬럼 길이(`VARCHAR2`)가 암호문 길이(최소 100~300 BYTE 이상)를 수용하는지 사전 확인해야 합니다.
 
 ---
 
