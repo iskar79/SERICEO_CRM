@@ -21,7 +21,8 @@
    - `WebContent/js/jquery-1.12.4.min.js`: jQuery 1.12.4
    - `WebContent/WEB-INF/lib/POI 4.1.2 신규 라이브러리/`: POI 4.1.2 및 의존성 7종
 3. **VDI 최초 반입 및 베이스라인 구동 성공 (완료 - 2026.10.29)**:
-   - `sericeo_crm_VDI반입용_20261029.zip`(68.90MB)을 VDI 이클립스에 반입하고, **Java Compiler `1.7` 설정으로 현재 운영 베이스라인 톰캣 9 서버가 정상 구동되는 것까지 확인 완료**했습니다.
+   - `sericeo_crm_VDI반입용_20261029.zip`(68.90MB)을 VDI 이클립스에 반입하고, **Default output folder를 `WebContent/WEB-INF/classes`로 설정**, **Java Compiler `1.7` 설정으로 현재 운영 베이스라인 톰캣 9 서버가 정상 구동되는 것까지 확인 완료**했습니다. (로컬 `.classpath` 및 `.settings/*`도 동일하게 동기화 완료)
+   - ⚠️ **VDI 오라클 DB 접속 주소 유의**: 운영 서버(`26.2.51.37:1622`)와 달리 **VDI 내부에서 오라클 DB 접속 주소는 `70.2.251.122:4034` (`jdbc:oracle:thin:@70.2.251.122:4034:MICRODB`)**이며, VDI 이클립스의 `src/properties/jdbc.properties`에 이미 반영되어 있으므로 향후 VDI 파일 복사 시 `jdbc.properties`를 덮어쓰지 않도록 주의합니다.
 
 ---
 

@@ -14,5 +14,7 @@
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
-	<classpathentry kind="output" path="build/classes"/>
+	<!-- 20261029 khma : 컴파일 클래스 출력 경로를 WEB-INF/classes로 변경 -->
+	<!-- <classpathentry kind="output" path="build/classes"/> -->
+	<classpathentry kind="output" path="WebContent/WEB-INF/classes"/>
 </classpath>

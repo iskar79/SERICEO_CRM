@@ -81,6 +81,7 @@
 
 | 일자 | 작업자 | 대상 파일 경로 | 구분 | 위치 (메서드/라인) | 변경 내용 요약 (초급자도 이해할 수 있게 명확히 작성) |
 | :---: | :---: | :--- | :---: | :--- | :--- |
+| 20261029 | khma | `.classpath`, `.settings/*` | 수정 | `output` 경로 및 컴파일 타깃 | VDI 이클립스 설정과 동일하게 클래스 출력 경로(`WebContent/WEB-INF/classes`) 및 컴파일 타깃(`1.7`) 일원화 |
 | 20261029 | khma | `WebContent/WEB-INF/lib/Spring 4.3.30 신규 라이브러리/`, `WebContent/js/jquery-1.12.4.min.js` | 추가 | `WEB-INF/lib/`, `js/` | Step 1 업그레이드용 Spring 4.3.30.RELEASE(18종), Commons Fileupload 1.5/IO 2.15.1, jQuery 1.12.4 사전 다운로드 및 반입 |
 | 20261029 | khma | `WebContent/FileData/`, `WebContent/WEB-INF/lib/` | 정리 | 첨부/백업파일 | 불필요 테스트 첨부/구형 설치파일(96MB) 및 중복 백업 파일(`*_20260922` 등) 정리로 VDI 반입 용량 경량화 |
 | 20261029 | khma | `ARCHITECTURE.md`, `3_TASK_SECUREDB_API.md`, `3_ALT_SECUREDB_UDF.md` | 보강 | 8장 테이블/프로시저 명세 외 | `운영쿼리정보/` 실제 운영 테이블(7종+`A_FAMILY`/`US_USER`) 및 프로시저(5종) 스키마/암호화 대상 컬럼 매핑 및 배치·엑셀업로드 영향도 반영 |

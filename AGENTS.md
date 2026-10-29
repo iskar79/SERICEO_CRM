@@ -187,7 +187,8 @@ VDI 내부망 코드를 카메라로 촬영하여 전달받는 경우, 단순 OC
   * `WebContent/WEB-INF/lib/POI 4.1.2 신규 라이브러리/`: POI 4.1.2 및 의존성 7종 배치 완료.
 * **[완료] Step 0-3 (VDI 최초 반입 및 베이스라인 톰캣 구동 검증 완료)**:
   * `sericeo_crm_VDI반입용_20261029.zip`(68.90MB, Git 포함)을 VDI 이클립스에 반입 완료.
-  * VDI 이클립스에서 **Java Compiler `1.7`** 설정으로 현재 운영 베이스라인 톰캣 9 서버가 에러 없이 정상 구동됨을 확인 완료 (2026-10-29).
+  * VDI 이클립스에서 **Default output folder(`WebContent/WEB-INF/classes`)** 및 **Java Compiler `1.7`** 설정으로 현재 운영 베이스라인 톰캣 9 서버가 에러 없이 정상 구동됨을 확인 완료 (2026-10-29, 로컬 `.classpath` 및 `.settings/*` 동기화 완료).
+  * ⚠️ **VDI 오라클 접속 주소**: 운영(`26.2.51.37:1622`)과 달리 VDI에서는 `70.2.251.122:4034`로 접속하며 VDI 이클립스 내 `src/properties/jdbc.properties`에 변경 적용 완료됨 (덮어쓰기 금지).
 
 ### 3) 지금 바로 착수할 다음 스텝 (Next Action)
 `1_TASK_SYSTEM_UPGRADE.md`에 따라 **Step 1 (시스템 버전 업그레이드)**을 아래 3개의 세부 스텝으로 나누어 **한 번에 하나씩(Step-by-Step)** 진행합니다:
