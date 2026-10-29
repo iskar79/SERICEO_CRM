@@ -44,14 +44,15 @@
 
 ### 🥇 Step 1. 시스템 버전 업그레이드 (기초 공사)
 > 📘 참조 가이드: `1_TASK_SYSTEM_UPGRADE.md`
-* [ ] `WebContent/WEB-INF/lib/` ➡️ Spring 4.3.30 JAR 17개 반입 및 구형 3.1.1 JAR 백업/제외
+* [x] `WebContent/WEB-INF/lib/Spring 4.3.30 신규 라이브러리/` ➡️ Spring 4.3.30.RELEASE JAR 18종 + `commons-fileupload-1.5.jar`, `commons-io-2.15.1.jar` 사전 반입 완료 (Step 1 작업 시 `lib/` 직하위로 이동 및 구형 3.1.1 JAR 백업/제외)
+* [x] `WebContent/js/jquery-1.12.4.min.js` ➡️ jQuery 1.12.4 파일 사전 반입 완료
 * [ ] `WebContent/WEB-INF/web.xml` ➡️ Spring 스키마(xmlns) 버전 상향 (`3.1` ➡️ `4.3`)
 * [ ] `WebContent/WEB-INF/dispatcher-servlet.xml` ➡️ Spring 스키마(xmlns) 버전 상향 (`3.1` ➡️ `4.3`)
 * [ ] `WebContent/ui/monform.jsp` ➡️ jQuery 라이브러리 스크립트 경로 상향 (`1.10.2` ➡️ `1.12.4`)
 
 ### 🥈 Step 2. 엑셀 다운로드 보안 적용 (기능 개발)
 > 📘 참조 가이드: `2_TASK_EXCEL_DOWNLOAD_PWD.md`
-* [ ] `WebContent/WEB-INF/lib/POI 4.1.2 신규 라이브러리.zip` ➡️ POI 4.1.2 및 의존성 7종 반입 (압축 해제 후 `lib/` 직하위 배치)
+* [x] `WebContent/WEB-INF/lib/POI 4.1.2 신규 라이브러리/` ➡️ POI 4.1.2 및 의존성 7종 사전 반입 완료 (Step 2 작업 시 `lib/` 직하위로 이동 및 구형 3.8 JAR 백업/제외)
 * [ ] `src/co/kr/kydbm/common/CommonExcelUtil.java` ➡️ POI 4.1.2 호환을 위한 `CellType` Enum 문법 수정
 * [ ] `WebContent/js/jquery.kdb.superContaner.js` ➡️ `DownXls` 함수 블록 내 비밀번호 모달 팝업 추가 (⚠️ 주의: DownXls 함수 블록만 선별 복사!)
 * [ ] `src/co/kr/kydbm/core/filecontrol/UploadController.java` ➡️ 엑셀 비밀번호(`excelPassword`) 파라미터 수신 연동
@@ -77,6 +78,8 @@
 
 | 일자 | 작업자 | 대상 파일 경로 | 구분 | 위치 (메서드/라인) | 변경 내용 요약 (초급자도 이해할 수 있게 명확히 작성) |
 | :---: | :---: | :--- | :---: | :--- | :--- |
+| 20261029 | khma | `WebContent/WEB-INF/lib/Spring 4.3.30 신규 라이브러리/`, `WebContent/js/jquery-1.12.4.min.js` | 추가 | `WEB-INF/lib/`, `js/` | Step 1 업그레이드용 Spring 4.3.30.RELEASE(18종), Commons Fileupload 1.5/IO 2.15.1, jQuery 1.12.4 사전 다운로드 및 반입 |
+| 20261029 | khma | `WebContent/FileData/`, `WebContent/WEB-INF/lib/` | 정리 | 첨부/백업파일 | 불필요 테스트 첨부/구형 설치파일(96MB) 및 중복 백업 파일(`*_20260922` 등) 정리로 VDI 반입 용량 경량화 |
 | 20261029 | khma | `ARCHITECTURE.md`, `3_TASK_SECUREDB_API.md`, `3_ALT_SECUREDB_UDF.md` | 보강 | 8장 테이블/프로시저 명세 외 | `운영쿼리정보/` 실제 운영 테이블(7종+`A_FAMILY`/`US_USER`) 및 프로시저(5종) 스키마/암호화 대상 컬럼 매핑 및 배치·엑셀업로드 영향도 반영 |
 | 20261029 | khma | `운영쿼리정보/` (구 `sericrm_20261021/q`) | 정리 | 프로젝트 루트 | 운영 DB 테이블/프로시저 쿼리 텍스트 12종을 `운영쿼리정보/`로 이관 후 중복 백업 폴더(`sericrm_20261021`) 삭제 |
 | 20261029 | khma | `WebContent/js/jquery.kdb.superContaner.js` | 동기화 | 6693L, 10185L, 14610L 등 | 운영 백업본(`sericrm_20261021`) 기준 DownCsv 확장, 다음 주소 API 오프라인 주석(20250528 khma), 에디터 이슈 수정(20250529 khma) 100% 동기화 |
