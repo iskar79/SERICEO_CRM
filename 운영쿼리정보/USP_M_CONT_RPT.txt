@@ -1,0 +1,529 @@
+create or replace PROCEDURE     USP_M_CONT_RPT
+AS
+/********************************************************************************************
+ * 1.Project Name  : SERICEO CRM 고도화 - DataMart 구성 										*
+ * 2.System        : CRM - Oracle 11g														*
+ * 3.Program ID    : USP_M_CONT_RPT 	        											* 
+ * 4.Description   : DataMart 일일배치 테이블 저장 											*
+ * 					 기존 오즈report 대체용													*
+ * 					 이용현황-리뉴얼 report용 일일배치											*
+ * 																							*
+ * 5.Input Value   : NONE																	*
+ * 																							*
+ * 6.Out Value     : NONE 																	*
+ * 1. M_CONT_SERV table delete / insert (SYSDATE - 2) 										*
+ * 2. M_CONT_MYGRADE table delete / insert (SYSDATE - 2) 									*
+ * 3. M_CONT_MYREP table table delete / insert (SYSDATE - 2) 								*
+ * 4. M_CONT_MYCNT table table delete / insert (SYSDATE - 2) 								*
+ * 5. M_CONT_MYSHARE table delete / insert (SYSDATE - 2) 									*
+ * 6. M_CONT_LMS table delete / insert (SYSDATE - 2) 										*
+ * 7. M_CONT_RPT table delete / insert (SYSDATE - 2) 										*
+ * 																							*
+ *   version 	 AUTHOR 		Date 		  DESCRIPTION                     Request By 	*
+ *  --------- 	-------- 	-------------- 	--------------------------- 	-------------- 	*
+ *    1.0         마경호        2024.06.10 	  Initial Release 								*
+ *    2.0         마경호        2024.09.03 	  Major Modification							*
+ *******************************************************************************************/
+BEGIN
+
+	/*********************************************************************************************/
+	/**** 집계 테이블 사용 쿼리 위치  *****/
+	/**** USP_M_CONT_RPT.M_CONT_RPT 집계 테이블 생성시 사용  *****/
+	/**** 현황 >> 회원현황 >> 서비스참여현황 *****/
+	/**** 현황 >> 회원현황 >> 퍼미션정보현황 *****/
+	/**** 현황 >> 이용현황 >> 계약구분별 *****/
+	/**** 현황 >> 콘텐츠현황 >> 요약 >> 월별 제공편수 *****/
+	/**** 현황 >> 콘텐츠현황 >> 요약 >> 시청수 기반 Best 10 *****/
+	/**** 현황 >> 콘텐츠현황 >> 카테고리별현황 *****/
+	/**** 현황 >> 콘텐츠현황 >> 콘텐츠별현황 *****/
+	/**** 현황 >> 콘텐츠현황 >> 프로그램별현황 *****/
+	/**** 현황 >> 서비스현황 >> 구독현황 *****/
+	/*********************************************************************************************/
+
+-- merge로 변경 - 유서희 (25.03.07)
+
+    USP_EXCEPTION('', 'M_CONT_SERV', '일일배치', 'USP_M_CONT_RPT-1', 'DBMS_BATCH_SYSTEM');
+	
+	MERGE INTO M_CONT_SERV t
+	USING (
+		SELECT
+			 TA.SITE, TA.CORP, TA.USEYN, TA.MENUCODE, TA.CSEQ, TA.GGMENU, TA.GGMENUNAME, TB.STATUS, TB.TMENU,
+			 (CASE
+				WHEN TA.SITE = 'CEO'
+					THEN (SELECT M.MENUNAME FROM A_TMENU M WHERE M.SITE = TA.SITE AND SUBSTR(M.TMENU,3,4) = TB.TMENU)
+				WHEN TA.SITE = 'PRO'
+					THEN (SELECT M.MENUNAME FROM A_TMENU M WHERE M.SITE = TA.SITE AND M.TMENU = TB.TMENU)
+					ELSE (SELECT M.MENUNAME FROM A_TMENU M WHERE M.SITE = TA.SITE AND M.TMENU = TB.TMENU AND M.CORP = TA.CORP)
+				END) AS TMENUNAME
+			,TA.GMENU, TA.GMENUNAME, TA.TITLE, TA.GRADE, NVL(TA.REPCNT,0) AS REPCNT, NVL(TA.VIEWCNT,0) AS VIEWCNT, NVL(TA.MYCNT,0) AS MYCNT
+			,NVL(TA.SHARECNT,0) AS SHARECNT, TRUNC(TA.SERVSTIME) AS SERVSTIME, TA.PR_NAME, TA.PR_JIKWI, TA.PR_DEPART, TA.PR_COMPANY, TRUNC(TA.REGTIME) AS REGTIME
+		FROM A_CONT_SERV TA
+			/***** 유서희 프로의 요청으로 A_MENU의 STATUS IN ('Y','S') 삭제 처리 *****/
+			--INNER JOIN A_MENU TB ON TB.GMENU = TA.GMENU AND TB.SITE = TA.SITE --AND NVL(TB.CORP,0) = NVL(TA.CORP,0)
+	  LEFT OUTER JOIN A_MENU TB 	ON TB.SITE = TA.SITE
+										AND TB.GMENU = TA.GMENU
+										--AND ((TA.SITE = 'MS' AND TB.CORP = TA.CORP) OR 1 = 1)
+		WHERE 1 = 1
+			AND TA.USEYN = 'Y' AND TA.SITE <> 'MS' AND TA.SITE IN (SELECT S.SITE FROM A_SITE S)
+			AND TA.USEYN = 'Y' AND TA.GGMENU <> 'AA'
+	) vw
+	ON (t.site=vw.site AND t.gmenu=vw.gmenu AND t.cseq=vw.cseq)
+	WHEN matched THEN
+	UPDATE set
+	      USEYN=vw.useyn, MENUCODE=vw.menucode, GGMENU=vw.ggmenu, GGMENUNAME=vw.ggmenuname, STATUS=vw.status,
+	      TMENU=vw.tmenu, TMENUNAME=vw.tmenuname, GMENUNAME=vw.gmenuname, TITLE=vw.title,
+	      GRADE=vw.grade, REPCNT=vw.repcnt, VIEWCNT=vw.viewcnt, MYCNT=vw.mycnt, SHARECNT=vw.sharecnt,
+			  SERVSTIME=vw.servstime, PR_NAME=vw.pr_name, PR_JIKWI=vw.pr_jikwi, PR_DEPART=vw.pr_depart, PR_COMPANY=vw.pr_company, REGTIME=vw.regtime
+	WHEN NOT matched THEN
+	INSERT (SITE, CORP, USEYN, MENUCODE, CSEQ, GGMENU, GGMENUNAME, STATUS, TMENU, TMENUNAME
+			 ,GMENU, GMENUNAME, TITLE, GRADE, REPCNT, VIEWCNT, MYCNT, SHARECNT, SERVSTIME
+			 ,PR_NAME, PR_JIKWI, PR_DEPART, PR_COMPANY, REGTIME)
+	VALUES (
+		vw.SITE, vw.CORP, vw.USEYN, vw.MENUCODE, vw.CSEQ, vw.GGMENU, vw.GGMENUNAME, vw.STATUS, vw.TMENU, vw.TMENUNAME
+			 ,vw.GMENU, vw.GMENUNAME, vw.TITLE, vw.GRADE, vw.REPCNT, vw.VIEWCNT, vw.MYCNT, vw.SHARECNT, vw.SERVSTIME
+			 ,vw.PR_NAME, vw.PR_JIKWI, vw.PR_DEPART, vw.PR_COMPANY, vw.REGTIME) ;
+
+
+	/*********************************************************************************************/
+	/**** 집계 테이블 사용 쿼리 위치  *****/
+	/**** USP_M_CONT_RPT.M_CONT_LMS 집계 테이블 생성시 사용  *****/
+	/*********************************************************************************************/
+
+    USP_EXCEPTION('', 'M_CONT_MYGRADE', '일일배치', 'USP_M_CONT_RPT-2', 'DBMS_BATCH_SYSTEM');
+    
+	--평점 (VIEW로 전환 예정)
+	DELETE FROM M_CONT_MYGRADE
+	-- WHERE CHGTIME >= TO_CHAR(TRUNC(SYSDATE - 2),'YYYY-MM-DD');
+	WHERE CHGTIME >= TRUNC(SYSDATE - 2);
+
+	--DROP TABLE M_CONT_MYGRADE;
+	--CREATE TABLE M_CONT_MYGRADE AS
+	INSERT INTO M_CONT_MYGRADE (
+		 SITE
+		,USEQ
+		,CORP
+		,CSEQ
+		,UGRADE
+		,REGTIME
+		,CHGTIME
+	)
+	SELECT
+		 G.SITE
+		,G.USEQ
+		,G.CORP
+		,G.CSEQ
+		,(SUM(G.GRADE)/COUNT(G.USEQ)) AS UGRADE
+		,TRUNC(G.REGTIME) AS REGTIME
+		,TRUNC(NVL(G.CHGTIME,G.REGTIME)) AS CHGTIME
+	FROM A_GRADE G
+	WHERE 1 = 1
+		AND G.USEYN = 'Y'
+		AND G.SITE <> 'MS'
+		AND G.SITE IN (SELECT S.SITE FROM A_SITE S)
+		AND G.USEQ IS NOT NULL
+		AND G.CSEQ IS NOT NULL
+		--AND NVL(G.CHGTIME,G.REGTIME) >= '2024-01-01'
+		-- AND TRUNC(NVL(G.CHGTIME,G.REGTIME)) >= TO_CHAR(TRUNC(SYSDATE - 2),'YYYY-MM-DD')
+		AND TRUNC(NVL(G.CHGTIME,G.REGTIME)) >= TRUNC(SYSDATE - 2)
+		AND TRUNC(NVL(G.CHGTIME,G.REGTIME)) < TRUNC(SYSDATE)
+	GROUP BY
+		 G.SITE
+		,G.USEQ
+		,G.CORP
+		,G.CSEQ
+		,TRUNC(G.REGTIME)
+		,TRUNC(NVL(G.CHGTIME,G.REGTIME))
+	;
+
+
+	/*********************************************************************************************/
+	/**** 집계 테이블 사용 쿼리 위치  *****/
+	/**** USP_M_CONT_RPT.M_CONT_LMS 집계 테이블 생성시 사용  *****/
+	/*********************************************************************************************/
+
+    USP_EXCEPTION('', 'M_CONT_MYREP', '일일배치', 'USP_M_CONT_RPT-3', 'DBMS_BATCH_SYSTEM');
+    
+	--의견 (VIEW로 전환 예정)
+	DELETE FROM M_CONT_MYREP
+	-- WHERE CHGTIME >= TO_CHAR(TRUNC(SYSDATE - 2),'YYYY-MM-DD');
+	WHERE CHGTIME >= TRUNC(SYSDATE - 2);
+
+	--DROP TABLE M_CONT_MYREP;
+	--CREATE TABLE M_CONT_MYREP AS
+	INSERT INTO M_CONT_MYREP (
+		 SITE
+		,USEQ
+		,CORP
+		,CSEQ
+		,UREPCNT
+		,REGTIME
+		,CHGTIME
+	)
+	SELECT
+		 R.SITE
+		,R.USEQ
+		,R.CORP
+		,R.CSEQ
+		,COUNT(R.USEQ) AS UREPCNT
+		,TRUNC(R.REGTIME) AS REGTIME
+		,TRUNC(NVL(R.CHGTIME,R.REGTIME)) AS CHGTIME
+	FROM A_REP R
+	WHERE 1 = 1
+		AND R.USEYN = 'Y'
+		AND R.SITE <> 'MS'
+		AND R.SITE IN (SELECT S.SITE FROM A_SITE S)
+		AND R.USEQ IS NOT NULL
+		AND R.CSEQ IS NOT NULL
+		--AND R.REGTIME >= '2024-01-01'
+		-- AND TRUNC(NVL(R.CHGTIME,R.REGTIME)) >= TO_CHAR(TRUNC(SYSDATE - 2),'YYYY-MM-DD')
+		AND TRUNC(NVL(R.CHGTIME,R.REGTIME)) >= TRUNC(SYSDATE - 2)
+		AND TRUNC(NVL(R.CHGTIME,R.REGTIME)) < TRUNC(SYSDATE)
+	GROUP BY
+		 R.SITE
+		,R.USEQ
+		,R.CORP
+		,R.CSEQ
+		,TRUNC(R.REGTIME)
+		,TRUNC(NVL(R.CHGTIME,R.REGTIME))
+	;
+
+
+	/*********************************************************************************************/
+	/**** 집계 테이블 사용 쿼리 위치  *****/
+	/**** USP_M_CONT_RPT.M_CONT_LMS 집계 테이블 생성시 사용  *****/
+	/*********************************************************************************************/
+
+    USP_EXCEPTION('', 'M_CONT_MYCNT', '일일배치', 'USP_M_CONT_RPT-4', 'DBMS_BATCH_SYSTEM');
+
+	--보관 (VIEW로 전환 예정)
+	DELETE FROM M_CONT_MYCNT
+	-- WHERE CHGTIME >= TO_CHAR(TRUNC(SYSDATE - 2),'YYYY-MM-DD');
+	WHERE CHGTIME >= TRUNC(SYSDATE - 2);
+
+	--DROP TABLE M_CONT_MYCNT;
+	--CREATE TABLE M_CONT_MYCNT AS
+	INSERT INTO M_CONT_MYCNT (
+		 SITE
+		,USEQ
+		,CORP
+		,CSEQ
+		,UMYCNT
+		,REGTIME
+		,CHGTIME
+	)
+	SELECT
+		 A.SITE
+		,A.USEQ
+		,A.CORP
+		,A.KEY1 AS CSEQ
+		,COUNT(A.KEY1) AS UMYCNT
+		,TRUNC(A.REGTIME) AS REGTIME
+		,TRUNC(NVL(A.CHGTIME,A.REGTIME)) AS CHGTIME
+	FROM A_ACT_LOG A
+	WHERE 1 = 1
+		AND A.GBN = '콘텐츠담기'
+		AND A.SITE <> 'MS'
+		AND A.SITE IN (SELECT S.SITE FROM A_SITE S)
+		AND A.USEQ IS NOT NULL
+		AND A.KEY1 IS NOT NULL
+		--AND A.REGTIME >= '2024-01-01'
+		-- AND TRUNC(NVL(A.CHGTIME,A.REGTIME)) >= TO_CHAR(TRUNC(SYSDATE - 2),'YYYY-MM-DD')
+		AND TRUNC(NVL(A.CHGTIME,A.REGTIME)) >= TRUNC(SYSDATE - 2)
+		AND TRUNC(NVL(A.CHGTIME,A.REGTIME)) < TRUNC(SYSDATE)
+	GROUP BY
+		 A.SITE
+		,A.USEQ
+		,A.CORP
+		,A.KEY1
+		,TRUNC(A.REGTIME)
+		,TRUNC(NVL(A.CHGTIME,A.REGTIME))
+	;
+
+
+	/*********************************************************************************************/
+	/**** 집계 테이블 사용 쿼리 위치  *****/
+	/**** USP_M_CONT_RPT.M_CONT_LMS 집계 테이블 생성시 사용  *****/
+	/*********************************************************************************************/
+
+    USP_EXCEPTION('', 'M_CONT_MYSHARE', '일일배치', 'USP_M_CONT_RPT-5', 'DBMS_BATCH_SYSTEM');
+
+	--공유 (VIEW로 전환 예정)
+	DELETE FROM M_CONT_MYSHARE
+	-- WHERE CHGTIME >= TO_CHAR(TRUNC(SYSDATE - 2),'YYYY-MM-DD');
+	WHERE CHGTIME >= TRUNC(SYSDATE - 2);
+
+	--DROP TABLE M_CONT_MYSHARE;
+	--CREATE TABLE M_CONT_MYSHARE AS
+	INSERT INTO M_CONT_MYSHARE (
+		 SITE
+		,USEQ
+		,CORP
+		,TITLE
+		,CSEQ
+		,USHARECNT
+		,REGTIME
+		,CHGTIME
+	)
+	SELECT
+		 A.SITE
+		,A.USEQ
+		,A.CORP
+		,A.TITLE
+		,A.KEY2 AS CSEQ
+		,COUNT(A.USEQ) AS USHARECNT
+		,TRUNC(A.REGTIME) AS REGTIME
+		,TRUNC(NVL(A.CHGTIME,A.REGTIME)) AS CHGTIME
+	FROM A_ACT_LOG A
+	WHERE 1 = 1
+		AND A.GBN = '선물레터'
+		AND A.SITE <> 'MS'
+		AND A.SITE IN (SELECT S.SITE FROM A_SITE S)
+		AND A.USEQ IS NOT NULL
+		--AND A.REGTIME >= '2024-01-01'
+		-- AND TRUNC(NVL(A.CHGTIME,A.REGTIME)) >= TO_CHAR(TRUNC(SYSDATE - 2),'YYYY-MM-DD')
+		AND TRUNC(NVL(A.CHGTIME,A.REGTIME)) >= TRUNC(SYSDATE - 2)
+		AND TRUNC(NVL(A.CHGTIME,A.REGTIME)) < TRUNC(SYSDATE)
+	GROUP BY
+		 A.SITE
+		,A.USEQ
+		,A.CORP
+		,A.TITLE
+		,A.KEY2
+		,TRUNC(A.REGTIME)
+		,TRUNC(NVL(A.CHGTIME,A.REGTIME))
+	;
+
+
+	/*********************************************************************************************/
+	/**** 집계 테이블 사용 쿼리 위치  *****/
+	/**** 현황 >> 이용현황 >> 서비스 참여현황 *****/
+	/*********************************************************************************************/
+
+    USP_EXCEPTION('', 'M_CONT_LMS', '일일배치', 'USP_M_CONT_RPT-6', 'DBMS_BATCH_SYSTEM');
+
+	-- 시간오래 걸림
+	-- 콘텐츠별시청이력 -- 시간이 오래 걸림
+	DELETE FROM M_CONT_LMS
+	-- WHERE VIEWDATE >= TO_CHAR(TRUNC(SYSDATE - 2),'YYYY-MM-DD');
+	WHERE VIEWDATE >= TRUNC(SYSDATE - 2);
+
+	--DROP TABLE M_CONT_LMS;
+	--CREATE TABLE M_CONT_LMS AS
+	INSERT INTO M_CONT_LMS (
+		 SITE
+		,USEQ
+		,CORP
+		,CSEQ
+		,TOTALTIME
+		,VIEWDATE
+		,COMPLETEYN
+		,RT
+		,DV
+		,UGRADE
+		,UREPCNT
+		,UMYCNT
+		,USHARECNT
+	)
+	SELECT
+		 T.SITE
+		,T.USEQ
+		,T.CORP
+		,T.CSEQ
+		,T.TOTALTIME
+		,T.VIEWDATE
+		,T.COMPLETEYN
+		,T.RT
+		,T.DV
+		,T.UGRADE
+		,T.UREPCNT
+		,T.UMYCNT
+		--,T.USHARECNT
+		,NVL((SELECT S.USHARECNT
+				FROM M_CONT_MYSHARE S
+				WHERE 1 = 1
+					AND S.SITE = T.SITE
+					AND S.USEQ = T.USEQ
+					AND S.TITLE = T.TITLE
+					AND S.REGTIME = T.VIEWDATE)
+			,0) AS USHARECNT
+	FROM (
+		SELECT
+			 TC.SITE
+			,TC.USEQ
+			,TC.CORP
+			,TC.CSEQ
+			,TC.TOTALTIME
+			,TC.REGTIME AS VIEWDATE
+			,TC.COMPLETEYN
+			,TC.RT
+			,TC.DV
+			,NVL((SELECT DECODE(COUNT(1)
+								,0,0
+								,SUM(G.UGRADE)/COUNT(1))
+					FROM M_CONT_MYGRADE G
+					WHERE G.SITE = TC.SITE
+						AND G.USEQ = TC.USEQ
+						AND G.CSEQ = TC.CSEQ
+						AND G.REGTIME = TRUNC(TC.REGTIME))
+				,0)	AS UGRADE
+			,NVL((SELECT SUM(R.UREPCNT)
+					FROM M_CONT_MYREP R
+					WHERE R.SITE = TC.SITE
+						AND R.USEQ = TC.USEQ
+						AND R.CSEQ = TC.CSEQ
+						AND R.REGTIME = TRUNC(TC.REGTIME))
+				,0)	AS UREPCNT
+			,NVL((SELECT SUM(C.UMYCNT)
+					FROM M_CONT_MYCNT C
+					WHERE C.SITE = TC.SITE
+						AND C.USEQ = TC.USEQ
+						AND C.CSEQ = TC.CSEQ
+						AND C.REGTIME = TRUNC(TC.REGTIME))
+				,0) AS UMYCNT
+			--,,NVL((SELECT S.USHARECNT 	FROM M_CONT_MYSHARE S 	WHERE S.SITE = TC.SITE AND S.USEQ = TC.USEQ AND S.CSEQ = TC.CSEQ),0) 	AS USHARECNT
+			,(SELECT DISTINCT T.TITLE
+				FROM A_CONT T
+				WHERE T.CSEQ = TC.CSEQ) AS TITLE
+		FROM A_CONT_LMS TC
+			INNER JOIN A_CONT_SERV TA 	ON TA.CSEQ = TC.CSEQ
+										AND TA.SITE = TC.SITE
+										--AND ((TC.SITE = 'MS' AND TA.CORP = TC.CORP) OR 1 = 1)
+		WHERE 1 = 1
+			AND TA.USEYN = 'Y'
+			AND TA.GGMENU <> 'AA'
+			AND TC.SITE <> 'MS'
+			AND TC.SITE IN (SELECT S.SITE FROM A_SITE S)
+			AND NVL(TC.USEQ,TC.CORP) IS NOT NULL
+			AND TC.CSEQ IS NOT NULL
+			--AND TRUNC(TC.REGTIME) >= '2024-01-01'
+			-- AND TRUNC(TC.REGTIME) >= TO_CHAR(TRUNC(SYSDATE - 2),'YYYY-MM-DD')
+			AND TRUNC(TC.REGTIME) >= TRUNC(SYSDATE - 2)
+			AND TRUNC(TC.REGTIME) < TRUNC(SYSDATE)
+	) T
+	;
+
+    USP_EXCEPTION('', 'M_CONT_RPT', '일일배치', 'USP_M_CONT_RPT-7', 'DBMS_BATCH_SYSTEM');
+
+	--콘텐츠별시청내역 집계 -- 시간이 오래 걸림
+	DELETE FROM M_CONT_RPT
+	-- WHERE VIEWDATE >= TO_CHAR(TRUNC(SYSDATE - 2),'YYYY-MM-DD');
+	WHERE VIEWDATE >= TRUNC(SYSDATE - 2);
+
+	--DROP TABLE M_CONT_RPT;
+	--CREATE TABLE M_CONT_RPT AS
+	INSERT INTO M_CONT_RPT (
+			 SITE
+			,USEQ
+			,CORP
+			,SIGNCORP
+			,CSEQ
+			,GGMENU
+			,GGMENUNAME
+			,GMENU
+			,GMENUNAME
+			,TMENU
+			,TMENUNAME
+			,TITLE
+			,MENUCODE
+			,GRADE
+			,REPCNT
+			,VIEWCNT
+			,MYCNT
+			,SHARECNT
+			,UGRADE
+			,UREPCNT
+			,UMYCNT
+			,USHARECNT
+			,SERVSTIME
+			,VIEWDATE
+			,TOTALTIME
+			,RT
+			,COMPLETEYN
+			,USERGBN
+			,USEYN
+			,LOGINID
+			,NAME
+			,COMPANY
+			,REGUSEQ
+			,DEPART
+			,JIKWI
+			,MTELNO
+			,EMAIL
+			,USERVSTIME
+			,USERVETIME
+			,SIGNSEQ
+	)
+	SELECT
+		X.*
+	FROM (
+		SELECT
+			 U.SITE
+			,U.USEQ
+			,U.CORP
+			,U.SIGNCORP
+			,CS.CSEQ
+			,CS.GGMENU
+			,CS.GGMENUNAME
+			,CS.GMENU
+			,CS.GMENUNAME
+			,CS.TMENU
+			,CS.TMENUNAME
+			,CS.TITLE
+			,CS.MENUCODE
+			,NVL(CS.GRADE,0)		AS GRADE
+			,NVL(CS.REPCNT,0)  		AS REPCNT
+			,NVL(CS.VIEWCNT,0)  	AS VIEWCNT
+			,NVL(CS.MYCNT,0)  		AS MYCNT
+			,NVL(CS.SHARECNT,0) 	AS SHARECNT
+
+			,NVL(CL.UGRADE,0)    	AS UGRADE
+			,NVL(CL.UREPCNT,0)   	AS UREPCNT
+			,NVL(CL.UMYCNT,0)  	 	AS UMYCNT
+			,NVL(CL.USHARECNT,0) 	AS USHARECNT
+			,CS.SERVSTIME
+			,CL.VIEWDATE
+			,CL.TOTALTIME
+			,CL.RT
+			,CL.COMPLETEYN
+			,U.USERGBN
+			,U.USEYN
+			,U.LOGINID
+			,U.NAME
+			,U.COMPANY
+			,U.REGUSEQ
+			,U.DEPART
+			,U.JIKWI
+			,U.MTELNO
+			,U.EMAIL
+			,TRUNC(U.SERVSTIME) 	AS USERVSTIME
+			,TRUNC(U.SERVETIME) 	AS USERVETIME
+			,U.SIGNSS AS SIGNSEQ
+		FROM M_CONT_SERV CS
+			INNER JOIN M_CONT_LMS CL 	ON CL.SITE = CS.SITE
+										AND CL.CSEQ = CS.CSEQ
+										--AND ((CS.SITE = 'MS' AND CL.CORP = CS.CORP) OR 1 = 1)
+			INNER JOIN A_USER U 		ON U.SITE = CS.SITE
+										AND U.USEQ = CL.USEQ
+										--AND ((CS.SITE = 'MS' AND U.CORP = CS.CORP) OR 1 = 1)
+		WHERE 1 = 1
+			AND CS.SITE <> 'MS'
+			AND CS.SITE IN (SELECT S.SITE FROM A_SITE S)
+            AND SUBSTR(U.USERGBN,0,1) IN ('A','C')
+
+			--AND CS.SERVSTIME >= TO_CHAR(ADD_MONTHS(SYSDATE,-3),'YYYY-MM-DD')
+			--AND CL.VIEWDATE >= '2024-01-01'
+			-- AND CL.VIEWDATE >= TO_CHAR(TRUNC(SYSDATE - 2),'YYYY-MM-DD')
+			AND CL.VIEWDATE >= TRUNC(SYSDATE - 2)
+			AND CL.VIEWDATE < TRUNC(SYSDATE)
+	) X;
+
+    USP_EXCEPTION('', 'USP_M_CONT_RPT 완료', '일일배치', 'USP_M_CONT_RPT-8', 'DBMS_BATCH_SYSTEM');
+
+
+	COMMIT;
+
+	EXCEPTION
+			WHEN OTHERS THEN ROLLBACK;
+	USP_EXCEPTION('', DBMS_UTILITY.FORMAT_ERROR_STACK, '일일배치', 'USP_M_CONT_RPT', 'DBMS_BATCH_SYSTEM');
+
+END;

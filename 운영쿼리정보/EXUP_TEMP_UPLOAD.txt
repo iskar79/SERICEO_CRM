@@ -1,0 +1,211 @@
+create or replace PROCEDURE     "EXUP_TEMP_UPLOAD" 
+(
+  v_SITE 		IN NVARCHAR2 DEFAULT NULL ,
+  v_UID 		IN NVARCHAR2 DEFAULT NULL ,
+  v_JOB_TYPE 	IN NVARCHAR2 DEFAULT NULL ,
+  v_C01 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C02 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C03 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C04 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C05 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C06 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C07 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C08 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C09 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C10 		IN NVARCHAR2 DEFAULT NULL ,
+		
+  v_C11 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C12 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C13 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C14 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C15 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C16 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C17 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C18 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C19 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C20 		IN NVARCHAR2 DEFAULT NULL ,
+		
+  v_C21 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C22 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C23 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C24 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C25 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C26 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C27 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C28 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C29 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C30 		IN NVARCHAR2 DEFAULT NULL ,
+		
+  v_C31 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C32 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C33 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C34 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C35 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C36 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C37 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C38 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C39 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C40 		IN NVARCHAR2 DEFAULT NULL ,
+		
+  v_C41 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C42 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C43 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C44 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C45 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C46 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C47 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C48 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C49 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C50 		IN NVARCHAR2 DEFAULT NULL ,
+		
+  v_C51 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C52 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C53 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C54 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C55 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C56 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C57 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C58 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C59 		IN NVARCHAR2 DEFAULT NULL ,
+  v_C60 		IN NVARCHAR2 DEFAULT NULL 
+)
+AS
+
+/****************************************************************************************
+ * 1.Project Name : MonArch_Oracle *
+ * 2.System : Oracle *
+  * 3.Program ID : EXUP_TEMP_UPLOAD *
+ * 4.Description : 모나크 오라클 버전용 공통 엑셀업로드 프로시저(SERICEO 버전) *
+ * *
+ * 5.Input Value : SITE (실행 SITE 코드)
+                  ,USEQ (엑셀업로드 실행 사원번호)
+                  ,JOB_TYPE (상세실행 프로시저 명) *
+				  ,TEMP 컬럼 01-60
+ * 6.Out Value : 사용자정보 *
+ * *
+ * version AUTHOR Date DESCRIPTION Request By *
+  *  -----   ----------   -----------   ------------------------------   ----------*
+ * 1.0 마경호 2024.05.08 Initial Release *
+ *****************************************************************************************/
+
+    --v_result_code NUMBER(10,0);
+    --v_Processed_rows NUMBER(10,0);
+    --v_proc_str NVARCHAR2(200);
+    v_KEY NUMBER(10,0);
+
+BEGIN
+
+	--DBMS_OUTPUT.PUT_LINE('1');
+	INSERT INTO M_EXUP_TEMP ( 
+			  M_EXUP_NO
+			, SF_FLAG
+			, REG_DATE
+			, REG_USER
+			, SITE
+			, JOB_TYPE
+			, C01, C02, C03, C04, C05, C06, C07, C08, C09, C10
+			, C11, C12, C13, C14, C15, C16, C17, C18, C19, C20
+			, C21, C22, C23, C24, C25, C26, C27, C28, C29, C30
+			, C31, C32, C33, C34, C35, C36, C37, C38, C39, C40
+			, C41, C42, C43, C44, C45, C46, C47, C48, C49, C50
+			, C51, C52, C53, C54, C55, C56, C57, C58, C59, C60 
+	) VALUES (
+			  M_EXUP_SEQ.NEXTVAL
+			, '성공'
+			, SYSDATE
+			, v_UID
+			, v_SITE
+			, v_JOB_TYPE
+			, v_C01, v_C02, v_C03, v_C04, v_C05, v_C06, v_C07, v_C08, v_C09, v_C10
+			, v_C11, v_C12, v_C13, v_C14, v_C15, v_C16, v_C17, v_C18, v_C19, v_C20
+			, v_C21, v_C22, v_C23, v_C24, v_C25, v_C26, v_C27, v_C28, v_C29, v_C30
+			, v_C31, v_C32, v_C33, v_C34, v_C35, v_C36, v_C37, v_C38, v_C39, v_C40
+			, v_C41, v_C42, v_C43, v_C44, v_C45, v_C46, v_C47, v_C48, v_C49, v_C50
+			, v_C51, v_C52, v_C53, v_C54, v_C55, v_C56, v_C57, v_C58, v_C59, v_C60 
+	);
+
+	v_KEY := M_EXUP_SEQ.CURRVAL;
+
+	USP_EXCEPTION(''
+				, DBMS_UTILITY.FORMAT_ERROR_STACK 
+				, 'EXUP_TEMP_UPLOAD'
+				, ' v_SITE:' || v_SITE || ' v_UID:' || TO_CHAR(v_UID) || ' v_KEY:' || TO_CHAR(v_KEY) 
+				, v_UID
+				);
+
+	-- 회원 >> 회원관리 >> 대량업로드
+	IF v_JOB_TYPE = 'USER_ExUpload' THEN
+		INSERT INTO M_SCHEDULE_LOG (
+				MSG
+				,EXEDATE
+		)VALUES('회원 대량업로드 시작_' || SYSDATE ||'_v_UID_'|| v_UID ||'_v_KEY_'|| v_KEY ||'_v_SITE_'|| v_SITE 
+				,SYSDATE);        
+
+		USP_USER_EXUPLOAD(v_UID,v_KEY);
+
+	-- 회원 >> 회원관리 >> 일괄탈퇴
+	ELSIF v_JOB_TYPE = 'WITHDRAW_USER_ExUpload' THEN
+		INSERT INTO M_SCHEDULE_LOG (
+				 MSG
+				,EXEDATE
+		)VALUES('회원 일괄탈퇴 시작_' || SYSDATE ||'_v_UID_'|| v_UID ||'_v_KEY_'|| v_KEY ||'_v_SITE_'|| v_SITE 
+				,SYSDATE);    
+
+		USP_WITHDRAW_USER_EXUPLOAD(v_UID,v_KEY);
+
+	-- 회원 >> 회원관리 >> 회원정보 일괄수정
+	ELSIF v_JOB_TYPE='USER_UPDATE_ExUpload' THEN
+	     INSERT INTO M_SCHEDULE_LOG (MSG,EXEDATE)
+	     VALUES('회원 일괄수정 시작_' || SYSDATE ||'_v_UID_'|| v_UID ||'_v_KEY_'|| v_KEY ||'_v_SITE_'|| v_SITE , SYSDATE);    
+
+	     USP_USER_UPDATE_EXUPLOAD(v_UID,v_KEY);
+
+	-- 회원 >> 법인관리 >> 법인담당자 일괄수정
+	ELSIF v_JOB_TYPE='CORP_MANAGER_ExUpload' THEN
+	     INSERT INTO M_SCHEDULE_LOG (MSG,EXEDATE)
+	     VALUES('회사 영업대표 일괄수정 시작_' || SYSDATE ||'_v_UID_'|| v_UID ||'_v_KEY_'|| v_KEY ||'_v_SITE_'|| v_SITE , SYSDATE);  
+
+	     USP_SALES_MNG_UPDATE_EXUPLOAD(v_UID,v_KEY);
+
+	-- 계약 >> 개인계약 >> 승계처리 대량업로드
+	ELSIF v_JOB_TYPE='USER_SIGN_ExUpload' THEN
+	     INSERT INTO M_SCHEDULE_LOG (MSG,EXEDATE)
+	     VALUES('개인계약 승계처리 대량업로드 시작_' || SYSDATE ||'_v_UID_'|| v_UID ||'_v_KEY_'|| v_KEY ||'_v_SITE_'|| v_SITE , SYSDATE);    
+
+	     USP_USER_SIGN_EXUPLOAD(v_UID,v_KEY);
+
+	-- 계약 >> 법인계약 >> 승계처리 대량업로드
+	ELSIF v_JOB_TYPE='CORP_SIGN_ExUpload' THEN
+	     INSERT INTO M_SCHEDULE_LOG (MSG,EXEDATE)
+	     VALUES('법인 승계처리 대량업로드 시작_' || SYSDATE ||'_v_UID_'|| v_UID ||'_v_KEY_'|| v_KEY ||'_v_SITE_'|| v_SITE , SYSDATE);    
+
+	     USP_CORP_SIGN_EXUPLOAD(v_UID,v_KEY);
+
+	-- 계약 >> 법인계약 >> 계약회원 대량업로드
+	ELSIF v_JOB_TYPE='CORP_USER_SIGN_ExUpload' THEN
+	     INSERT INTO M_SCHEDULE_LOG (MSG,EXEDATE)
+	     VALUES('법인 계약회원 대량업로드 시작_' || SYSDATE ||'_v_UID_'|| v_UID ||'_v_KEY_'|| v_KEY ||'_v_SITE_'|| v_SITE , SYSDATE);    
+
+	     USP_CORP_USER_SIGN_EXUPLOAD(v_UID,v_KEY);
+	END IF;
+
+	COMMIT;
+
+	EXCEPTION
+				WHEN OTHERS THEN
+					--DECLARE  v_KEY NUMBER(10,0);
+					USP_EXCEPTION( '', DBMS_UTILITY.FORMAT_ERROR_STACK , 'ExUpload', 'EXCEL_UPLOAD_MON', v_UID);
+					ROLLBACK;
+
+				BEGIN
+					--utils.resetTrancount;
+
+					UPDATE M_EXUP_TEMP
+					SET  SF_FLAG = '실패'
+						,ERROR_MSG = DBMS_UTILITY.FORMAT_ERROR_STACK
+					WHERE M_EXUP_NO = v_KEY;
+
+					COMMIT;
+
+				END;
+END;

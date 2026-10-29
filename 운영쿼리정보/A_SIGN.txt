@@ -1,0 +1,36 @@
+"CEO"."A_SIGN"
+이름           널?       유형             
+------------ -------- -------------- 
+SIGNSEQ      NOT NULL NUMBER(18)     
+SITE                  VARCHAR2(8)    
+CORP                  NUMBER(10)     
+USEQ                  NUMBER(18)     
+SIGNNO                NUMBER(10)     
+SIGNSTATUS            VARCHAR2(1)    
+SIGNTIME              DATE           
+SIGNSTIME             DATE           
+SIGNETIME             DATE           
+SERVSTIME             DATE           
+SERVETIME             DATE           
+SIGNUSERCNT           NUMBER(10)     
+LISTPRICE             NUMBER(10)     
+PRICE                 NUMBER(10)     
+SURTAX                NUMBER(10)     
+CANCELTIME            DATE           
+REFUNDPRICE           NUMBER(10)     
+NOTE                  VARCHAR2(4000) 
+USEYN                 VARCHAR2(1)    
+REGTIME               DATE           
+REGUSEQ               NUMBER(18)     
+CHGTIME               DATE           
+CHGUSEQ               NUMBER(18)     
+ETC1                  VARCHAR2(300)  
+ETC2                  VARCHAR2(300)  
+ETC3                  VARCHAR2(300)  
+NSIGNUSERCNT          NUMBER(10)     
+NPRICE                NUMBER(10)     
+REFUNDSURTAX          NUMBER(10)     
+ETC2_NOTE             VARCHAR2(4000) 
+SALEGBN               VARCHAR2(1)    
+PREV_SIGNSEQ          VARCHAR2(100)  
+UNITPRICE             NUMBER(10)     

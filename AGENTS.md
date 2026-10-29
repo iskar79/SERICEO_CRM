@@ -78,7 +78,7 @@ String realPath = defaultFilePath + "/" + uploadFolder; // 20261001 khma {사유
      * `[ ] WebContent/WEB-INF/jsp/member/memberList.jsp`
 
 2. **CHANGELOG_KHMA.md 자동 갱신**
-   - 소스 파일이 추가/수정/삭제될 때마다 [CHANGELOG_KHMA.md](file:///c:/Users/khma7/eclipse-workspace/sericeo_crm/CHANGELOG_KHMA.md)에 상대 경로와 작업 내역을 빠짐없이 누적 기록합니다.
+   - 소스 파일이 추가/수정/삭제될 때마다 [CHANGELOG_KHMA.md](file:///c:/Users/khma7/eclipse-workspace/sericeo_crm_origin/CHANGELOG_KHMA.md)에 상대 경로와 작업 내역을 빠짐없이 누적 기록합니다.
 
 ---
 
@@ -105,13 +105,17 @@ VDI 내부망 코드를 카메라로 촬영하여 전달받는 경우, 단순 OC
 2. **서버 구동 및 런타임 검증 전담 (이클립스 Tomcat 9 / JDK 11)**
    * 톰캣 서버 구동, 빌드 및 화면 동작 테스트는 이클립스에서 전담합니다.
    * 로컬 이클립스에서는 안티그래비티에서 파일 저장 후 이클립스 프로젝트 새로고침(`F5`)으로 즉시 반영하여 구동합니다.
-   * VDI 내부망 반영 시에는 [CHANGELOG_KHMA.md](file:///c:/Users/khma7/eclipse-workspace/sericeo_crm/CHANGELOG_KHMA.md)에 기록된 파일만 정확히 선별하여 복사-붙여넣기합니다.
+   * VDI 내부망 반영 시에는 [CHANGELOG_KHMA.md](file:///c:/Users/khma7/eclipse-workspace/sericeo_crm_origin/CHANGELOG_KHMA.md)에 기록된 파일만 정확히 선별하여 복사-붙여넣기합니다.
+
+3. **운영 서버 최신 소스 동기화 완료 및 운영 쿼리 정보 폴더 (`운영쿼리정보/`) 활용**
+   * 운영 톰캣(Tomcat) 서버에서 구동 중이던 `sericrm_20261021`(`ROOT.war` 압축 해제 원본)을 기준으로 프로젝트 메인 소스(`src/`, `WebContent/`)를 **100% 동기화 완료**한 후, 이클립스 중복 검색 방지를 위해 중복 백업 폴더는 제거하였습니다.
+   * 운영 백업본 내부에 있던 주요 테이블 스키마 및 스토어드 프로시저 원문 스크립트(12종)는 프로젝트 루트 하위 **`운영쿼리정보/`** 폴더(`a_user.txt`, `A_CONT.txt`, `USP_M_CONT_USE_STATUS.txt` 등)에 별도 보존되어 있으므로, DB 테이블 구조나 프로시저 로직 확인 시 참조합니다.
 
 ---
 
 ## 6. SERICEO CRM (MonArch 8.2.0) 시스템 아키텍처 상세 요약
 
-*(전체 기술 명세서는 [ARCHITECTURE.md](file:///c:/Users/khma7/eclipse-workspace/sericeo_crm/ARCHITECTURE.md) 참조)*
+*(전체 기술 명세서는 [ARCHITECTURE.md](file:///c:/Users/khma7/eclipse-workspace/sericeo_crm_origin/ARCHITECTURE.md) 참조)*
 
 1. **환경 및 런타임 스펙**
    - WAS / Runtime: Apache Tomcat 9 / JDK 11

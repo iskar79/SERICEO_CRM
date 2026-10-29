@@ -77,6 +77,17 @@
 
 | 일자 | 작업자 | 대상 파일 경로 | 구분 | 위치 (메서드/라인) | 변경 내용 요약 (초급자도 이해할 수 있게 명확히 작성) |
 | :---: | :---: | :--- | :---: | :--- | :--- |
+| 20261029 | khma | `운영쿼리정보/` (구 `sericrm_20261021/q`) | 정리 | 프로젝트 루트 | 운영 DB 테이블/프로시저 쿼리 텍스트 12종을 `운영쿼리정보/`로 이관 후 중복 백업 폴더(`sericrm_20261021`) 삭제 |
+| 20261029 | khma | `WebContent/js/jquery.kdb.superContaner.js` | 동기화 | 6693L, 10185L, 14610L 등 | 운영 백업본(`sericrm_20261021`) 기준 DownCsv 확장, 다음 주소 API 오프라인 주석(20250528 khma), 에디터 이슈 수정(20250529 khma) 100% 동기화 |
+| 20261029 | khma | `WebContent/js/MonArch.js` | 동기화 | 57L, 113L | 운영 백업본(`sericrm_20261021`) 기준 오프라인 다음 주소 API 로딩 주석 처리(20250528 khma) 동기화 |
+| 20261029 | khma | `WebContent/Resource.js` | 동기화 | 155L~315L (`WordOption`) | 운영 백업본(`sericrm_20261021`) 기준 tinymce WordOption 설정 및 에디터 수정(20250529 khma) 동기화 |
+| 20261029 | khma | `WebContent/js/jquery.kdb.resizingCell.js` | 동기화 | 73L~102L | 운영 백업본(`sericrm_20261021`) 기준 tinymce 테이블 리사이즈 이슈 주석 처리(20250626 khma) 동기화 |
+| 20261029 | khma | `WebContent/js/thirdparties/tinymce4/tinymce.min.js`, `content.min.css` | 동기화 | 10653L / 21L~90L | 운영 백업본(`sericrm_20261021`) 기준 tinymce4 테이블 기본 보더 및 클래스 제외 동기화 |
+| 20261029 | khma | `WebContent/WEB-INF/Monarch820-servlet.xml` | 동기화 | 64L~73L (`dataSource`) | 운영 백업본(`sericrm_20261021`) 기준 DBCP validationQuery 및 NLS_DATE_FORMAT 초기화 설정 동기화 |
+| 20261029 | khma | `WebContent/WEB-INF/log4j.properties` | 동기화 | 1L~23L | 운영 백업본(`sericrm_20261021`) 기준 로그 용량 관리 정책(INFO 레벨, 20250609 khma) 동기화 |
+| 20261029 | khma | `src/monarch.properties`, `src/properties/jdbc.properties` | 동기화 | 전체 | 운영 백업본(`sericrm_20261021/WEB-INF/classes`) 기준 운영 URL 및 신규 DB 접속 설정 동기화 |
+| 20261029 | khma | `WebContent/WEB-INF/lib/ojdbc8.jar` 외 템플릿/HTML | 동기화 | `WEB-INF/lib`, `FileData/template`, `ui/popup` | 운영 백업본(`sericrm_20261021`) 기준 `ojdbc8.jar`(기존 `ojdbc6.jar_20261029` 백업), POI 3.8 원본 복원, 엑셀 업로드 서식 및 HTML 파비콘 주석 100% 일치화 |
+| 20261029 | khma | `AGENTS.md`, `ARCHITECTURE.md`, `CHANGELOG_KHMA.md` | 보강 | 디렉토리/원칙 | 운영 서버 백업 폴더(`sericrm_20261021/`) 구조 및 대조/보존 기준 명세 추가 |
 | 20261014 | khma | `2_TASK_EXCEL_DOWNLOAD_PWD.md` | 최신화 | Step 2, Step 3 | 고객사 확정 4단 모달 팝업(용도/대상/목적10자/암호), 감사로그 DDL, 3page 타겟추출 SQL 매트릭스 반영 |
 | 20261014 | khma | `3_TASK_SECUREDB_API.md` | 최신화 | 1장 개요 | 고객사 SecureDB 모듈 세팅 완료 및 실증 쿼리(AES256_DEV, SHA512_DEV, nts/bsh/fsh) 반영 |
 | 20261008 | khma | `4_TASK_PASSWORD_VALIDATION_UNIFICATION.md` | 신규 | 전체 | 비밀번호 복잡도 및 변경 검증 로직 단일 통합 실행 가이드 수립 (고객사 승인 대기) |
@@ -102,6 +113,36 @@
 ## 🔍 3. 작업 건별 세부 변경 내역 (Diff 요약)
 
 실제 코드 변경이 발생했을 때, 어떤 코드가 어떻게 바뀌었는지 Before / After 또는 작업 내용을 아래에 상세히 기록합니다.
+
+### [최신 운영 원본 100% 동기화] khma - 운영 백업본(`sericrm_20261021/`) 기준 전수 대조 및 1:1 동기화 완료
+* **대상 파일**:
+  * **핵심 JS/CSS/설정 (8종)**:
+    * `WebContent/js/jquery.kdb.superContaner.js` (DownCsv 확장, 20250528 다음 주소 API 주석, 20250529 에디터 수정)
+    * `WebContent/js/MonArch.js` (20250528 다음 주소 API 로딩 주석)
+    * `WebContent/Resource.js` (WordOption 및 20250529 에디터 설정)
+    * `WebContent/js/jquery.kdb.resizingCell.js` (20250626 tinymce 테이블 리사이즈 주석)
+    * `WebContent/js/thirdparties/tinymce4/tinymce.min.js`
+    * `WebContent/js/thirdparties/tinymce4/skins/lightgray/content.min.css`
+    * `WebContent/WEB-INF/Monarch820-servlet.xml` (DBCP `validationQuery` 및 `NLS_DATE_FORMAT` 초기화 설정)
+    * `WebContent/WEB-INF/log4j.properties` (20250609 로그 레벨 INFO 전환)
+  * **백엔드 프로퍼티 (2종)**:
+    * `src/monarch.properties`, `src/properties/jdbc.properties`
+  * **정적 HTML/CSS 및 리소스/라이브러리**:
+    * `WebContent/CustSearchlocal.html`, `WebContent/SurveyAnsform.htm`, `WebContent/error.htm`, `WebContent/testFilter.html`
+    * `WebContent/ui/popup/CustSearch.html`, `ReportView.html`, `ReportViewDt.html`, `ReportViewDt - 복사본.html`, `testCust.html`
+    * `WebContent/css/Common.css`, `WebContent/js/jquery.kdb.filter.js`, `WebContent/image/block_loading.gif`
+    * `WebContent/FileData/template/*` (운영 최신 엑셀 업로드 양식 일괄 반영)
+    * `WebContent/WEB-INF/lib/ojdbc8.jar` (기존 `ojdbc6.jar` ➡️ `ojdbc6.jar_20261029` 백업 보존) 및 POI 3.8 원본 JAR 복원
+* **작업 구분**: **운영 최신 원본 소스 100% 일치화 (기능 작업 착수 전 베이스라인 확립)**
+* **상세 내용**:
+  * `sericrm_20261021` 운영 백업본과 `WebContent/` 전체 파일 간 MD5 해시 불일치 건수 **0건** 달성 확인
+
+### [운영 백업 소스 기준 정립] khma - 운영 백업 폴더(`sericrm_20261021/`) 기준 명세 반영
+* **대상 파일**: `AGENTS.md`, `ARCHITECTURE.md`, `CHANGELOG_KHMA.md`
+* **작업 구분**: 운영 백업 원본 경로 및 기준점 문서화
+* **상세 내용**:
+  * 프로젝트 루트 하위 `sericrm_20261021/` 폴더를 **운영 톰캣에서 `ROOT.war`가 풀린 폴더 통째로 zip 압축해 가져온 실운영 배포 원본**으로 정의하고 아키텍처 트리 및 작업 규칙서에 반영
+  * `WebContent/`와 1:1 대응되는 정적 리소스(JS/JSP/CSS/XML/JAR) 및 `WEB-INF/classes/` 내 운영 `.class` 바이트코드/프로퍼티 대조 시 `sericrm_20261021/` 폴더를 최우선 기준(Baseline)으로 활용하며 원본 보존을 위해 직접 수정 금지 원칙 명시
 
 ### [기획 확정 및 실증 반영] khma - 엑셀 타겟 추출(4단 팝업) 및 SecureDB 실증 쿼리 최신화
 * **대상 파일**: `2_TASK_EXCEL_DOWNLOAD_PWD.md`, `3_TASK_SECUREDB_API.md`

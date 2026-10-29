@@ -1,0 +1,33 @@
+"CEO"."A_CONT_SERV"
+이름         널? 유형             
+---------- -- -------------- 
+SITE          VARCHAR2(8)    
+CORP          NUMBER(10)     
+GMENU         VARCHAR2(8)    
+CSEQ          NUMBER(10)     
+MENUNAME      VARCHAR2(200)  
+GMENUNAME     VARCHAR2(200)  
+GGMENU        VARCHAR2(8)    
+GGMENUNAME    VARCHAR2(100)  
+SERVSTIME     DATE           
+SERVETIME     DATE           
+TITLE         VARCHAR2(300)  
+SUMMARY       VARCHAR2(4000) 
+RUNTIME       NUMBER(10)     
+PHOTO         VARCHAR2(300)  
+GBN           VARCHAR2(8)    
+USEYN         VARCHAR2(1)    
+MOBILEYN      VARCHAR2(1)    
+GRADE         NUMBER(10,2)   
+REPCNT        NUMBER(10)     
+VIEWCNT       NUMBER(10)     
+PR_NAME       VARCHAR2(100)  
+PR_JIKWI      VARCHAR2(100)  
+PR_DEPART     VARCHAR2(100)  
+PR_COMPANY    VARCHAR2(100)  
+PR_EMAIL      VARCHAR2(100)  
+MENUCODE      VARCHAR2(20)   
+REGSEQ        VARCHAR2(20)   
+REGTIME       DATE           
+SHARECNT      NUMBER(10)     
+MYCNT         NUMBER(10)     

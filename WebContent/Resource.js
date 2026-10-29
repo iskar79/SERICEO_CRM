@@ -151,6 +151,88 @@ var _M = {
         currStepMenu: "", //
         actionName: ""
     },
+	//WordOption: {
+	//	selector: '',
+	//	language :'ko_KR',
+	//	theme: "modern",
+	//	menubar : false,
+	//	statusbar : false,
+    //    toolbar_items_size: 'small',
+	//	plugins: [
+	//		"advlist autolink lists link image charmap print preview hr anchor pagebreak",
+	//		"searchreplace wordcount visualblocks visualchars code fullscreen",
+	//		"insertdatetime media nonbreaking save table contextmenu directionality",
+	//		"emoticons template paste textcolor"
+	//	],
+	//	toolbar1: "newdocument GetContent GetImg | insertfile undo redo | cut copy paste pastetext | table | bullist numlist | outdent indent | link unlink image media | print preview code ",
+	//	toolbar2: "formatselect fontselect fontsizeselect | forecolor backcolor | bold italic underline strikethrough | alignleft aligncenter alignright alignjustify ",
+	//	toolbar1_default: "newdocument GetContent GetImg | insertfile undo redo | cut copy paste pastetext | table | bullist numlist | outdent indent | link unlink image media | print preview code ",
+	//	toolbar2_default: "formatselect fontselect fontsizeselect | forecolor backcolor | bold italic underline strikethrough | alignleft aligncenter alignright alignjustify ",
+	//	image_advtab: true,
+	//	paste_data_images: true,
+    //    paste_retain_style_properties : "all", // 허용할 style 속성을 지정.
+    //    paste_strip_class_attributes : "none", // 클래스 속성 제거여부 결정.	
+	//	templates: [
+	//		{title: 'Test template 1', content: 'Test 1'},
+	//		{title: 'Test template 2', content: 'Test 2'}
+	//	],
+	//	setup: function(ed) {
+	//		ed.on('blur', function(e) {
+	//		});	
+	//		ed.on('change', function(e) {
+	//			var _o = $('#' + ed.id ).parents('.fieldContaner');
+    //            _o.superContaner('ContanerChange');
+	//		});
+	//		ed.addButton('GetImg', {
+    //            title: '이미지 가져오기',
+    //            image: 'image/mceicon-image.png',
+    //            onclick: function () {
+    //                // Add you own code to execute something on click
+    //                $.GetImg(function (urlData, fileName) {
+    //                    _img = "<img src='" + urlData + "' alt='" + fileName + "' />";
+    //
+    //                    ed.focus();
+    //                    ed.selection.setContent(_img);
+    //                });
+    //            }
+    //        });
+	//		ed.addButton('GetContent', {
+    //            title: '컨텐츠 가져오기',
+    //            image: 'image/mceicon-template.png',
+    //            onclick: function () {
+    //                // Add you own code to execute something on click
+    //                var contentJson = "MON_ADM_컨텐츠POPUP_TBL";
+    //
+    //                $.ContentPopUp(contentJson, $(this), '기타', function (content) {
+    //                    ed.focus();
+    //                    ed.setContent(content);
+    //                });
+    //            }
+    //        });
+	//	},
+	//	force_p_newlines : true,
+	//	forced_root_block : false,
+	//	relative_urls : false,
+	//	remove_script_host : false,
+	//	init_instance_callback: function(editor) {
+	//		var object = $("#" + editor.id).parents(".fieldContaner");
+	//		var editorDisable = object.attr('editorDisable');
+	//		var value = object.attr("value");
+	//		editor.setContent($.decHTML(value));
+	//		
+	//		// 2014.06.09 dmjung :: 에디터 readonly 시, 지정한 toolbar 버튼 active 시키기.
+	//		if ( editorDisable == 'true' ) {
+	//			tinymce.activeEditor.theme.panel.find('button').disabled(false);
+	//		} 
+	//		
+	//		// 2014.06.09 dmjung :: resizingCell 바인딩.
+	//		object.find('iframe').resizingCell({
+    //            selector:'td',
+    //            thick: 14
+    //        });		
+	//	}
+	//},
+	
 	WordOption: {
 		selector: '',
 		language :'ko_KR',
@@ -164,14 +246,20 @@ var _M = {
 			"insertdatetime media nonbreaking save table contextmenu directionality",
 			"emoticons template paste textcolor"
 		],
+		
 		toolbar1: "newdocument GetContent GetImg | insertfile undo redo | cut copy paste pastetext | table | bullist numlist | outdent indent | link unlink image media | print preview code ",
 		toolbar2: "formatselect fontselect fontsizeselect | forecolor backcolor | bold italic underline strikethrough | alignleft aligncenter alignright alignjustify ",
 		toolbar1_default: "newdocument GetContent GetImg | insertfile undo redo | cut copy paste pastetext | table | bullist numlist | outdent indent | link unlink image media | print preview code ",
 		toolbar2_default: "formatselect fontselect fontsizeselect | forecolor backcolor | bold italic underline strikethrough | alignleft aligncenter alignright alignjustify ",
+		
+		//toolbar1: "GetContent GetImg | insertfile undo redo | cut copy paste pastetext | table | outdent indent | link unlink | print preview code | fontselect fontsizeselect | forecolor backcolor | bold italic underline strikethrough | alignleft aligncenter alignright alignjustify",
+		//toolbar1_default: "GetContent GetImg | insertfile undo redo | cut copy paste pastetext | table | outdent indent | link  unlink | customPrint preview code | fontselect fontsizeselect | forecolor backcolor | bold italic underline strikethrough | alignleft aligncenter alignright alignjustify",
+
 		image_advtab: true,
 		paste_data_images: true,
         paste_retain_style_properties : "all", // 허용할 style 속성을 지정.
-        paste_strip_class_attributes : "none", // 클래스 속성 제거여부 결정.	
+        paste_strip_class_attributes : "none", // 클래스 속성 제거여부 결정.
+        object_resizing : 'img',	
 		templates: [
 			{title: 'Test template 1', content: 'Test 1'},
 			{title: 'Test template 2', content: 'Test 2'}
@@ -210,15 +298,21 @@ var _M = {
                 }
             });
 		},
-		force_p_newlines : true,
+		force_br_newlines : true,
+		force_p_newlines : false,
 		forced_root_block : false,
 		relative_urls : false,
 		remove_script_host : false,
 		init_instance_callback: function(editor) {
+			debugger;
 			var object = $("#" + editor.id).parents(".fieldContaner");
 			var editorDisable = object.attr('editorDisable');
-			var value = object.attr("value");
-			editor.setContent($.decHTML(value));
+			var value = object.attr("value");	  
+			//khma 20250529 에디터 이슈로 인하여 주석
+			editor.setContent($.decHTML(value));	  
+			//khma 20250529 에디터 이슈로 인하여 수정 후 추가
+			//editor.setContent($.decHTML(value).replaceAll('\n','<br/>'));
+			//editor.setContent(value);
 			
 			// 2014.06.09 dmjung :: 에디터 readonly 시, 지정한 toolbar 버튼 active 시키기.
 			if ( editorDisable == 'true' ) {

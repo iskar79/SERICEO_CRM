@@ -1,0 +1,29 @@
+"CEO"."A_CORP"
+이름              널?       유형             
+--------------- -------- -------------- 
+CORP            NOT NULL NUMBER(10)     
+SITE                     VARCHAR2(8)    
+CORPNAME                 VARCHAR2(100)  
+USEYN                    VARCHAR2(1)    
+REGTIME                  DATE           
+CHGTIME                  DATE           
+CORPCODE                 VARCHAR2(20)   
+CORPNO                   VARCHAR2(20)   
+MANAGER                  VARCHAR2(20)   
+SERVSTIME                DATE           
+SERVETIME                DATE           
+CEONAME                  VARCHAR2(100)  
+ZIPCODE                  VARCHAR2(7)    
+ADDRESS1                 VARCHAR2(300)  
+ADDRESS2                 VARCHAR2(300)  
+TELNO                    VARCHAR2(20)   
+FAXNO                    VARCHAR2(20)   
+BUSI_TYPE                VARCHAR2(300)  
+BUSI_ITEM                VARCHAR2(300)  
+RELATED_COMPANY          VARCHAR2(50)   
+YEAR_CNT                 NUMBER(10)     
+NOTE                     VARCHAR2(2000) 
+REGUSEQ                  NUMBER(18)     
+CHGUSEQ                  NUMBER(12)     
+SRVC_NM                  VARCHAR2(100)  
+REPORT_TYPE              VARCHAR2(10)   

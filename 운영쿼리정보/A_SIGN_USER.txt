@@ -1,0 +1,23 @@
+"CEO"."A_SIGN_USER"
+이름          널?       유형            
+----------- -------- ------------- 
+SIGNUSERSEQ NOT NULL NUMBER(18)    
+SITE                 VARCHAR2(8)   
+SIGNSEQ     NOT NULL NUMBER(18)    
+USEQ        NOT NULL NUMBER(18)    
+SIGNUSERGBN          VARCHAR2(1)   
+SIGNSTIME            DATE          
+SIGNETIME            DATE          
+SERVSTIME            DATE          
+SERVETIME            DATE          
+CANCELTIME           DATE          
+REPLACEUSEQ          NUMBER(18)    
+NOTE                 VARCHAR2(300) 
+USEYN                VARCHAR2(1)   
+REGTIME              DATE          
+REGUSEQ              NUMBER(18)    
+CHGTIME              DATE          
+CHGUSEQ              NUMBER(18)    
+ETC1                 VARCHAR2(300) 
+ETC2                 VARCHAR2(300) 
+ETC3                 VARCHAR2(300) 

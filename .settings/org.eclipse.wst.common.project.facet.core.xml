@@ -4,7 +4,11 @@
   <fixed facet="jst.web"/>
   <fixed facet="java"/>
   <fixed facet="wst.jsdt.web"/>
-  <installed facet="java" version="1.6"/>
+  <!-- 20260921 khma JDK 11 환경 대응으로 기존 1.6 facet 설정 주석처리함. -->
+  <!-- <installed facet="java" version="1.6"/> -->
+  <!-- 20260921 khma JDK 11 facet 적용. -->
+  <installed facet="java" version="11"/>
+
   <installed facet="jst.web" version="2.5"/>
   <installed facet="wst.jsdt.web" version="1.0"/>
 </faceted-project>

@@ -1,7 +1,13 @@
 eclipse.preferences.version=1
 org.eclipse.jdt.core.compiler.codegen.inlineJsrBytecode=enabled
-org.eclipse.jdt.core.compiler.codegen.targetPlatform=1.6
-org.eclipse.jdt.core.compiler.compliance=1.6
+# 20260921 khma JDK 11 환경 대응으로 기존 1.6 컴파일러 설정 주석처리함.
+# org.eclipse.jdt.core.compiler.codegen.targetPlatform=1.6
+# org.eclipse.jdt.core.compiler.compliance=1.6
+# org.eclipse.jdt.core.compiler.source=1.6
+# 20260921 khma JDK 11 컴파일러 타깃 및 호환성 설정 적용.
+org.eclipse.jdt.core.compiler.codegen.targetPlatform=11
+org.eclipse.jdt.core.compiler.compliance=11
 org.eclipse.jdt.core.compiler.problem.assertIdentifier=error
 org.eclipse.jdt.core.compiler.problem.enumIdentifier=error
-org.eclipse.jdt.core.compiler.source=1.6
+org.eclipse.jdt.core.compiler.source=11
+

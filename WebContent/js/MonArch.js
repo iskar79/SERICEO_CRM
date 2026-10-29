@@ -53,7 +53,12 @@
 
     // 2013.11.20 dmjung :: resizingCell 플러그인 바인딩.
     document.writeln('<script type="text/javascript" src="/js/jquery.kdb.resizingCell.js"></script>');
+	
+	//구버전 tinymce 에디터 - textarea
+	//document.writeln('<script type="text/javascript" src="/js/tinymce/jscripts/tiny_mce/jquery.tinymce.js"></script>');	
+	//신버전 tinymce 에디터 - textarea
     document.writeln('<script type="text/javascript" src="/js/thirdparties/tinymce4/tinymce.min.js"></script>'); //tinymce4버전 추가
+	
     document.writeln('<script type="text/javascript" src="/js/thirdparties/fullcalendar-1.5.3/fullcalendar/fullcalendar.js"></script>');
     document.writeln('<script type="text/javascript" src="/js/jquery.blockUI.js"></script>');
     document.writeln('<script type="text/javascript" src="/js/jquery.qtip-1.0.0-rc3.min.js"></script>');//툴팁
@@ -105,7 +110,8 @@
     
     //document.writeln('<script  type="text/javascript" src="/js/thirdparties/jquery.nicescroll.340/jquery.nicescroll.js"></script>'); // scrollbar ui 컨트롤용 플러그인
     
-	document.writeln('<script src="https://ssl.daumcdn.net/dmaps/map_js_init/postcode.v2.js"></script>'); // daum주소 
+	// khma 20250528 오프라인 환경 사용으로 인하여 다음 주소 API 사용 않함
+	//document.writeln('<script src="https://ssl.daumcdn.net/dmaps/map_js_init/postcode.v2.js"></script>'); // daum주소 
 
 	
 })($, window, document);

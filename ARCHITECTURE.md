@@ -96,25 +96,29 @@ sericeo_crm_origin/
 │       │   └── SendDirectMailJob.java    # 대량 메일 발송 큐 배치 잡
 │       └── sso/                          # 외부 SSO 연동 모듈
 │           └── SsoLoginService.java      # 그룹사/포털 SSO 인증 연동
-└── WebContent/                           # [프론트엔드 및 웹 정적 리소스]
-    ├── WEB-INF/
-    │   ├── web.xml                       # 서블릿 매핑(Monarch820), 필터, 세션 설정
-    │   ├── dispatcher-servlet.xml        # 스프링 MVC 뷰리졸버, 컨트롤러 스캔, 인터셉터
-    │   ├── applicationContext.xml        # 트랜잭션, 데이터소스(DBCP) 설정
-    │   ├── lib/                          # 외부 JAR 라이브러리 (Spring, POI, Jackson 등)
-    │   └── jsp/                          # 팝업 등 서버 렌더링 보조 JSP
-    ├── ui/
-    │   ├── monform.jsp                   # CRM SPA 메인 컨테이너 (화면 분할 및 hashchange 제어)
-    │   └── index.jsp                     # 진입점 및 리다이렉트
-    ├── js/                               # 프론트엔드 코어 엔진
-    │   ├── Resource.js                   # [기둥 1] 전역 메타 정의서 (_M 객체, 24종 UI 데이터타입)
-    │   ├── jquery.kdb.MonArch800.js      # [기둥 2] 공통 유틸리티, 포맷팅, 베이스 라이브러리
-    │   ├── jquery.kdb.superContaner.js   # [기둥 3] CRM 화면 총괄 렌더링 엔진 (SuperTable 그리드)
-    │   ├── jquery.kdb.soap.2.0.js        # [기둥 4] 백엔드 통신 관문 (JSONClientParameters 직렬화)
-    │   └── MonArch.js                    # 전역 네비게이션 제어 및 테마 관리
-    ├── css/                              # 스타일시트 (Theme_CEO.css 등)
-    ├── FileData/                         # 파일 첨부 및 엑셀 임시 디렉토리 (excelTemp)
-    └── image/                            # UI 아이콘 및 이미지 리소스
+├── WebContent/                           # [프론트엔드 및 웹 정적 리소스]
+│   ├── WEB-INF/
+│   │   ├── web.xml                       # 서블릿 매핑(Monarch820), 필터, 세션 설정
+│   │   ├── dispatcher-servlet.xml        # 스프링 MVC 뷰리졸버, 컨트롤러 스캔, 인터셉터
+│   │   ├── applicationContext.xml        # 트랜잭션, 데이터소스(DBCP) 설정
+│   │   ├── lib/                          # 외부 JAR 라이브러리 (Spring, POI, Jackson 등)
+│   │   └── jsp/                          # 팝업 등 서버 렌더링 보조 JSP
+│   ├── ui/
+│   │   ├── monform.jsp                   # CRM SPA 메인 컨테이너 (화면 분할 및 hashchange 제어)
+│   │   └── index.jsp                     # 진입점 및 리다이렉트
+│   ├── js/                               # 프론트엔드 코어 엔진
+│   │   ├── Resource.js                   # [기둥 1] 전역 메타 정의서 (_M 객체, 24종 UI 데이터타입)
+│   │   ├── jquery.kdb.MonArch800.js      # [기둥 2] 공통 유틸리티, 포맷팅, 베이스 라이브러리
+│   │   ├── jquery.kdb.superContaner.js   # [기둥 3] CRM 화면 총괄 렌더링 엔진 (SuperTable 그리드)
+│   │   ├── jquery.kdb.soap.2.0.js        # [기둥 4] 백엔드 통신 관문 (JSONClientParameters 직렬화)
+│   │   └── MonArch.js                    # 전역 네비게이션 제어 및 테마 관리
+│   ├── css/                              # 스타일시트 (Theme_CEO.css 등)
+│   ├── FileData/                         # 파일 첨부 및 엑셀 임시 디렉토리 (excelTemp)
+│   └── image/                            # UI 아이콘 및 이미지 리소스
+└── 운영쿼리정보/                         # [운영 DB 주요 테이블 및 프로시저 원문 스크립트 모음 (구 sericrm_20261021/q)]
+    ├── a_user.txt, A_CORP.txt, A_SIGN.txt, A_SIGN_USER.txt
+    ├── A_CONT.txt, A_CONT_LMS.txt, A_CONT_SERV.txt, EXUP_TEMP_UPLOAD.txt
+    └── USP_M_CONT_DAILY_BATCH.txt, USP_M_CONT_RPT.txt, USP_M_CONT_USE_STATUS.txt, USP_USER_UPDATE_EXUPLOAD.txt
 ```
 
 ---

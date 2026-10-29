@@ -6689,11 +6689,23 @@ $(document).on("blur", ".t_Money", function (e) {
       _Obj.superContaner("Read", _keyValue);
     },
 
-    DownCsv: function () {
+    DownCsv: function (oCmd) {
       var _Obj = $(this);
       var _json = $(this).data("jsonData");
       var _popup = false;
+		var idx = oCmd.attr("index");
 
+		// 20170905 액셀다운로드 확장기능(확장클래스 사용)
+		var _jobInfo;
+		for (var c = 0; c < _json.jobs.length; c++) {
+			if (_json.jobs[c].inComm == "DownCsv" && _json.jobs[c].index == idx) {
+				_popup = _json.jobs[c].popup;
+				_jobInfo = _json.jobs[c];
+			}
+		}
+		// todo 20140107 액셀다운로드 개선을 위해 excelOpt:{excelType, excelService,
+		// excelMethod와 }을 추가
+		  
       for (var c = 0; c < _json.jobs.length; c++) {
         if (_json.jobs[c].inComm == "DownCsv") {
           _popup = _json.jobs[c].popup;
@@ -6719,7 +6731,9 @@ $(document).on("blur", ".t_Money", function (e) {
               i++;
             }
           });
-          $.GetExcelColumn(_Obj, "CSV", _col, _jobInfo);
+			// $.GetExcelColumn(_Obj, "CSV", _col, _jobInfo);
+			// 서비스, 함수 제대로 들어갔는지 확인하고 pl데이터 들어갔는지 확인
+			$.GetExcelColumn("CSV", _col, _jobInfo.service, pl);
         }
       } else {
         var _svc = _json.method.List;
@@ -10140,44 +10154,46 @@ $(document).on("blur", ".t_Money", function (e) {
 
           _zipfind.click(function (e) {
             var _fC = $(this).parents(".fieldContaner");
-            new daum.Postcode({
-              oncomplete: function (data) {
-                var fullAddr = ""; // 최종 주소 변수
-                var extraAddr = ""; // 조합형 주소 변수
-
-                // 사용자가 선택한 주소 타입에 따라 해당 주소 값을 가져온다.
-                if (data.userSelectedType === "R") {
-                  // 사용자가 도로명 주소를 선택했을 경우
-                  fullAddr = data.roadAddress;
-                } else {
-                  // 사용자가 지번 주소를 선택했을 경우(J)
-                  fullAddr = data.jibunAddress;
-                }
-
-                // 사용자가 선택한 주소가 도로명 타입일때 조합한다.
-                if (data.userSelectedType === "R") {
-                  //법정동명이 있을 경우 추가한다.
-                  if (data.bname !== "") {
-                    extraAddr += data.bname;
-                  }
-                  // 건물명이 있을 경우 추가한다.
-                  if (data.buildingName !== "") {
-                    extraAddr +=
-                      extraAddr !== ""
-                        ? ", " + data.buildingName
-                        : data.buildingName;
-                  }
-                  // 조합형주소의 유무에 따라 양쪽에 괄호를 추가하여 최종 주소를 만든다.
-                  fullAddr += extraAddr !== "" ? " (" + extraAddr + ")" : "";
-                }
-                $("input:eq(0)", _fC).val(data.zonecode);
-                $("input:eq(1)", _fC).val(fullAddr);
-                _fC.trigger("change");
-
-                // 팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분입니다.
-                // 예제를 참고하여 다양한 활용법을 확인해 보세요.
-              },
-            }).open();
+			
+			// khma 20250528 오프라인 환경 사용으로 인하여 다음 주소 API 사용 않함
+            //new daum.Postcode({
+            //  oncomplete: function (data) {
+            //    var fullAddr = ""; // 최종 주소 변수
+            //    var extraAddr = ""; // 조합형 주소 변수
+            //
+            //    // 사용자가 선택한 주소 타입에 따라 해당 주소 값을 가져온다.
+            //    if (data.userSelectedType === "R") {
+            //      // 사용자가 도로명 주소를 선택했을 경우
+            //      fullAddr = data.roadAddress;
+            //    } else {
+            //      // 사용자가 지번 주소를 선택했을 경우(J)
+            //      fullAddr = data.jibunAddress;
+            //    }
+            //
+            //    // 사용자가 선택한 주소가 도로명 타입일때 조합한다.
+            //    if (data.userSelectedType === "R") {
+            //      //법정동명이 있을 경우 추가한다.
+            //      if (data.bname !== "") {
+            //        extraAddr += data.bname;
+            //      }
+            //      // 건물명이 있을 경우 추가한다.
+            //      if (data.buildingName !== "") {
+            //        extraAddr +=
+            //          extraAddr !== ""
+            //            ? ", " + data.buildingName
+            //            : data.buildingName;
+            //      }
+            //      // 조합형주소의 유무에 따라 양쪽에 괄호를 추가하여 최종 주소를 만든다.
+            //      fullAddr += extraAddr !== "" ? " (" + extraAddr + ")" : "";
+            //    }
+            //    $("input:eq(0)", _fC).val(data.zonecode);
+            //    $("input:eq(1)", _fC).val(fullAddr);
+            //    _fC.trigger("change");
+            //
+            //    // 팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분입니다.
+            //    // 예제를 참고하여 다양한 활용법을 확인해 보세요.
+            //  },
+            //}).open();
             return;
             $.ZipOnePopUp(function (우편번호, 주소상, 주소하, tr) {
               $("input:eq(0)", _fC).val(우편번호);
@@ -10399,8 +10415,11 @@ $(document).on("blur", ".t_Money", function (e) {
           });
 
           myCodeMirror.on("update", function (cm, obj) {
-            var cmVal = cm.getValue();
-            _o.parents(".fieldContaner[type=codeEditor]").attr("Value", cmVal);
+            var cmVal = cm.getValue();		  
+			//khma 20250529 에디터 이슈로 인하여 주석
+            _o.parents(".fieldContaner[type=codeEditor]").attr("Value", cmVal);		  
+			//khma 20250529 에디터 이슈로 인하여 수정 추가
+            //_o.parents(".fieldContaner[type=codeEditor]").attr("Value", cmVal.replaceAll('\n','<br/>'));
             _o.parents(".fieldContaner[type=codeEditor]")
               .removeClass("fldChange")
               .addClass("fldChange");
@@ -13110,7 +13129,10 @@ $(document).on("blur", ".t_Money", function (e) {
           _o = $("textarea", _Obj);
           // _retVal = _o.html(); //khma 20181023 에디터변경으로 수정
           if (undefined != tinymce.activeEditor) {
-            _retVal = tinymce.activeEditor.getContent(); // khma 20181023 에디터변경으로 수정
+			//khma 20250529 에디터 저장시 해당 html이 임의로 변경되는걸 막기위해 수정
+			_retVal = tinymce.activeEditor.getContent(); // khma 20181023 에디터변경으로 수정
+			//_retVal = $('iframe').contents().find('.mce-content-body ').html();
+			//_retVal = _Obj.attr('value');
           }
           _Obj.attr("Value", _retVal);
           if (apl != undefined) apl.add(_Obj.attr("field"), _Obj.attr("Value"));
@@ -14293,7 +14315,8 @@ $(document).on("blur", ".t_Money", function (e) {
           if (!_Obj.find(".fieldEdit").length) _Obj.html(_value);
           break;
         case "textarea":
-          $("textarea", _Obj).val($.decHTML(_value));
+          //$("textarea", _Obj).val($.decHTML(_value));
+		  $("textarea", _Obj).val(_value);
           var _fldheight = $("textarea", _Obj).height();
           var _fldview = $(".fieldView", _Obj).html(
             '<pre class="readonlyPre input-bg" style="height:' +
@@ -14308,7 +14331,10 @@ $(document).on("blur", ".t_Money", function (e) {
 
         case "codeEditor":
           var cmInst = _Obj.data("CodeMirrorInstance");
+          //khma 20250529 에디터 이슈로 인하여 주석
           cmInst.setValue($.decHTML(_value));
+          //khma 20250529 에디터 이슈로 인하여 수정 추가
+          //cmInst.setValue($.decHTML(_value).replaceAll('\n','<br/>'));
 
           var _fldheight = $("textarea", _Obj).height();
           var _fldview = $(".fieldView", _Obj).html(
@@ -14582,9 +14608,14 @@ $(document).on("blur", ".t_Money", function (e) {
            * catch (e1) { }
            */
           var editor = tinyMCE.get(_Obj.find("textarea").attr("id"));
-          var _decValue = $.decHTML(_value)
+          var _decValue = $.decHTML(_value)		  
+			//khma 20250529 에디터 이슈로 인하여 수정
+            //.replaceAll("\n", "<br/>")
+			//khma 20250529 에디터 이슈로 인하여 주석
             .replace(/\s/g, " ")
-            .replace(/<script[^>]*>(.*?)<\/script>/gi, ""); //todo 2015-05-20 hycho : 정규식을 이용한 스크립트태그 제거 XSS 취약점 대응
+			//khma 20250529 에디터 이슈로 인하여 주석
+            .replace(/<script[^>]*>(.*?)<\/script>/gi, "")
+			; //todo 2015-05-20 hycho : 정규식을 이용한 스크립트태그 제거 XSS 취약점 대응
           if (undefined != editor) {
             editor.setContent(_decValue); // khma 20181023
             // 에디터변경으로 수정

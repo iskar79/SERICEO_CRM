@@ -60,6 +60,17 @@
 		<property name="password" value="${jdbc.password}" />
 		<property name="maxActive" value="500" />
 		<property name="maxIdle" value="100" />
+    
+		<property name="validationQuery" value="SELECT 1 FROM DUAL" />
+		<property name="testOnBorrow" value="true" />
+		<property name="testWhileIdle" value="true" />
+		<property name="timeBetweenEvictionRunsMillis" value="60000" />
+
+		<property name="connectionInitSqls">
+			<list>
+				<value>ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD'</value>
+			</list>
+		</property>
 	</bean>
 	
 <!-- 	<bean id="monOraDataSource" class="org.apache.commons.dbcp.BasicDataSource" -->

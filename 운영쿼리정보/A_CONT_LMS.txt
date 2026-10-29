@@ -1,0 +1,17 @@
+"CEO"."A_CONT_LMS" 
+이름         널?       유형           
+---------- -------- ------------ 
+SEQ        NOT NULL NUMBER       
+USEQ                NUMBER(18)   
+CSEQ                NUMBER(18)   
+VIEWDATE            VARCHAR2(8)  
+TOTALTIME           NUMBER(12)   
+PLAYTIME            NUMBER(10)   
+REGTIME             DATE         
+CHGTIME             DATE         
+COMPLETEYN          VARCHAR2(1)  
+LMSSTRING           VARCHAR2(64) 
+RT                  VARCHAR2(1)  
+DV                  VARCHAR2(1)  
+SITE                VARCHAR2(8)  
+CORP                NUMBER(10)   

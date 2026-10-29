@@ -1,0 +1,3238 @@
+create or replace PROCEDURE     USP_M_CONT_USE_STATUS
+AS
+/****************************************************************************************
+ * 1.Project Name : MonArch815_Oracle 													*
+ * 2.System : Oracle 11g 																*
+ * 3.Program ID : USP_M_CONT_USE_STATUS 												*
+ * 4.Description : SERICEO REPORT용 일일배치  											*
+ * 																						*
+ * 5.Input Value : NONE 																*
+ * 																						*
+ * 6.Out Value : NONE 																	*
+ * 1. 	US_USER table delete / insert (SYSDATE - 2) 										*
+ * 2. 	M_CONT_MYLOGIND table delete / insert (SYSDATE - 2) 								*
+ * 3. 	M_FOLDER_ITEM table merge (SYSDATE - 2) 											*
+ * 4. 	M_CEO_PAYLOG table merge (SYSDATE - 2) 											*
+ * 5. 	M_CONT_GGMENU table delete / insert (SYSDATE - 2) 								*
+ * 6. 	M_CONT_PREFER table delete / insert (SYSDATE - 2) 								*
+ * 7. 	M_CONT_BEST table delete / insert (SYSDATE - 2) 									*
+ * 8. 	M_CONT_VIEW table delete / insert (SYSDATE - 2) 									*
+ * 9. 	M_CONT_VIEW_COMB table delete / insert (SYSDATE - 2) 								*
+ * 10. 	M_CONT_USE_STATUS table delete / insert (SYSDATE - 2) 							*
+ * 12. 	M_CONT_USE_STATUS_CORP table delete / insert (SYSDATE - 2) 						*
+ * 13. 	M_CONT_VIEW_YEAR table delete / insert (SYSDATE - 2) 							*
+ * 																						*
+ * version 	   AUTHOR 		 Date 			DESCRIPTION 				  	Request By  *
+ * ------   ----------   --------------   ------------------------------   ------------ *
+ * 	1.0 	   KHMA 	   2024.06.10 	 	Initial Release 							*
+*****************************************************************************************/
+BEGIN
+
+    USP_EXCEPTION('', 'US_USER', '일일배치', 'USP_M_CONT_USE_STATUS-1', 'DBMS_BATCH_SYSTEM');
+
+
+    DELETE FROM US_USER U
+	WHERE U.USEQ IN (SELECT A.USEQ FROM A_USER A
+						-- WHERE NVL(A.CHGTIME,A.REGTIME) >= TO_CHAR(TRUNC(SYSDATE - 2),'YYYY-MM-DD')
+						WHERE NVL(A.CHGTIME,A.REGTIME) >= TRUNC(SYSDATE - 2)
+					);
+
+	--DROP TABLE US_USER;
+    --CREATE TABLE US_USER AS
+    INSERT INTO US_USER (
+         SITE
+        ,USEQ
+		,CORP
+		,SIGNCORP
+        ,USERGBN
+        ,USEYN
+		,LOGINID
+		,NAME
+		,COMPANY
+		,DEPART
+		,BIZGBN
+		,JIKWI
+
+		,MTELNO
+		,EMAIL
+		,BIRTHDAY
+		,SEX
+		,REGION
+		,EMAILYN
+		,SMSYN
+		,DMYN
+		,MANAGER
+		,MANAGER_NM
+
+        ,SERVSTIME
+        ,SERVETIME
+
+        ,OUTCODE
+        ,OUTDESC
+        ,OUTTIME
+
+        ,RELATED_COMPANY
+
+        ,SIGNSEQ
+        ,SIGNUSERGBN
+        ,SIGNSTIME
+        ,SIGNETIME
+		,CHGTIME
+    )
+    SELECT
+         U.SITE
+        ,U.USEQ
+
+		,U.CORP
+		,U.SIGNCORP
+
+        ,U.USERGBN
+        ,U.USEYN
+
+		,U.LOGINID
+		,U.NAME
+
+		,U.COMPANY
+		,U.DEPART
+		,U.BIZGBN
+		,U.JIKWI
+
+		,U.MTELNO
+		,U.EMAIL
+
+		,U.BIRTHDAY
+		,U.SEX
+		,U.REGION
+
+		,U.EMAILYN
+		,U.SMSYN
+		,U.DMYN
+
+		,U.MANAGER
+		,U.MANAGER_NM
+
+        ,U.SERVSTIME
+        ,U.SERVETIME
+
+        ,U.OUTCODE
+        ,U.OUTDESC
+        ,U.OUTTIME
+
+        ,U.RELATED_COMPANY
+
+        ,U.SIGNSEQ
+        --,(SELECT MIN(SU.SIGNUSERGBN) FROM A_SIGN_USER SU WHERE SU.SITE = U.SITE AND SU.USEQ = U.USEQ AND SU.SIGNSEQ = U.SIGNSEQ) AS SIGNUSERGBN
+		,U.SIGNUSERGBN
+        --,S.SIGNSTIME
+        --,S.SIGNETIME
+        ,U.SIGNSTIME
+        ,U.SIGNETIME
+
+		,U.CHGTIME
+    FROM (
+        SELECT
+             U.SITE
+            ,U.USEQ
+			,U.CORP
+			,U.SIGNCORP
+      ,U.USERGBN
+			,U.USEYN
+			,U.LOGINID
+			,U.NAME
+			,U.COMPANY
+			,U.DEPART
+			,U.JIKWI
+			,'' MTELNO
+			,'' EMAIL
+			,U.EMAILYN
+			,U.SMSYN
+			,U.DMYN
+			,U.MANAGER
+			,DECODE(U.SITE
+					,'MS',(SELECT FN_A_EMP_NAME(C.MANAGER) FROM A_CORP C WHERE C.CORP = NVL(U.CORP,U.SIGNCORP) AND ROWNUM <= 1)
+					, FN_A_EMP_NAME(U.MANAGER)) AS MANAGER_NM
+
+            ,U.SERVSTIME
+            ,U.SERVETIME AS SERVETIME
+
+			,U.OUTCODE
+			,U.OUTDESC
+			,U.OUTTIME
+
+            ,(SELECT RELATED_COMPANY FROM A_CORP C WHERE C.SITE = U.SITE AND C.CORP = NVL(U.CORP,U.SIGNCORP) AND ROWNUM <= 1) AS RELATED_COMPANY
+
+			,'' BIRTHDAY
+			,U.SEX
+			,U.BIZGBN
+			,DECODE(SUBSTR(TRIM(U.ADDRESS1),0,4)
+					,'충청북도','충북'
+					,'충청남도','충남'
+					,'경상북도','경북'
+					,'경상남도','경남'
+					,'전라북도','전북'
+					,'전라남도','전남'
+					,DECODE(SUBSTR(TRIM(U.ADDRESS1),0,2)
+							,'서울','서울'
+							,'경기','경기'
+							,'인천','인천'
+							,'부산','부산'
+							,'대전','대전'
+							,'세종','세종'
+							,'대구','대구'
+							,'광주','광주'
+							,'울산','울산'
+							,'제주','제주'
+							,'충북','충북'
+							,'충남','충남'
+							,'경북','경북'
+							,'경남','경남'
+							,'전북','전북'
+							,'전남','전남'
+							,'강원','강원'
+							,'해외','해외'
+							,SUBSTR(TRIM(U.ADDRESS1),0,15))
+					) AS REGION 
+			,U.SIGNSS AS SIGNSEQ
+			,(SELECT SU.SIGNUSERGBN FROM A_SIGN_USER SU WHERE SU.SITE = U.SITE AND SU.USEQ = U.USEQ AND SU.SIGNSEQ = U.SIGNSS AND ROWNUM <= 1) AS SIGNUSERGBN
+			,S.SIGNSTIME
+			,S.SIGNETIME
+
+			,GREATEST(U.REGTIME,U.CHGTIME) AS CHGTIME
+        FROM A_USER U
+			LEFT OUTER JOIN A_SIGN S 	ON S.SITE = U.SITE
+										AND S.SIGNSEQ = U.SIGNSS
+        WHERE 1 = 1
+			--AND U.USEYN = 'Y'
+            AND SUBSTR(U.USERGBN,0,1) IN ('A','C')
+
+            AND U.SITE <> 'MS'
+			AND U.SITE IN (SELECT S.SITE FROM A_SITE S)
+
+			-- AND NVL(U.CHGTIME,U.REGTIME) >= TO_CHAR(TRUNC(SYSDATE - 2),'YYYY-MM-DD')
+			AND NVL(U.CHGTIME,U.REGTIME) >= TRUNC(SYSDATE - 2)
+			AND NVL(U.CHGTIME,U.REGTIME) < TRUNC(SYSDATE)
+        ) U
+    WHERE 1 = 1
+    ;
+
+
+	/*********************************************************************************************/
+	/**** 집계 테이블 사용 쿼리 위치  *****/
+	/**** USP_M_CONT_USE_STATUS.M_CONT_VIEW 집계 테이블 생성시 사용  *****/
+	/**** USP_M_CONT_USE_STATUS.M_CONT_VIEW_YEAR 집계 테이블 생성시 사용  *****/
+	/**** 현황 >> 이용현황 >> 회원별 이용현황 *****/
+	/**** 현황 >> 보고서 >> 월별 이용현황 *****/
+	/**** 현황 >> 보고서 >> 기간별 이용현황 *****/
+	/*********************************************************************************************/
+
+    USP_EXCEPTION('', 'M_CONT_MYLOGIND', '일일배치', 'USP_M_CONT_USE_STATUS-2', 'DBMS_BATCH_SYSTEM');
+
+	--로그인 (VIEW로 전환 예정)
+	DELETE FROM M_CONT_MYLOGIND
+	-- WHERE REGTIME >= TO_CHAR(TRUNC(SYSDATE - 2),'YYYY-MM-DD');
+	WHERE REGTIME >= TRUNC(SYSDATE - 2);
+
+	--DROP TABLE M_CONT_MYLOGIND;
+	--CREATE TABLE M_CONT_MYLOGIND AS
+	INSERT INTO M_CONT_MYLOGIND (
+		 SITE
+		,USEQ
+		,CORP
+		,GBN
+		,RT
+		,DV
+		,LOGIN_CNT
+		,REGTIME
+	)
+	SELECT
+		 L.SITE
+		,L.USEQ
+		,L.CORP
+		,TRIM(L.GBN) AS GBN
+		,L.RT
+		,L.DV
+		,COUNT(L.USEQ) AS LOGIN_CNT
+		,TRUNC(L.REGTIME) AS REGTIME
+	FROM A_LOGIN_LOG L
+	WHERE 1 = 1
+
+		AND L.SITE <> 'MS'
+		AND L.SITE IN (SELECT S.SITE FROM A_SITE S)
+		AND TRIM(L.GBN) LIKE '%로그인%'
+
+		--AND L.REGTIME >= '2024-01-01'
+		-- AND L.REGTIME >= TO_CHAR(TRUNC(SYSDATE - 2),'YYYY-MM-DD')
+		AND L.REGTIME >= TRUNC(SYSDATE - 2)
+		AND L.REGTIME < TRUNC(SYSDATE)
+	GROUP BY
+		L.SITE
+		,L.USEQ
+		,L.CORP
+		,TRIM(L.GBN)
+		,L.RT
+		,L.DV
+		,TRUNC(L.REGTIME)
+	;
+
+
+	/*********************************************************************************************/
+	/**** 집계 테이블 사용 쿼리 위치  *****/
+	/**** 현황 >> 이용현황 >> 서비스 참여현황 *****/
+	/**** 현황 >> 서비스현황 >> 구독현황 *****/
+	/*********************************************************************************************/
+
+	--DELETE FROM M_FOLDER_ITEM
+	--WHERE CHGTIME >= TO_CHAR(TRUNC(SYSDATE - 2),'YYYY-MM-DD');
+	--
+	----DROP TABLE M_FOLDER_ITEM;
+	----CREATE TABLE M_FOLDER_ITEM AS
+	--INSERT INTO M_FOLDER_ITEM (
+	--	FOLDERSEQ
+	--	,FOLDERITEMSEQ
+	--	,USEQ
+	--	,SITE
+	--	,TITLE
+	--	,GBN
+	--	,MENUCODE
+	--	,MENUNAME
+	--	,GMENU
+	--	,RESNO
+	--	,RES_NAME
+	--	,RES_JIKGBN
+	--	,RES_COMP
+	--	,REGTIME
+	--	,CHGTIME
+	--)
+	--SELECT
+	--	 F.FOLDERSEQ
+	--	,I.FOLDERITEMSEQ
+	--	,F.USEQ
+	--	,F.SITE
+	--	,F.TITLE
+	--	,DECODE(F.TITLE,'_좋아요','P','L') AS GBN
+	--	,I.MENUCODE
+	--	,(SELECT M.MENUNAME FROM CEOMENU@DBL_CEO M WHERE M.MENUCODE = I.MENUCODE) AS MENUNAME
+	--	,(SELECT G.GMENU FROM CEO_GNAV_NEW@DBL_CEO G WHERE G.MENUCODE = I.MENUCODE AND G.USEYN = 'Y' AND G.MENUCODE IS NOT NULL) AS GMENU
+	--	,I.KEY1 AS RESNO
+	--	,P.NAME AS RES_NAME
+	--	,P.JIKGUBNM AS RES_JIKGBN
+	--	,P.COMPANY AS RES_COMP
+	--	--,F.REGTIME
+	--	,I.REGTIME
+	--	,NVL(I.CHGTIME,I.REGTIME) AS CHGTIME
+	--FROM A_FOLDER@DBL_CEO F
+	--	INNER JOIN A_FOLDER_ITEM@DBL_CEO I 	ON I.FOLDERSEQ = F.FOLDERSEQ
+	--	LEFT OUTER JOIN CEOPERSON@DBL_CEO P ON P.RESNO = I.KEY1
+	--WHERE 1 = 1
+	--	AND F.SITE = 'CEO'
+	--	AND F.USEYN = 'Y'
+	--	AND F.OPENYN = 'N'
+	--	AND F.CORP IS NULL
+	--	AND F.TITLE IN ('_좋아요','_강사구독')
+	--	AND F.USEQ IN (SELECT U.USEQ FROM A_USER U)
+	--	AND I.USEYN = 'Y'
+	--	AND NVL(I.CHGTIME,I.REGTIME) >= TO_CHAR(TRUNC(SYSDATE - 2),'YYYY-MM-DD')
+	--	AND NVL(I.CHGTIME,I.REGTIME) < TRUNC(SYSDATE)
+	--;
+
+    USP_EXCEPTION('', 'M_FOLDER_ITEM', '일일배치', 'USP_M_CONT_USE_STATUS-3', 'DBMS_BATCH_SYSTEM');
+
+
+	MERGE INTO M_FOLDER_ITEM F
+	USING (
+			SELECT
+				 F.FOLDERSEQ
+				,I.FOLDERITEMSEQ
+				,F.USEQ
+				,F.SITE
+				,F.TITLE
+				,DECODE(F.TITLE,'_좋아요','P','L') AS GBN
+				,I.MENUCODE
+				,(SELECT M.MENUNAME FROM CEOMENU@DBL_CEO M WHERE M.MENUCODE = I.MENUCODE AND ROWNUM <= 1) AS MENUNAME
+				,(SELECT G.GMENU FROM CEO_GNAV_NEW@DBL_CEO G WHERE G.MENUCODE = I.MENUCODE AND G.USEYN = 'Y' AND G.MENUCODE IS NOT NULL AND ROWNUM <= 1) AS GMENU
+				,I.KEY1 AS RESNO
+				,P.NAME AS RES_NAME
+				,P.JIKGUBNM AS RES_JIKGBN
+				,P.COMPANY AS RES_COMP
+				--,F.REGTIME
+				,I.REGTIME
+				,NVL(I.CHGTIME,I.REGTIME) AS CHGTIME
+			FROM A_FOLDER@DBL_CEO F
+				INNER JOIN A_FOLDER_ITEM@DBL_CEO I 	ON I.FOLDERSEQ = F.FOLDERSEQ
+				LEFT OUTER JOIN CEOPERSON@DBL_CEO P ON P.RESNO = I.KEY1
+			WHERE 1 = 1
+				AND F.SITE = 'CEO'
+				AND F.USEYN = 'Y'
+				AND F.OPENYN = 'N'
+				AND F.CORP IS NULL
+				AND F.TITLE IN ('_좋아요','_강사구독')
+				AND F.USEQ IN (SELECT U.USEQ FROM A_USER U)
+				AND I.USEYN = 'Y'
+				-- AND NVL(I.CHGTIME,I.REGTIME) >= TO_CHAR(TRUNC(SYSDATE - 2),'YYYY-MM-DD')
+				AND NVL(I.CHGTIME,I.REGTIME) >= TRUNC(SYSDATE - 2)
+				AND NVL(I.CHGTIME,I.REGTIME) < TRUNC(SYSDATE)
+			) C ON (F.FOLDERITEMSEQ = C.FOLDERITEMSEQ)
+	WHEN MATCHED THEN
+		UPDATE SET
+			 F.FOLDERSEQ = C.FOLDERSEQ
+			,F.USEQ = C.USEQ
+			,F.SITE = C.SITE
+			,F.TITLE = C.TITLE
+			,F.GBN = C.GBN
+			,F.MENUCODE = C.MENUCODE
+			,F.MENUNAME = C.MENUNAME
+			,F.GMENU = C.GMENU
+			,F.RESNO = C.RESNO
+			,F.RES_NAME = C.RES_NAME
+			,F.RES_JIKGBN = C.RES_JIKGBN
+			,F.RES_COMP = C.RES_COMP
+			,F.REGTIME = C.REGTIME
+			,F.CHGTIME = C.CHGTIME
+	WHEN NOT MATCHED THEN
+		INSERT (
+			 F.FOLDERSEQ
+			,F.FOLDERITEMSEQ
+			,F.USEQ
+			,F.SITE
+			,F.TITLE
+			,F.GBN
+			,F.MENUCODE
+			,F.MENUNAME
+			,F.GMENU
+			,F.RESNO
+			,F.RES_NAME
+			,F.RES_JIKGBN
+			,F.RES_COMP
+			,F.REGTIME
+			,F.CHGTIME
+		) VALUES (
+			 C.FOLDERSEQ
+			,C.FOLDERITEMSEQ
+			,C.USEQ
+			,C.SITE
+			,C.TITLE
+			,C.GBN
+			,C.MENUCODE
+			,C.MENUNAME
+			,C.GMENU
+			,C.RESNO
+			,C.RES_NAME
+			,C.RES_JIKGBN
+			,C.RES_COMP
+			,C.REGTIME
+			,C.CHGTIME
+		);
+
+
+	/*********************************************************************************************/
+	/**** 집계 테이블 사용 쿼리 위치  *****/
+	/**** 현황 >> 서비스현황 >> 공유권현황 *****/
+	/*********************************************************************************************/
+
+    USP_EXCEPTION('', 'M_CEO_PAYLOG', '일일배치', 'USP_M_CONT_USE_STATUS-4', 'DBMS_BATCH_SYSTEM');
+
+
+	MERGE INTO M_CEO_PAYLOG P
+	USING (
+			SELECT
+				 P.REGSEQ
+				,TRIM(P.USERID) AS USERID
+				,U.USEQ
+				,U.SITE
+				--,(SELECT U.USEQ FROM A_USER U WHERE U.LOGINID = TRIM(P.USERID) AND U.SITE = 'CEO' AND ROWNUM <= 1) AS USEQ
+				,P.MENUCODE
+				,P.CNT
+				,P.GBN
+				,P.USEYN
+				,P.AMT
+				,P.STATUS
+				,P.PRICE
+				,P.ETC
+				,P.SEQ
+				,P.CCNT
+				,P.PCNT
+				,P.TCNT
+				,P.PAYMODE
+				,P.PAYNAME
+				,P.DEPOYN
+				,P.ORDERNO
+				--,P.REGDATE
+				,TO_DATE(P.REGDATE,'YYYYMMDDHH24MISS') AS REGDATE
+				,P.REGUSERID
+				,DECODE(TRIM(P.REGUSERID)
+						,TRIM(P.USERID), U.USEQ
+						,(SELECT U.USEQ FROM A_USER U
+							WHERE U.LOGINID = TRIM(P.REGUSERID)
+								AND U.SITE = 'CEO'
+								AND ROWNUM <= 1)
+						) AS REGUSEQ
+				--,P.CHGDATE
+				,NVL(TO_DATE(P.CHGDATE,'YYYYMMDDHH24MISS')
+					,TO_DATE(P.REGDATE,'YYYYMMDDHH24MISS')
+					) AS CHGDATE
+				,P.CHGUSERID
+				,DECODE(TRIM(P.CHGUSERID)
+						,TRIM(P.USERID), U.USEQ
+						,NVL(
+							(SELECT U.USEQ FROM A_USER U
+							WHERE U.LOGINID = TRIM(P.CHGUSERID)
+								AND U.SITE = 'CEO'
+								AND ROWNUM <= 1)
+							,(SELECT U.USEQ FROM A_USER U
+							WHERE U.LOGINID = TRIM(P.REGUSERID)
+								AND U.SITE = 'CEO'
+								AND ROWNUM <= 1))
+						) AS CHGUSEQ
+			FROM CEO_PAYLOG@DBL_CEO P
+				INNER JOIN A_USER U ON U.LOGINID = TRIM(P.USERID)
+			WHERE 1 = 1
+				AND MENUCODE = '0605'
+				AND U.SITE = 'CEO'
+				AND NVL(TRIM(P.USERID),'X') IN (SELECT U.LOGINID FROM A_USER U WHERE U.SITE = 'CEO')
+
+				-- AND TO_DATE(NVL(P.CHGDATE,P.REGDATE),'YYYYMMDDHH24MISS') >= TO_CHAR(TRUNC(SYSDATE - 2),'YYYY-MM-DD')
+				AND NVL(P.CHGDATE,P.REGDATE) >= TO_CHAR(TRUNC(SYSDATE - 2),'YYYYMMDDHH24MISS')
+				-- AND NVL(TO_DATE(P.CHGDATE,'YYYYMMDDHH24MISS'),TO_DATE(P.REGDATE,'YYYYMMDDHH24MISS')) < TRUNC(SYSDATE)
+				AND NVL(P.CHGDATE,P.REGDATE) < TO_CHAR(TRUNC(SYSDATE),'YYYYMMDDHH24MISS')
+			) C ON (P.REGSEQ = C.REGSEQ)
+	WHEN MATCHED THEN
+		UPDATE SET
+			 P.USERID 		= C.USERID
+			,P.USEQ 		= C.USEQ
+			,P.SITE 		= C.SITE
+			,P.MENUCODE 	= C.MENUCODE
+			,P.CNT 			= C.CNT
+			,P.GBN 			= C.GBN
+			,P.USEYN 		= C.USEYN
+			,P.AMT 			= C.AMT
+			,P.STATUS 		= C.STATUS
+			,P.PRICE 		= C.PRICE
+			,P.ETC 			= C.ETC
+			,P.SEQ 			= C.SEQ
+			,P.CCNT 		= C.CCNT
+			,P.PCNT 		= C.PCNT
+			,P.TCNT 		= C.TCNT
+			,P.PAYMODE 		= C.PAYMODE
+			,P.PAYNAME 		= C.PAYNAME
+			,P.DEPOYN 		= C.DEPOYN
+			,P.ORDERNO 		= C.ORDERNO
+			,P.REGDATE 		= C.REGDATE
+			,P.REGUSERID 	= C.REGUSERID
+			,P.REGUSEQ 		= C.REGUSEQ
+			,P.CHGDATE 		= C.CHGDATE
+			,P.CHGUSERID 	= C.CHGUSERID
+			,P.CHGUSEQ 		= C.CHGUSEQ
+	WHEN NOT MATCHED THEN
+		INSERT (
+			 P.REGSEQ
+			,P.USERID
+			,P.USEQ
+			,P.SITE
+			,P.MENUCODE
+			,P.CNT
+			,P.GBN
+			,P.USEYN
+			,P.AMT
+			,P.STATUS
+			,P.PRICE
+			,P.ETC
+			,P.SEQ
+			,P.CCNT
+			,P.PCNT
+			,P.TCNT
+			,P.PAYMODE
+			,P.PAYNAME
+			,P.DEPOYN
+			,P.ORDERNO
+			,P.REGDATE
+			,P.REGUSERID
+			,P.REGUSEQ
+			,P.CHGDATE
+			,P.CHGUSERID
+			,P.CHGUSEQ
+		) VALUES (
+			 C.REGSEQ
+			,C.USERID
+			,C.USEQ
+			,C.SITE
+			,C.MENUCODE
+			,C.CNT
+			,C.GBN
+			,C.USEYN
+			,C.AMT
+			,C.STATUS
+			,C.PRICE
+			,C.ETC
+			,C.SEQ
+			,C.CCNT
+			,C.PCNT
+			,C.TCNT
+			,C.PAYMODE
+			,C.PAYNAME
+			,C.DEPOYN
+			,C.ORDERNO
+			,C.REGDATE
+			,C.REGUSERID
+			,C.REGUSEQ
+			,C.CHGDATE
+			,C.CHGUSERID
+			,C.CHGUSEQ
+		);
+
+
+	/*********************************************************************************************/
+	/**** 집계 테이블 사용 쿼리 위치  *****/
+	/**** USP_M_CONT_USE_STATUS.M_CONT_VIEW 집계 테이블 생성시 사용  *****/
+	/**** USP_M_CONT_USE_STATUS.M_CONT_VIEW_COMB 집계 테이블 생성시 사용  *****/
+	/**** USP_M_CONT_USE_STATUS.M_CONT_VIEW_YEAR 집계 테이블 생성시 사용  *****/
+	/*********************************************************************************************/
+
+    USP_EXCEPTION('', 'M_CONT_GGMENU', '일일배치', 'USP_M_CONT_USE_STATUS-5', 'DBMS_BATCH_SYSTEM');
+
+	-- 메뉴별 집계
+	DELETE FROM M_CONT_GGMENU G
+	-- WHERE G.VIEWDATE >= TO_CHAR(TRUNC(SYSDATE - 2),'YYYY-MM-DD');
+	WHERE G.VIEWDATE >= TRUNC(SYSDATE - 2);
+
+
+	--DROP TABLE M_CONT_GGMENU;
+	--CREATE TABLE M_CONT_GGMENU AS
+	INSERT INTO M_CONT_GGMENU (
+		 SITE
+		,USEQ
+		,CORP
+
+		,VIEWDATE
+
+		,GGMENU_01
+		,GGMENU_02
+		,GGMENU_03
+		,GGMENU_04
+		,GGMENU_05
+		,GGMENU_06
+		,GGMENU_07
+		,GGMENU_08
+		,GGMENU_09
+		--,GGMENU_10
+
+		,GGMENU_CNT_01
+		,GGMENU_CNT_02
+		,GGMENU_CNT_03
+		,GGMENU_CNT_04
+		,GGMENU_CNT_05
+		,GGMENU_CNT_06
+		,GGMENU_CNT_07
+		,GGMENU_CNT_08
+		,GGMENU_CNT_09
+		--,GGMENU_CNT_10
+	)
+	SELECT
+		 X.SITE
+		,X.USEQ
+		,X.CORP
+
+		,X.VIEWDATE
+
+		,SUM(X.GGMENU_TIME_01) AS GGMENU_01
+		,SUM(X.GGMENU_TIME_02) AS GGMENU_02
+		,SUM(X.GGMENU_TIME_03) AS GGMENU_03
+		,SUM(X.GGMENU_TIME_04) AS GGMENU_04
+		,SUM(X.GGMENU_TIME_05) AS GGMENU_05
+		,SUM(X.GGMENU_TIME_06) AS GGMENU_06
+		,SUM(X.GGMENU_TIME_07) AS GGMENU_07
+		,SUM(X.GGMENU_TIME_08) AS GGMENU_08
+		,SUM(X.GGMENU_TIME_09) AS GGMENU_09
+		--,SUM(X.GGMENU_TIME_10) AS GGMENU_10
+
+		,SUM(X.GGMENU_CNT_01) AS GGMENU_CNT_01
+		,SUM(X.GGMENU_CNT_02) AS GGMENU_CNT_02
+		,SUM(X.GGMENU_CNT_03) AS GGMENU_CNT_03
+		,SUM(X.GGMENU_CNT_04) AS GGMENU_CNT_04
+		,SUM(X.GGMENU_CNT_05) AS GGMENU_CNT_05
+		,SUM(X.GGMENU_CNT_06) AS GGMENU_CNT_06
+		,SUM(X.GGMENU_CNT_07) AS GGMENU_CNT_07
+		,SUM(X.GGMENU_CNT_08) AS GGMENU_CNT_08
+		,SUM(X.GGMENU_CNT_09) AS GGMENU_CNT_09
+		--,SUM(X.GGMENU_CNT_10) AS GGMENU_CNT_10
+	FROM (
+		SELECT
+			 SITE
+			,USEQ
+			,CORP
+
+			,VIEWDATE
+
+			,NVL(GGMENU_TIME_01,0) AS GGMENU_TIME_01
+			,NVL(GGMENU_TIME_02,0) AS GGMENU_TIME_02
+			,NVL(GGMENU_TIME_03,0) AS GGMENU_TIME_03
+			,NVL(GGMENU_TIME_04,0) AS GGMENU_TIME_04
+			,NVL(GGMENU_TIME_05,0) AS GGMENU_TIME_05
+			,NVL(GGMENU_TIME_06,0) AS GGMENU_TIME_06
+			,NVL(GGMENU_TIME_07,0) AS GGMENU_TIME_07
+			,NVL(GGMENU_TIME_08,0) AS GGMENU_TIME_08
+			,NVL(GGMENU_TIME_09,0) AS GGMENU_TIME_09
+			,NVL(GGMENU_TIME_10,0) AS GGMENU_TIME_10
+
+			,0 AS GGMENU_CNT_01
+			,0 AS GGMENU_CNT_02
+			,0 AS GGMENU_CNT_03
+			,0 AS GGMENU_CNT_04
+			,0 AS GGMENU_CNT_05
+			,0 AS GGMENU_CNT_06
+			,0 AS GGMENU_CNT_07
+			,0 AS GGMENU_CNT_08
+			,0 AS GGMENU_CNT_09
+			,0 AS GGMENU_CNT_10
+		FROM (
+			SELECT
+				 TC.SITE
+				,TC.USEQ
+				,NVL(TC.CORP,0) AS CORP
+
+				,TC.TOTALTIME
+
+				,(SELECT TA.GGMENU
+					FROM A_CONT_SERV TA
+
+						/***** 유서희 프로의 요청으로 A_MENU의 STATUS IN ('Y','S') 삭제 처리 *****/
+						--INNER JOIN A_MENU TB ON TB.GMENU = TA.GMENU AND TB.SITE = TA.SITE --AND NVL(TB.CORP,0) = NVL(TA.CORP,0)
+					WHERE 1 = 1
+						AND TA.USEYN = 'Y'
+						AND TA.GGMENU <> 'AA'
+
+						/***** 유서희 프로의 요청으로 A_MENU의 STATUS IN ('Y','S') 삭제 처리 *****/
+						--AND TB.STATUS IN ('Y','S')
+
+						AND TA.CSEQ = TC.CSEQ
+						AND TA.SITE = TC.SITE
+						--AND NVL(TA.CORP,0) = NVL(TC.CORP,0)
+						AND ROWNUM <= 1
+					) AS GGMENU
+
+				,TO_CHAR(TRUNC(TC.REGTIME),'YYYY-MM-DD') AS VIEWDATE
+			FROM A_CONT_LMS TC
+				INNER JOIN A_CONT_SERV TA 	ON TA.CSEQ = TC.CSEQ
+											AND TA.SITE = TC.SITE
+											--AND NVL(TA.CORP,0) = NVL(TC.CORP,0)
+											--AND ((TC.SITE = 'MS' AND TA.CORP = TC.CORP) OR 1 = 1)
+
+				/***** 유서희 프로의 요청으로 A_MENU의 STATUS IN ('Y','S') 삭제 처리 *****/
+				--INNER JOIN A_MENU TB ON TB.GMENU = TA.GMENU AND TB.SITE = TA.SITE --AND NVL(TB.CORP,0) = NVL(TC.CORP,0)
+			WHERE 1 = 1
+				AND TA.USEYN = 'Y'
+				AND TA.GGMENU <> 'AA'
+
+				/***** 유서희 프로의 요청으로 A_MENU의 STATUS IN ('Y','S') 삭제 처리 *****/
+				--AND TB.STATUS IN ('Y','S')
+
+				AND TC.USEQ IS NOT NULL
+
+				AND TC.SITE <> 'MS'
+				AND TC.SITE IN (SELECT S.SITE FROM A_SITE S)
+
+				-- AND TC.REGTIME >= TO_CHAR(TRUNC(SYSDATE - 2),'YYYY-MM-DD')
+				AND TC.REGTIME >= TRUNC(SYSDATE - 2)
+				AND TC.REGTIME < TRUNC(SYSDATE)
+			)
+			PIVOT (
+					SUM(TOTALTIME)
+					FOR GGMENU IN (
+									 '01' AS GGMENU_TIME_01
+									,'02' AS GGMENU_TIME_02
+									,'03' AS GGMENU_TIME_03
+									,'04' AS GGMENU_TIME_04
+									,'05' AS GGMENU_TIME_05
+									,'06' AS GGMENU_TIME_06
+									,'07' AS GGMENU_TIME_07
+									,'08' AS GGMENU_TIME_08
+									,'09' AS GGMENU_TIME_09
+									,'10' AS GGMENU_TIME_10
+								)
+			)
+		UNION ALL
+		SELECT
+			 SITE
+			,USEQ
+			,CORP
+
+			,VIEWDATE
+
+			,0 AS GGMENU_TIME_01
+			,0 AS GGMENU_TIME_02
+			,0 AS GGMENU_TIME_03
+			,0 AS GGMENU_TIME_04
+			,0 AS GGMENU_TIME_05
+			,0 AS GGMENU_TIME_06
+			,0 AS GGMENU_TIME_07
+			,0 AS GGMENU_TIME_08
+			,0 AS GGMENU_TIME_09
+			,0 AS GGMENU_TIME_10
+
+			,NVL(GGMENU_CNT_01,0) AS GGMENU_CNT_01
+			,NVL(GGMENU_CNT_02,0) AS GGMENU_CNT_02
+			,NVL(GGMENU_CNT_03,0) AS GGMENU_CNT_03
+			,NVL(GGMENU_CNT_04,0) AS GGMENU_CNT_04
+			,NVL(GGMENU_CNT_05,0) AS GGMENU_CNT_05
+			,NVL(GGMENU_CNT_06,0) AS GGMENU_CNT_06
+			,NVL(GGMENU_CNT_07,0) AS GGMENU_CNT_07
+			,NVL(GGMENU_CNT_08,0) AS GGMENU_CNT_08
+			,NVL(GGMENU_CNT_09,0) AS GGMENU_CNT_09
+			,NVL(GGMENU_CNT_10,0) AS GGMENU_CNT_10
+		FROM (
+			SELECT
+				 TC.SITE
+				,TC.USEQ
+				,NVL(TC.CORP,0) AS CORP
+
+				,(SELECT TA.GGMENU
+					FROM A_CONT_SERV TA
+
+						/***** 유서희 프로의 요청으로 A_MENU의 STATUS IN ('Y','S') 삭제 처리 *****/
+						--INNER JOIN A_MENU TB ON TB.GMENU = TA.GMENU AND TB.SITE = TA.SITE --AND NVL(TB.CORP,0) = NVL(TA.CORP,0)
+					WHERE 1 = 1
+						AND TA.USEYN = 'Y'
+						AND TA.GGMENU <> 'AA'
+
+						/***** 유서희 프로의 요청으로 A_MENU의 STATUS IN ('Y','S') 삭제 처리 *****/
+						--AND TB.STATUS IN ('Y','S')
+
+						AND TA.CSEQ = TC.CSEQ
+						AND TA.SITE = TC.SITE
+						--AND NVL(TA.CORP,0) = NVL(TC.CORP,0)
+						AND ROWNUM <= 1
+					) AS GGMENU
+
+				,TO_CHAR(TRUNC(TC.REGTIME),'YYYY-MM-DD') AS VIEWDATE
+			FROM A_CONT_LMS TC
+				INNER JOIN A_CONT_SERV TA 	ON TA.CSEQ = TC.CSEQ
+											AND TA.SITE = TC.SITE
+											--AND NVL(TA.CORP,0) = NVL(TC.CORP,0)
+											--AND ((TC.SITE = 'MS' AND TA.CORP = TC.CORP) OR 1 = 1)
+
+				/***** 유서희 프로의 요청으로 A_MENU의 STATUS IN ('Y','S') 삭제 처리 *****/
+				--INNER JOIN A_MENU TB ON TB.GMENU = TA.GMENU AND TB.SITE = TA.SITE --AND NVL(TB.CORP,0) = NVL(TC.CORP,0)
+			WHERE 1 = 1
+				AND TA.USEYN = 'Y'
+				AND TA.GGMENU <> 'AA'
+
+				/***** 유서희 프로의 요청으로 A_MENU의 STATUS IN ('Y','S') 삭제 처리 *****/
+				--AND TB.STATUS IN ('Y','S')
+
+				AND TC.USEQ IS NOT NULL
+
+				AND TC.SITE <> 'MS'
+				AND TC.SITE IN (SELECT S.SITE FROM A_SITE S)
+
+				-- AND TC.REGTIME >= TO_CHAR(TRUNC(SYSDATE - 2),'YYYY-MM-DD')
+				AND TC.REGTIME >= TRUNC(SYSDATE - 2)
+				AND TC.REGTIME < TRUNC(SYSDATE)
+				--AND TC.TOTALTIME > 0
+			)
+			PIVOT (
+					COUNT(GGMENU)
+					FOR GGMENU IN (
+									 '01' AS GGMENU_CNT_01
+									,'02' AS GGMENU_CNT_02
+									,'03' AS GGMENU_CNT_03
+									,'04' AS GGMENU_CNT_04
+									,'05' AS GGMENU_CNT_05
+									,'06' AS GGMENU_CNT_06
+									,'07' AS GGMENU_CNT_07
+									,'08' AS GGMENU_CNT_08
+									,'09' AS GGMENU_CNT_09
+									,'10' AS GGMENU_CNT_10
+								)
+			)
+	) X
+	GROUP BY
+		 X.SITE
+		,X.USEQ
+		,X.CORP
+		,X.VIEWDATE
+	;
+
+
+	/*********************************************************************************************/
+	/**** 집계 테이블 사용 쿼리 위치  *****/
+	/**** 현황 >> 이용현황 >> 회원별 이용현황 *****/
+	/**** 현황 >> 보고서 >> 기간별 이용현황 *****/
+	/*********************************************************************************************/
+
+    USP_EXCEPTION('', 'M_CONT_PREFER', '일일배치', 'USP_M_CONT_USE_STATUS-6', 'DBMS_BATCH_SYSTEM');
+
+	DELETE FROM M_CONT_PREFER
+	-- WHERE VIEWDATE >= TO_CHAR(TRUNC(SYSDATE - 2),'YYYY-MM-DD');
+	WHERE VIEWDATE >= TRUNC(SYSDATE - 2);
+
+
+	-- 선호대메뉴
+	--DROP TABLE M_CONT_PREFER;
+	--CREATE TABLE M_CONT_PREFER AS
+	INSERT INTO M_CONT_PREFER (
+		 SITE
+		,USEQ
+		,CORP
+
+		,VIEWDATE
+
+		,GGMENU
+		,GGMENUNAME
+		,GGMENUCNT
+	)
+	SELECT
+		X.*
+	FROM (
+		SELECT
+			 TC.SITE
+			,TC.USEQ
+			,NVL(TC.CORP,0) AS CORP
+
+			,TO_CHAR(TC.REGTIME,'YYYY-MM-DD') AS VIEWDATE
+
+			,TA.GGMENU
+			,TA.GGMENUNAME
+			--,COUNT((CASE WHEN TC.TOTALTIME > 0 THEN TC.USEQ ELSE NULL END)) AS GGMENUCNT				--GGMENU 시청횟수
+			,COUNT(TC.USEQ) AS GGMENUCNT				--GGMENU 시청횟수
+		FROM A_CONT_LMS TC
+			INNER JOIN A_CONT_SERV TA 	ON TA.CSEQ = TC.CSEQ
+										AND TA.SITE = TC.SITE
+										--AND NVL(TA.CORP,0) = NVL(TC.CORP,0)
+										--AND ((TC.SITE = 'MS' AND TA.CORP = TC.CORP) OR 1 = 1)
+
+			/***** 유서희 프로의 요청으로 A_MENU의 STATUS IN ('Y','S') 삭제 처리 *****/
+			--INNER JOIN A_MENU TB ON TB.GMENU = TA.GMENU AND TB.SITE = TA.SITE --AND NVL(TB.CORP,0) = NVL(TC.CORP,0)
+		WHERE 1 = 1
+			AND TA.USEYN = 'Y'
+			AND TA.GGMENU <> 'AA'
+
+			/***** 유서희 프로의 요청으로 A_MENU의 STATUS IN ('Y','S') 삭제 처리 *****/
+			--AND TB.STATUS IN ('Y','S')
+
+			AND TC.USEQ IS NOT NULL
+
+			AND TC.SITE <> 'MS'
+			AND TC.SITE IN (SELECT S.SITE FROM A_SITE S)
+
+			-- AND TC.REGTIME >= TO_CHAR(TRUNC(SYSDATE - 2),'YYYY-MM-DD')
+			AND TC.REGTIME >= TRUNC(SYSDATE - 2)
+			AND TC.REGTIME < TRUNC(SYSDATE)
+		GROUP BY
+			 TC.SITE
+			,TC.USEQ
+			,NVL(TC.CORP,0)
+			,TA.GGMENU
+			,TA.GGMENUNAME
+			,TO_CHAR(TC.REGTIME,'YYYY-MM-DD')
+	) X
+	WHERE 1 = 1
+		AND GGMENUCNT > 0
+	;
+
+
+	/*********************************************************************************************/
+	/**** 집계 테이블 사용 쿼리 위치  *****/
+	/**** USP_M_CONT_USE_STATUS.M_CONT_VIEW_YEAR 집계 테이블 생성시 사용  *****/
+	/**** 현황 >> 이용현황 >> 회원별 이용현황 *****/
+	/**** 현황 >> 보고서 >> 월별 이용현황 *****/
+	/**** 현황 >> 보고서 >> 기간별 이용현황 *****/
+	/*********************************************************************************************/
+
+    USP_EXCEPTION('', 'M_CONT_BEST', '일일배치', 'USP_M_CONT_USE_STATUS-7', 'DBMS_BATCH_SYSTEM');
+
+	--선호과목
+	DELETE FROM M_CONT_BEST
+	-- WHERE VIEWDATE >= TO_CHAR(TRUNC(SYSDATE - 2),'YYYY-MM-DD');
+	WHERE VIEWDATE >= TRUNC(SYSDATE - 2);
+
+
+	--DROP TABLE M_CONT_BEST;
+	--CREATE TABLE M_CONT_BEST AS
+	INSERT INTO M_CONT_BEST (
+		 SITE
+		,USEQ
+		,CORP
+
+		,VIEWDATE
+
+		,GMENU
+		,GMENUNAME
+		,GMENUCNT
+	)
+	SELECT
+		*
+	FROM (
+		SELECT
+			 TC.SITE
+			,TC.USEQ
+			,NVL(TC.CORP,0) AS CORP
+
+			,TO_CHAR(TC.REGTIME,'YYYY-MM-DD') AS VIEWDATE
+
+			,TA.GMENU
+			,TA.GMENUNAME
+			--,COUNT((CASE WHEN TC.TOTALTIME > 0 THEN TC.USEQ ELSE NULL END)) AS GMENUCNT				--GMENUCNT 시청횟수
+			,COUNT(TC.USEQ) AS GMENUCNT				--GMENUCNT 시청횟수
+		FROM A_CONT_LMS TC
+			INNER JOIN A_CONT_SERV TA 	ON TA.CSEQ = TC.CSEQ
+										AND TA.SITE = TC.SITE
+										--AND NVL(TA.CORP,0) = NVL(TC.CORP,0)
+										--AND ((TC.SITE = 'MS' AND TA.CORP = TC.CORP) OR 1 = 1)
+
+			/***** 유서희 프로의 요청으로 A_MENU의 STATUS IN ('Y','S') 삭제 처리 *****/
+			--INNER JOIN A_MENU TB ON TB.GMENU = TA.GMENU AND TB.SITE = TA.SITE --AND NVL(TB.CORP,0) = NVL(TC.CORP,0)
+		WHERE 1 = 1
+			AND TA.USEYN = 'Y'
+			AND TA.GGMENU <> 'AA'
+
+			/***** 유서희 프로의 요청으로 A_MENU의 STATUS IN ('Y','S') 삭제 처리 *****/
+			--AND TB.STATUS IN ('Y','S')
+
+			AND TC.USEQ IS NOT NULL
+
+			AND TC.SITE <> 'MS'
+			AND TC.SITE IN (SELECT S.SITE FROM A_SITE S)
+
+			-- AND TC.REGTIME >= TO_CHAR(TRUNC(SYSDATE - 2),'YYYY-MM-DD')
+			AND TC.REGTIME >= TRUNC(SYSDATE - 2)
+			AND TC.REGTIME < TRUNC(SYSDATE)
+		GROUP BY
+			 TC.SITE
+			,TC.USEQ
+			,NVL(TC.CORP,0)
+			,TA.GMENU
+			,TA.GMENUNAME
+			,TO_CHAR(TC.REGTIME,'YYYY-MM-DD')
+	) X
+	WHERE 1 = 1
+		AND GMENUCNT > 0
+	;
+
+
+	/*********************************************************************************************/
+	/**** 집계 테이블 사용 쿼리 위치  *****/
+	/**** USP_M_CONT_USE_STATUS.M_CONT_USE_STATUS 집계 테이블 생성시 사용  *****/
+	/**** USP_M_CONT_USE_STATUS.M_CONT_USE_STATUS_CORP 집계 테이블 생성시 사용  *****/
+	/**** USP_M_CONT_USE_STATUS.M_CONT_VIEW_COMB 집계 테이블 생성시 사용  *****/
+	/**** USP_M_CONT_USE_STATUS.M_CONT_VIEW_YEAR 집계 테이블 생성시 사용  *****/
+	/**** 현황 >> 이용현황 >> 전체 *****/
+	/**** 현황 >> 보고서 >> 전체 *****/
+	/*********************************************************************************************/
+
+    USP_EXCEPTION('', 'M_CONT_VIEW', '일일배치', 'USP_M_CONT_USE_STATUS-8', 'DBMS_BATCH_SYSTEM');
+
+	--CONT_LMS 테이블 집계
+	DELETE FROM M_CONT_VIEW
+	-- WHERE VIEWDATE >= TO_CHAR(TRUNC(SYSDATE - 2),'YYYY-MM-DD');
+	WHERE VIEWDATE >= TRUNC(SYSDATE - 2);
+
+
+	--DROP TABLE M_CONT_VIEW;
+	--CREATE TABLE M_CONT_VIEW AS
+	INSERT INTO M_CONT_VIEW (
+		 SITE
+		,USEQ
+		,CORP
+
+		,VIEWDATE
+
+		,SIGNSEQ
+
+		,LOGIN_CNT
+
+		,CSEQ_CNT
+
+		,TOTAL_CNT
+		,TOTAL_TIME
+
+		,ONLINE_CNT
+		,MOBILE_CNT
+		,TV_CNT
+
+		,ONLINE_TIME
+		,MOBILE_TIME
+		,TV_TIME
+
+		,BOOK_CNT
+
+		,INSITE_CNT
+		,INSITE_ON_CNT
+		,INSITE_OFF_CNT --NEW
+
+		,GGMENU_01 --NEW
+		,GGMENU_02 --NEW
+		,GGMENU_03 --NEW
+		,GGMENU_04 --NEW
+		,GGMENU_05 --NEW
+		,GGMENU_06 --NEW
+		,GGMENU_07 --NEW
+		,GGMENU_08 --NEW
+		,GGMENU_09 --NEW
+
+		,GGMENU_CNT_01 --NEW
+		,GGMENU_CNT_02 --NEW
+		,GGMENU_CNT_03 --NEW
+		,GGMENU_CNT_04 --NEW
+		,GGMENU_CNT_05 --NEW
+		,GGMENU_CNT_06 --NEW
+		,GGMENU_CNT_07 --NEW
+		,GGMENU_CNT_08 --NEW
+		,GGMENU_CNT_09 --NEW
+	)
+	SELECT
+		 CV.SITE
+		,CV.USEQ
+		,CV.CORP
+
+		,TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYY-MM-DD') AS VIEWDATE
+
+		--,(SELECT
+		--		MAX(S.SIGNSEQ)
+		--		--,SU.SITE
+		--		--,SU.USEQ
+		--	FROM A_SIGN S
+		--		INNER JOIN A_SIGN_USER SU ON SU.SITE = S.SITE AND S.SIGNSEQ = SU.SIGNSEQ
+		--	WHERE 1 = 1
+		--		AND S.USEYN = 'Y'
+		--		AND SU.SITE = CV.SITE
+		--		AND SU.USEQ = CV.USEQ
+		--		AND SU.SIGNUSERGBN IN (SELECT CC.CODE_VAL
+		--								FROM M_COMM_CODE CC
+		--								WHERE 1 = 1
+		--									--AND CC.UPPER_CODE_GRP <> '1'
+		--									AND CC.CODE_GRP = 'SIGNUSERGBN')
+		--	) AS SIGNSEQ
+		,(SELECT U.SIGNSS FROM A_USER U WHERE U.SITE = CV.SITE AND U.USEQ = CV.USEQ AND ROWNUM <= 1) AS SIGNSEQ
+
+		,SUM(CV.LOGIN_CNT) 		AS LOGIN_CNT
+		--,COUNT(CV.VIEWDATE) 		AS LOGIN_CNT
+
+		,SUM(CV.CSEQ_CNT) 			AS CSEQ_CNT
+
+		,(SUM(CV.ONLINE_CNT) 	+ SUM(CV.MOBILE_CNT)  + SUM(CV.TV_CNT)) 	AS TOTAL_CNT
+		,(SUM(CV.ONLINE_TIME) 	+ SUM(CV.MOBILE_TIME) + SUM(CV.TV_TIME)) 	AS TOTAL_TIME
+
+		,SUM(CV.ONLINE_CNT) 		AS ONLINE_CNT
+		,SUM(CV.MOBILE_CNT) 		AS MOBILE_CNT
+		,SUM(CV.TV_CNT) 			AS TV_CNT
+
+		,SUM(CV.ONLINE_TIME) 		AS ONLINE_TIME
+		,SUM(CV.MOBILE_TIME) 		AS MOBILE_TIME
+		,SUM(CV.TV_TIME) 			AS TV_TIME
+
+		,SUM(CV.BOOK_CNT) 			AS BOOK_CNT
+
+		,SUM(CV.INSITE_CNT) 		AS INSITE_CNT
+		,SUM(CV.INSITE_ON_CNT) 		AS INSITE_ON_CNT
+		,SUM(CV.INSITE_CNT) 		AS INSITE_OFF_CNT --NEW
+
+		,SUM(CG.GGMENU_01) AS GGMENU_01
+		,SUM(CG.GGMENU_02) AS GGMENU_02
+		,SUM(CG.GGMENU_03) AS GGMENU_03
+		,SUM(CG.GGMENU_04) AS GGMENU_04
+		,SUM(CG.GGMENU_05) AS GGMENU_05
+		,SUM(CG.GGMENU_06) AS GGMENU_06
+		,SUM(CG.GGMENU_07) AS GGMENU_07
+		,SUM(CG.GGMENU_08) AS GGMENU_08
+		,SUM(CG.GGMENU_09) AS GGMENU_09
+
+		,SUM(CG.GGMENU_CNT_01) AS GGMENU_CNT_01
+		,SUM(CG.GGMENU_CNT_02) AS GGMENU_CNT_02
+		,SUM(CG.GGMENU_CNT_03) AS GGMENU_CNT_03
+		,SUM(CG.GGMENU_CNT_04) AS GGMENU_CNT_04
+		,SUM(CG.GGMENU_CNT_05) AS GGMENU_CNT_05
+		,SUM(CG.GGMENU_CNT_06) AS GGMENU_CNT_06
+		,SUM(CG.GGMENU_CNT_07) AS GGMENU_CNT_07
+		,SUM(CG.GGMENU_CNT_08) AS GGMENU_CNT_08
+		,SUM(CG.GGMENU_CNT_09) AS GGMENU_CNT_09
+	FROM (
+		SELECT
+			 TC.SITE
+			,TC.USEQ
+			,TC.CORP
+
+			,(SELECT SUM(L.LOGIN_CNT)
+				FROM M_CONT_MYLOGIND L
+				WHERE L.SITE = TC.SITE
+					AND L.USEQ = TC.USEQ
+					AND L.REGTIME = TRUNC(TC.REGTIME)
+				) AS LOGIN_CNT
+
+			,COUNT(DISTINCT TC.CSEQ) AS CSEQ_CNT
+
+			,COUNT((CASE WHEN TC.RT = 'W'
+						THEN TC.USEQ
+						ELSE NULL END)) AS ONLINE_CNT
+			,SUM((CASE WHEN TC.RT = 'W'
+						THEN TC.TOTALTIME
+						ELSE 0 END)) AS ONLINE_TIME
+
+			,COUNT((CASE WHEN TC.RT IN ('M','A','O')
+						THEN TC.USEQ
+						ELSE NULL END)) AS MOBILE_CNT
+			,SUM((CASE WHEN TC.RT IN ('M','A','O')
+						THEN TC.TOTALTIME
+						ELSE 0 END)) AS MOBILE_TIME
+
+			,COUNT((CASE WHEN TC.RT = 'T'
+						THEN TC.USEQ
+						ELSE NULL END)) AS TV_CNT
+
+			,SUM((CASE WHEN TC.RT = 'T'
+						THEN TC.TOTALTIME
+						ELSE 0 END)) AS TV_TIME
+
+			,0 AS BOOK_CNT
+
+			,0 AS INSITE_CNT 	--인사이트포럼(오프라인)
+			,0 AS INSITE_ON_CNT --인사이트포럼(온라인)
+
+			,TRUNC(TC.REGTIME) AS VIEWDATE
+		FROM A_CONT_LMS TC
+			INNER JOIN A_CONT_SERV TA 	ON TA.CSEQ = TC.CSEQ
+										AND TA.SITE = TC.SITE
+										--AND NVL(TA.CORP,0) = NVL(TC.CORP,0)
+
+			/***** 유서희 프로의 요청으로 A_MENU의 STATUS IN ('Y','S') 삭제 처리 *****/
+			--INNER JOIN A_MENU TB ON TB.GMENU = TA.GMENU AND TB.SITE = TA.SITE --AND NVL(TB.CORP,0) = NVL(TC.CORP,0)
+		WHERE 1 = 1
+			--AND TA.USEYN = 'Y'
+			AND TA.GGMENU <> 'AA'
+
+			/***** 유서희 프로의 요청으로 A_MENU의 STATUS IN ('Y','S') 삭제 처리 *****/
+			--AND TB.STATUS IN ('Y','S')
+
+			AND TC.USEQ IS NOT NULL
+
+			AND TC.SITE <> 'MS'
+			AND TC.SITE IN (SELECT S.SITE FROM A_SITE S)
+
+			-- AND TC.VIEWDATE >= '20240101'
+			-- AND TC.REGTIME >= TO_CHAR(TRUNC(SYSDATE - 2),'YYYY-MM-DD')
+			AND TC.REGTIME >= TRUNC(SYSDATE - 2)
+			AND TC.REGTIME < TRUNC(SYSDATE)
+		GROUP BY
+			 TC.SITE
+			,TC.USEQ
+			,TC.CORP
+			,TRUNC(TC.REGTIME)
+		UNION ALL
+		SELECT
+			 AO.SITE
+			,AO.USEQ
+			,AO.CORP AS CORP
+
+			,0 AS LOGIN_CNT
+
+			,0 AS CSEQ_CNT
+
+			,0 AS ONLINE_CNT
+			,0 AS ONLINE_TIME
+
+			,0 AS MOBILE_CNT
+			,0 AS MOBILE_TIME
+
+			,0 AS TV_CNT
+			,0 AS TV_TIME
+
+			,SUM(OI.CNT) AS BOOK_CNT --도서신청
+
+			,0 AS INSITE_CNT 	--인사이트포럼(오프라인)
+			,0 AS INSITE_ON_CNT --인사이트포럼(온라인)
+
+			,TRUNC(AO.REGTIME) AS VIEWDATE
+		FROM A_ORDER_ITEM OI
+			INNER JOIN A_ORDER AO ON AO.ORDERSEQ = OI.ORDERSEQ
+		WHERE 1 = 1
+			AND AO.USEQ IS NOT NULL
+
+			AND AO.SITE <> 'MS'
+			AND AO.SITE IN (SELECT S.SITE FROM A_SITE S)
+
+			AND OI.CNT IS NOT NULL
+
+			--AND AO.REGTIME >= '2024-01-01'
+			-- AND AO.REGTIME >= TO_CHAR(TRUNC(SYSDATE - 2),'YYYY-MM-DD')
+			AND AO.REGTIME >= TRUNC(SYSDATE - 2)
+			AND AO.REGTIME < TRUNC(SYSDATE)
+		GROUP BY
+			 AO.SITE
+			,AO.USEQ
+			,AO.CORP
+			,TRUNC(AO.REGTIME)
+		UNION ALL
+		SELECT
+			 SD.SITE
+			,SD.USER_NO AS USEQ
+			,NULL AS CORP
+
+			,0 AS LOGIN_CNT
+
+			,0 AS CSEQ_CNT
+
+			,0 AS ONLINE_CNT
+			,0 AS ONLINE_TIME
+
+			,0 AS MOBILE_CNT
+			,0 AS MOBILE_TIME
+
+			,0 AS TV_CNT
+			,0 AS TV_TIME
+
+			,0 AS BOOK_CNT
+
+			,SUM((DECODE(SD.STATUS,'참석'	,1,0))) AS INSITE_CNT 		--인사이트포럼(오프라인)
+			,SUM((DECODE(SD.STATUS,'온라인'	,1,0))) AS INSITE_ON_CNT 	--인사이트포럼(온라인)
+
+			,TRUNC(SD.ISRT_DATE) AS VIEWDATE
+		FROM SEMINAR_DETAIL SD
+			INNER JOIN SEMINAR SM 	ON SM.SEMI_NO = SD.SEMI_NO
+									AND SM.SITE = SD.SITE
+		WHERE 1 = 1
+			AND SM.SEMI_KIND = '3' --인사이트포럼
+			AND SD.USER_NO IS NOT NULL
+
+			AND SD.SITE <> 'MS'
+			AND SD.SITE IN (SELECT S.SITE FROM A_SITE S)
+
+			AND STATUS IN ('참석','온라인')
+
+			--AND SD.ISRT_DATE >= '2024-01-01'
+			-- AND SD.ISRT_DATE >= TO_CHAR(TRUNC(SYSDATE - 2),'YYYY-MM-DD')
+			AND SD.ISRT_DATE >= TRUNC(SYSDATE - 2)
+			AND SD.ISRT_DATE < TRUNC(SYSDATE)
+		GROUP BY
+			 SD.SITE
+			,SD.USER_NO
+			,TRUNC(SD.ISRT_DATE)
+	) CV
+		LEFT OUTER JOIN M_CONT_GGMENU CG 	ON CG.SITE = CV.SITE
+											AND CG.USEQ = CV.USEQ
+											--AND CG.CORP = CV.CORP
+											AND CG.VIEWDATE = CV.VIEWDATE
+	GROUP BY
+		 CV.SITE
+		,CV.USEQ
+		,CV.CORP
+		,CV.VIEWDATE
+	;
+
+
+	/*********************************************************************************************/
+	/**** 집계 테이블 사용 쿼리 *****/
+	/**** M_CONT_VIEW_COMB 집계 테이블 M_CONT_VIEW / M_CONT_GGMENU 사용 *****/
+	/*********************************************************************************************/
+
+    USP_EXCEPTION('', 'M_CONT_VIEW_COMB', '일일배치', 'USP_M_CONT_USE_STATUS-9', 'DBMS_BATCH_SYSTEM');
+
+	--현황집계 (조건별 집계용)
+	DELETE FROM M_CONT_VIEW_COMB
+	-- WHERE VIEWDATE >= TO_CHAR(TRUNC(SYSDATE - 2),'YYYY-MM-DD');
+	WHERE VIEWDATE >= TRUNC(SYSDATE - 2);
+
+	--DROP TABLE M_CONT_VIEW_COMB;
+	--CREATE TABLE M_CONT_VIEW_COMB AS
+	INSERT INTO M_CONT_VIEW_COMB (
+		 SITE
+		,USEQ
+		,CORP
+		,SIGNCORP
+
+		,USERGBN
+		,USEYN
+
+		,BIRTHDAY
+		,AGE
+		,SEX
+		,SEX_NAME
+		,RELATED_COMPANY
+		,BIZGBN
+		,BIZGBN_CLASS1
+		,BIZGBN_NAME
+		,JIKWI
+		,REGION
+
+
+		,VIEWDATE
+		,DAYSOFWEEK
+
+		,LOGIN_CNT
+
+		,TOTAL_CNT
+		,TOTAL_TIME
+
+		,ONLINE_CNT
+		,MOBILE_CNT
+		,TV_CNT
+
+		,ONLINE_TIME
+		,MOBILE_TIME
+		,TV_TIME
+
+		,BOOK_CNT
+
+		,INSITE_ON_CNT
+		,INSITE_OFF_CNT
+
+		,GGMENU_01
+		,GGMENU_02
+		,GGMENU_03
+		,GGMENU_04
+		,GGMENU_05
+		,GGMENU_06
+		,GGMENU_07
+		,GGMENU_08
+		,GGMENU_09
+	)
+	SELECT
+		 U.SITE
+		,U.USEQ
+		,U.CORP
+		,U.SIGNCORP
+
+		,U.USERGBN
+		,U.USEYN
+
+
+		,U.BIRTHDAY
+		,(CASE
+			WHEN TRUNC((TO_CHAR(SYSDATE, 'YYYY') - TO_CHAR(U.BIRTHDAY, 'YYYY') ), -1) <= 30 THEN 30
+			WHEN TRUNC((TO_CHAR(SYSDATE, 'YYYY') - TO_CHAR(U.BIRTHDAY, 'YYYY') ), -1) >= 70 THEN 70
+			ELSE TRUNC((TO_CHAR(SYSDATE, 'YYYY') - TO_CHAR(U.BIRTHDAY, 'YYYY') ), -1)
+			END) AS AGE
+
+		,UPPER(NVL(TRIM(U.SEX),'E')) AS SEX
+		,DECODE(UPPER(NVL(TRIM(U.SEX),'E'))
+				,'E','미상'
+				,FN_COMM_CODE(UPPER(NVL(TRIM(U.SEX),'E')),'성별',U.SITE)
+				) AS SEX_NAME
+
+		,U.RELATED_COMPANY
+
+		,UPPER(TRIM(U.BIZGBN)) AS BIZGBN
+		,SUBSTR(UPPER(TRIM(U.BIZGBN)),0,1) AS BIZGBN_CLASS1
+		,FN_COMM_CODE(SUBSTR(UPPER(TRIM(U.BIZGBN)),0,1),'업종분류_NEW',U.SITE) 	AS BIZGBN_NAME
+
+		,U.JIKWI
+
+		,U.REGION
+
+
+		,CV.VIEWDATE
+		,TO_CHAR(TO_DATE(CV.VIEWDATE),'DY') AS DAYSOFWEEK
+
+		,SUM(CV.LOGIN_CNT) AS LOGIN_CNT
+
+		,(SUM(CV.ONLINE_CNT) + SUM(CV.MOBILE_CNT) + SUM(CV.TV_CNT)) AS TOTAL_CNT
+		,(SUM(CV.ONLINE_TIME) + SUM(CV.MOBILE_TIME) + SUM(CV.TV_TIME)) AS TOTAL_TIME
+
+		,SUM(CV.ONLINE_CNT) 	AS ONLINE_CNT
+		,SUM(CV.MOBILE_CNT) 	AS MOBILE_CNT
+		,SUM(CV.TV_CNT) 		AS TV_CNT
+
+		,SUM(CV.ONLINE_TIME) 	AS ONLINE_TIME
+		,SUM(CV.MOBILE_TIME) 	AS MOBILE_TIME
+		,SUM(CV.TV_TIME)		AS TV_TIME
+
+		,SUM(CV.BOOK_CNT) 		AS BOOK_CNT
+
+		,SUM(CV.INSITE_ON_CNT) 	AS INSITE_ON_CNT
+		,SUM(CV.INSITE_CNT) 	AS INSITE_OFF_CNT
+
+		,SUM(CG.GGMENU_01) AS GGMENU_01
+		,SUM(CG.GGMENU_02) AS GGMENU_02
+		,SUM(CG.GGMENU_03) AS GGMENU_03
+		,SUM(CG.GGMENU_04) AS GGMENU_04
+		,SUM(CG.GGMENU_05) AS GGMENU_05
+		,SUM(CG.GGMENU_06) AS GGMENU_06
+		,SUM(CG.GGMENU_07) AS GGMENU_07
+		,SUM(CG.GGMENU_08) AS GGMENU_08
+		,SUM(CG.GGMENU_09) AS GGMENU_09
+
+	FROM US_USER U
+		INNER JOIN M_CONT_VIEW CV 	ON CV.SITE = U.SITE
+									AND CV.USEQ = U.USEQ
+									--AND ((U.SITE = 'MS' AND CV.CORP = U.CORP) OR 1 = 1)
+		LEFT OUTER JOIN M_CONT_GGMENU CG 	ON CG.SITE = CV.SITE
+											AND CG.USEQ = CV.USEQ
+											AND CG.VIEWDATE = CV.VIEWDATE
+											--AND ((U.SITE = 'MS' AND CG.CORP = U.CORP) OR 1 = 1)
+	WHERE 1 = 1
+
+		AND U.SITE <> 'MS'
+		AND U.SITE IN (SELECT S.SITE FROM A_SITE S)
+
+		AND U.USEYN = 'Y'
+		AND SUBSTR(U.USERGBN,0,1) IN ('A','C')
+
+		--AND CV.VIEWDATE >= '2024-01-01'
+		-- AND CV.VIEWDATE >= TO_CHAR(TRUNC(SYSDATE - 2),'YYYY-MM-DD')
+		AND CV.VIEWDATE >= TRUNC(SYSDATE - 2)
+		AND CV.VIEWDATE < TRUNC(SYSDATE)
+	GROUP BY
+		 U.SITE
+		,U.USEQ
+		,U.CORP
+		,U.SIGNCORP
+
+		,U.USERGBN
+		,U.USEYN
+
+		,U.BIRTHDAY
+		,(CASE
+			WHEN TRUNC((TO_CHAR(SYSDATE, 'YYYY') - TO_CHAR(U.BIRTHDAY, 'YYYY') ), -1) <= 30 THEN 30
+			WHEN TRUNC((TO_CHAR(SYSDATE, 'YYYY') - TO_CHAR(U.BIRTHDAY, 'YYYY') ), -1) >= 70 THEN 70
+			ELSE TRUNC((TO_CHAR(SYSDATE, 'YYYY') - TO_CHAR(U.BIRTHDAY, 'YYYY') ), -1)
+			END)
+		,UPPER(NVL(TRIM(U.SEX),'E'))
+		,U.RELATED_COMPANY
+		,UPPER(TRIM(U.BIZGBN))
+		,SUBSTR(UPPER(TRIM(U.BIZGBN)),0,1)
+		,U.JIKWI
+		,U.REGION
+
+		,CV.VIEWDATE
+	;
+
+
+	/*********************************************************************************************/
+	/**** 						년간 집계 시작 TO_CHAR(SYSDATE,'YYYY') 							*****/
+	/*********************************************************************************************/
+
+
+	/*********************************************************************************************/
+	/**** 집계 테이블 사용 쿼리 *****/
+	/**** M_CONT_USE_STATUS는 집계 테이블 M_CONT_VIEW 사용 *****/
+	/*********************************************************************************************/
+
+
+	/*********************************************************************************************/
+	/**** 집계 테이블 사용 쿼리 위치  *****/
+	/**** USP_M_CONT_USE_STATUS.M_CONT_USE_STATUS 집계 테이블 생성시 사용  *****/
+	/**** USP_M_CONT_USE_STATUS.M_CONT_USE_STATUS_CORP 집계 테이블 생성시 사용  *****/
+	/**** USP_M_CONT_USE_STATUS.M_CONT_VIEW_COMB 집계 테이블 생성시 사용  *****/
+	/**** USP_M_CONT_USE_STATUS.M_CONT_VIEW_YEAR 집계 테이블 생성시 사용  *****/
+	/**** 현황 >> 이용현황 >> 전체 *****/
+	/**** 현황 >> 보고서 >> 전체 *****/
+	/*********************************************************************************************/
+
+    USP_EXCEPTION('', 'M_CONT_USE_STATUS', '일일배치', 'USP_M_CONT_USE_STATUS-10', 'DBMS_BATCH_SYSTEM');
+
+	--CONT 현황 집계
+	DELETE FROM M_CONT_USE_STATUS
+	WHERE CONT_YEAR = TO_CHAR(SYSDATE,'YYYY');
+
+
+	--DROP TABLE M_CONT_USE_STATUS;
+	--CREATE TABLE M_CONT_USE_STATUS AS
+	INSERT INTO M_CONT_USE_STATUS (
+			 SITE
+			,CORP
+			,CONT_YEAR
+
+			,TU_CNT
+
+			,TTT
+			,T01
+			,T02
+			,T03
+			,T04
+			,T05
+			,T06
+			,T07
+			,T08
+			,T09
+            ,T10
+			,T11
+			,T12
+
+			,LTT
+			,L01
+			,L02
+			,L03
+			,L04
+			,L05
+			,L06
+			,L07
+			,L08
+            ,L09
+			,L10
+			,L11
+			,L12
+
+			,STT
+			,S01
+			,S02
+			,S03
+			,S04
+			,S05
+			,S06
+			,S07
+            ,S08
+			,S09
+			,S10
+			,S11
+			,S12
+
+			,CTT
+			,C01
+			,C02
+			,C03
+			,C04
+			,C05
+			,C06
+            ,C07
+			,C08
+			,C09
+			,C10
+			,C11
+			,C12
+
+			,OTT
+			,O01
+			,O02
+			,O03
+			,O04
+			,O05
+            ,O06
+			,O07
+			,O08
+			,O09
+			,O10
+			,O11
+			,O12
+
+			,MTT
+			,M01
+			,M02
+			,M03
+			,M04
+            ,M05
+			,M06
+			,M07
+			,M08
+			,M09
+			,M10
+			,M11
+			,M12
+
+			,VTT
+			,V01
+			,V02
+			,V03
+            ,V04
+			,V05
+			,V06
+			,V07
+			,V08
+			,V09
+			,V10
+			,V11
+			,V12
+
+			,PTT
+			,P01
+			,P02
+            ,P03
+			,P04
+			,P05
+			,P06
+			,P07
+			,P08
+			,P09
+			,P10
+			,P11
+			,P12
+
+			,PCTT
+			,PC01
+            ,PC02
+			,PC03
+			,PC04
+			,PC05
+			,PC06
+			,PC07
+			,PC08
+			,PC09
+			,PC10
+			,PC11
+			,PC12
+
+			,PTTT
+			,PT01
+			,PT02
+			,PT03
+			,PT04
+			,PT05
+			,PT06
+			,PT07
+			,PT08
+			,PT09
+			,PT10
+			,PT11
+			,PT12
+	)
+	SELECT
+		 X.SITE
+		,X.CORP
+		,CONT_YEAR
+
+		,COUNT(DISTINCT X.USEQ) 																							AS TU_CNT
+
+		,COUNT(DISTINCT X.TTT)																								AS TTT
+		,COUNT(DISTINCT X.T01)																								AS T01
+		,COUNT(DISTINCT X.T02)																								AS T02
+		,COUNT(DISTINCT X.T03)																								AS T03
+		,COUNT(DISTINCT X.T04)																								AS T04
+		,COUNT(DISTINCT X.T05)																								AS T05
+		,COUNT(DISTINCT X.T06)																								AS T06
+		,COUNT(DISTINCT X.T07)																								AS T07
+		,COUNT(DISTINCT X.T08)																								AS T08
+		,COUNT(DISTINCT X.T09)																								AS T09
+		,COUNT(DISTINCT X.T10)																								AS T10
+		,COUNT(DISTINCT X.T11)																								AS T11
+		,COUNT(DISTINCT X.T12)																								AS T12
+
+		,COUNT(DISTINCT X.LTT)																								AS LTT
+		,COUNT(DISTINCT X.L01)																								AS L01
+		,COUNT(DISTINCT X.L02)																								AS L02
+		,COUNT(DISTINCT X.L03)																								AS L03
+		,COUNT(DISTINCT X.L04)																								AS L04
+		,COUNT(DISTINCT X.L05)																								AS L05
+		,COUNT(DISTINCT X.L06)																								AS L06
+		,COUNT(DISTINCT X.L07)																								AS L07
+		,COUNT(DISTINCT X.L08)																								AS L08
+		,COUNT(DISTINCT X.L09)																								AS L09
+		,COUNT(DISTINCT X.L10)																								AS L10
+		,COUNT(DISTINCT X.L11)																								AS L11
+		,COUNT(DISTINCT X.L12)																								AS L12
+
+		,SUM(X.STT)																											AS STT
+		,SUM(X.S01)																											AS S01
+		,SUM(X.S02)																											AS S02
+		,SUM(X.S03)																											AS S03
+		,SUM(X.S04)																											AS S04
+		,SUM(X.S05)																											AS S05
+		,SUM(X.S06)																											AS S06
+		,SUM(X.S07)																											AS S07
+		,SUM(X.S08)																											AS S08
+		,SUM(X.S09)																											AS S09
+		,SUM(X.S10)																											AS S10
+		,SUM(X.S11)																											AS S11
+		,SUM(X.S12)																											AS S12
+
+		,SUM(X.CTT)																											AS CTT
+		,SUM(X.C01)																											AS C01
+		,SUM(X.C02)																											AS C02
+		,SUM(X.C03)																											AS C03
+		,SUM(X.C04)																											AS C04
+		,SUM(X.C05)																											AS C05
+		,SUM(X.C06)																											AS C06
+		,SUM(X.C07)																											AS C07
+		,SUM(X.C08)																											AS C08
+		,SUM(X.C09)																											AS C09
+		,SUM(X.C10)																											AS C10
+		,SUM(X.C11)																											AS C11
+		,SUM(X.C12)																											AS C12
+
+		,SUM(X.OTT)																											AS OTT
+		,SUM(X.O01)																											AS O01
+		,SUM(X.O02)																											AS O02
+		,SUM(X.O03)																											AS O03
+		,SUM(X.O04)																											AS O04
+		,SUM(X.O05)																											AS O05
+		,SUM(X.O06)																											AS O06
+		,SUM(X.O07)																											AS O07
+		,SUM(X.O08)																											AS O08
+		,SUM(X.O09)																											AS O09
+		,SUM(X.O10)																											AS O10
+		,SUM(X.O11)																											AS O11
+		,SUM(X.O12)																											AS O12
+
+		,SUM(X.MTT)																											AS MTT
+		,SUM(X.M01)																											AS M01
+		,SUM(X.M02)																											AS M02
+		,SUM(X.M03)																											AS M03
+		,SUM(X.M04)																											AS M04
+		,SUM(X.M05)																											AS M05
+		,SUM(X.M06)																											AS M06
+		,SUM(X.M07)																											AS M07
+		,SUM(X.M08)																											AS M08
+		,SUM(X.M09)																											AS M09
+		,SUM(X.M10)																											AS M10
+		,SUM(X.M11)																											AS M11
+		,SUM(X.M12)																											AS M12
+
+		,SUM(X.VTT)																											AS VTT
+		,SUM(X.V01)																											AS V01
+		,SUM(X.V02)																											AS V02
+		,SUM(X.V03)																											AS V03
+		,SUM(X.V04)																											AS V04
+		,SUM(X.V05)																											AS V05
+		,SUM(X.V06)																											AS V06
+		,SUM(X.V07)																											AS V07
+		,SUM(X.V08)																											AS V08
+		,SUM(X.V09)																											AS V09
+		,SUM(X.V10)																											AS V10
+		,SUM(X.V11)																											AS V11
+		,SUM(X.V12)																											AS V12
+
+		,COUNT(DISTINCT X.PTT)																								AS PTT
+		,COUNT(DISTINCT X.P01)																								AS P01
+		,COUNT(DISTINCT X.P02)																								AS P02
+		,COUNT(DISTINCT X.P03)																								AS P03
+		,COUNT(DISTINCT X.P04)																								AS P04
+		,COUNT(DISTINCT X.P05)																								AS P05
+		,COUNT(DISTINCT X.P06)																								AS P06
+		,COUNT(DISTINCT X.P07)																								AS P07
+		,COUNT(DISTINCT X.P08)																								AS P08
+		,COUNT(DISTINCT X.P09)																								AS P09
+		,COUNT(DISTINCT X.P10)																								AS P10
+		,COUNT(DISTINCT X.P11)																								AS P11
+		,COUNT(DISTINCT X.P12)																								AS P12
+
+		,COUNT(DISTINCT X.PCTT)																								AS PCTT
+		,COUNT(DISTINCT X.PC01)																								AS PC01
+		,COUNT(DISTINCT X.PC02)																								AS PC02
+		,COUNT(DISTINCT X.PC03)																								AS PC03
+		,COUNT(DISTINCT X.PC04)																								AS PC04
+		,COUNT(DISTINCT X.PC05)																								AS PC05
+		,COUNT(DISTINCT X.PC06)																								AS PC06
+		,COUNT(DISTINCT X.PC07)																								AS PC07
+		,COUNT(DISTINCT X.PC08)																								AS PC08
+		,COUNT(DISTINCT X.PC09)																								AS PC09
+		,COUNT(DISTINCT X.PC10)																								AS PC10
+		,COUNT(DISTINCT X.PC11)																								AS PC11
+		,COUNT(DISTINCT X.PC12)																								AS PC12
+
+		,COUNT(DISTINCT X.PTTT)																								AS PTTT
+		,COUNT(DISTINCT X.PT01)																								AS PT01
+		,COUNT(DISTINCT X.PT02)																								AS PT02
+		,COUNT(DISTINCT X.PT03)																								AS PT03
+		,COUNT(DISTINCT X.PT04)																								AS PT04
+		,COUNT(DISTINCT X.PT05)																								AS PT05
+		,COUNT(DISTINCT X.PT06)																								AS PT06
+		,COUNT(DISTINCT X.PT07)																								AS PT07
+		,COUNT(DISTINCT X.PT08)																								AS PT08
+		,COUNT(DISTINCT X.PT09)																								AS PT09
+		,COUNT(DISTINCT X.PT10)																								AS PT10
+		,COUNT(DISTINCT X.PT11)																								AS PT11
+		,COUNT(DISTINCT X.PT12)																								AS PT12
+	FROM (
+		SELECT
+			 TO_CHAR(SYSDATE,'YYYY') AS CONT_YEAR
+			,U.SITE
+			,U.USEQ
+			,CV.CORP
+
+			-- 유료회원
+			,(CASE WHEN (TO_CHAR(SYSDATE,'YYYY')) 			BETWEEN TO_CHAR(U.SERVSTIME,'YYYY') 	AND TO_CHAR(NVL(U.OUTTIME,U.SERVETIME),'YYYY') 		AND SUBSTR(U.USERGBN,0,1) = 'A' AND U.USEYN = 'Y' THEN U.USEQ ELSE NULL END)	AS TTT
+			,(CASE WHEN (TO_CHAR(SYSDATE,'YYYY') || '01') 	BETWEEN TO_CHAR(U.SERVSTIME,'YYYYMM') 	AND TO_CHAR(NVL(U.OUTTIME,U.SERVETIME),'YYYYMM') 	AND SUBSTR(U.USERGBN,0,1) = 'A' AND U.USEYN = 'Y' THEN U.USEQ ELSE NULL END)	AS T01
+			,(CASE WHEN (TO_CHAR(SYSDATE,'YYYY') || '02') 	BETWEEN TO_CHAR(U.SERVSTIME,'YYYYMM') 	AND TO_CHAR(NVL(U.OUTTIME,U.SERVETIME),'YYYYMM') 	AND SUBSTR(U.USERGBN,0,1) = 'A' AND U.USEYN = 'Y' THEN U.USEQ ELSE NULL END)	AS T02
+			,(CASE WHEN (TO_CHAR(SYSDATE,'YYYY') || '03') 	BETWEEN TO_CHAR(U.SERVSTIME,'YYYYMM') 	AND TO_CHAR(NVL(U.OUTTIME,U.SERVETIME),'YYYYMM') 	AND SUBSTR(U.USERGBN,0,1) = 'A' AND U.USEYN = 'Y' THEN U.USEQ ELSE NULL END)	AS T03
+			,(CASE WHEN (TO_CHAR(SYSDATE,'YYYY') || '04') 	BETWEEN TO_CHAR(U.SERVSTIME,'YYYYMM') 	AND TO_CHAR(NVL(U.OUTTIME,U.SERVETIME),'YYYYMM') 	AND SUBSTR(U.USERGBN,0,1) = 'A' AND U.USEYN = 'Y' THEN U.USEQ ELSE NULL END)	AS T04
+			,(CASE WHEN (TO_CHAR(SYSDATE,'YYYY') || '05') 	BETWEEN TO_CHAR(U.SERVSTIME,'YYYYMM') 	AND TO_CHAR(NVL(U.OUTTIME,U.SERVETIME),'YYYYMM') 	AND SUBSTR(U.USERGBN,0,1) = 'A' AND U.USEYN = 'Y' THEN U.USEQ ELSE NULL END)	AS T05
+			,(CASE WHEN (TO_CHAR(SYSDATE,'YYYY') || '06') 	BETWEEN TO_CHAR(U.SERVSTIME,'YYYYMM') 	AND TO_CHAR(NVL(U.OUTTIME,U.SERVETIME),'YYYYMM') 	AND SUBSTR(U.USERGBN,0,1) = 'A' AND U.USEYN = 'Y' THEN U.USEQ ELSE NULL END)	AS T06
+			,(CASE WHEN (TO_CHAR(SYSDATE,'YYYY') || '07') 	BETWEEN TO_CHAR(U.SERVSTIME,'YYYYMM') 	AND TO_CHAR(NVL(U.OUTTIME,U.SERVETIME),'YYYYMM') 	AND SUBSTR(U.USERGBN,0,1) = 'A' AND U.USEYN = 'Y' THEN U.USEQ ELSE NULL END)	AS T07
+			,(CASE WHEN (TO_CHAR(SYSDATE,'YYYY') || '08') 	BETWEEN TO_CHAR(U.SERVSTIME,'YYYYMM') 	AND TO_CHAR(NVL(U.OUTTIME,U.SERVETIME),'YYYYMM') 	AND SUBSTR(U.USERGBN,0,1) = 'A' AND U.USEYN = 'Y' THEN U.USEQ ELSE NULL END)	AS T08
+			,(CASE WHEN (TO_CHAR(SYSDATE,'YYYY') || '09') 	BETWEEN TO_CHAR(U.SERVSTIME,'YYYYMM') 	AND TO_CHAR(NVL(U.OUTTIME,U.SERVETIME),'YYYYMM') 	AND SUBSTR(U.USERGBN,0,1) = 'A' AND U.USEYN = 'Y' THEN U.USEQ ELSE NULL END)	AS T09
+			,(CASE WHEN (TO_CHAR(SYSDATE,'YYYY') || '10') 	BETWEEN TO_CHAR(U.SERVSTIME,'YYYYMM') 	AND TO_CHAR(NVL(U.OUTTIME,U.SERVETIME),'YYYYMM') 	AND SUBSTR(U.USERGBN,0,1) = 'A' AND U.USEYN = 'Y' THEN U.USEQ ELSE NULL END)	AS T10
+			,(CASE WHEN (TO_CHAR(SYSDATE,'YYYY') || '11') 	BETWEEN TO_CHAR(U.SERVSTIME,'YYYYMM') 	AND TO_CHAR(NVL(U.OUTTIME,U.SERVETIME),'YYYYMM') 	AND SUBSTR(U.USERGBN,0,1) = 'A' AND U.USEYN = 'Y' THEN U.USEQ ELSE NULL END)	AS T11
+			,(CASE WHEN (TO_CHAR(SYSDATE,'YYYY') || '12') 	BETWEEN TO_CHAR(U.SERVSTIME,'YYYYMM') 	AND TO_CHAR(NVL(U.OUTTIME,U.SERVETIME),'YYYYMM') 	AND SUBSTR(U.USERGBN,0,1) = 'A' AND U.USEYN = 'Y' THEN U.USEQ ELSE NULL END)	AS T12
+
+			-- 기간의 접속자속
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYY') 	= (TO_CHAR(SYSDATE,'YYYY')) 		AND CV.LOGIN_CNT > 0 THEN U.USEQ ELSE NULL END)									AS LTT
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '01') AND CV.LOGIN_CNT > 0 THEN U.USEQ ELSE NULL END)									AS L01
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '02') AND CV.LOGIN_CNT > 0 THEN U.USEQ ELSE NULL END)									AS L02
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '03') AND CV.LOGIN_CNT > 0 THEN U.USEQ ELSE NULL END)									AS L03
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '04') AND CV.LOGIN_CNT > 0 THEN U.USEQ ELSE NULL END)									AS L04
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '05') AND CV.LOGIN_CNT > 0 THEN U.USEQ ELSE NULL END)									AS L05
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '06') AND CV.LOGIN_CNT > 0 THEN U.USEQ ELSE NULL END)									AS L06
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '07') AND CV.LOGIN_CNT > 0 THEN U.USEQ ELSE NULL END)									AS L07
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '08') AND CV.LOGIN_CNT > 0 THEN U.USEQ ELSE NULL END)									AS L08
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '09') AND CV.LOGIN_CNT > 0 THEN U.USEQ ELSE NULL END)									AS L09
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '10') AND CV.LOGIN_CNT > 0 THEN U.USEQ ELSE NULL END)									AS L10
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '11') AND CV.LOGIN_CNT > 0 THEN U.USEQ ELSE NULL END)									AS L11
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '12') AND CV.LOGIN_CNT > 0 THEN U.USEQ ELSE NULL END)									AS L12
+
+			-- 학습시간
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYY') 	= (TO_CHAR(SYSDATE,'YYYY')) 		THEN (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) ELSE 0 END)					AS STT
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '01') THEN (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) ELSE 0 END)					AS S01
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '02') THEN (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) ELSE 0 END)					AS S02
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '03') THEN (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) ELSE 0 END)					AS S03
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '04') THEN (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) ELSE 0 END)					AS S04
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '05') THEN (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) ELSE 0 END)					AS S05
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '06') THEN (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) ELSE 0 END)					AS S06
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '07') THEN (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) ELSE 0 END)					AS S07
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '08') THEN (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) ELSE 0 END)					AS S08
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '09') THEN (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) ELSE 0 END)					AS S09
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '10') THEN (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) ELSE 0 END)					AS S10
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '11') THEN (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) ELSE 0 END)					AS S11
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '12') THEN (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) ELSE 0 END)					AS S12
+
+			-- 동영상시청 수
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYY') 	= (TO_CHAR(SYSDATE,'YYYY')) 		THEN (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) ELSE 0 END)					AS CTT
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '01') THEN (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) ELSE 0 END)					AS C01
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '02') THEN (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) ELSE 0 END)					AS C02
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '03') THEN (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) ELSE 0 END)					AS C03
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '04') THEN (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) ELSE 0 END)					AS C04
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '05') THEN (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) ELSE 0 END)					AS C05
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '06') THEN (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) ELSE 0 END)					AS C06
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '07') THEN (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) ELSE 0 END)					AS C07
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '08') THEN (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) ELSE 0 END)					AS C08
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '09') THEN (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) ELSE 0 END)					AS C09
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '10') THEN (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) ELSE 0 END)					AS C10
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '11') THEN (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) ELSE 0 END)					AS C11
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '12') THEN (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) ELSE 0 END)					AS C12
+
+			-- 온라인 시청수
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYY') 	= (TO_CHAR(SYSDATE,'YYYY')) 		THEN (CV.ONLINE_CNT) ELSE 0 END)												AS OTT
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '01') THEN (CV.ONLINE_CNT) ELSE 0 END)												AS O01
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '02') THEN (CV.ONLINE_CNT) ELSE 0 END)												AS O02
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '03') THEN (CV.ONLINE_CNT) ELSE 0 END)												AS O03
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '04') THEN (CV.ONLINE_CNT) ELSE 0 END)												AS O04
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '05') THEN (CV.ONLINE_CNT) ELSE 0 END)												AS O05
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '06') THEN (CV.ONLINE_CNT) ELSE 0 END)												AS O06
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '07') THEN (CV.ONLINE_CNT) ELSE 0 END)												AS O07
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '08') THEN (CV.ONLINE_CNT) ELSE 0 END)												AS O08
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '09') THEN (CV.ONLINE_CNT) ELSE 0 END)												AS O09
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '10') THEN (CV.ONLINE_CNT) ELSE 0 END)												AS O10
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '11') THEN (CV.ONLINE_CNT) ELSE 0 END)												AS O11
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '12') THEN (CV.ONLINE_CNT) ELSE 0 END)												AS O12
+
+			-- 모바일 시청수
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYY') 	= (TO_CHAR(SYSDATE,'YYYY')) 		THEN (CV.MOBILE_CNT) ELSE 0 END)												AS MTT
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '01') THEN (CV.MOBILE_CNT) ELSE 0 END)												AS M01
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '02') THEN (CV.MOBILE_CNT) ELSE 0 END)												AS M02
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '03') THEN (CV.MOBILE_CNT) ELSE 0 END)												AS M03
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '04') THEN (CV.MOBILE_CNT) ELSE 0 END)												AS M04
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '05') THEN (CV.MOBILE_CNT) ELSE 0 END)												AS M05
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '06') THEN (CV.MOBILE_CNT) ELSE 0 END)												AS M06
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '07') THEN (CV.MOBILE_CNT) ELSE 0 END)												AS M07
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '08') THEN (CV.MOBILE_CNT) ELSE 0 END)												AS M08
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '09') THEN (CV.MOBILE_CNT) ELSE 0 END)												AS M09
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '10') THEN (CV.MOBILE_CNT) ELSE 0 END)												AS M10
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '11') THEN (CV.MOBILE_CNT) ELSE 0 END)												AS M11
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '12') THEN (CV.MOBILE_CNT) ELSE 0 END)												AS M12
+
+			-- TV 시청수
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYY') 	= (TO_CHAR(SYSDATE,'YYYY')) 		THEN (CV.TV_CNT) ELSE 0 END)													AS VTT
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '01') THEN (CV.TV_CNT) ELSE 0 END)													AS V01
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '02') THEN (CV.TV_CNT) ELSE 0 END)													AS V02
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '03') THEN (CV.TV_CNT) ELSE 0 END)													AS V03
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '04') THEN (CV.TV_CNT) ELSE 0 END)													AS V04
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '05') THEN (CV.TV_CNT) ELSE 0 END)													AS V05
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '06') THEN (CV.TV_CNT) ELSE 0 END)													AS V06
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '07') THEN (CV.TV_CNT) ELSE 0 END)													AS V07
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '08') THEN (CV.TV_CNT) ELSE 0 END)													AS V08
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '09') THEN (CV.TV_CNT) ELSE 0 END)													AS V09
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '10') THEN (CV.TV_CNT) ELSE 0 END)													AS V10
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '11') THEN (CV.TV_CNT) ELSE 0 END)													AS V11
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '12') THEN (CV.TV_CNT) ELSE 0 END)													AS V12
+
+			-- 기간별 시청이력 회원 (CNT 기준)
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYY') 	= (TO_CHAR(SYSDATE,'YYYY')) 		AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS PTT
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '01') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS P01
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '02') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS P02
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '03') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS P03
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '04') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS P04
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '05') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS P05
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '06') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS P06
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '07') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS P07
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '08') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS P08
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '09') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS P09
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '10') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS P10
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '11') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS P11
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '12') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS P12
+
+			-- 기간별 시청이력 회원 (CNT 기준)
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYY') 	= (TO_CHAR(SYSDATE,'YYYY')) 		AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS PCTT
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '01') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS PC01
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '02') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS PC02
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '03') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS PC03
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '04') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS PC04
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '05') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS PC05
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '06') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS PC06
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '07') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS PC07
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '08') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS PC08
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '09') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS PC09
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '10') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS PC10
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '11') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS PC11
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '12') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS PC12
+
+			-- 기간별 시청이력 회원 (TIME 기준)
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYY') 	= (TO_CHAR(SYSDATE,'YYYY')) 		AND (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) > 0 THEN U.USEQ ELSE NULL END) 	AS PTTT
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '01') AND (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) > 0 THEN U.USEQ ELSE NULL END) 	AS PT01
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '02') AND (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) > 0 THEN U.USEQ ELSE NULL END) 	AS PT02
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '03') AND (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) > 0 THEN U.USEQ ELSE NULL END) 	AS PT03
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '04') AND (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) > 0 THEN U.USEQ ELSE NULL END) 	AS PT04
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '05') AND (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) > 0 THEN U.USEQ ELSE NULL END) 	AS PT05
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '06') AND (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) > 0 THEN U.USEQ ELSE NULL END) 	AS PT06
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '07') AND (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) > 0 THEN U.USEQ ELSE NULL END) 	AS PT07
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '08') AND (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) > 0 THEN U.USEQ ELSE NULL END) 	AS PT08
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '09') AND (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) > 0 THEN U.USEQ ELSE NULL END) 	AS PT09
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '10') AND (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) > 0 THEN U.USEQ ELSE NULL END) 	AS PT10
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '11') AND (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) > 0 THEN U.USEQ ELSE NULL END) 	AS PT11
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '12') AND (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) > 0 THEN U.USEQ ELSE NULL END) 	AS PT12
+		FROM US_USER U
+			LEFT OUTER JOIN M_CONT_VIEW CV 	ON CV.SITE = U.SITE
+											AND CV.USEQ = U.USEQ
+											AND TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYY') = TO_CHAR(SYSDATE,'YYYY')
+											--AND ((U.SITE = 'MS' AND CV.CORP = U.CORP) OR 1 = 1)
+		WHERE 1 = 1
+
+			AND U.SITE <> 'MS'
+			AND U.SITE IN (SELECT S.SITE FROM A_SITE S)
+
+			AND U.USEYN = 'Y'
+			AND U.USERGBN LIKE 'A%'
+
+			--AND NVL(U.SERVSTIME,NVL(U.OUTTIME,U.SERVETIME)) IS NOT NULL
+			AND (
+				TO_CHAR(SYSDATE,'YYYY') BETWEEN TO_CHAR(U.SERVSTIME,'YYYY') AND TO_CHAR(NVL(U.OUTTIME,U.SERVETIME),'YYYY')
+				OR
+				TO_CHAR(SYSDATE,'YYYY') = TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYY')
+				)
+
+	) X
+	GROUP BY
+		 X.SITE
+		,X.CORP
+		,X.CONT_YEAR
+	;
+
+
+	/*********************************************************************************************/
+	/**** 집계 테이블 사용 쿼리 *****/
+	/**** M_CONT_USE_STATUS_CORP는 집계 테이블 M_CONT_VIEW 사용 *****/
+	/*********************************************************************************************/
+
+    USP_EXCEPTION('', 'M_CONT_USE_STATUS_CORP', '일일배치', 'USP_M_CONT_USE_STATUS-11', 'DBMS_BATCH_SYSTEM');
+
+	-- 현황 집계 (회사코드 포함)
+	DELETE FROM M_CONT_USE_STATUS_CORP
+	WHERE CONT_YEAR = TO_CHAR(SYSDATE,'YYYY');
+
+
+	--DROP TABLE M_CONT_USE_STATUS_CORP;
+	--CREATE TABLE M_CONT_USE_STATUS_CORP AS
+	INSERT INTO M_CONT_USE_STATUS_CORP (
+			 SITE
+			,USEQ
+			,CORP
+			,CONT_YEAR
+
+			,TU_CNT
+
+			,TTT
+			,T01
+			,T02
+			,T03
+			,T04
+			,T05
+			,T06
+			,T07
+			,T08
+			,T09
+            ,T10
+			,T11
+			,T12
+
+			,LTT
+			,L01
+			,L02
+			,L03
+			,L04
+			,L05
+			,L06
+			,L07
+			,L08
+            ,L09
+			,L10
+			,L11
+			,L12
+
+			,STT
+			,S01
+			,S02
+			,S03
+			,S04
+			,S05
+			,S06
+			,S07
+            ,S08
+			,S09
+			,S10
+			,S11
+			,S12
+
+			,CTT
+			,C01
+			,C02
+			,C03
+			,C04
+			,C05
+			,C06
+            ,C07
+			,C08
+			,C09
+			,C10
+			,C11
+			,C12
+
+			,OTT
+			,O01
+			,O02
+			,O03
+			,O04
+			,O05
+            ,O06
+			,O07
+			,O08
+			,O09
+			,O10
+			,O11
+			,O12
+
+			,MTT
+			,M01
+			,M02
+			,M03
+			,M04
+            ,M05
+			,M06
+			,M07
+			,M08
+			,M09
+			,M10
+			,M11
+			,M12
+
+			,VTT
+			,V01
+			,V02
+			,V03
+            ,V04
+			,V05
+			,V06
+			,V07
+			,V08
+			,V09
+			,V10
+			,V11
+			,V12
+
+			,PTT
+			,P01
+			,P02
+            ,P03
+			,P04
+			,P05
+			,P06
+			,P07
+			,P08
+			,P09
+			,P10
+			,P11
+			,P12
+
+			,PCTT
+			,PC01
+            ,PC02
+			,PC03
+			,PC04
+			,PC05
+			,PC06
+			,PC07
+			,PC08
+			,PC09
+			,PC10
+			,PC11
+			,PC12
+
+			,PTTT
+			,PT01
+			,PT02
+			,PT03
+			,PT04
+			,PT05
+			,PT06
+			,PT07
+			,PT08
+			,PT09
+			,PT10
+			,PT11
+			,PT12
+	)
+	SELECT
+		 X.SITE
+		,X.USEQ
+		,X.CORP
+		,CONT_YEAR
+
+		,COUNT(DISTINCT X.USEQ) 																							AS TU_CNT
+
+		,COUNT(DISTINCT X.TTT)																								AS TTT
+		,COUNT(DISTINCT X.T01)																								AS T01
+		,COUNT(DISTINCT X.T02)																								AS T02
+		,COUNT(DISTINCT X.T03)																								AS T03
+		,COUNT(DISTINCT X.T04)																								AS T04
+		,COUNT(DISTINCT X.T05)																								AS T05
+		,COUNT(DISTINCT X.T06)																								AS T06
+		,COUNT(DISTINCT X.T07)																								AS T07
+		,COUNT(DISTINCT X.T08)																								AS T08
+		,COUNT(DISTINCT X.T09)																								AS T09
+		,COUNT(DISTINCT X.T10)																								AS T10
+		,COUNT(DISTINCT X.T11)																								AS T11
+		,COUNT(DISTINCT X.T12)																								AS T12
+
+		,COUNT(DISTINCT X.LTT)																								AS LTT
+		,COUNT(DISTINCT X.L01)																								AS L01
+		,COUNT(DISTINCT X.L02)																								AS L02
+		,COUNT(DISTINCT X.L03)																								AS L03
+		,COUNT(DISTINCT X.L04)																								AS L04
+		,COUNT(DISTINCT X.L05)																								AS L05
+		,COUNT(DISTINCT X.L06)																								AS L06
+		,COUNT(DISTINCT X.L07)																								AS L07
+		,COUNT(DISTINCT X.L08)																								AS L08
+		,COUNT(DISTINCT X.L09)																								AS L09
+		,COUNT(DISTINCT X.L10)																								AS L10
+		,COUNT(DISTINCT X.L11)																								AS L11
+		,COUNT(DISTINCT X.L12)																								AS L12
+
+		,SUM(X.STT)																											AS STT
+		,SUM(X.S01)																											AS S01
+		,SUM(X.S02)																											AS S02
+		,SUM(X.S03)																											AS S03
+		,SUM(X.S04)																											AS S04
+		,SUM(X.S05)																											AS S05
+		,SUM(X.S06)																											AS S06
+		,SUM(X.S07)																											AS S07
+		,SUM(X.S08)																											AS S08
+		,SUM(X.S09)																											AS S09
+		,SUM(X.S10)																											AS S10
+		,SUM(X.S11)																											AS S11
+		,SUM(X.S12)																											AS S12
+
+		,SUM(X.CTT)																											AS CTT
+		,SUM(X.C01)																											AS C01
+		,SUM(X.C02)																											AS C02
+		,SUM(X.C03)																											AS C03
+		,SUM(X.C04)																											AS C04
+		,SUM(X.C05)																											AS C05
+		,SUM(X.C06)																											AS C06
+		,SUM(X.C07)																											AS C07
+		,SUM(X.C08)																											AS C08
+		,SUM(X.C09)																											AS C09
+		,SUM(X.C10)																											AS C10
+		,SUM(X.C11)																											AS C11
+		,SUM(X.C12)																											AS C12
+
+		,SUM(X.OTT)																											AS OTT
+		,SUM(X.O01)																											AS O01
+		,SUM(X.O02)																											AS O02
+		,SUM(X.O03)																											AS O03
+		,SUM(X.O04)																											AS O04
+		,SUM(X.O05)																											AS O05
+		,SUM(X.O06)																											AS O06
+		,SUM(X.O07)																											AS O07
+		,SUM(X.O08)																											AS O08
+		,SUM(X.O09)																											AS O09
+		,SUM(X.O10)																											AS O10
+		,SUM(X.O11)																											AS O11
+		,SUM(X.O12)																											AS O12
+
+		,SUM(X.MTT)																											AS MTT
+		,SUM(X.M01)																											AS M01
+		,SUM(X.M02)																											AS M02
+		,SUM(X.M03)																											AS M03
+		,SUM(X.M04)																											AS M04
+		,SUM(X.M05)																											AS M05
+		,SUM(X.M06)																											AS M06
+		,SUM(X.M07)																											AS M07
+		,SUM(X.M08)																											AS M08
+		,SUM(X.M09)																											AS M09
+		,SUM(X.M10)																											AS M10
+		,SUM(X.M11)																											AS M11
+		,SUM(X.M12)																											AS M12
+
+		,SUM(X.VTT)																											AS VTT
+		,SUM(X.V01)																											AS V01
+		,SUM(X.V02)																											AS V02
+		,SUM(X.V03)																											AS V03
+		,SUM(X.V04)																											AS V04
+		,SUM(X.V05)																											AS V05
+		,SUM(X.V06)																											AS V06
+		,SUM(X.V07)																											AS V07
+		,SUM(X.V08)																											AS V08
+		,SUM(X.V09)																											AS V09
+		,SUM(X.V10)																											AS V10
+		,SUM(X.V11)																											AS V11
+		,SUM(X.V12)																											AS V12
+
+		,COUNT(DISTINCT X.PTT)																								AS PTT
+		,COUNT(DISTINCT X.P01)																								AS P01
+		,COUNT(DISTINCT X.P02)																								AS P02
+		,COUNT(DISTINCT X.P03)																								AS P03
+		,COUNT(DISTINCT X.P04)																								AS P04
+		,COUNT(DISTINCT X.P05)																								AS P05
+		,COUNT(DISTINCT X.P06)																								AS P06
+		,COUNT(DISTINCT X.P07)																								AS P07
+		,COUNT(DISTINCT X.P08)																								AS P08
+		,COUNT(DISTINCT X.P09)																								AS P09
+		,COUNT(DISTINCT X.P10)																								AS P10
+		,COUNT(DISTINCT X.P11)																								AS P11
+		,COUNT(DISTINCT X.P12)																								AS P12
+
+		,COUNT(DISTINCT X.PCTT)																								AS PCTT
+		,COUNT(DISTINCT X.PC01)																								AS PC01
+		,COUNT(DISTINCT X.PC02)																								AS PC02
+		,COUNT(DISTINCT X.PC03)																								AS PC03
+		,COUNT(DISTINCT X.PC04)																								AS PC04
+		,COUNT(DISTINCT X.PC05)																								AS PC05
+		,COUNT(DISTINCT X.PC06)																								AS PC06
+		,COUNT(DISTINCT X.PC07)																								AS PC07
+		,COUNT(DISTINCT X.PC08)																								AS PC08
+		,COUNT(DISTINCT X.PC09)																								AS PC09
+		,COUNT(DISTINCT X.PC10)																								AS PC10
+		,COUNT(DISTINCT X.PC11)																								AS PC11
+		,COUNT(DISTINCT X.PC12)																								AS PC12
+
+		,COUNT(DISTINCT X.PTTT)																								AS PTTT
+		,COUNT(DISTINCT X.PT01)																								AS PT01
+		,COUNT(DISTINCT X.PT02)																								AS PT02
+		,COUNT(DISTINCT X.PT03)																								AS PT03
+		,COUNT(DISTINCT X.PT04)																								AS PT04
+		,COUNT(DISTINCT X.PT05)																								AS PT05
+		,COUNT(DISTINCT X.PT06)																								AS PT06
+		,COUNT(DISTINCT X.PT07)																								AS PT07
+		,COUNT(DISTINCT X.PT08)																								AS PT08
+		,COUNT(DISTINCT X.PT09)																								AS PT09
+		,COUNT(DISTINCT X.PT10)																								AS PT10
+		,COUNT(DISTINCT X.PT11)																								AS PT11
+		,COUNT(DISTINCT X.PT12)																								AS PT12
+	FROM (
+		SELECT
+			 TO_CHAR(SYSDATE,'YYYY') AS CONT_YEAR
+			,U.SITE
+			,U.USEQ
+			,NVL(U.CORP,U.SIGNCORP) AS CORP
+
+			-- 유료회원
+			,(CASE WHEN (TO_CHAR(SYSDATE,'YYYY')) 			BETWEEN TO_CHAR(U.SERVSTIME,'YYYY') 	AND TO_CHAR(NVL(U.OUTTIME,U.SERVETIME),'YYYY') 		AND SUBSTR(U.USERGBN,0,1) = 'A' AND U.USEYN = 'Y' THEN U.USEQ ELSE NULL END)	AS TTT
+			,(CASE WHEN (TO_CHAR(SYSDATE,'YYYY') || '01') 	BETWEEN TO_CHAR(U.SERVSTIME,'YYYYMM') 	AND TO_CHAR(NVL(U.OUTTIME,U.SERVETIME),'YYYYMM') 	AND SUBSTR(U.USERGBN,0,1) = 'A' AND U.USEYN = 'Y' THEN U.USEQ ELSE NULL END)	AS T01
+			,(CASE WHEN (TO_CHAR(SYSDATE,'YYYY') || '02') 	BETWEEN TO_CHAR(U.SERVSTIME,'YYYYMM') 	AND TO_CHAR(NVL(U.OUTTIME,U.SERVETIME),'YYYYMM') 	AND SUBSTR(U.USERGBN,0,1) = 'A' AND U.USEYN = 'Y' THEN U.USEQ ELSE NULL END)	AS T02
+			,(CASE WHEN (TO_CHAR(SYSDATE,'YYYY') || '03') 	BETWEEN TO_CHAR(U.SERVSTIME,'YYYYMM') 	AND TO_CHAR(NVL(U.OUTTIME,U.SERVETIME),'YYYYMM') 	AND SUBSTR(U.USERGBN,0,1) = 'A' AND U.USEYN = 'Y' THEN U.USEQ ELSE NULL END)	AS T03
+			,(CASE WHEN (TO_CHAR(SYSDATE,'YYYY') || '04') 	BETWEEN TO_CHAR(U.SERVSTIME,'YYYYMM') 	AND TO_CHAR(NVL(U.OUTTIME,U.SERVETIME),'YYYYMM') 	AND SUBSTR(U.USERGBN,0,1) = 'A' AND U.USEYN = 'Y' THEN U.USEQ ELSE NULL END)	AS T04
+			,(CASE WHEN (TO_CHAR(SYSDATE,'YYYY') || '05') 	BETWEEN TO_CHAR(U.SERVSTIME,'YYYYMM') 	AND TO_CHAR(NVL(U.OUTTIME,U.SERVETIME),'YYYYMM') 	AND SUBSTR(U.USERGBN,0,1) = 'A' AND U.USEYN = 'Y' THEN U.USEQ ELSE NULL END)	AS T05
+			,(CASE WHEN (TO_CHAR(SYSDATE,'YYYY') || '06') 	BETWEEN TO_CHAR(U.SERVSTIME,'YYYYMM') 	AND TO_CHAR(NVL(U.OUTTIME,U.SERVETIME),'YYYYMM') 	AND SUBSTR(U.USERGBN,0,1) = 'A' AND U.USEYN = 'Y' THEN U.USEQ ELSE NULL END)	AS T06
+			,(CASE WHEN (TO_CHAR(SYSDATE,'YYYY') || '07') 	BETWEEN TO_CHAR(U.SERVSTIME,'YYYYMM') 	AND TO_CHAR(NVL(U.OUTTIME,U.SERVETIME),'YYYYMM') 	AND SUBSTR(U.USERGBN,0,1) = 'A' AND U.USEYN = 'Y' THEN U.USEQ ELSE NULL END)	AS T07
+			,(CASE WHEN (TO_CHAR(SYSDATE,'YYYY') || '08') 	BETWEEN TO_CHAR(U.SERVSTIME,'YYYYMM') 	AND TO_CHAR(NVL(U.OUTTIME,U.SERVETIME),'YYYYMM') 	AND SUBSTR(U.USERGBN,0,1) = 'A' AND U.USEYN = 'Y' THEN U.USEQ ELSE NULL END)	AS T08
+			,(CASE WHEN (TO_CHAR(SYSDATE,'YYYY') || '09') 	BETWEEN TO_CHAR(U.SERVSTIME,'YYYYMM') 	AND TO_CHAR(NVL(U.OUTTIME,U.SERVETIME),'YYYYMM') 	AND SUBSTR(U.USERGBN,0,1) = 'A' AND U.USEYN = 'Y' THEN U.USEQ ELSE NULL END)	AS T09
+			,(CASE WHEN (TO_CHAR(SYSDATE,'YYYY') || '10') 	BETWEEN TO_CHAR(U.SERVSTIME,'YYYYMM') 	AND TO_CHAR(NVL(U.OUTTIME,U.SERVETIME),'YYYYMM') 	AND SUBSTR(U.USERGBN,0,1) = 'A' AND U.USEYN = 'Y' THEN U.USEQ ELSE NULL END)	AS T10
+			,(CASE WHEN (TO_CHAR(SYSDATE,'YYYY') || '11') 	BETWEEN TO_CHAR(U.SERVSTIME,'YYYYMM') 	AND TO_CHAR(NVL(U.OUTTIME,U.SERVETIME),'YYYYMM') 	AND SUBSTR(U.USERGBN,0,1) = 'A' AND U.USEYN = 'Y' THEN U.USEQ ELSE NULL END)	AS T11
+			,(CASE WHEN (TO_CHAR(SYSDATE,'YYYY') || '12') 	BETWEEN TO_CHAR(U.SERVSTIME,'YYYYMM') 	AND TO_CHAR(NVL(U.OUTTIME,U.SERVETIME),'YYYYMM') 	AND SUBSTR(U.USERGBN,0,1) = 'A' AND U.USEYN = 'Y' THEN U.USEQ ELSE NULL END)	AS T12
+
+			-- 기간의 접속자속
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYY') 	= (TO_CHAR(SYSDATE,'YYYY')) 		AND CV.LOGIN_CNT > 0 THEN U.USEQ ELSE NULL END)									AS LTT
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '01') AND CV.LOGIN_CNT > 0 THEN U.USEQ ELSE NULL END)									AS L01
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '02') AND CV.LOGIN_CNT > 0 THEN U.USEQ ELSE NULL END)									AS L02
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '03') AND CV.LOGIN_CNT > 0 THEN U.USEQ ELSE NULL END)									AS L03
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '04') AND CV.LOGIN_CNT > 0 THEN U.USEQ ELSE NULL END)									AS L04
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '05') AND CV.LOGIN_CNT > 0 THEN U.USEQ ELSE NULL END)									AS L05
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '06') AND CV.LOGIN_CNT > 0 THEN U.USEQ ELSE NULL END)									AS L06
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '07') AND CV.LOGIN_CNT > 0 THEN U.USEQ ELSE NULL END)									AS L07
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '08') AND CV.LOGIN_CNT > 0 THEN U.USEQ ELSE NULL END)									AS L08
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '09') AND CV.LOGIN_CNT > 0 THEN U.USEQ ELSE NULL END)									AS L09
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '10') AND CV.LOGIN_CNT > 0 THEN U.USEQ ELSE NULL END)									AS L10
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '11') AND CV.LOGIN_CNT > 0 THEN U.USEQ ELSE NULL END)									AS L11
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '12') AND CV.LOGIN_CNT > 0 THEN U.USEQ ELSE NULL END)									AS L12
+
+			-- 학습시간
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYY') 	= (TO_CHAR(SYSDATE,'YYYY')) 		THEN (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) ELSE 0 END)					AS STT
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '01') THEN (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) ELSE 0 END)					AS S01
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '02') THEN (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) ELSE 0 END)					AS S02
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '03') THEN (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) ELSE 0 END)					AS S03
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '04') THEN (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) ELSE 0 END)					AS S04
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '05') THEN (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) ELSE 0 END)					AS S05
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '06') THEN (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) ELSE 0 END)					AS S06
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '07') THEN (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) ELSE 0 END)					AS S07
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '08') THEN (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) ELSE 0 END)					AS S08
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '09') THEN (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) ELSE 0 END)					AS S09
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '10') THEN (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) ELSE 0 END)					AS S10
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '11') THEN (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) ELSE 0 END)					AS S11
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '12') THEN (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) ELSE 0 END)					AS S12
+
+			-- 동영상시청 수
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYY') 	= (TO_CHAR(SYSDATE,'YYYY')) 		THEN (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) ELSE 0 END)					AS CTT
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '01') THEN (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) ELSE 0 END)					AS C01
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '02') THEN (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) ELSE 0 END)					AS C02
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '03') THEN (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) ELSE 0 END)					AS C03
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '04') THEN (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) ELSE 0 END)					AS C04
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '05') THEN (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) ELSE 0 END)					AS C05
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '06') THEN (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) ELSE 0 END)					AS C06
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '07') THEN (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) ELSE 0 END)					AS C07
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '08') THEN (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) ELSE 0 END)					AS C08
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '09') THEN (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) ELSE 0 END)					AS C09
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '10') THEN (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) ELSE 0 END)					AS C10
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '11') THEN (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) ELSE 0 END)					AS C11
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '12') THEN (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) ELSE 0 END)					AS C12
+
+			-- 온라인 시청수
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYY') 	= (TO_CHAR(SYSDATE,'YYYY')) 		THEN (CV.ONLINE_CNT) ELSE 0 END)												AS OTT
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '01') THEN (CV.ONLINE_CNT) ELSE 0 END)												AS O01
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '02') THEN (CV.ONLINE_CNT) ELSE 0 END)												AS O02
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '03') THEN (CV.ONLINE_CNT) ELSE 0 END)												AS O03
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '04') THEN (CV.ONLINE_CNT) ELSE 0 END)												AS O04
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '05') THEN (CV.ONLINE_CNT) ELSE 0 END)												AS O05
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '06') THEN (CV.ONLINE_CNT) ELSE 0 END)												AS O06
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '07') THEN (CV.ONLINE_CNT) ELSE 0 END)												AS O07
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '08') THEN (CV.ONLINE_CNT) ELSE 0 END)												AS O08
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '09') THEN (CV.ONLINE_CNT) ELSE 0 END)												AS O09
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '10') THEN (CV.ONLINE_CNT) ELSE 0 END)												AS O10
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '11') THEN (CV.ONLINE_CNT) ELSE 0 END)												AS O11
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '12') THEN (CV.ONLINE_CNT) ELSE 0 END)												AS O12
+
+			-- 모바일 시청수
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYY') 	= (TO_CHAR(SYSDATE,'YYYY')) 		THEN (CV.MOBILE_CNT) ELSE 0 END)												AS MTT
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '01') THEN (CV.MOBILE_CNT) ELSE 0 END)												AS M01
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '02') THEN (CV.MOBILE_CNT) ELSE 0 END)												AS M02
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '03') THEN (CV.MOBILE_CNT) ELSE 0 END)												AS M03
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '04') THEN (CV.MOBILE_CNT) ELSE 0 END)												AS M04
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '05') THEN (CV.MOBILE_CNT) ELSE 0 END)												AS M05
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '06') THEN (CV.MOBILE_CNT) ELSE 0 END)												AS M06
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '07') THEN (CV.MOBILE_CNT) ELSE 0 END)												AS M07
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '08') THEN (CV.MOBILE_CNT) ELSE 0 END)												AS M08
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '09') THEN (CV.MOBILE_CNT) ELSE 0 END)												AS M09
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '10') THEN (CV.MOBILE_CNT) ELSE 0 END)												AS M10
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '11') THEN (CV.MOBILE_CNT) ELSE 0 END)												AS M11
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '12') THEN (CV.MOBILE_CNT) ELSE 0 END)												AS M12
+
+			-- TV 시청수
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYY') 	= (TO_CHAR(SYSDATE,'YYYY')) 		THEN (CV.TV_CNT) ELSE 0 END)													AS VTT
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '01') THEN (CV.TV_CNT) ELSE 0 END)													AS V01
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '02') THEN (CV.TV_CNT) ELSE 0 END)													AS V02
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '03') THEN (CV.TV_CNT) ELSE 0 END)													AS V03
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '04') THEN (CV.TV_CNT) ELSE 0 END)													AS V04
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '05') THEN (CV.TV_CNT) ELSE 0 END)													AS V05
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '06') THEN (CV.TV_CNT) ELSE 0 END)													AS V06
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '07') THEN (CV.TV_CNT) ELSE 0 END)													AS V07
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '08') THEN (CV.TV_CNT) ELSE 0 END)													AS V08
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '09') THEN (CV.TV_CNT) ELSE 0 END)													AS V09
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '10') THEN (CV.TV_CNT) ELSE 0 END)													AS V10
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '11') THEN (CV.TV_CNT) ELSE 0 END)													AS V11
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '12') THEN (CV.TV_CNT) ELSE 0 END)													AS V12
+
+			-- 기간별 시청이력 회원 (CNT 기준)
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYY') 	= (TO_CHAR(SYSDATE,'YYYY')) 		AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS PTT
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '01') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS P01
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '02') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS P02
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '03') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS P03
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '04') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS P04
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '05') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS P05
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '06') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS P06
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '07') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS P07
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '08') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS P08
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '09') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS P09
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '10') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS P10
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '11') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS P11
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '12') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS P12
+
+			-- 기간별 시청이력 회원 (CNT 기준)
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYY') 	= (TO_CHAR(SYSDATE,'YYYY')) 		AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS PCTT
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '01') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS PC01
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '02') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS PC02
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '03') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS PC03
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '04') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS PC04
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '05') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS PC05
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '06') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS PC06
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '07') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS PC07
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '08') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS PC08
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '09') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS PC09
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '10') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS PC10
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '11') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS PC11
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '12') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS PC12
+
+			-- 기간별 시청이력 회원 (TOTALTIME 기준)
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYY') 	= (TO_CHAR(SYSDATE,'YYYY')) 		AND (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) > 0 THEN U.USEQ ELSE NULL END) 	AS PTTT
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '01') AND (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) > 0 THEN U.USEQ ELSE NULL END) 	AS PT01
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '02') AND (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) > 0 THEN U.USEQ ELSE NULL END) 	AS PT02
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '03') AND (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) > 0 THEN U.USEQ ELSE NULL END) 	AS PT03
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '04') AND (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) > 0 THEN U.USEQ ELSE NULL END) 	AS PT04
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '05') AND (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) > 0 THEN U.USEQ ELSE NULL END) 	AS PT05
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '06') AND (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) > 0 THEN U.USEQ ELSE NULL END) 	AS PT06
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '07') AND (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) > 0 THEN U.USEQ ELSE NULL END) 	AS PT07
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '08') AND (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) > 0 THEN U.USEQ ELSE NULL END) 	AS PT08
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '09') AND (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) > 0 THEN U.USEQ ELSE NULL END) 	AS PT09
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '10') AND (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) > 0 THEN U.USEQ ELSE NULL END) 	AS PT10
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '11') AND (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) > 0 THEN U.USEQ ELSE NULL END) 	AS PT11
+			,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '12') AND (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) > 0 THEN U.USEQ ELSE NULL END) 	AS PT12
+		FROM US_USER U
+			LEFT OUTER JOIN M_CONT_VIEW CV 	ON CV.SITE = U.SITE
+											AND CV.USEQ = U.USEQ
+											AND TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYY') = TO_CHAR(SYSDATE,'YYYY')
+											--AND ((U.SITE = 'MS' AND CV.CORP = U.CORP) OR 1 = 1)
+		WHERE 1 = 1
+
+			AND U.SITE <> 'MS'
+			AND U.SITE IN (SELECT S.SITE FROM A_SITE S)
+
+			AND U.USEYN = 'Y'
+			AND SUBSTR(U.USERGBN,0,1) = 'A'
+			--AND SUBSTR(U.USERGBN,0,1) IN ('A','C')
+
+			--AND U.SIGNSEQ IS NOT NULL
+			--AND NVL(U.SERVSTIME,NVL(U.OUTTIME,U.SERVETIME)) IS NOT NULL
+			AND (
+				TO_CHAR(SYSDATE,'YYYY') BETWEEN TO_CHAR(U.SERVSTIME,'YYYY') AND TO_CHAR(NVL(U.OUTTIME,U.SERVETIME),'YYYY')
+				OR
+				TO_CHAR(SYSDATE,'YYYY') = TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYY')
+				)
+
+	) X
+	GROUP BY
+		 X.SITE
+		,X.USEQ
+		,X.CORP
+		,X.CONT_YEAR
+	;
+
+
+	/**** 미사용 쿼리 *****/
+	/*********************************************************************************************/
+	/**** 집계 테이블 사용 쿼리 *****/
+	/**** M_CONT_USE_SIGN는 집계 테이블 M_CONT_VIEW 사용 *****/
+	/*********************************************************************************************/
+
+	----현황집계 (계약일기준)
+	--DELETE FROM M_CONT_USE_SIGN
+	--WHERE CONT_YEAR = TO_CHAR(SYSDATE,'YYYY');
+	--
+	--
+	----DROP TABLE M_CONT_USE_SIGN;
+	----CREATE TABLE M_CONT_USE_SIGN AS
+	--INSERT INTO M_CONT_USE_SIGN (
+	--		 SITE
+	--		--,CORP
+	--		,CONT_YEAR
+	--
+	--		,TU_CNT
+	--
+	--		,TTT
+	--		,T01
+	--		,T02
+	--		,T03
+	--		,T04
+	--		,T05
+	--		,T06
+	--		,T07
+	--		,T08
+	--		,T09
+	--		,T10
+	--		,T11
+	--		,T12
+	--
+	--		,LTT
+	--		,L01
+	--		,L02
+	--		,L03
+	--		,L04
+	--		,L05
+	--		,L06
+	--		,L07
+	--		,L08
+	--		,L09
+	--		,L10
+	--		,L11
+	--		,L12
+	--
+	--		,STT
+	--		,S01
+	--		,S02
+	--		,S03
+	--		,S04
+	--		,S05
+	--		,S06
+	--		,S07
+	--		,S08
+	--		,S09
+	--		,S10
+	--		,S11
+	--		,S12
+	--
+	--		,CTT
+	--		,C01
+	--		,C02
+	--		,C03
+	--		,C04
+	--		,C05
+	--		,C06
+	--		,C07
+	--		,C08
+	--		,C09
+	--		,C10
+	--		,C11
+	--		,C12
+	--
+	--		,OTT
+	--		,O01
+	--		,O02
+	--		,O03
+	--		,O04
+	--		,O05
+	--		,O06
+	--		,O07
+	--		,O08
+	--		,O09
+	--		,O10
+	--		,O11
+	--		,O12
+	--
+	--		,MTT
+	--		,M01
+	--		,M02
+	--		,M03
+	--		,M04
+	--		,M05
+	--		,M06
+	--		,M07
+	--		,M08
+	--		,M09
+	--		,M10
+	--		,M11
+	--		,M12
+	--
+	--		,VTT
+	--		,V01
+	--		,V02
+	--		,V03
+	--		,V04
+	--		,V05
+	--		,V06
+	--		,V07
+	--		,V08
+	--		,V09
+	--		,V10
+	--		,V11
+	--		,V12
+	--
+	--		,PTT
+	--		,P01
+	--		,P02
+	--		,P03
+	--		,P04
+	--		,P05
+	--		,P06
+	--		,P07
+	--		,P08
+	--		,P09
+	--		,P10
+	--		,P11
+	--		,P12
+	--
+	--		,PCTT
+	--		,PC01
+	--		,PC02
+	--		,PC03
+	--		,PC04
+	--		,PC05
+	--		,PC06
+	--		,PC07
+	--		,PC08
+	--		,PC09
+	--		,PC10
+	--		,PC11
+	--		,PC12
+	--
+	--		,PTTT
+	--		,PT01
+	--		,PT02
+	--		,PT03
+	--		,PT04
+	--		,PT05
+	--		,PT06
+	--		,PT07
+	--		,PT08
+	--		,PT09
+	--		,PT10
+	--		,PT11
+	--		,PT12
+	--)
+	--SELECT
+	--	 X.SITE
+	--	--,X.CORP
+	--	,CONT_YEAR
+	--
+	--	,COUNT(DISTINCT X.USEQ) 																							AS TU_CNT
+	--
+	--	,COUNT(DISTINCT X.TTT)																								AS TTT
+	--	,COUNT(DISTINCT X.T01)																								AS T01
+	--	,COUNT(DISTINCT X.T02)																								AS T02
+	--	,COUNT(DISTINCT X.T03)																								AS T03
+	--	,COUNT(DISTINCT X.T04)																								AS T04
+	--	,COUNT(DISTINCT X.T05)																								AS T05
+	--	,COUNT(DISTINCT X.T06)																								AS T06
+	--	,COUNT(DISTINCT X.T07)																								AS T07
+	--	,COUNT(DISTINCT X.T08)																								AS T08
+	--	,COUNT(DISTINCT X.T09)																								AS T09
+	--	,COUNT(DISTINCT X.T10)																								AS T10
+	--	,COUNT(DISTINCT X.T11)																								AS T11
+	--	,COUNT(DISTINCT X.T12)																								AS T12
+	--
+	--	,COUNT(DISTINCT X.LTT)																								AS LTT
+	--	,COUNT(DISTINCT X.L01)																								AS L01
+	--	,COUNT(DISTINCT X.L02)																								AS L02
+	--	,COUNT(DISTINCT X.L03)																								AS L03
+	--	,COUNT(DISTINCT X.L04)																								AS L04
+	--	,COUNT(DISTINCT X.L05)																								AS L05
+	--	,COUNT(DISTINCT X.L06)																								AS L06
+	--	,COUNT(DISTINCT X.L07)																								AS L07
+	--	,COUNT(DISTINCT X.L08)																								AS L08
+	--	,COUNT(DISTINCT X.L09)																								AS L09
+	--	,COUNT(DISTINCT X.L10)																								AS L10
+	--	,COUNT(DISTINCT X.L11)																								AS L11
+	--	,COUNT(DISTINCT X.L12)																								AS L12
+	--
+	--	,SUM(X.STT)																											AS STT
+	--	,SUM(X.S01)																											AS S01
+	--	,SUM(X.S02)																											AS S02
+	--	,SUM(X.S03)																											AS S03
+	--	,SUM(X.S04)																											AS S04
+	--	,SUM(X.S05)																											AS S05
+	--	,SUM(X.S06)																											AS S06
+	--	,SUM(X.S07)																											AS S07
+	--	,SUM(X.S08)																											AS S08
+	--	,SUM(X.S09)																											AS S09
+	--	,SUM(X.S10)																											AS S10
+	--	,SUM(X.S11)																											AS S11
+	--	,SUM(X.S12)																											AS S12
+	--
+	--	,SUM(X.CTT)																											AS CTT
+	--	,SUM(X.C01)																											AS C01
+	--	,SUM(X.C02)																											AS C02
+	--	,SUM(X.C03)																											AS C03
+	--	,SUM(X.C04)																											AS C04
+	--	,SUM(X.C05)																											AS C05
+	--	,SUM(X.C06)																											AS C06
+	--	,SUM(X.C07)																											AS C07
+	--	,SUM(X.C08)																											AS C08
+	--	,SUM(X.C09)																											AS C09
+	--	,SUM(X.C10)																											AS C10
+	--	,SUM(X.C11)																											AS C11
+	--	,SUM(X.C12)																											AS C12
+	--
+	--	,SUM(X.OTT)																											AS OTT
+	--	,SUM(X.O01)																											AS O01
+	--	,SUM(X.O02)																											AS O02
+	--	,SUM(X.O03)																											AS O03
+	--	,SUM(X.O04)																											AS O04
+	--	,SUM(X.O05)																											AS O05
+	--	,SUM(X.O06)																											AS O06
+	--	,SUM(X.O07)																											AS O07
+	--	,SUM(X.O08)																											AS O08
+	--	,SUM(X.O09)																											AS O09
+	--	,SUM(X.O10)																											AS O10
+	--	,SUM(X.O11)																											AS O11
+	--	,SUM(X.O12)																											AS O12
+	--
+	--	,SUM(X.MTT)																											AS MTT
+	--	,SUM(X.M01)																											AS M01
+	--	,SUM(X.M02)																											AS M02
+	--	,SUM(X.M03)																											AS M03
+	--	,SUM(X.M04)																											AS M04
+	--	,SUM(X.M05)																											AS M05
+	--	,SUM(X.M06)																											AS M06
+	--	,SUM(X.M07)																											AS M07
+	--	,SUM(X.M08)																											AS M08
+	--	,SUM(X.M09)																											AS M09
+	--	,SUM(X.M10)																											AS M10
+	--	,SUM(X.M11)																											AS M11
+	--	,SUM(X.M12)																											AS M12
+	--
+	--	,SUM(X.VTT)																											AS VTT
+	--	,SUM(X.V01)																											AS V01
+	--	,SUM(X.V02)																											AS V02
+	--	,SUM(X.V03)																											AS V03
+	--	,SUM(X.V04)																											AS V04
+	--	,SUM(X.V05)																											AS V05
+	--	,SUM(X.V06)																											AS V06
+	--	,SUM(X.V07)																											AS V07
+	--	,SUM(X.V08)																											AS V08
+	--	,SUM(X.V09)																											AS V09
+	--	,SUM(X.V10)																											AS V10
+	--	,SUM(X.V11)																											AS V11
+	--	,SUM(X.V12)																											AS V12
+	--
+	--	,COUNT(DISTINCT X.PTT)																								AS PTT
+	--	,COUNT(DISTINCT X.P01)																								AS P01
+	--	,COUNT(DISTINCT X.P02)																								AS P02
+	--	,COUNT(DISTINCT X.P03)																								AS P03
+	--	,COUNT(DISTINCT X.P04)																								AS P04
+	--	,COUNT(DISTINCT X.P05)																								AS P05
+	--	,COUNT(DISTINCT X.P06)																								AS P06
+	--	,COUNT(DISTINCT X.P07)																								AS P07
+	--	,COUNT(DISTINCT X.P08)																								AS P08
+	--	,COUNT(DISTINCT X.P09)																								AS P09
+	--	,COUNT(DISTINCT X.P10)																								AS P10
+	--	,COUNT(DISTINCT X.P11)																								AS P11
+	--	,COUNT(DISTINCT X.P12)																								AS P12
+	--
+	--	,COUNT(DISTINCT X.PCTT)																								AS PCTT
+	--	,COUNT(DISTINCT X.PC01)																								AS PC01
+	--	,COUNT(DISTINCT X.PC02)																								AS PC02
+	--	,COUNT(DISTINCT X.PC03)																								AS PC03
+	--	,COUNT(DISTINCT X.PC04)																								AS PC04
+	--	,COUNT(DISTINCT X.PC05)																								AS PC05
+	--	,COUNT(DISTINCT X.PC06)																								AS PC06
+	--	,COUNT(DISTINCT X.PC07)																								AS PC07
+	--	,COUNT(DISTINCT X.PC08)																								AS PC08
+	--	,COUNT(DISTINCT X.PC09)																								AS PC09
+	--	,COUNT(DISTINCT X.PC10)																								AS PC10
+	--	,COUNT(DISTINCT X.PC11)																								AS PC11
+	--	,COUNT(DISTINCT X.PC12)																								AS PC12
+	--
+	--	,COUNT(DISTINCT X.PTTT)																								AS PTTT
+	--	,COUNT(DISTINCT X.PT01)																								AS PT01
+	--	,COUNT(DISTINCT X.PT02)																								AS PT02
+	--	,COUNT(DISTINCT X.PT03)																								AS PT03
+	--	,COUNT(DISTINCT X.PT04)																								AS PT04
+	--	,COUNT(DISTINCT X.PT05)																								AS PT05
+	--	,COUNT(DISTINCT X.PT06)																								AS PT06
+	--	,COUNT(DISTINCT X.PT07)																								AS PT07
+	--	,COUNT(DISTINCT X.PT08)																								AS PT08
+	--	,COUNT(DISTINCT X.PT09)																								AS PT09
+	--	,COUNT(DISTINCT X.PT10)																								AS PT10
+	--	,COUNT(DISTINCT X.PT11)																								AS PT11
+	--	,COUNT(DISTINCT X.PT12)																								AS PT12
+	--FROM (
+	--	SELECT
+	--		 TO_CHAR(SYSDATE,'YYYY') AS CONT_YEAR
+	--		,U.SITE
+	--		,U.USEQ
+	--		,U.CORP AS CORP
+	--
+	--		-- 유료회원
+	--		--,(CASE WHEN (TO_CHAR(SYSDATE,'YYYY') || '01') BETWEEN TO_CHAR(U.SERVSTIME,'YYYYMM') AND TO_CHAR(NVL(U.OUTTIME,U.SERVETIME),'YYYYMM') AND SUBSTR(U.USERGBN,0,1) = 'A' AND U.SIGNSEQ IS NOT NULL AND U.USEYN = 'Y' THEN U.USEQ ELSE NULL END)	AS T01
+	--		--,(CASE WHEN (TO_CHAR(SYSDATE,'YYYY') || '02') BETWEEN TO_CHAR(U.SERVSTIME,'YYYYMM') AND TO_CHAR(NVL(U.OUTTIME,U.SERVETIME),'YYYYMM') AND SUBSTR(U.USERGBN,0,1) = 'A' AND U.SIGNSEQ IS NOT NULL AND U.USEYN = 'Y' THEN U.USEQ ELSE NULL END)	AS T02
+	--		--,(CASE WHEN (TO_CHAR(SYSDATE,'YYYY') || '03') BETWEEN TO_CHAR(U.SERVSTIME,'YYYYMM') AND TO_CHAR(NVL(U.OUTTIME,U.SERVETIME),'YYYYMM') AND SUBSTR(U.USERGBN,0,1) = 'A' AND U.SIGNSEQ IS NOT NULL AND U.USEYN = 'Y' THEN U.USEQ ELSE NULL END)	AS T03
+	--		--,(CASE WHEN (TO_CHAR(SYSDATE,'YYYY') || '04') BETWEEN TO_CHAR(U.SERVSTIME,'YYYYMM') AND TO_CHAR(NVL(U.OUTTIME,U.SERVETIME),'YYYYMM') AND SUBSTR(U.USERGBN,0,1) = 'A' AND U.SIGNSEQ IS NOT NULL AND U.USEYN = 'Y' THEN U.USEQ ELSE NULL END)	AS T04
+	--		--,(CASE WHEN (TO_CHAR(SYSDATE,'YYYY') || '05') BETWEEN TO_CHAR(U.SERVSTIME,'YYYYMM') AND TO_CHAR(NVL(U.OUTTIME,U.SERVETIME),'YYYYMM') AND SUBSTR(U.USERGBN,0,1) = 'A' AND U.SIGNSEQ IS NOT NULL AND U.USEYN = 'Y' THEN U.USEQ ELSE NULL END)	AS T05
+	--		--,(CASE WHEN (TO_CHAR(SYSDATE,'YYYY') || '06') BETWEEN TO_CHAR(U.SERVSTIME,'YYYYMM') AND TO_CHAR(NVL(U.OUTTIME,U.SERVETIME),'YYYYMM') AND SUBSTR(U.USERGBN,0,1) = 'A' AND U.SIGNSEQ IS NOT NULL AND U.USEYN = 'Y' THEN U.USEQ ELSE NULL END)	AS T06
+	--		--,(CASE WHEN (TO_CHAR(SYSDATE,'YYYY') || '07') BETWEEN TO_CHAR(U.SERVSTIME,'YYYYMM') AND TO_CHAR(NVL(U.OUTTIME,U.SERVETIME),'YYYYMM') AND SUBSTR(U.USERGBN,0,1) = 'A' AND U.SIGNSEQ IS NOT NULL AND U.USEYN = 'Y' THEN U.USEQ ELSE NULL END)	AS T07
+	--		--,(CASE WHEN (TO_CHAR(SYSDATE,'YYYY') || '08') BETWEEN TO_CHAR(U.SERVSTIME,'YYYYMM') AND TO_CHAR(NVL(U.OUTTIME,U.SERVETIME),'YYYYMM') AND SUBSTR(U.USERGBN,0,1) = 'A' AND U.SIGNSEQ IS NOT NULL AND U.USEYN = 'Y' THEN U.USEQ ELSE NULL END)	AS T08
+	--		--,(CASE WHEN (TO_CHAR(SYSDATE,'YYYY') || '09') BETWEEN TO_CHAR(U.SERVSTIME,'YYYYMM') AND TO_CHAR(NVL(U.OUTTIME,U.SERVETIME),'YYYYMM') AND SUBSTR(U.USERGBN,0,1) = 'A' AND U.SIGNSEQ IS NOT NULL AND U.USEYN = 'Y' THEN U.USEQ ELSE NULL END)	AS T09
+	--		--,(CASE WHEN (TO_CHAR(SYSDATE,'YYYY') || '10') BETWEEN TO_CHAR(U.SERVSTIME,'YYYYMM') AND TO_CHAR(NVL(U.OUTTIME,U.SERVETIME),'YYYYMM') AND SUBSTR(U.USERGBN,0,1) = 'A' AND U.SIGNSEQ IS NOT NULL AND U.USEYN = 'Y' THEN U.USEQ ELSE NULL END)	AS T10
+	--		--,(CASE WHEN (TO_CHAR(SYSDATE,'YYYY') || '11') BETWEEN TO_CHAR(U.SERVSTIME,'YYYYMM') AND TO_CHAR(NVL(U.OUTTIME,U.SERVETIME),'YYYYMM') AND SUBSTR(U.USERGBN,0,1) = 'A' AND U.SIGNSEQ IS NOT NULL AND U.USEYN = 'Y' THEN U.USEQ ELSE NULL END)	AS T11
+	--		--,(CASE WHEN (TO_CHAR(SYSDATE,'YYYY') || '12') BETWEEN TO_CHAR(U.SERVSTIME,'YYYYMM') AND TO_CHAR(NVL(U.OUTTIME,U.SERVETIME),'YYYYMM') AND SUBSTR(U.USERGBN,0,1) = 'A' AND U.SIGNSEQ IS NOT NULL AND U.USEYN = 'Y' THEN U.USEQ ELSE NULL END)	AS T12
+	--
+	--		,(CASE WHEN (TO_CHAR(SYSDATE,'YYYY')) 			BETWEEN TO_CHAR(U.SERVSTIME,'YYYY') 	AND TO_CHAR(NVL(U.OUTTIME,U.SERVETIME),'YYYY') 		AND SUBSTR(U.USERGBN,0,1) = 'A' AND U.USEYN = 'Y' THEN U.USEQ ELSE NULL END)	AS TTT
+	--		,(CASE WHEN (TO_CHAR(SYSDATE,'YYYY') || '01') 	BETWEEN TO_CHAR(U.SERVSTIME,'YYYYMM') 	AND TO_CHAR(NVL(U.OUTTIME,U.SERVETIME),'YYYYMM') 	AND SUBSTR(U.USERGBN,0,1) = 'A' AND U.USEYN = 'Y' THEN U.USEQ ELSE NULL END)	AS T01
+	--		,(CASE WHEN (TO_CHAR(SYSDATE,'YYYY') || '02') 	BETWEEN TO_CHAR(U.SERVSTIME,'YYYYMM') 	AND TO_CHAR(NVL(U.OUTTIME,U.SERVETIME),'YYYYMM') 	AND SUBSTR(U.USERGBN,0,1) = 'A' AND U.USEYN = 'Y' THEN U.USEQ ELSE NULL END)	AS T02
+	--		,(CASE WHEN (TO_CHAR(SYSDATE,'YYYY') || '03') 	BETWEEN TO_CHAR(U.SERVSTIME,'YYYYMM') 	AND TO_CHAR(NVL(U.OUTTIME,U.SERVETIME),'YYYYMM') 	AND SUBSTR(U.USERGBN,0,1) = 'A' AND U.USEYN = 'Y' THEN U.USEQ ELSE NULL END)	AS T03
+	--		,(CASE WHEN (TO_CHAR(SYSDATE,'YYYY') || '04') 	BETWEEN TO_CHAR(U.SERVSTIME,'YYYYMM') 	AND TO_CHAR(NVL(U.OUTTIME,U.SERVETIME),'YYYYMM') 	AND SUBSTR(U.USERGBN,0,1) = 'A' AND U.USEYN = 'Y' THEN U.USEQ ELSE NULL END)	AS T04
+	--		,(CASE WHEN (TO_CHAR(SYSDATE,'YYYY') || '05') 	BETWEEN TO_CHAR(U.SERVSTIME,'YYYYMM') 	AND TO_CHAR(NVL(U.OUTTIME,U.SERVETIME),'YYYYMM') 	AND SUBSTR(U.USERGBN,0,1) = 'A' AND U.USEYN = 'Y' THEN U.USEQ ELSE NULL END)	AS T05
+	--		,(CASE WHEN (TO_CHAR(SYSDATE,'YYYY') || '06') 	BETWEEN TO_CHAR(U.SERVSTIME,'YYYYMM') 	AND TO_CHAR(NVL(U.OUTTIME,U.SERVETIME),'YYYYMM') 	AND SUBSTR(U.USERGBN,0,1) = 'A' AND U.USEYN = 'Y' THEN U.USEQ ELSE NULL END)	AS T06
+	--		,(CASE WHEN (TO_CHAR(SYSDATE,'YYYY') || '07') 	BETWEEN TO_CHAR(U.SERVSTIME,'YYYYMM') 	AND TO_CHAR(NVL(U.OUTTIME,U.SERVETIME),'YYYYMM') 	AND SUBSTR(U.USERGBN,0,1) = 'A' AND U.USEYN = 'Y' THEN U.USEQ ELSE NULL END)	AS T07
+	--		,(CASE WHEN (TO_CHAR(SYSDATE,'YYYY') || '08') 	BETWEEN TO_CHAR(U.SERVSTIME,'YYYYMM') 	AND TO_CHAR(NVL(U.OUTTIME,U.SERVETIME),'YYYYMM') 	AND SUBSTR(U.USERGBN,0,1) = 'A' AND U.USEYN = 'Y' THEN U.USEQ ELSE NULL END)	AS T08
+	--		,(CASE WHEN (TO_CHAR(SYSDATE,'YYYY') || '09') 	BETWEEN TO_CHAR(U.SERVSTIME,'YYYYMM') 	AND TO_CHAR(NVL(U.OUTTIME,U.SERVETIME),'YYYYMM') 	AND SUBSTR(U.USERGBN,0,1) = 'A' AND U.USEYN = 'Y' THEN U.USEQ ELSE NULL END)	AS T09
+	--		,(CASE WHEN (TO_CHAR(SYSDATE,'YYYY') || '10') 	BETWEEN TO_CHAR(U.SERVSTIME,'YYYYMM') 	AND TO_CHAR(NVL(U.OUTTIME,U.SERVETIME),'YYYYMM') 	AND SUBSTR(U.USERGBN,0,1) = 'A' AND U.USEYN = 'Y' THEN U.USEQ ELSE NULL END)	AS T10
+	--		,(CASE WHEN (TO_CHAR(SYSDATE,'YYYY') || '11') 	BETWEEN TO_CHAR(U.SERVSTIME,'YYYYMM') 	AND TO_CHAR(NVL(U.OUTTIME,U.SERVETIME),'YYYYMM') 	AND SUBSTR(U.USERGBN,0,1) = 'A' AND U.USEYN = 'Y' THEN U.USEQ ELSE NULL END)	AS T11
+	--		,(CASE WHEN (TO_CHAR(SYSDATE,'YYYY') || '12') 	BETWEEN TO_CHAR(U.SERVSTIME,'YYYYMM') 	AND TO_CHAR(NVL(U.OUTTIME,U.SERVETIME),'YYYYMM') 	AND SUBSTR(U.USERGBN,0,1) = 'A' AND U.USEYN = 'Y' THEN U.USEQ ELSE NULL END)	AS T12
+	--
+	--		-- 기간의 접속자속
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYY') 	= (TO_CHAR(SYSDATE,'YYYY')) 		AND CV.LOGIN_CNT > 0 THEN U.USEQ ELSE NULL END)									AS LTT
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '01') AND CV.LOGIN_CNT > 0 THEN U.USEQ ELSE NULL END)									AS L01
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '02') AND CV.LOGIN_CNT > 0 THEN U.USEQ ELSE NULL END)									AS L02
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '03') AND CV.LOGIN_CNT > 0 THEN U.USEQ ELSE NULL END)									AS L03
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '04') AND CV.LOGIN_CNT > 0 THEN U.USEQ ELSE NULL END)									AS L04
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '05') AND CV.LOGIN_CNT > 0 THEN U.USEQ ELSE NULL END)									AS L05
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '06') AND CV.LOGIN_CNT > 0 THEN U.USEQ ELSE NULL END)									AS L06
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '07') AND CV.LOGIN_CNT > 0 THEN U.USEQ ELSE NULL END)									AS L07
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '08') AND CV.LOGIN_CNT > 0 THEN U.USEQ ELSE NULL END)									AS L08
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '09') AND CV.LOGIN_CNT > 0 THEN U.USEQ ELSE NULL END)									AS L09
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '10') AND CV.LOGIN_CNT > 0 THEN U.USEQ ELSE NULL END)									AS L10
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '11') AND CV.LOGIN_CNT > 0 THEN U.USEQ ELSE NULL END)									AS L11
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '12') AND CV.LOGIN_CNT > 0 THEN U.USEQ ELSE NULL END)									AS L12
+	--
+	--		-- 학습시간
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYY') 	= (TO_CHAR(SYSDATE,'YYYY')) 		THEN (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) ELSE 0 END)					AS STT
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '01') THEN (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) ELSE 0 END)					AS S01
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '02') THEN (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) ELSE 0 END)					AS S02
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '03') THEN (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) ELSE 0 END)					AS S03
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '04') THEN (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) ELSE 0 END)					AS S04
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '05') THEN (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) ELSE 0 END)					AS S05
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '06') THEN (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) ELSE 0 END)					AS S06
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '07') THEN (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) ELSE 0 END)					AS S07
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '08') THEN (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) ELSE 0 END)					AS S08
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '09') THEN (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) ELSE 0 END)					AS S09
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '10') THEN (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) ELSE 0 END)					AS S10
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '11') THEN (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) ELSE 0 END)					AS S11
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '12') THEN (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) ELSE 0 END)					AS S12
+	--
+	--		-- 동영상시청 수
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYY') 	= (TO_CHAR(SYSDATE,'YYYY')) 		THEN (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) ELSE 0 END)					AS CTT
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '01') THEN (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) ELSE 0 END)					AS C01
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '02') THEN (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) ELSE 0 END)					AS C02
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '03') THEN (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) ELSE 0 END)					AS C03
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '04') THEN (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) ELSE 0 END)					AS C04
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '05') THEN (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) ELSE 0 END)					AS C05
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '06') THEN (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) ELSE 0 END)					AS C06
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '07') THEN (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) ELSE 0 END)					AS C07
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '08') THEN (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) ELSE 0 END)					AS C08
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '09') THEN (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) ELSE 0 END)					AS C09
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '10') THEN (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) ELSE 0 END)					AS C10
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '11') THEN (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) ELSE 0 END)					AS C11
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '12') THEN (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) ELSE 0 END)					AS C12
+	--
+	--		-- 온라인 시청수
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYY') 	= (TO_CHAR(SYSDATE,'YYYY')) 		THEN (CV.ONLINE_CNT) ELSE 0 END)												AS OTT
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '01') THEN (CV.ONLINE_CNT) ELSE 0 END)												AS O01
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '02') THEN (CV.ONLINE_CNT) ELSE 0 END)												AS O02
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '03') THEN (CV.ONLINE_CNT) ELSE 0 END)												AS O03
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '04') THEN (CV.ONLINE_CNT) ELSE 0 END)												AS O04
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '05') THEN (CV.ONLINE_CNT) ELSE 0 END)												AS O05
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '06') THEN (CV.ONLINE_CNT) ELSE 0 END)												AS O06
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '07') THEN (CV.ONLINE_CNT) ELSE 0 END)												AS O07
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '08') THEN (CV.ONLINE_CNT) ELSE 0 END)												AS O08
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '09') THEN (CV.ONLINE_CNT) ELSE 0 END)												AS O09
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '10') THEN (CV.ONLINE_CNT) ELSE 0 END)												AS O10
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '11') THEN (CV.ONLINE_CNT) ELSE 0 END)												AS O11
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '12') THEN (CV.ONLINE_CNT) ELSE 0 END)												AS O12
+	--
+	--		-- 모바일 시청수
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYY') 	= (TO_CHAR(SYSDATE,'YYYY')) 		THEN (CV.MOBILE_CNT) ELSE 0 END)												AS MTT
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '01') THEN (CV.MOBILE_CNT) ELSE 0 END)												AS M01
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '02') THEN (CV.MOBILE_CNT) ELSE 0 END)												AS M02
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '03') THEN (CV.MOBILE_CNT) ELSE 0 END)												AS M03
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '04') THEN (CV.MOBILE_CNT) ELSE 0 END)												AS M04
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '05') THEN (CV.MOBILE_CNT) ELSE 0 END)												AS M05
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '06') THEN (CV.MOBILE_CNT) ELSE 0 END)												AS M06
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '07') THEN (CV.MOBILE_CNT) ELSE 0 END)												AS M07
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '08') THEN (CV.MOBILE_CNT) ELSE 0 END)												AS M08
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '09') THEN (CV.MOBILE_CNT) ELSE 0 END)												AS M09
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '10') THEN (CV.MOBILE_CNT) ELSE 0 END)												AS M10
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '11') THEN (CV.MOBILE_CNT) ELSE 0 END)												AS M11
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '12') THEN (CV.MOBILE_CNT) ELSE 0 END)												AS M12
+	--
+	--		-- TV 시청수
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYY') 	= (TO_CHAR(SYSDATE,'YYYY')) 		THEN (CV.TV_CNT) ELSE 0 END)													AS VTT
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '01') THEN (CV.TV_CNT) ELSE 0 END)													AS V01
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '02') THEN (CV.TV_CNT) ELSE 0 END)													AS V02
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '03') THEN (CV.TV_CNT) ELSE 0 END)													AS V03
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '04') THEN (CV.TV_CNT) ELSE 0 END)													AS V04
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '05') THEN (CV.TV_CNT) ELSE 0 END)													AS V05
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '06') THEN (CV.TV_CNT) ELSE 0 END)													AS V06
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '07') THEN (CV.TV_CNT) ELSE 0 END)													AS V07
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '08') THEN (CV.TV_CNT) ELSE 0 END)													AS V08
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '09') THEN (CV.TV_CNT) ELSE 0 END)													AS V09
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '10') THEN (CV.TV_CNT) ELSE 0 END)													AS V10
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '11') THEN (CV.TV_CNT) ELSE 0 END)													AS V11
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '12') THEN (CV.TV_CNT) ELSE 0 END)													AS V12
+	--
+	--		-- 기간별 시청이력 회원 (CNT 기준)
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYY') 	= (TO_CHAR(SYSDATE,'YYYY')) 		AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS PTT
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '01') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS P01
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '02') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS P02
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '03') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS P03
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '04') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS P04
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '05') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS P05
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '06') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS P06
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '07') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS P07
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '08') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS P08
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '09') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS P09
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '10') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS P10
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '11') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS P11
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '12') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS P12
+	--
+	--		-- 기간별 시청이력 회원 (CNT 기준)
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYY') 	= (TO_CHAR(SYSDATE,'YYYY')) 		AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS PCTT
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '01') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS PC01
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '02') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS PC02
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '03') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS PC03
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '04') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS PC04
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '05') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS PC05
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '06') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS PC06
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '07') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS PC07
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '08') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS PC08
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '09') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS PC09
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '10') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS PC10
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '11') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS PC11
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '12') AND (CV.ONLINE_CNT + CV.MOBILE_CNT + CV.TV_CNT) > 0 THEN U.USEQ ELSE NULL END) 	AS PC12
+	--
+	--		-- 기간별 시청이력 회원 (TOTALTIME 기준)
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYY') 	= (TO_CHAR(SYSDATE,'YYYY')) 		AND (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) > 0 THEN U.USEQ ELSE NULL END) 	AS PTTT
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '01') AND (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) > 0 THEN U.USEQ ELSE NULL END) 	AS PT01
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '02') AND (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) > 0 THEN U.USEQ ELSE NULL END) 	AS PT02
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '03') AND (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) > 0 THEN U.USEQ ELSE NULL END) 	AS PT03
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '04') AND (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) > 0 THEN U.USEQ ELSE NULL END) 	AS PT04
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '05') AND (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) > 0 THEN U.USEQ ELSE NULL END) 	AS PT05
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '06') AND (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) > 0 THEN U.USEQ ELSE NULL END) 	AS PT06
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '07') AND (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) > 0 THEN U.USEQ ELSE NULL END) 	AS PT07
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '08') AND (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) > 0 THEN U.USEQ ELSE NULL END) 	AS PT08
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '09') AND (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) > 0 THEN U.USEQ ELSE NULL END) 	AS PT09
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '10') AND (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) > 0 THEN U.USEQ ELSE NULL END) 	AS PT10
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '11') AND (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) > 0 THEN U.USEQ ELSE NULL END) 	AS PT11
+	--		,(CASE WHEN TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYYMM') 	= (TO_CHAR(SYSDATE,'YYYY') || '12') AND (CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME) > 0 THEN U.USEQ ELSE NULL END) 	AS PT12
+	--	FROM US_USER U
+	--		LEFT OUTER JOIN M_CONT_VIEW CV ON CV.SITE = U.SITE AND CV.USEQ = U.USEQ
+	--										AND TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYY') = TO_CHAR(SYSDATE,'YYYY')
+	--										--AND ((U.SITE = 'MS' AND CV.CORP = U.CORP) OR 1 = 1)
+	--	WHERE 1 = 1
+	--
+	--		AND U.SITE <> 'MS'
+	--		AND U.SITE IN (SELECT S.SITE FROM A_SITE S)
+	--
+	--		AND U.USEYN = 'Y'
+	--		AND SUBSTR(U.USERGBN,0,1) = 'A'
+	--		AND U.SIGNSEQ IS NOT NULL
+	--
+	--		AND NVL(U.SIGNSTIME,U.SIGNETIME) IS NOT NULL
+	--		AND (
+	--			TO_CHAR(SYSDATE,'YYYY') BETWEEN TO_CHAR(U.SIGNSTIME,'YYYY') AND TO_CHAR(U.SIGNETIME,'YYYY')
+	--			OR
+	--			TO_CHAR(SYSDATE,'YYYY') = TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYY')
+	--			)
+	--) X
+	--GROUP BY
+	--	 X.SITE
+	--	--,X.CORP
+	--	,X.CONT_YEAR
+	--;
+
+
+	/*********************************************************************************************/
+	/**** 집계 테이블 사용 쿼리 *****/
+	/**** M_CONT_VIEW_YEAR는 집계 테이블 M_CONT_VIEW / M_CONT_GGMENU / M_CONT_BEST 사용 		 *****/
+	/*********************************************************************************************/
+
+    USP_EXCEPTION('', 'M_CONT_VIEW_YEAR', '일일배치', 'USP_M_CONT_USE_STATUS-12', 'DBMS_BATCH_SYSTEM');
+
+	--현황집계 (기간별 집계용)
+	DELETE FROM M_CONT_VIEW_YEAR
+	WHERE VIEWYEAR = TO_CHAR(SYSDATE,'YYYY');
+
+
+	--DROP TABLE M_CONT_VIEW_YEAR;
+	--CREATE TABLE M_CONT_VIEW_YEAR AS
+	INSERT INTO M_CONT_VIEW_YEAR (
+		 SITE
+		,USEQ
+		,CORP
+		,VIEWYEAR
+
+		,SIGNSEQ
+
+		,BOOK_CNT
+
+		,INSITE_CNT
+		,INSITE_ON_CNT
+
+		,TOTAL_CNT
+		,TOTAL_TIME
+
+		,T01_CNT
+		,T02_CNT
+		,T03_CNT
+		,T04_CNT
+		,T05_CNT
+		,T06_CNT
+		,T07_CNT
+		,T08_CNT
+		,T09_CNT
+		,T10_CNT
+		,T11_CNT
+		,T12_CNT
+
+		,T01_TIME
+		,T02_TIME
+		,T03_TIME
+		,T04_TIME
+		,T05_TIME
+		,T06_TIME
+		,T07_TIME
+		,T08_TIME
+		,T09_TIME
+		,T10_TIME
+		,T11_TIME
+		,T12_TIME
+
+		,BEST1
+		,BEST2
+		,BEST3
+
+		,GGMENU_01
+		,GGMENU_02
+		,GGMENU_03
+		,GGMENU_04
+		,GGMENU_05
+		,GGMENU_06
+		,GGMENU_07
+		,GGMENU_08
+		,GGMENU_09
+
+		,GGMENU_CNT_01
+		,GGMENU_CNT_02
+		,GGMENU_CNT_03
+		,GGMENU_CNT_04
+		,GGMENU_CNT_05
+		,GGMENU_CNT_06
+		,GGMENU_CNT_07
+		,GGMENU_CNT_08
+		,GGMENU_CNT_09
+
+		,LOGIN_DAY
+	)
+	SELECT
+		 CV.SITE
+		,CV.USEQ
+		,CV.CORP
+		,TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYY') 	AS VIEWYEAR
+
+		,MAX(CV.SIGNSEQ) 						AS SIGNSEQ
+
+		--,SUM(CV.LOGIN_CNT) 					AS LOGIN_CNT
+
+		,SUM(CV.BOOK_CNT) 		AS BOOK_CNT
+
+		,SUM(CV.INSITE_CNT) 	AS INSITE_CNT
+		,SUM(CV.INSITE_ON_CNT) 	AS INSITE_ON_CNT
+
+		,	   SUM(													(CV.ONLINE_CNT  + CV.MOBILE_CNT  + CV.TV_CNT )			 )		AS TOTAL_CNT
+		,ROUND(SUM(													(CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME)	 /1000/60))		AS TOTAL_TIME
+
+		,	   SUM(DECODE(	TO_CHAR(TO_DATE(CV.VIEWDATE),'MM'),'01',(CV.ONLINE_CNT 	+ CV.MOBILE_CNT  + CV.TV_CNT ),0)		 ) 		AS T01_CNT
+		,	   SUM(DECODE(	TO_CHAR(TO_DATE(CV.VIEWDATE),'MM'),'02',(CV.ONLINE_CNT 	+ CV.MOBILE_CNT  + CV.TV_CNT ),0)		 ) 		AS T02_CNT
+		,	   SUM(DECODE(	TO_CHAR(TO_DATE(CV.VIEWDATE),'MM'),'03',(CV.ONLINE_CNT 	+ CV.MOBILE_CNT  + CV.TV_CNT ),0)		 ) 		AS T03_CNT
+		,	   SUM(DECODE(	TO_CHAR(TO_DATE(CV.VIEWDATE),'MM'),'04',(CV.ONLINE_CNT 	+ CV.MOBILE_CNT  + CV.TV_CNT ),0)		 ) 		AS T04_CNT
+		,	   SUM(DECODE(	TO_CHAR(TO_DATE(CV.VIEWDATE),'MM'),'05',(CV.ONLINE_CNT 	+ CV.MOBILE_CNT  + CV.TV_CNT ),0)		 ) 		AS T05_CNT
+		,	   SUM(DECODE(	TO_CHAR(TO_DATE(CV.VIEWDATE),'MM'),'06',(CV.ONLINE_CNT 	+ CV.MOBILE_CNT  + CV.TV_CNT ),0)		 ) 		AS T06_CNT
+		,	   SUM(DECODE(	TO_CHAR(TO_DATE(CV.VIEWDATE),'MM'),'07',(CV.ONLINE_CNT 	+ CV.MOBILE_CNT  + CV.TV_CNT ),0)		 ) 		AS T07_CNT
+		,	   SUM(DECODE(	TO_CHAR(TO_DATE(CV.VIEWDATE),'MM'),'08',(CV.ONLINE_CNT 	+ CV.MOBILE_CNT  + CV.TV_CNT ),0)		 ) 		AS T08_CNT
+		,	   SUM(DECODE(	TO_CHAR(TO_DATE(CV.VIEWDATE),'MM'),'09',(CV.ONLINE_CNT 	+ CV.MOBILE_CNT  + CV.TV_CNT ),0)		 ) 		AS T09_CNT
+		,	   SUM(DECODE(	TO_CHAR(TO_DATE(CV.VIEWDATE),'MM'),'10',(CV.ONLINE_CNT 	+ CV.MOBILE_CNT  + CV.TV_CNT ),0)		 ) 		AS T10_CNT
+		,	   SUM(DECODE(	TO_CHAR(TO_DATE(CV.VIEWDATE),'MM'),'11',(CV.ONLINE_CNT 	+ CV.MOBILE_CNT  + CV.TV_CNT ),0)		 ) 		AS T11_CNT
+		,	   SUM(DECODE(	TO_CHAR(TO_DATE(CV.VIEWDATE),'MM'),'12',(CV.ONLINE_CNT 	+ CV.MOBILE_CNT  + CV.TV_CNT ),0)		 ) 		AS T12_CNT
+
+		,ROUND(SUM(DECODE(	TO_CHAR(TO_DATE(CV.VIEWDATE),'MM'),'01',(CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME),0)/1000/60)) 	AS T01_TIME
+		,ROUND(SUM(DECODE(	TO_CHAR(TO_DATE(CV.VIEWDATE),'MM'),'02',(CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME),0)/1000/60)) 	AS T02_TIME
+		,ROUND(SUM(DECODE(	TO_CHAR(TO_DATE(CV.VIEWDATE),'MM'),'03',(CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME),0)/1000/60)) 	AS T03_TIME
+		,ROUND(SUM(DECODE(	TO_CHAR(TO_DATE(CV.VIEWDATE),'MM'),'04',(CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME),0)/1000/60)) 	AS T04_TIME
+		,ROUND(SUM(DECODE(	TO_CHAR(TO_DATE(CV.VIEWDATE),'MM'),'05',(CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME),0)/1000/60)) 	AS T05_TIME
+		,ROUND(SUM(DECODE(	TO_CHAR(TO_DATE(CV.VIEWDATE),'MM'),'06',(CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME),0)/1000/60)) 	AS T06_TIME
+		,ROUND(SUM(DECODE(	TO_CHAR(TO_DATE(CV.VIEWDATE),'MM'),'07',(CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME),0)/1000/60)) 	AS T07_TIME
+		,ROUND(SUM(DECODE(	TO_CHAR(TO_DATE(CV.VIEWDATE),'MM'),'08',(CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME),0)/1000/60)) 	AS T08_TIME
+		,ROUND(SUM(DECODE(	TO_CHAR(TO_DATE(CV.VIEWDATE),'MM'),'09',(CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME),0)/1000/60)) 	AS T09_TIME
+		,ROUND(SUM(DECODE(	TO_CHAR(TO_DATE(CV.VIEWDATE),'MM'),'10',(CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME),0)/1000/60)) 	AS T10_TIME
+		,ROUND(SUM(DECODE(	TO_CHAR(TO_DATE(CV.VIEWDATE),'MM'),'11',(CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME),0)/1000/60)) 	AS T11_TIME
+		,ROUND(SUM(DECODE(	TO_CHAR(TO_DATE(CV.VIEWDATE),'MM'),'12',(CV.ONLINE_TIME + CV.MOBILE_TIME + CV.TV_TIME),0)/1000/60)) 	AS T12_TIME
+
+		,MAX(B.BEST1) 			AS BEST1
+		,MAX(B.BEST2) 			AS BEST2
+		,MAX(B.BEST3) 			AS BEST3
+
+		,SUM(CG.GGMENU_01) 		AS GGMENU_01
+		,SUM(CG.GGMENU_02) 		AS GGMENU_02
+		,SUM(CG.GGMENU_03) 		AS GGMENU_03
+		,SUM(CG.GGMENU_04) 		AS GGMENU_04
+		,SUM(CG.GGMENU_05) 		AS GGMENU_05
+		,SUM(CG.GGMENU_06) 		AS GGMENU_06
+		,SUM(CG.GGMENU_07) 		AS GGMENU_07
+		,SUM(CG.GGMENU_08) 		AS GGMENU_08
+		,SUM(CG.GGMENU_09) 		AS GGMENU_09
+
+		,SUM(CG.GGMENU_CNT_01) 	AS GGMENU_CNT_01
+		,SUM(CG.GGMENU_CNT_02) 	AS GGMENU_CNT_02
+		,SUM(CG.GGMENU_CNT_03) 	AS GGMENU_CNT_03
+		,SUM(CG.GGMENU_CNT_04) 	AS GGMENU_CNT_04
+		,SUM(CG.GGMENU_CNT_05) 	AS GGMENU_CNT_05
+		,SUM(CG.GGMENU_CNT_06) 	AS GGMENU_CNT_06
+		,SUM(CG.GGMENU_CNT_07) 	AS GGMENU_CNT_07
+		,SUM(CG.GGMENU_CNT_08) 	AS GGMENU_CNT_08
+		,SUM(CG.GGMENU_CNT_09) 	AS GGMENU_CNT_09
+
+		--,CV.VIEWDATE
+		--,COUNT(DISTINCT CV.VIEWDATE) AS LOGIN_DAY
+		,COUNT((SELECT DISTINCT TRUNC(L.REGTIME)
+				FROM M_CONT_MYLOGIND L
+				WHERE L.SITE = CV.SITE
+					AND L.USEQ = CV.USEQ
+					AND L.REGTIME = CV.VIEWDATE
+					--AND ((CV.SITE = 'MS' AND L.CORP = CV.CORP) OR 1 = 1)
+				)
+			) AS LOGIN_DAY
+	FROM M_CONT_VIEW CV /* M_CONT_VIEW 생성 */
+		LEFT OUTER JOIN M_CONT_GGMENU CG 	ON CG.SITE = CV.SITE
+											AND CG.USEQ = CV.USEQ --AND CG.CORP = CV.CORP
+											AND CG.VIEWDATE = CV.VIEWDATE
+											--AND ((CV.SITE = 'MS' AND CG.CORP = CV.CORP) OR 1 = 1)
+		LEFT OUTER JOIN (
+						SELECT
+							 B.SITE
+							,B.USEQ
+							,B.CORP
+							,B.VIEWYEAR
+							,MAX(DECODE(B.BEST_NUMB,1, B.GMENUNAME,'')) AS BEST1
+							,MAX(DECODE(B.BEST_NUMB,2, B.GMENUNAME,'')) AS BEST2
+							,MAX(DECODE(B.BEST_NUMB,3, B.GMENUNAME,'')) AS BEST3
+						FROM (
+							SELECT
+								 B.SITE
+								,B.USEQ
+								,B.CORP
+								,TO_CHAR(TO_DATE(B.VIEWDATE),'YYYY') AS VIEWYEAR
+								,B.GMENUNAME
+								,SUM(B.GMENUCNT) AS GMENUCNT
+
+								,ROW_NUMBER()
+									OVER(PARTITION BY
+													 B.SITE
+													,B.USEQ
+													,B.CORP
+													,TO_CHAR(TO_DATE(B.VIEWDATE),'YYYY')
+										ORDER BY SUM(B.GMENUCNT) DESC, B.GMENUNAME) AS BEST_NUMB
+							FROM M_CONT_BEST B
+							WHERE 1 = 1
+
+								AND B.SITE <> 'MS'
+								AND B.SITE IN (SELECT S.SITE FROM A_SITE S)
+
+								AND TO_CHAR(TO_DATE(B.VIEWDATE),'YYYY') = TO_CHAR(SYSDATE,'YYYY')
+							GROUP BY
+								 B.SITE
+								,B.USEQ
+								,B.CORP
+								,TO_CHAR(TO_DATE(B.VIEWDATE),'YYYY')
+								,B.GMENUNAME
+						) B
+						WHERE BEST_NUMB < 4
+						GROUP BY
+							 B.SITE
+							,B.USEQ
+							,B.CORP
+							,B.VIEWYEAR
+						) B ON B.SITE = CV.SITE AND B.USEQ = CV.USEQ --AND B.CORP = CV.CORP
+							AND B.VIEWYEAR = TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYY')
+							--AND ((CV.SITE = 'MS' AND B.CORP = CV.CORP) OR 1 = 1)
+	WHERE 1 = 1
+		AND CV.USEQ IS NOT NULL
+
+		AND CV.SITE <> 'MS'
+		AND CV.SITE IN (SELECT S.SITE FROM A_SITE S)
+
+		AND TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYY') = TO_CHAR(SYSDATE,'YYYY')
+	GROUP BY
+		 CV.SITE
+		,CV.USEQ
+		,CV.CORP
+		,TO_CHAR(TO_DATE(CV.VIEWDATE),'YYYY')
+	;
+
+    USP_EXCEPTION('', 'USP_M_CONT_USE_STATUS 완료', '일일배치', 'USP_M_CONT_USE_STATUS-13', 'DBMS_BATCH_SYSTEM');
+
+
+	COMMIT;
+
+	EXCEPTION
+			WHEN OTHERS THEN ROLLBACK;
+	USP_EXCEPTION('', DBMS_UTILITY.FORMAT_ERROR_STACK, '일일배치', 'USP_M_CONT_USE_STATUS', 'DBMS_BATCH_SYSTEM');
+
+END;

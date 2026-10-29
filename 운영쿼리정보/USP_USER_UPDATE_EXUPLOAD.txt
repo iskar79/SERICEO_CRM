@@ -1,0 +1,645 @@
+create or replace PROCEDURE     "USP_USER_UPDATE_EXUPLOAD"
+(
+  v_UID IN NUMBER DEFAULT NULL ,
+  v_TEMP_NO IN NUMBER DEFAULT NULL
+)
+AS
+
+    v_result_code NUMBER(10,0);
+    v_Processed_rows NUMBER(10,0);
+    v_성명 NVARCHAR2(30);
+    v_회원분류 NVARCHAR2(20);
+    v_직위 NVARCHAR2(40);
+    v_직책 NVARCHAR2(40);
+    v_부서명 NVARCHAR2(60);
+    v_직장명 NVARCHAR2(50);
+    v_사업장번호 NUMBER(10);
+    v_법인번호 NUMBER(10);
+    v_휴대전화번호 NVARCHAR2(30);
+    v_직장전화번호 NVARCHAR2(30);
+    v_직장우편번호 NVARCHAR2(8);
+    v_직장주소1 NVARCHAR2(100);
+    v_직장주소2 NVARCHAR2(100);
+    v_이메일주소 NVARCHAR2(60);
+    v_팩스번호 NVARCHAR2(30);
+    v_사용여부 NVARCHAR2(1);
+    v_개인정보동의여부 NVARCHAR2(1);
+    v_자택우편번호 NVARCHAR2(8);
+    v_자택주소1 NVARCHAR2(100);
+    v_자택주소2 NVARCHAR2(100);
+    v_자택전화번호 NVARCHAR2(30);
+    v_비서이름 NVARCHAR2(20);
+    v_비서직책 NVARCHAR2(20);
+    v_비서전화번호 NVARCHAR2(30);
+    v_비서이메일  NVARCHAR2(60);
+    v_TAX담당자이름 NVARCHAR2(20);
+    v_TAX담당자전화번호 NVARCHAR2(30);
+    v_TAX담당자이메일 NVARCHAR2(60);
+    v_추천인이름 NVARCHAR2(20);
+    v_추천인소속 NVARCHAR2(20);
+    v_주소사용구분 NVARCHAR2(20);
+    v_키맨번호 NUMBER(18);
+    v_SITE VARCHAR2(10);
+    v_ID NVARCHAR2(20);
+    v_패스워드 NVARCHAR2(300);
+    v_패스워드2 NVARCHAR2(50);
+    v_질문 NVARCHAR2(1000);
+    v_계약번호 NUMBER(18);
+    v_CHARGER VARCHAR(20); --담당자번호
+    v_JOIN_LCL NVARCHAR2(10); --대분류코드
+    v_JOIN_MCL NVARCHAR2(100); --증분류코드
+    v_JOIN_MCL_NM NVARCHAR2(100); --중분류명
+    v_SERVSTIME DATE;--서비스시작일
+    v_SERVETIME DATE;--서비스종료일
+    v_생년월일 DATE;
+    v_성별 NVARCHAR2(1);
+
+    v_CORP NUMBER;
+    V_SIGNUSERCNT NUMBER;--계약건수
+    V_REALCNT NUMBER;--실계약수
+    v_CLASS1 VARCHAR2(2);--회원분류
+    v_CLASS2 VARCHAR2(3);--회원분류
+
+    V_SIGNGBN NUMBER;
+    V_SIGNSTIME DATE;
+    V_SIGNETIME DATE;
+    --V_SERVSTIME DATE;
+    --V_SERVETIME DATE;
+    V_SIGNUSERGBN VARCHAR2(1);
+    V_CNT NUMBER;
+
+	V_USER_USEQ NUMBER;
+
+    v_이메일수신동의 NVARCHAR2(1);
+    v_SMS수신동의 NVARCHAR2(1);
+    v_광고성정보수신동의 NVARCHAR2(1);
+
+BEGIN
+
+    SELECT SITE INTO v_SITE
+    FROM M_USER
+    WHERE M_USER_NO = v_UID
+		AND ROWNUM <= 1;
+
+    --USP_EXCEPTION( '', DBMS_UTILITY.FORMAT_ERROR_STACK , 'USER_UPDATE_ExUpload', '시작, v_TEMP_NO : ' || v_TEMP_NO || ', UID : ' || v_UID, v_UID);
+
+    SELECT
+		--v_성명
+         NVL(TRIM(REGEXP_REPLACE(C01,'[^[:alnum:]]|[^[가-힝]]')), '')
+		 --v_회원분류
+		,NVL(TRIM(C02), '')
+		--v_ID
+		,NVL(TRIM(lower(C03)),'')
+		--v_패스워드	(PassWord의 경우 암호화 적용 필수)
+		--,NVL(REPLACE(TRIM(C04), ' ', ''), '')
+        --,F_SHA512(FN_MD5_CRIPT(TRIM(NVL(C04,'C'))))
+        --,F_SHA512(FN_MD5_CRIPT(TRIM(C04)))
+		,DECODE(C04, NULL, NULL, F_SHA512(FN_MD5_CRIPT(TRIM(C04))))
+		--v_패스워드2
+		--,NVL(REPLACE(TRIM(C04), ' ', ''), '')
+
+		--v_질문
+		--,NVL(C05, '')
+		--v_휴대전화번호
+		,NVL(REGEXP_REPLACE(REGEXP_REPLACE(C05,'[^0-9]+'),'(02|.{3})(.+)(.{4})','\1-\2-\3'), '')
+		--v_개인정보동의여부
+		,NVL(C06, '')
+        --v_사용여부
+        ,DECODE(NVL(C07, 'Y'),'N','N','Y')  
+		--v_법인번호
+		--,NVL(C09, '')
+		--,NVL(GETNUMBER(C09, '')
+		,NVL(REGEXP_REPLACE(C08,'[^0-9]+'), '')
+
+		--v_SERVSTIME
+		,NVL((CASE WHEN C09 IS NULL OR LENGTH(REGEXP_REPLACE(C09,'[^0-9]')) <> 8 THEN NULL ELSE TO_DATE(REGEXP_REPLACE(C09,'[^0-9]'),'YYYYMMDD') END),'')
+		--v_SERVETIME
+		,NVL((CASE WHEN C10 IS NULL OR LENGTH(REGEXP_REPLACE(C10,'[^0-9]')) <> 8 THEN NULL ELSE TO_DATE(REGEXP_REPLACE(C10,'[^0-9]'),'YYYYMMDD') END),'')
+		--v_직위
+		,NVL(C11, '')
+		--v_직책
+		,NVL(C12, '')
+		--v_부서명
+		,NVL(C13, '')
+
+		--v_직장명
+		,NVL(C14, '')
+		--v_직장전화번호
+		,NVL(REGEXP_REPLACE(REGEXP_REPLACE(C15,'[^0-9]'), '(02|.{3})(.+)(.{4})', '\1-\2-\3'), '')
+        --v_주소사용구분
+		,NVL(C16, '')
+		--v_직장우편번호
+		,NVL(REGEXP_REPLACE(C17,'[^0-9]+'), '')
+		--v_직장주소1
+		,NVL(C18, '')
+
+		--v_직장주소2
+		,NVL(C19, '')
+		--v_이메일주소
+		,NVL(C20, '')
+		--v_비서이름
+		,NVL(C21, '')
+		--v_비서직책
+		,NVL(C22, '')
+		--v_비서전화번호
+		,NVL(REGEXP_REPLACE(REGEXP_REPLACE(C23,'[^0-9]'), '(02|.{3})(.+)(.{4})', '\1-\2-\3'), '')
+
+        --v_비서이메일
+		,NVL(C24, '')
+		--v_TAX담당자이름
+		,NVL(C25, '')
+		--v_TAX담당자전화번호
+		,NVL(REGEXP_REPLACE(REGEXP_REPLACE(C26,'[^0-9]'), '(02|.{3})(.+)(.{4})', '\1-\2-\3'), '')
+		--v_TAX담당자이메일
+		,NVL(C27, '')
+
+		--v_계약번호
+		--,NVL(C36, '')
+		,NVL(REGEXP_REPLACE(C28,'[^0-9]+'), '')
+		--v_CHARGER/MANAGER
+		,NVL(C29, '')
+		--v_JOIN_MCL
+		,NVL(C30, '')
+		--v_생년월일
+		--,NVL(C39, '')
+		,NVL((CASE WHEN C38 IS NULL OR LENGTH(REGEXP_REPLACE(C31,'[^0-9]')) <> 8 THEN NULL ELSE TO_DATE(REGEXP_REPLACE(C31,'[^0-9]'),'YYYYMMDD') END),'')
+        --v_성별
+		,NVL(C32, '')
+
+        --v_이메일수신동의
+		,NVL(C33, '')
+        --v_SMS수신동의
+		,NVL(C34, '')
+        --v_광고성정보수신동의
+		,NVL(C35, '')
+
+    INTO
+         v_성명
+		,v_회원분류
+		,v_ID
+		,v_패스워드
+		--,v_패스워드2
+
+		--,v_질문
+		,v_휴대전화번호
+		,v_개인정보동의여부
+        ,v_사용여부
+		,v_법인번호
+
+		,v_SERVSTIME
+		,v_SERVETIME
+		,v_직위
+		,v_직책
+		,v_부서명
+
+		,v_직장명
+		,v_직장전화번호
+        ,v_주소사용구분
+		,v_직장우편번호
+		,v_직장주소1
+
+		,v_직장주소2
+		,v_이메일주소
+		,v_비서이름
+		,v_비서직책
+		,v_비서전화번호
+
+		,v_비서이메일
+		,v_TAX담당자이름
+		,v_TAX담당자전화번호
+		,v_TAX담당자이메일
+		,v_계약번호
+
+		,v_CHARGER
+		,v_JOIN_MCL
+		,v_생년월일
+		,v_성별
+
+        ,v_이메일수신동의
+        ,v_SMS수신동의
+        ,v_광고성정보수신동의
+
+    FROM M_EXUP_TEMP
+    WHERE M_EXUP_NO = v_TEMP_NO
+        AND JOB_TYPE = 'USER_UPDATE_ExUpload';
+
+
+	/********** VALIDATION 시작 *********/
+	IF v_ID = '' THEN
+		BEGIN
+
+			UPDATE M_EXUP_TEMP
+			SET SF_FLAG = '실패'
+				,ERROR_MSG = NVL(ERROR_MSG,'') ||  '로그인ID는 필수입력사항 입니다.'
+			WHERE M_EXUP_NO = v_TEMP_NO;
+
+		END;
+	ELSE
+
+		DECLARE v_temp NUMBER(1, 0) := 0;
+
+		BEGIN
+
+			BEGIN
+
+				SELECT 1 INTO v_temp
+				FROM DUAL
+				WHERE EXISTS
+				(
+					SELECT  1
+					FROM    A_USER
+					WHERE   1 = 1
+                    AND     SITE = v_SITE
+                    --AND     TRIM(성명) = v_성명
+					AND     TRIM(lower(LOGINID)) = v_ID
+				);
+
+			END;
+
+			IF v_temp = 0 THEN
+				BEGIN
+
+					UPDATE M_EXUP_TEMP
+					SET SF_FLAG = '실패'
+						,ERROR_MSG = '회원이 존재하지 않습니다.'
+					WHERE M_EXUP_NO = v_TEMP_NO;
+
+				END;
+			ELSE
+				BEGIN --A_USER UPDATE
+
+					--USP_EXCEPTION( '', DBMS_UTILITY.FORMAT_ERROR_STACK , 'USER_UPDATE_ExUpload', '키맨_UPDATE_시작, v_TEMP_NO : ' || v_TEMP_NO, v_UID);
+
+					SELECT 
+						USEQ INTO V_USER_USEQ
+					FROM A_USER
+					WHERE 1 = 1
+						AND SITE = v_SITE
+						AND TRIM(lower(LOGINID)) = v_ID;
+
+					--USP_EXCEPTION( '', DBMS_UTILITY.FORMAT_ERROR_STACK , 'USER_UPDATE_ExUpload', '키맨번호 : ' || V_USER_USEQ || ', v_TEMP_NO : ' || v_TEMP_NO, v_UID);
+
+
+					UPDATE A_USER U
+					SET  --,U.SITE 			= v_SITE											--사이트 구분(CEO/PRO/MS/SP)					VARCHAR2(8 BYTE)	Yes
+						 U.CORP 			= DECODE(v_SITE,'MS',NVL(v_법인번호,U.CORP),NULL)    --법인구분(숫자 : 법인맞춤)					NUMBER(10,0)		Yes
+						,U.SIGNCORP 		= NVL(v_법인번호,U.SIGNCORP)    						--법인구분(숫자 : 법인맞춤)					NUMBER(10,0)		Yes
+						,U.USEYN 			= NVL(v_사용여부,U.USEYN)							    --사용유무									VARCHAR2(1 BYTE)	Yes
+						--,U.LOGINID 		    = NVL(v_ID,U.LOGINID)								--로그인 아이디								VARCHAR2(100 BYTE)	Yes
+						,U.NAME 			= NVL(v_성명,U.NAME)									--이름										VARCHAR2(100 BYTE)	Yes
+						,U.JIKWI 			= NVL(v_직위,U.JIKWI)								--직위										VARCHAR2(100 BYTE)	Yes
+						,U.JIKCHAK 			= NVL(v_직책,U.JIKCHAK)								--직책										VARCHAR2(100 BYTE)	Yes
+						,U.DEPART 			= NVL(v_부서명,U.DEPART)								--부서명										VARCHAR2(100 BYTE)	Yes
+						,U.COMPANY 			= NVL(v_직장명,U.COMPANY)							--소속 회사명								    VARCHAR2(100 BYTE)	Yes
+
+                        ,U.EMAIL 			= NVL(v_이메일주소,U.EMAIL)							--이메일										VARCHAR2(100 BYTE)	Yes
+						--,U.SUBEMAIL 		= NVL(v_이메일주소,U.SUBEMAIL)						--2차 이메일									VARCHAR2(100 BYTE)	Yes
+						,U.POSTGBN 			= NVL(v_주소사용구분,U.POSTGBN)						--주소구분(W : 직장, H : 집)					VARCHAR2(1 BYTE)	Yes
+						,U.ZIPCODE 			= NVL(v_직장우편번호, U.ZIPCODE)                      --우편번호		                            VARCHAR2(7 BYTE)	Yes
+						,U.REGIONGBN        = SUBSTR(v_직장주소1, 1, INSTR(v_직장주소1, ' ', 1, 1) -1)  -- 지역구분
+                        ,U.ADDRESS1 		= NVL(v_직장주소1, U.ADDRESS1)                       --기본주소		                            VARCHAR2(300 BYTE)	Yes
+						,U.ADDRESS2 		= NVL(v_직장주소2, U.ADDRESS2)                       --상세주소		                            VARCHAR2(300 BYTE)	Yes
+						,U.TELNO 			= NVL(v_직장전화번호,U.TELNO)		                    --전화번호									VARCHAR2(100 BYTE)	Yes
+						,U.MTELNO 			= NVL(v_휴대전화번호,U.MTELNO)						--휴대폰번호									VARCHAR2(100 BYTE)	Yes
+
+                        ,U.SERVSTIME 		= NVL(v_SERVSTIME,U.SERVSTIME)						--서비스 시작일								DATE				Yes
+						,U.SERVETIME 		= NVL(v_SERVETIME,U.SERVETIME)						--서비스 종료일								DATE				Yes
+						,U.BIRTHDAY 		= NVL(v_생년월일,U.BIRTHDAY)							--생년월일									DATE				Yes
+						,U.SEX 				= NVL(v_성별,U.SEX)									--성별(M : 남자, F : 여자)					VARCHAR2(1 BYTE)	Yes
+						,U.USERGBN 			= DECODE(v_회원분류,  '',U.USERGBN
+																,(  
+																	SELECT  C.CODE_VAL 
+																	FROM    M_COMM_CODE C 
+																	WHERE   C.CODE_GRP = 'USERGBN'  
+																		AND     C.CODE_NAME = TRIM(v_회원분류) 
+																		AND     C.SITE = v_SITE 
+																		AND     ROWNUM <= 1
+																)
+                                                    )						                    --회원구분									VARCHAR2(8 BYTE)	Yes
+
+
+                        ,U.CHGTIME 			= SYSDATE											--변경시간									DATE				Yes
+						,U.CHGUSEQ			= v_UID												--변경자 정보								    NUMBER(18,0)		Yes
+                        --,U.OUTTIME 		= @OUTTIME@											--탈퇴일										DATE				Yes
+						--,U.OUTDESC 		= @OUTDESC@											--탈퇴 사유									VARCHAR2(300 BYTE)	Yes
+						,U.MANAGER 			= NVL(v_CHARGER,U.MANAGER)							--담당자										VARCHAR2(20 BYTE)	Yes
+                        ,U.ENPW2 			= NVL(v_패스워드,U.ENPW2)							    --암호화된 패스워드(SHA512)					VARCHAR2(128 BYTE)	Yes
+
+                        ,U.EMAILYN 			= NVL(v_이메일수신동의, U.EMAILYN)		            --이메일 수신 여부							VARCHAR2(1 BYTE)	Yes
+						,U.SMSYN 			= NVL(v_SMS수신동의, U.SMSYN)			                --SMS 수신 여부							    VARCHAR2(1 BYTE)	Yes
+						,U.DMYN 			= NVL(v_광고성정보수신동의,U.DMYN)						--마케팅 활용 동의 여부						VARCHAR2(1 BYTE)	Yes
+
+					WHERE 1 = 1
+						AND U.USEQ = V_USER_USEQ												--회원 키 값 (유일키)							NUMBER(18,0)		No
+						--AND TRIM(lower(U.LOGINID)) = v_ID
+					;
+
+					IF(v_사용여부 = 'Y') THEN
+						BEGIN
+
+							UPDATE A_USER
+							SET  OUTTIME = NULL
+								,OUTDESC = NULL
+								,OUTCODE = NULL
+							WHERE USEQ = V_USER_USEQ;
+
+						END;
+					END IF;
+
+
+					UPDATE M_EXUP_TEMP
+					SET SF_FLAG = '성공'
+						,ERROR_MSG = '회원정보 일괄수정이 되었습니다.'
+					WHERE M_EXUP_NO = v_TEMP_NO;
+
+
+					--A_FAMILY에  회원의 비서 정보 넣어줌.	
+					V_CNT := 0;
+					SELECT COUNT(1) 
+						INTO V_CNT
+					FROM A_FAMILY
+					WHERE USEQ = V_USER_USEQ
+						AND GBN IN('SEC')
+						AND ROWNUM <= 1;
+
+
+					IF(V_CNT > 0) THEN
+						BEGIN
+
+							UPDATE A_FAMILY
+							SET  GBN ='SEC'
+								,NAME = NVL(v_비서이름,NAME)
+								,JIKWI = NVL(v_비서직책,JIKWI)
+								--,DEPART = NVL(v_비서이름,DEPART)
+								,TELNO = NVL(v_비서전화번호,TELNO)
+								,EMAIL = NVL(v_비서이메일,EMAIL)
+								--,MTELNO = NVL(v_비서이름,MTELNO)
+							WHERE USEQ = V_USER_USEQ
+								AND GBN IN('SEC');
+
+						END;
+					ELSE
+						BEGIN
+
+							INSERT INTO A_FAMILY 
+							(
+									 USEQ
+									,GBN
+									,NAME
+									,JIKWI
+									--,DEPART
+									,TELNO
+									,EMAIL
+									--,MTELNO
+							)
+							VALUES( 
+									 V_USER_USEQ
+									,'SEC'
+									,NVL(v_비서이름,'')
+									,NVL(v_비서직책,'')
+									--,NVL(v_비서이름,'')
+									,NVL(v_비서전화번호,'')
+									,NVL(v_비서이메일,'')
+									--,NVL(v_비서이름,'')
+							);
+
+						END;
+					END IF;
+
+					--A_FAMILY에  회원의 세금계산서 담당자 정보 넣어줌.	
+					V_CNT := 0;
+					SELECT COUNT(1) 
+						INTO V_CNT
+					FROM A_FAMILY
+					WHERE USEQ = V_USER_USEQ
+						AND GBN IN('TAX')
+						AND ROWNUM <= 1;
+
+					IF(V_CNT > 0) THEN
+						BEGIN
+
+							UPDATE A_FAMILY
+							SET GBN ='TAX'
+								,NAME = NVL(v_TAX담당자이름,NAME)
+								--,JIKWI = NVL(v_TAX담당자이름,JIKWI)
+								--,DEPART = NVL(v_TAX담당자이름,DEPART)
+								,TELNO = NVL(v_TAX담당자전화번호,TELNO)
+								,EMAIL = NVL(v_TAX담당자이메일,EMAIL)
+								--,MTELNO = NVL(v_TAX담당자이름,MTELNO)
+							WHERE USEQ = V_USER_USEQ
+								AND GBN IN('TAX');
+
+						END;
+					ELSE
+						BEGIN
+
+							INSERT INTO A_FAMILY 
+							(
+									 USEQ
+									,GBN
+									,NAME
+									--,JIKWI
+									--,DEPART
+									,TELNO
+									,EMAIL
+									--,MTELNO
+							)
+							VALUES( 
+									 V_USER_USEQ
+									,'TAX'
+									,NVL(v_TAX담당자이름,'')
+									--,NVL(v_TAX담당자이름,'')
+									--,NVL(v_TAX담당자이름,'')
+									,NVL(v_TAX담당자전화번호,'')
+									,NVL(v_TAX담당자이메일,'')
+									--,NVL(v_TAX담당자이름,'')
+							);
+
+						END;
+					END IF;
+
+					--USP_EXCEPTION( '', DBMS_UTILITY.FORMAT_ERROR_STACK , 'USER_UPDATE_ExUpload', '키맨추가정보 UPDATE 종료, v_TEMP_NO : ' || v_TEMP_NO || ', v_키맨번호 : ' || V_USER_USEQ, v_UID);
+
+
+					--A_FAMILY에  회원의 추천인 정보 넣어줌.	
+					V_CNT := 0;
+					SELECT COUNT(1) 
+						INTO V_CNT
+					FROM A_FAMILY
+					WHERE USEQ = V_USER_USEQ
+						AND GBN IN('REC')
+						AND ROWNUM <= 1;
+
+					IF(V_CNT > 0) THEN
+						BEGIN
+
+							UPDATE A_FAMILY
+							SET GBN ='REC'
+								,NAME = NVL(v_추천인이름,NAME)
+								--,JIKWI = NVL(v_추천인이름,JIKWI)
+								,DEPART = NVL(v_추천인소속,DEPART)
+								--,TELNO = NVL(v_추천인이름,TELNO)
+								--,EMAIL = NVL(v_추천인이름,EMAIL)
+								--,MTELNO = NVL(v_추천인이름,MTELNO)
+							WHERE USEQ = V_USER_USEQ
+								AND GBN IN('REC');
+
+						END;
+					ELSE
+						BEGIN
+
+							INSERT INTO A_FAMILY 
+							(
+									 USEQ
+									,GBN
+									,NAME
+									--,JIKWI
+									,DEPART
+									--,TELNO
+									--,EMAIL
+									--,MTELNO
+							)
+							VALUES( 
+									 V_USER_USEQ
+									,'REC'
+									,NVL(v_추천인이름,'')
+									--,NVL(v_추천인이름,'')
+									,NVL(v_추천인소속,'')
+									--,NVL(v_추천인이름,'')
+									--,NVL(v_추천인이름,'')
+									--,NVL(v_추천인이름,'')
+							);
+
+						END;
+					END IF;
+
+
+					/********** 법인번호 시작 *********/
+					--IF v_법인번호 <> '' THEN
+                    IF v_법인번호 IS NOT NULL THEN
+
+						DECLARE v_temp NUMBER(1, 0) := 0;
+
+						BEGIN
+
+							BEGIN
+
+								SELECT 1 INTO v_temp
+								FROM DUAL
+								WHERE EXISTS
+								(
+									SELECT 1
+									FROM A_CORP
+									WHERE 1 = 1
+										AND SITE = v_SITE
+										AND CORP = v_법인번호
+								);
+
+								SELECT 
+									CORP INTO v_CORP
+								FROM A_CORP
+								WHERE 1 = 1
+									AND SITE = v_SITE
+									AND CORP = v_법인번호;
+
+							END;
+
+							IF v_temp = 0 THEN
+								BEGIN
+
+									UPDATE M_EXUP_TEMP
+									SET SF_FLAG = '오류'
+										,ERROR_MSG = NVL(ERROR_MSG,'') ||  ', 법인이 존재하지 않습니다.'
+									WHERE M_EXUP_NO = v_TEMP_NO;
+
+								END;
+							ELSE
+								BEGIN
+
+									/********** 계약번호 시작 *********/
+									--IF v_계약번호 <> '' THEN
+                                    IF v_계약번호 IS NOT NULL THEN
+
+										DECLARE v_temp NUMBER(1, 0) := 0;
+
+										BEGIN
+
+											SELECT 1 INTO v_temp
+											FROM DUAL
+											WHERE EXISTS
+											(
+												SELECT 1
+												FROM A_SIGN
+												WHERE SIGNSEQ = v_계약번호
+											);
+
+										END;
+
+										IF v_temp = 0 THEN
+											BEGIN
+
+												UPDATE M_EXUP_TEMP
+												SET SF_FLAG = '오류'
+													,ERROR_MSG = NVL(ERROR_MSG,'') ||  ', 계약이 존재하지 않습니다.'
+												WHERE M_EXUP_NO = v_TEMP_NO;
+
+											END;
+										ELSE
+											BEGIN
+
+												UPDATE A_SIGN_USER S
+												SET  S.CHGTIME = SYSDATE
+													,S.CHGUSEQ = v_UID
+													,S.SERVSTIME = DECODE(v_SERVSTIME,'',S.SERVSTIME,v_SERVSTIME)
+													,S.SIGNETIME = DECODE(v_SERVETIME,'',S.SIGNETIME,v_SERVETIME)
+												WHERE 1 = 1
+													AND S.SITE = v_SITE
+													AND S.SIGNSEQ = v_계약번호
+													AND S.USEQ = V_USER_USEQ;
+
+												--A_USER 업데이트
+												UPDATE A_USER
+												SET  SIGNCORP = DECODE(v_SITE,'MS',NULL,v_CORP)
+													,CHGTIME = SYSDATE
+													,CHGUSEQ = v_UID
+												WHERE USEQ = V_USER_USEQ;
+
+												UPDATE M_EXUP_TEMP
+												SET SF_FLAG = '성공'
+													,ERROR_MSG = '회원 계약이 갱신 되었습니다.'
+												WHERE M_EXUP_NO = v_TEMP_NO;
+
+											END;
+										END IF;
+
+									END IF;
+									/********** 계약번호 종료 *********/
+
+								END;
+							END IF;
+
+						END;
+					END IF;
+					/********** 법인번호 종료 *********/
+
+				END;
+			END IF;
+
+		END;
+	END IF;
+
+
+    COMMIT;
+
+
+    EXCEPTION
+			WHEN OTHERS THEN
+
+            UPDATE M_EXUP_TEMP
+               SET SF_FLAG = '실패'
+					,ERROR_MSG = DBMS_UTILITY.FORMAT_ERROR_STACK
+               WHERE M_EXUP_NO = v_TEMP_NO;
+
+            USP_EXCEPTION( '', DBMS_UTILITY.FORMAT_ERROR_STACK , '회원정보 일괄수정', 'USP_USER_UPDATE_EXUPLOAD',v_UID);
+
+END;

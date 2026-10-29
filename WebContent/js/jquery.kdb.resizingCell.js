@@ -56,18 +56,32 @@
                 fixedValue: function(selectedElement, tableElement) {                    
                     if ( $(tableElement).attr('fixed') != 'true' ) {
                         $(tableElement).find(settings.selector).each(function(index, td) {
+							debugger;
+							//khma 20250626 tinymce 리사이즈 이슈로 인하여 주석처리
                             var w,h;
+                            //if ( $.getInternetVersion() == "8" ) {
+                            //    // 8일 때만.. 문제있음.. 나머지는 문제 해결 됨.
+                            //    w = $(td).width();
+                            //    h = $(td).height();
+                            //} else {
+                            //    w = $(td).width();
+                            //    h = $(td).height();
+                            //}
+                            //$(td).css('width', w).css('height', h);
+                            //$(td).attr('resize-width', w + 'px').attr('resize-height', h + 'px');
+                            //$(td).attr('data-mce-style', 'width:' + w + 'px; ' + 'height:' + h + 'px; ' + 'border: 1px solid black; border-top: 0; border-right: 0;');
+							
                             if ( $.getInternetVersion() == "8" ) {
                                 // 8일 때만.. 문제있음.. 나머지는 문제 해결 됨.
                                 w = $(td).width();
                                 h = $(td).height();
+								$(td).css('width', w).css('height', h);
+								$(td).attr('resize-width', w + 'px').attr('resize-height', h + 'px');
+								$(td).attr('data-mce-style', 'width:' + w + 'px; ' + 'height:' + h + 'px; ' + 'border: 1px solid black; border-top: 0; border-right: 0;');
                             } else {
                                 w = $(td).width();
                                 h = $(td).height();
                             }
-                            $(td).css('width', w).css('height', h);
-                            $(td).attr('resize-width', w + 'px').attr('resize-height', h + 'px');
-                            $(td).attr('data-mce-style', 'width:' + w + 'px; ' + 'height:' + h + 'px; ' + 'border: 1px solid black; border-top: 0; border-right: 0;');
                         });
                         $(tableElement).attr('fixed', 'true');
                         $(tableElement).css('width', $(tableElement).outerWidth()).attr('data-mce-style', 'width:' + $(tableElement).outerWidth() + 'px;').attr('width', $(tableElement).outerWidth());

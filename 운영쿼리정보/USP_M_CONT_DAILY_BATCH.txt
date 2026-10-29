@@ -1,0 +1,36 @@
+create or replace PROCEDURE     USP_M_CONT_DAILY_BATCH
+AS
+/********************************************************************************************
+ * 1.Project Name  : SERICEO CRM 고도화 - DataMart 구성 										*
+ * 2.System        : CRM - Oracle 11g														*
+ * 3.Program ID    : USP_M_CONT_DAILY_BATCH 												*
+ * 4.Description   : DataMart 일일배치 테이블 저장 											*
+ * 																							*
+ * 5.Input Value   : NONE																	*
+ * 																							*
+ * 6.Out Value     : NONE 																	*
+ * 																							*
+ *   version 	 AUTHOR 		Date 		  DESCRIPTION                     Request By 	*
+ *  --------- 	-------- 	-------------- 	--------------------------- 	-------------- 	*
+ *    1.0         마경호        2024.06.10 	  Initial Release 								*
+ *******************************************************************************************/
+BEGIN
+
+    EXECUTE IMMEDIATE 'ALTER SESSION SET NLS_DATE_FORMAT = ''YYYY-MM-DD''';
+
+	-- 사용자 정보 데일리 캡쳐
+	USP_M_USER_INFO_BACKUP;
+
+	-- 이용현황 관련 집계쿼리
+	USP_M_CONT_RPT;
+
+	-- 마트 관련 집계 쿼리
+	USP_M_CONT_USE_STATUS;
+
+	COMMIT;
+
+	EXCEPTION
+			WHEN OTHERS THEN ROLLBACK;
+		USP_EXCEPTION('', DBMS_UTILITY.FORMAT_ERROR_STACK, '일일배치', 'USP_CRM_DAILY_PKG_BATCH', 'DBMS_BATCH_SYSTEM');
+
+END;
