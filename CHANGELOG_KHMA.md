@@ -29,15 +29,31 @@
    * ③ 외부 PC에서 VDI 내부로는 **클립보드 텍스트 복사·붙여넣기(`Ctrl+C` ➡️ `Ctrl+V`)가 가능**하므로, 파일 크기에 따라 다음 두 가지 방식으로 VDI 이클립스에 즉시 반영합니다:
      - **중소형 파일 전체 덮어쓰기**: 로컬 파일에서 `Ctrl+A` ➡️ `Ctrl+C` 후, VDI 이클립스 해당 파일에서 `Ctrl+A` ➡️ `Ctrl+V`
      - **대용량 파일(`superContaner.js` 등) 핀포인트 붙여넣기**: VDI 이클립스에서 `Ctrl+L`(라인 이동)로 해당 라인에 이동한 뒤, `// YYYYMMDD khma Start` ~ `End` 주석이 포함된 수정 블록만 정확히 덮어쓰기
-   * ④ 각 스텝 반영 및 VDI 테스트 완료 후, 본 문서 체크리스트(`[x]`)와 변경 이력 표에 즉시 기록합니다.
+   * ④ **🚨 2단계 검증 게이트(`① 로컬 수정` vs `② VDI 붙여넣기 확인`)**:
+     - 로컬 안티그래비티에서 파일을 수정한 직후에는 **`[① 로컬 수정: O / ② VDI 반영: 대기]`** 상태로 기록합니다.
+     - 이후 사용자가 실제로 VDI 이클립스에 붙여넣기(`Ctrl+V`)를 완료하고 동작을 확인해 주었을 때만 **`[② VDI 반영: O]`** 최종 완료 처리 후 다음 스텝으로 넘어갑니다.
 
 ---
 
-## 📌 1. VDI 반영 대상 파일 체크리스트 (작업 순서 100% 일치)
+## 📌 1. 전체 작업 Tasklist 및 2단계 검증 대장 (`① 로컬 수정` ➡️ `② VDI 붙여넣기 확인`)
 
-`0_MASTER_EXECUTION_PLAN.md`에 명시된 필수 작업 순서에 따라 단계별로 진행하며 완료 시 `[x]`로 체크합니다.
+| 스텝 | 대상 파일 경로 | 작업 내용 요약 | ① 로컬 수정 | ② VDI 붙여넣기/구동확인 | 최종 상태 |
+| :---: | :--- | :--- | :---: | :---: | :---: |
+| **Step 0-1** | `.project`, `.classpath`, `.settings/*` | 구형 VJET 제거, 출력경로(`WEB-INF/classes`) 및 컴파일러 `1.7` 설정 | `[x]` | `[x]` | **완료** |
+| **Step 0-2** | `sericeo_crm_VDI반입용_20261029.zip` | 운영 소스 100% 동기화본 + 신규 JAR 포함 반입 및 VDI 베이스라인 기동 확인 | `[x]` | `[x]` | **완료** |
+| **Step 1-1** | `WebContent/WEB-INF/lib/` | 구형 Spring 3.1.1(21개) & Commons(2개) `_20261029` 백업 후 신규 JAR 20종 배치 | `[ ]` | `[ ]` | 👉 **최우선 착수 대기** |
+| **Step 1-2** | `WebContent/WEB-INF/Monarch820-servlet.xml` | Spring XML 스키마(`xsd`) 버전 상향 (`3.0` ➡️ `4.3`) | `[ ]` | `[ ]` | 대기 |
+| **Step 1-3** | `WebContent/ui/monform.jsp`, `login.jsp`, `loginProcess.jsp`, `logoutProcess.jsp` | jQuery 스크립트 경로 상향 (`1.10.2` ➡️ `1.12.4`, 4개 JSP) | `[ ]` | `[ ]` | 대기 |
+| **Step 1-4** | `WebContent/js/jquery.kdb.MonArch800.js` | 로그인 화면 아이디 저장 체크박스(`#chk-save`) 활성화 및 쿠키(`SAVE_ID`) 연동 | `[ ]` | `[ ]` | 대기 |
+| **Step 2-1** | `WebContent/WEB-INF/lib/` | 구형 POI 3.8 `_20261029` 백업 후 `POI 4.1.2 신규 라이브러리/` 7종 배치 | `[ ]` | `[ ]` | 대기 |
+| **Step 2-2** | `src/co/kr/kydbm/common/CommonExcelUtil.java` | POI 4.1.2 호환을 위한 `CellType` Enum 문법 수정 | `[ ]` | `[ ]` | 대기 |
+| **Step 2-3** | `WebContent/js/jquery.kdb.superContaner.js` | `DownXls` 함수 블록 내 4단 보안 모달 팝업 및 감사로그 연동 | `[ ]` | `[ ]` | 대기 |
+| **Step 2-4** | `src/co/kr/kydbm/core/filecontrol/UploadController.java` | 엑셀 비밀번호(`excelPassword`) 파라미터 수신 연동 | `[ ]` | `[ ]` | 대기 |
+| **Step 2-5** | `src/co/kr/kydbm/core/filecontrol/ExcelDownload.java` | POI 4.1.2 Agile AES 암호화 워크북 생성 및 스트림 방출 엔진 | `[ ]` | `[ ]` | 대기 |
+| **Step 3** | `MonArchDaoImpl.java`, `FilterGenerator.java`, 프로시저/배치 등 | KSign SecureDB 개인정보 암복호화 공통 모듈 및 프로시저/엑셀업로드 적용 | `[ ]` | `[ ]` | 대기 |
+| **Step 4** | `WebContent/js/jquery.kdb.MonArch800.js` | `validatePassword` 비밀번호 검증 로직 단일 통합 (고객사 승인 대기) | `[ ]` | `[ ]` | 승인대기 |
 
-### 📖 Step 0. 사전 환경 정상화 및 아키텍처 숙지
+### 📖 Step 0. 사전 환경 정상화 및 아키텍처 숙지 (완료)
 > 📘 관련 문서: `ARCHITECTURE.md`, `AGENTS.md`, `0_MASTER_EXECUTION_PLAN.md`
 * [x] `0_MASTER_EXECUTION_PLAN.md` ➡️ [Step 0] 전체 작업 순서를 강제하는 최상위 마스터 실행 계획서 (작업 착수 전 필독)
 * [x] `ARCHITECTURE.md` ➡️ [Step 0] CRM 전체 아키텍처 및 소스 디렉토리/파일 트리 구조 정의서
@@ -47,19 +63,21 @@
 
 ### 🥇 Step 1. 시스템 버전 업그레이드 (기초 공사)
 > 📘 참조 가이드: `1_TASK_SYSTEM_UPGRADE.md`
-* [x] `WebContent/WEB-INF/lib/Spring 4.3.30 신규 라이브러리/` ➡️ Spring 4.3.30.RELEASE JAR 18종 + `commons-fileupload-1.5.jar`, `commons-io-2.15.1.jar` 사전 반입 완료 (Step 1 작업 시 `lib/` 직하위로 이동 및 구형 3.1.1 JAR 백업/제외)
+* [x] `WebContent/WEB-INF/lib/Spring 4.3.30 신규 라이브러리/` ➡️ Spring 4.3.30.RELEASE JAR 18종 + `commons-fileupload-1.5.jar`, `commons-io-2.15.1.jar` 사전 반입 완료
 * [x] `WebContent/js/jquery-1.12.4.min.js` ➡️ jQuery 1.12.4 파일 사전 반입 완료
-* [ ] `WebContent/WEB-INF/web.xml` ➡️ Spring 스키마(xmlns) 버전 상향 (`3.1` ➡️ `4.3`)
-* [ ] `WebContent/WEB-INF/dispatcher-servlet.xml` ➡️ Spring 스키마(xmlns) 버전 상향 (`3.1` ➡️ `4.3`)
-* [ ] `WebContent/ui/monform.jsp` ➡️ jQuery 라이브러리 스크립트 경로 상향 (`1.10.2` ➡️ `1.12.4`)
+* [ ] **[Step 1-1]** `WebContent/WEB-INF/lib/` ➡️ 구형 Spring 3.1.1(21개) & Commons(2개) `_20261029` 백업 후 신규 JAR 20종 `lib/` 직하위 배치 (`[① 로컬: 대기 / ② VDI: 대기]`)
+* [ ] **[Step 1-2]** `WebContent/WEB-INF/Monarch820-servlet.xml` ➡️ Spring 스키마(`xsd`) 버전 상향 (`3.0` ➡️ `4.3`) (`[① 로컬: 대기 / ② VDI: 대기]`)
+* [ ] **[Step 1-3]** `WebContent/ui/monform.jsp`, `login.jsp`, `loginProcess.jsp`, `logoutProcess.jsp` ➡️ jQuery 스크립트 경로 상향 (`1.10.2` ➡️ `1.12.4`) (`[① 로컬: 대기 / ② VDI: 대기]`)
+* [ ] **[Step 1-4]** `WebContent/js/jquery.kdb.MonArch800.js` ➡️ 로그인 화면 아이디 저장 체크박스(`#chk-save`) 활성화 및 쿠키(`SAVE_ID`) 연동 (`[① 로컬: 대기 / ② VDI: 대기]`)
 
 ### 🥈 Step 2. 엑셀 다운로드 보안 적용 (기능 개발)
 > 📘 참조 가이드: `2_TASK_EXCEL_DOWNLOAD_PWD.md`
-* [x] `WebContent/WEB-INF/lib/POI 4.1.2 신규 라이브러리/` ➡️ POI 4.1.2 및 의존성 7종 사전 반입 완료 (Step 2 작업 시 `lib/` 직하위로 이동 및 구형 3.8 JAR 백업/제외)
-* [ ] `src/co/kr/kydbm/common/CommonExcelUtil.java` ➡️ POI 4.1.2 호환을 위한 `CellType` Enum 문법 수정
-* [ ] `WebContent/js/jquery.kdb.superContaner.js` ➡️ `DownXls` 함수 블록 내 비밀번호 모달 팝업 추가 (⚠️ 주의: DownXls 함수 블록만 선별 복사!)
-* [ ] `src/co/kr/kydbm/core/filecontrol/UploadController.java` ➡️ 엑셀 비밀번호(`excelPassword`) 파라미터 수신 연동
-* [ ] `src/co/kr/kydbm/core/filecontrol/ExcelDownload.java` ➡️ POI 4.1.2 Agile AES 암호화 워크북 생성 및 스트림 방출 엔진
+* [x] `WebContent/WEB-INF/lib/POI 4.1.2 신규 라이브러리/` ➡️ POI 4.1.2 및 의존성 7종 사전 반입 완료
+* [ ] **[Step 2-1]** `WebContent/WEB-INF/lib/` ➡️ 구형 POI 3.8 백업 후 POI 4.1.2 7종 `lib/` 직하위 배치 (`[① 로컬: 대기 / ② VDI: 대기]`)
+* [ ] **[Step 2-2]** `src/co/kr/kydbm/common/CommonExcelUtil.java` ➡️ POI 4.1.2 호환을 위한 `CellType` Enum 문법 수정 (`[① 로컬: 대기 / ② VDI: 대기]`)
+* [ ] **[Step 2-3]** `WebContent/js/jquery.kdb.superContaner.js` ➡️ `DownXls` 함수 블록 내 비밀번호 모달 팝업 추가 (`[① 로컬: 대기 / ② VDI: 대기]`)
+* [ ] **[Step 2-4]** `src/co/kr/kydbm/core/filecontrol/UploadController.java` ➡️ 엑셀 비밀번호(`excelPassword`) 파라미터 수신 연동 (`[① 로컬: 대기 / ② VDI: 대기]`)
+* [ ] **[Step 2-5]** `src/co/kr/kydbm/core/filecontrol/ExcelDownload.java` ➡️ POI 4.1.2 Agile AES 암호화 워크북 생성 및 스트림 방출 엔진 (`[① 로컬: 대기 / ② VDI: 대기]`)
 
 ### 🥉 Step 3. 개인정보 암호화 (공통 모듈 확장 적용)
 > 📘 참조 가이드: `3_TASK_SECUREDB_API.md` (또는 `3_ALT_SECUREDB_UDF.md`)
@@ -144,60 +162,3 @@
 * **작업 구분**: **운영 최신 원본 소스 100% 일치화 (기능 작업 착수 전 베이스라인 확립)**
 * **상세 내용**:
   * `sericrm_20261021` 운영 백업본과 `WebContent/` 전체 파일 간 MD5 해시 불일치 건수 **0건** 달성 확인
-
-### [운영 백업 소스 기준 정립] khma - 운영 백업 폴더(`sericrm_20261021/`) 기준 명세 반영
-* **대상 파일**: `AGENTS.md`, `ARCHITECTURE.md`, `CHANGELOG_KHMA.md`
-* **작업 구분**: 운영 백업 원본 경로 및 기준점 문서화
-* **상세 내용**:
-  * 프로젝트 루트 하위 `sericrm_20261021/` 폴더를 **운영 톰캣에서 `ROOT.war`가 풀린 폴더 통째로 zip 압축해 가져온 실운영 배포 원본**으로 정의하고 아키텍처 트리 및 작업 규칙서에 반영
-  * `WebContent/`와 1:1 대응되는 정적 리소스(JS/JSP/CSS/XML/JAR) 및 `WEB-INF/classes/` 내 운영 `.class` 바이트코드/프로퍼티 대조 시 `sericrm_20261021/` 폴더를 최우선 기준(Baseline)으로 활용하며 원본 보존을 위해 직접 수정 금지 원칙 명시
-
-### [기획 확정 및 실증 반영] khma - 엑셀 타겟 추출(4단 팝업) 및 SecureDB 실증 쿼리 최신화
-* **대상 파일**: `2_TASK_EXCEL_DOWNLOAD_PWD.md`, `3_TASK_SECUREDB_API.md`
-* **작업 구분**: 실행 가이드 최신화
-* **상세 내용**:
-  * 고객사 기획서([CRM 메일/문자/전화 타겟 추출 건 추가 요청]) 기반 4단 모달 팝업(용도/대상/목적 10자 이상/파일 패스워드) 전사 공통 연동 코드 보강
-  * 엑셀 다운로드 감사 로그 신규 테이블(`A_EXCEL_DOWN_LOG`) DDL 설계안 및 백엔드 파라미터 수신 로직 수록
-  * 회원관리 타겟 추출 SQL 매트릭스(정보성/오프라인홍보용/광고성홍보용 및 수신동의 테이블 `a_act_log`, `a_user_dminfo` 조인) 명세 완비
-  * MonArch 코어 정규식(`\/\*(.*?)[@](.*?)\*\/`) 주석 해제 메커니즘 분석 및 `@CHK_SERV@`, `@DM_GBN@`, `@SMS_YN@` 등 파라미터 기반 다이나믹 쿼리 템플릿 표준 확립
-  * 고객사 DB 실증 검증 쿼리(`dbsecnew.sdb_crypto.encrypt/decrypt`, `sdb_crypto.nts/nts_bsh/nts_fsh`) 및 확정 정책명(`AES256_DEV`, `SHA512_DEV`) 가이드 반영
-
-### [사전 가이드] khma - 비밀번호 검증 로직 단일 통합 가이드(Task 4) 수립
-* **대상 파일**: `4_TASK_PASSWORD_VALIDATION_UNIFICATION.md`, `0_MASTER_EXECUTION_PLAN.md`
-* **작업 구분**: 실행 가이드 수립 (고객사 승인 대기)
-* **상세 내용**:
-  * `MonArch800.js`의 `validatePassword` 함수를 단일 통합 진입점으로 일원화하기 위한 가이드 작성
-  * 폼 객체 전달(`isFormMode`), 3개 암호 인자 전달(`isTripleMode`), 단일 문자열 전달(기존 복잡도 호환) 다형성 지원 로직 및 교체 코드 수록
-  * 기존 코드 100% 보존 주석 원칙 및 `[날짜] khma` 주석 표준 명시 완료
-
-### [운영 소스 원본 동기화] khma - 20250228 운영 백업본(`ROOT_20250228`) 기준 100% 원본 동기화
-* **대상 파일**: 
-  * `WebContent/js/MonArchResource.js`
-  * `WebContent/js/jquery.kdb.jobButton.js`
-  * `WebContent/js/jquery.kdb.MonArch800.js`
-  * `WebContent/ui/login.jsp`, `WebContent/ui/loginProcess.jsp`
-  * `WebContent/css/Theme_CEO.css`
-  * `WebContent/Resource.js`
-  * `WebContent/WEB-INF/Monarch820-servlet.xml`
-  * `WebContent/ui/monform.jsp`
-* **작업 구분**: **운영 원본 소스 동기화 (기능 수정 아님)**
-* **상세 내용**:
-  * 운영 서버 실배포 백업본(`ROOT_20250228\ROOT`)의 최신 정상 소스와 로컬 소스 간의 차이점을 운영 원본 기준으로 1:1 동기화하여 파일 해시(MD5)까지 100% 완벽 일치 완료
-  * 소스 내부에 불필요한 수정 주석 없이 운영 원본 소스 코드 자체로 일치화 완료
-
-### [사전 준비] khma - 마이그레이션 마스터 플랜 및 기술 가이드라인 수립
-* **대상 파일**: `0_MASTER_EXECUTION_PLAN.md`, `1_TASK_SYSTEM_UPGRADE.md`, `2_TASK_EXCEL_DOWNLOAD_PWD.md`, `3_TASK_SECUREDB_API.md`, `ARCHITECTURE.md`, `AGENTS.md`
-* **작업 구분**: 마이그레이션 설계 및 사전 기술 가이드 완비
-* **상세 내용**:
-  * Step 0 ~ Step 3 단계별 작업 순서 마스터 플랜 수립 (순서 준수 필수)
-  * Spring 4.3.30 및 POI 4.1.2 라이브러리 교체 명세 및 POI 신규 JAR 7종 사전 수집 완료
-  * Apache POI 4.1.2 Agile AES 암호화 풀 소스코드 및 프론트엔드 비밀번호 모달 팝업 가이드라인 완비
-  * KSign SecureDB Java API(CryptoService) 및 DB UDF 방식 비교 분석 및 구현 코드 완비
-  * 전체 프로젝트 디렉토리 및 핵심 파일 트리 구조도 명세 수립
-
-### [사전 점검] khma - VDI 기존 소스(superContaner.js) 보존 상태 확인
-* **대상 파일**: `WebContent/js/jquery.kdb.superContaner.js`
-* **작업 구분**: 기존 운영 소스 수정 이력 대조 및 보존
-* **상세 내용**:
-  * 218라인 `//페이지 볼드처리 추가 20241115 khma` 및 12,053라인 `_logOld` 취득 로직 보존 확인
-  * 16,500줄짜리 화면 엔진을 통째로 덮어쓰지 않고 향후 Step 2 반영 시 `DownXls` 함수 블록만 정밀 병합하도록 원칙 확립

@@ -67,18 +67,18 @@ String realPath = defaultFilePath + "/" + uploadFolder; // 20261001 khma {사유
 
 ---
 
-## 3. VDI 반영 대상 파일 목록 보고 및 이력 관리 (필수)
+## 3. VDI 반영 대상 파일 목록 보고 및 2단계 검증 대장 관리 (필수)
 
-사용자가 VDI 내부망으로 해당 소스를 그대로 복사-붙여넣기 할 수 있어야 하므로, **어떤 파일이 변경되었는지 100% 명확히 파악**되어야 합니다.
+사용자가 VDI 내부망으로 해당 소스를 그대로 복사-붙여넣기 할 수 있어야 하므로, **어떤 파일이 변경되었고 실제로 VDI에 붙여넣어졌는지 100% 명확히 추적**되어야 합니다.
 
-1. **답변 시 VDI 복사 대상 파일 목록 필수 제공**
-   - 코드 작업 완료 후, 사용자 답변 마지막에 **"VDI 반영 대상 파일 목록(프로젝트 기준 상대 경로)"**을 체크리스트 형태로 빠짐없이 제공해야 합니다.
-   - 예시:
-     * `[ ] src/com/sericeo/crm/member/service/MemberService.java`
-     * `[ ] WebContent/WEB-INF/jsp/member/memberList.jsp`
+1. **답변 시 VDI 복사 대상 파일 목록 및 2단계 상태 필수 제공**
+   - 코드 작업 완료 후, 사용자 답변 마지막에 **"VDI 반영 대상 파일 목록(프로젝트 기준 상대 경로)"**을 **`[① 로컬 수정]`**과 **`[② VDI 붙여넣기/구동확인]`** 2단계 체크리스트 형태로 빠짐없이 제공해야 합니다.
+   - **🚨 VDI 반영 확인 게이트(Gate) 프로세스**:
+     * 로컬에서 수정한 직후에는 반드시 **`[① 로컬 수정: O / ② VDI 붙여넣기: 대기( )]`**로 표시합니다.
+     * 사용자가 실제로 VDI 이클립스에 복사·붙여넣기(`Ctrl+V`)를 완료하고 이상 유무를 확인해 주었을 때만 **`[② VDI 붙여넣기: 완료(x)]`**로 변경하고 다음 스텝으로 넘어갑니다.
 
-2. **CHANGELOG_KHMA.md 자동 갱신**
-   - 소스 파일이 추가/수정/삭제될 때마다 [CHANGELOG_KHMA.md](file:///c:/Users/khma7/eclipse-workspace/sericeo_crm_origin/CHANGELOG_KHMA.md)에 상대 경로와 작업 내역을 빠짐없이 누적 기록합니다.
+2. **CHANGELOG_KHMA.md 및 HANDOVER_SYNC.md 자동 갱신**
+   - 소스 파일이 수정되거나 VDI 반영이 확인될 때마다 [CHANGELOG_KHMA.md](file:///c:/Users/khma7/eclipse-workspace/sericeo_crm_origin/CHANGELOG_KHMA.md) 및 [HANDOVER_SYNC.md](file:///c:/Users/khma7/eclipse-workspace/sericeo_crm_origin/HANDOVER_SYNC.md)의 2단계 Tasklist 표와 작업 내역을 즉시 갱신합니다.
 
 ---
 
@@ -114,7 +114,7 @@ VDI 내부망 코드를 카메라로 촬영하여 전달받는 경우, 단순 OC
      - 최초 반입용 `sericeo_crm_VDI반입용_20261029.zip` 내부에 이미 Step 1(`WEB-INF/lib/Spring 4.3.30 신규 라이브러리/`, `js/jquery-1.12.4.min.js`) 및 Step 2(`WEB-INF/lib/POI 4.1.2 신규 라이브러리/`)용 바이너리 파일이 모두 포함되어 있으므로 추가 파일 반입 결재가 불필요합니다.
      - VDI에서 압축 해제 후 코드 수정 전 **현재 운영 상태 그대로 먼저 톰캣 서버를 기동하여 이상 유무를 확인**합니다.
    * **한 번에 하나씩(One-by-One) Step-by-Step 진행**:
-     - 여러 파일을 한꺼번에 수정하지 않고, **반드시 단일 파일(또는 단일 함수 블록) 단위로 수정 ➡️ 로컬 이클립스 에러 확인 ➡️ VDI 복사·붙여넣기 반영 ➡️ VDI 동작 확인** 순서로 한 단계씩 진행합니다.
+     - 여러 파일을 한꺼번에 수정하지 않고, **반드시 단일 파일(또는 단일 함수 블록) 단위로 수정 ➡️ 로컬 이클립스 에러 확인 ➡️ VDI 복사·붙여넣기 반영 확인 ➡️ VDI 동작 확인** 순서로 한 단계씩 진행합니다.
    * **외부 PC ➡️ VDI 내부 클립보드 텍스트 복사·붙여넣기(`Ctrl+C` ➡️ `Ctrl+V`) 가이드 제공**:
      - 외부에서 VDI 내부로 텍스트 복사·붙여넣기가 가능하므로, 모든 소스 수정(`.java`, `.js`, `.jsp`, `.xml`, `.properties`) 시 다음 2가지 방식을 명확히 안내합니다:
        1. **파일 전체 덮어쓰기 (`Ctrl+A` ➡️ `Ctrl+V`)**: `CommonExcelUtil.java`, `UploadController.java`, `ExcelDownload.java`, `web.xml`, `monform.jsp` 등 중소형 단일 파일은 로컬 파일 전체를 복사(`Ctrl+A` ➡️ `Ctrl+C`)하여 VDI 이클립스 해당 파일에 전체 붙여넣기(`Ctrl+A` ➡️ `Ctrl+V`)하도록 안내하여 라인 밀림·오타를 원천 방지합니다.
@@ -190,11 +190,13 @@ VDI 내부망 코드를 카메라로 촬영하여 전달받는 경우, 단순 OC
   * VDI 이클립스에서 **Default output folder(`WebContent/WEB-INF/classes`)** 및 **Java Compiler `1.7`** 설정으로 현재 운영 베이스라인 톰캣 9 서버가 에러 없이 정상 구동됨을 확인 완료 (2026-10-29, 로컬 `.classpath` 및 `.settings/*` 동기화 완료).
   * ⚠️ **VDI 오라클 접속 주소**: 운영(`26.2.51.37:1622`)과 달리 VDI에서는 `70.2.251.122:4034`로 접속하며 VDI 이클립스 내 `src/properties/jdbc.properties`에 변경 적용 완료됨 (덮어쓰기 금지).
 
-### 3) 지금 바로 착수할 다음 스텝 (Next Action)
-`1_TASK_SYSTEM_UPGRADE.md`에 따라 **Step 1 (시스템 버전 업그레이드)**을 아래 3개의 세부 스텝으로 나누어 **한 번에 하나씩(Step-by-Step)** 진행합니다:
-* 👉 **[진행 대기 - 최우선 착수 대상] Step 1-1**:
-  * `WebContent/WEB-INF/lib/` 내 구형 Spring `3.1.1` JAR 및 구형 `commons-fileupload-1.3.1.jar`, `commons-io-2.2.jar` 파일명 뒤에 `_20261029`를 붙여 백업 보존(삭제 금지)하고, `WebContent/WEB-INF/lib/Spring 4.3.30 신규 라이브러리/` 안의 신규 JAR 20종을 `WebContent/WEB-INF/lib/` 직하위로 배치.
-* **[대기] Step 1-2**:
+### 3) 지금 바로 착수할 다음 스텝 (Next Action) & 2단계 검증 게이트(`로컬 수정` ➡️ `VDI 붙여넣기 확인`)
+`1_TASK_SYSTEM_UPGRADE.md`에 따라 **Step 1 (시스템 버전 업그레이드)**을 아래 **4개의 세부 스텝**으로 나누어 **한 번에 하나씩(Step-by-Step)** 진행합니다:
+* 👉 **[진행 대기 - 최우선 착수 대상] Step 1-1** (`[① 로컬: 대기 / ② VDI: 대기]`):
+  * `WebContent/WEB-INF/lib/` 내 구형 Spring `3.1.1`(21개) 및 구형 `commons-fileupload-1.3.1.jar`, `commons-io-2.2.jar` 파일명 뒤에 `_20261029`를 붙여 백업 보존(삭제 금지)하고, `WebContent/WEB-INF/lib/Spring 4.3.30 신규 라이브러리/` 안의 신규 JAR 20종을 `WebContent/WEB-INF/lib/` 직하위로 배치.
+* **[대기] Step 1-2** (`[① 로컬: 대기 / ② VDI: 대기]`):
   * `WebContent/WEB-INF/Monarch820-servlet.xml` 상단 Spring XML 스키마(`xsd`) `3.0` ➡️ `4.3` 상향 (`khma` 주석 적용 및 VDI 클립보드 복사·붙여넣기 가이드 제시).
-* **[대기] Step 1-3**:
-  * `WebContent/ui/monform.jsp` 내 jQuery `1.10.2` ➡️ `1.12.4` 스크립트 경로 변경 (`khma` 주석 적용 및 VDI 클립보드 복사·붙여넣기 가이드 제시) 후 VDI 톰캣 재기동 테스트.
+* **[대기] Step 1-3** (`[① 로컬: 대기 / ② VDI: 대기]`):
+  * `WebContent/ui/monform.jsp`, `login.jsp`, `loginProcess.jsp`, `logoutProcess.jsp` 내 jQuery `1.10.2` ➡️ `1.12.4` 스크립트 경로 변경 (`khma` 주석 적용 및 VDI 클립보드 복사·붙여넣기 가이드 제시).
+* **[대기] Step 1-4** (`[① 로컬: 대기 / ② VDI: 대기]`):
+  * `WebContent/js/jquery.kdb.MonArch800.js` 내 `$.Login` 함수에서 로그인 화면 아이디 저장 체크박스(`#chk-save`) 주석 해제 및 쿠키(`SAVE_ID`) 저장/불러오기 연동 (`Mon_LinkCRM_Maven` 동일 방식, `khma` 주석 적용 후 VDI 톰캣 재기동 테스트).

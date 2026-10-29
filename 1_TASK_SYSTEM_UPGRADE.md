@@ -103,16 +103,39 @@
 1. jQuery 공식 홈페이지에서 `jquery-1.12.4.min.js` 파일을 다운로드합니다.
 2. 다운받은 파일을 `WebContent/js/` 폴더 안에 복사해 넣습니다.
 3. 기존 파일인 `jquery-1.10.2.min.js` 파일은 삭제하지 말고 이름 뒤에 `_old`를 붙여 백업해 둡니다.
-4. `WebContent/ui/monform.jsp` (SPA 메인 컨테이너) 파일이나 `index.jsp` 파일을 엽니다.
-5. 아래와 같이 `<script>` 태그의 버전을 변경합니다.
+4. `WebContent/ui/monform.jsp`, `login.jsp`, `loginProcess.jsp`, `logoutProcess.jsp` 파일을 엽니다.
+5. 아래와 같이 기존 `<script>` 태그를 주석 보존하고 버전을 `1.12.4`로 변경합니다.
    ```html
-   <!-- [기존 코드] -->
-   <script src="/js/jquery-1.10.2.min.js"></script>
-   
-   <!-- [수정 코드] -->
-   <script src="/js/jquery-1.12.4.min.js"></script>
+   <!-- 20261029 khma : jQuery 1.12.4 업그레이드 -->
+   <!-- <script type="text/javascript" src="js/jquery-1.10.2.min.js"></script> -->
+   <script type="text/javascript" src="js/jquery-1.12.4.min.js"></script>
    ```
 6. 웹 브라우저 캐시를 완전히 삭제(Ctrl + Shift + R)한 뒤 접속하여 메인 화면 리스트가 정상적으로 그려지는지 확인합니다.
+
+**[3-2. 로그인 화면 아이디 저장(`#chk-save`) 체크박스 활성화 및 쿠키(`SAVE_ID`) 연동 (Step 1-4)]**
+* `WebContent/js/jquery.kdb.MonArch800.js` 내 `$.Login` 함수(3907~3937라인 부근)에서 과거 주석 처리되었던 아이디 저장 체크박스(`#chk-save`)를 활성화하고, `Mon_LinkCRM_Maven`과 동일하게 쿠키(`SAVE_ID`) 저장/복원 로직을 적용합니다.
+  ```javascript
+  // 20261029 khma Start : 로그인 페이지 아이디 저장 체크박스 활성화 및 쿠키 연동
+  //khma	20240315 로그인 페이지 아이디 저장 체크박스 주석 처리 ==> 추후 해당 옵션 처리 필요 
+  var _o4 = $('<span class="checkbox"><input type="checkbox" id="chk-save"><label for="chk-save">아이디 저장</label></span>').appendTo(_o);
+
+  var matchId = document.cookie.match(new RegExp('(^| )SAVE_ID=([^;]+)'));
+  if (matchId) {
+      _id.val(matchId[2]);
+      setTimeout(function() { $("#chk-save").prop("checked", true); }, 10);
+  }
+  // 20261029 khma End : 로그인 페이지 아이디 저장 체크박스 활성화 및 쿠키 연동
+  ```
+  * 로그인 버튼 클릭 이벤트(`.loginBTN.click`) 내부(`_Biz.인증.로그인` 호출 직전):
+  ```javascript
+  // 20261029 khma Start : 아이디 저장 체크 여부에 따른 쿠키(SAVE_ID) 저장/삭제 처리
+  if ($("#chk-save").is(":checked")) {
+      document.cookie = "SAVE_ID=" + _id + "; path=/; max-age=31536000";
+  } else {
+      document.cookie = "SAVE_ID=; path=/; max-age=0";
+  }
+  // 20261029 khma End : 아이디 저장 체크 여부에 따른 쿠키(SAVE_ID) 저장/삭제 처리
+  ```
 
 ---
 
