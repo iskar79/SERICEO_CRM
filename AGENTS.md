@@ -162,3 +162,36 @@ VDI 내부망 코드를 카메라로 촬영하여 전달받는 경우, 단순 OC
 
 5. **서버 초기화 및 캐싱 (`Initializer.java`)**
    - WAS 기동 시 공통코드(`MetaCommCode`), 라벨(`MetaCommLabel`), 메시지(`MetaCommMsg`) 메모리 적재
+
+---
+
+## 7. 다중 PC 간 Git 공유 및 실시간 작업 진행 상태 (자동 인수인계 대장)
+
+> **중요**: 본 프로젝트는 두 대 이상의 외부 PC에서 안티그래비티(Antigravity)를 통해 번갈아 작업합니다. `AGENTS.md`는 안티그래비티 실행 시 자동으로 시스템 규칙(`<user_rules>`)에 로드되므로, **각 단일 스텝 작업이 끝날 때마다 반드시 본 7번 섹션의 [현재 진행 상태]와 `CHANGELOG_KHMA.md`를 함께 갱신한 뒤 `git push github master`를 수행**해야 합니다.
+
+### 1) Git 원격 저장소(Remote) 구성 및 동기화 명령어
+* **외부 PC 간 공유용 GitHub (`github`)**: `https://github.com/iskar79/SERICEO_CRM.git` (브랜치: `master`)
+  * 작업 시작 전 최신화: `git pull github master`
+  * 스텝 완료 후 반영: `git add -A && git commit -m "..." && git push github master`
+* **사내 내부망 GitLab (`origin`)**: `http://gitlab.multicampus.com/sericeo_crm/sericeo_crm` (외부망 PC에서는 접속 불가하므로 반드시 `github` 리모트를 사용할 것)
+
+### 2) 현재까지 완료된 작업 상태 (Last Updated: 2026-10-29)
+* **[완료] Step 0-1 (운영 최신 소스 100% 동기화 및 경량화)**:
+  * 운영 백업본(`sericrm_20261021`) 기준 `src/`, `WebContent/` 100% 동기화 완료.
+  * 운영 DB 테이블/프로시저 스크립트 12종은 `운영쿼리정보/` 폴더로 분리 보존하고, 불필요 설치파일/테스트 첨부파일(96MB) 및 중복 백업 파일 제거 완료.
+* **[완료] Step 0-2 (Step 1 & Step 2 업그레이드용 라이브러리 사전 반입)**:
+  * `WebContent/WEB-INF/lib/Spring 4.3.30 신규 라이브러리/`: Spring `4.3.30.RELEASE` 18종 + `commons-fileupload-1.5.jar` + `commons-io-2.15.1.jar` (총 20개 JAR) 배치 완료.
+  * `WebContent/js/jquery-1.12.4.min.js`: jQuery 1.12.4 배치 완료.
+  * `WebContent/WEB-INF/lib/POI 4.1.2 신규 라이브러리/`: POI 4.1.2 및 의존성 7종 배치 완료.
+* **[완료] Step 0-3 (VDI 최초 반입 및 베이스라인 톰캣 구동 검증 완료)**:
+  * `sericeo_crm_VDI반입용_20261029.zip`(68.90MB, Git 포함)을 VDI 이클립스에 반입 완료.
+  * VDI 이클립스에서 **Java Compiler `1.7`** 설정으로 현재 운영 베이스라인 톰캣 9 서버가 에러 없이 정상 구동됨을 확인 완료 (2026-10-29).
+
+### 3) 지금 바로 착수할 다음 스텝 (Next Action)
+`1_TASK_SYSTEM_UPGRADE.md`에 따라 **Step 1 (시스템 버전 업그레이드)**을 아래 3개의 세부 스텝으로 나누어 **한 번에 하나씩(Step-by-Step)** 진행합니다:
+* 👉 **[진행 대기 - 최우선 착수 대상] Step 1-1**:
+  * `WebContent/WEB-INF/lib/` 내 구형 Spring `3.1.1` JAR 및 구형 `commons-fileupload-1.3.1.jar`, `commons-io-2.2.jar` 파일명 뒤에 `_20261029`를 붙여 백업 보존(삭제 금지)하고, `WebContent/WEB-INF/lib/Spring 4.3.30 신규 라이브러리/` 안의 신규 JAR 20종을 `WebContent/WEB-INF/lib/` 직하위로 배치.
+* **[대기] Step 1-2**:
+  * `WebContent/WEB-INF/Monarch820-servlet.xml` 상단 Spring XML 스키마(`xsd`) `3.0` ➡️ `4.3` 상향 (`khma` 주석 적용 및 VDI 클립보드 복사·붙여넣기 가이드 제시).
+* **[대기] Step 1-3**:
+  * `WebContent/ui/monform.jsp` 내 jQuery `1.10.2` ➡️ `1.12.4` 스크립트 경로 변경 (`khma` 주석 적용 및 VDI 클립보드 복사·붙여넣기 가이드 제시) 후 VDI 톰캣 재기동 테스트.
