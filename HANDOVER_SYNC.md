@@ -13,31 +13,28 @@
 
 ---
 
-## 1. 현재까지 완료된 작업 요약 (Step 0 완료)
+## 1. 현재까지 완료된 작업 요약 (2026.10.29 기준)
 
-1. **운영 최신 소스 100% 동기화 및 정리 완료**:
-   - 운영 백업본(`sericrm_20261021`) 기준으로 `src/` 및 `WebContent/` 전체를 100% 동기화 완료했습니다.
-   - 운영 DB 테이블/프로시저 쿼리 12종은 `운영쿼리정보/` 폴더로 이관 보존했고, 불필요한 대용량 설치/첨부파일 및 중복 백업 파일을 모두 정리했습니다.
-2. **Step 1 & Step 2 업그레이드용 라이브러리 사전 반입 완료**:
-   - `WebContent/WEB-INF/lib/Spring 4.3.30 신규 라이브러리/`: Spring `4.3.30.RELEASE` 18종 + `commons-fileupload-1.5.jar` + `commons-io-2.15.1.jar` (총 20개 JAR)
-   - `WebContent/js/jquery-1.12.4.min.js`: jQuery 1.12.4
-   - `WebContent/WEB-INF/lib/POI 4.1.2 신규 라이브러리/`: POI 4.1.2 및 의존성 7종
-3. **VDI 최초 반입 및 베이스라인 구동 성공 (완료 - 2026.10.29)**:
-   - `sericeo_crm_VDI반입용_20261029.zip`(68.90MB)을 VDI 이클립스에 반입하고, **Default output folder를 `WebContent/WEB-INF/classes`로 설정**, **Java Compiler `1.7` 설정으로 현재 운영 베이스라인 톰캣 9 서버가 정상 구동되는 것까지 확인 완료**했습니다. (로컬 `.classpath` 및 `.settings/*`도 동일하게 동기화 완료)
-   - ⚠️ **VDI 오라클 DB 접속 주소 유의**: 운영 서버(`26.2.51.37:1622`)와 달리 **VDI 내부에서 오라클 DB 접속 주소는 `70.2.251.122:4034` (`jdbc:oracle:thin:@70.2.251.122:4034:MICRODB`)**이며, VDI 이클립스의 `src/properties/jdbc.properties`에 이미 반영되어 있으므로 향후 VDI 파일 복사 시 `jdbc.properties`를 덮어쓰지 않도록 주의합니다.
+1. **Step 0: 운영 최신 소스 100% 동기화 및 베이스라인 구동 검증 완료**:
+   - 운영 백업본(`sericrm_20261021`) 기준으로 `src/` 및 `WebContent/` 전체 100% 동기화 완료.
+   - VDI 환경에서 Default output folder(`WebContent/WEB-INF/classes`) 및 Compiler `1.7` 설정으로 베이스라인 톰캣 정상 구동 확인 완료.
+   - ⚠️ **VDI 오라클 DB 접속 주소 유의**: VDI 내부에서는 `70.2.251.122:4034` (`jdbc:oracle:thin:@70.2.251.122:4034:MICRODB`)로 접속하며 VDI 이클립스의 `src/properties/jdbc.properties`에 이미 반영되어 있으므로 덮어쓰지 않도록 주의합니다.
+2. **Step 1-1 ~ Step 1-2: Spring 4.3.30 업그레이드 완료 및 VDI 톰캣 정상 기동 성공**:
+   - `WebContent/WEB-INF/lib/`: 구형 Spring 3.1.1(22개) 및 Commons(2개) `_20261029` 백업 보존 후 Spring 4.3.30 신규 JAR 20종 배치 완료.
+   - `src/co/kr/kydbm/core/utils/MappingJacksonJsonViewEx.java`: 구형 `MappingJacksonJsonView` 제거에 대응하여 `AbstractView` 상속 및 필요한 메서드 자체 구현 (Jackson 1.x 호환성 100% 유지).
+   - `WebContent/WEB-INF/Monarch820-servlet.xml`: XML 스키마 `4.3.xsd` 상향, `ContentNegotiationManager` 적용, `<mvc:annotation-driven />` 표준 적용, 미사용 Quartz 스케줄러 빈 비활성화로 기동 충돌 원천 해결.
+   - `src/co/kr/kydbm/core/dao/MonArchDaoImpl.java`: Spring 4.3 및 Java 1.8 제네릭 강화에 따른 `UserInfo` 형변환 보정 (1015 라인).
+   - **VDI 톰캣 9 정상 기동 확인 완료 (2026-10-29 16:00)**.
 
 ---
 
-## 2. 절대 준수해야 할 작업 원칙 (필수 리마인드)
+## 2. 내일 바로 착수할 작업 (Next Action - Step 1-3)
 
-1. **완전한 Step-by-Step 진행 및 VDI 붙여넣기 확인 게이트**:
-   - 여러 파일을 한꺼번에 수정하지 말고 **반드시 단일 스텝 단위로 로컬 수정 ➡️ 로컬 이클립스 에러 확인 ➡️ 사용자 VDI 복사·붙여넣기 반영 확인 ➡️ VDI 동작 확인** 순서로 진행합니다.
-2. **외부 PC ➡️ VDI 클립보드 텍스트 복사·붙여넣기(`Ctrl+C` ➡️ `Ctrl+V`) 가이드 제공**:
-   - 중소형 파일은 전체 덮어쓰기(`Ctrl+A` ➡️ `Ctrl+V`), 대형 파일(`superContaner.js`, `MonArch800.js` 등)은 이클립스 `Ctrl+L`(라인 이동) 기준 `[시작 라인 ~ 끝 라인]`, `[기존 코드 블록]`, `[교체할 khma 주석 포함 코드 블록]`을 정확히 안내합니다.
-3. **기존 코드 삭제 절대 금지 & `khma` 주석 표준 엄수**:
-   - 기존 코드는 절대 지우지 않고 주석(`/* ... */`, `//`, `<!-- ... -->`)으로 보존하며, 모든 주석은 `[날짜] [khma]` 순서(`// 20261029 khma Start : ...` ~ `End`)로 작성합니다.
-4. **AI 작업 흔적 절대 금지**:
-   - 코드, 주석, 문서 어디에도 AI 관련 단어나 영문 태그(`Why:`, `What:` 등)를 절대 남기지 않고 사내 `khma` 개발자 스타일과 100% 일치시킵니다.
+* **Step 1-3 (jQuery 1.10.2 ➡️ 1.12.4 보안 패치)**:
+  - 대상 파일 (4개 JSP): `WebContent/ui/monform.jsp`, `login.jsp`, `loginProcess.jsp`, `logoutProcess.jsp`
+  - 이미 `WebContent/js/jquery-1.12.4.min.js`가 배치되어 있으므로, 4개 JSP 파일 내의 script src 경로를 교체하고 `<!-- 20261029 khma : ... -->` 주석 처리.
+* **Step 1-4 (로그인 아이디 저장 기능 활성화)**:
+  - `WebContent/js/jquery.kdb.MonArch800.js` `$.Login` 함수 내 `#chk-save` 및 `SAVE_ID` 쿠키 연동.
 
 ---
 
@@ -47,9 +44,11 @@
 | :---: | :--- | :--- | :---: | :---: | :---: |
 | **Step 0-1** | `.project`, `.classpath`, `.settings/*` | 구형 VJET 제거, 출력경로(`WEB-INF/classes`) 및 컴파일러 `1.7` 설정 | `[x]` | `[x]` | **완료** |
 | **Step 0-2** | `sericeo_crm_VDI반입용_20261029.zip` | 운영 소스 100% 동기화본 + 신규 JAR 반입 및 VDI 베이스라인 기동 확인 | `[x]` | `[x]` | **완료** |
-| **Step 1-1** | `WebContent/WEB-INF/lib/` | 구형 Spring 3.1.1(21개) & Commons(2개) `_20261029` 백업 후 신규 JAR 20종 배치 | `[ ]` | `[ ]` | 👉 **최우선 착수 대기** |
-| **Step 1-2** | `WebContent/WEB-INF/Monarch820-servlet.xml` | 상단 Spring XML 스키마(`xsd`) `3.0` ➡️ `4.3` 상향 (`khma` 주석 적용) | `[ ]` | `[ ]` | 대기 |
-| **Step 1-3** | `WebContent/ui/monform.jsp`, `login.jsp`, `loginProcess.jsp`, `logoutProcess.jsp` | jQuery `1.10.2` ➡️ `1.12.4` 스크립트 경로 변경 (JSP 4개) | `[ ]` | `[ ]` | 대기 |
+| **Step 1-1** | `WebContent/WEB-INF/lib/` | 구형 Spring 3.1.1(22개) & Commons(2개) `_20261029` 백업 후 신규 JAR 20종 배치 | `[x]` | `[x]` | **완료** |
+| **Step 1-1b**| `src/co/kr/kydbm/core/utils/MappingJacksonJsonViewEx.java` | Spring 4.3.30 호환을 위해 `AbstractView` 상속 전환 (Jackson 1.x 유지) | `[x]` | `[x]` | **완료** |
+| **Step 1-2** | `WebContent/WEB-INF/Monarch820-servlet.xml` | XML 스키마 `4.3`, `ContentNegotiationManager`, `mvc:annotation-driven` 적용 | `[x]` | `[x]` | **완료** |
+| **Step 1-2b**| `src/co/kr/kydbm/core/dao/MonArchDaoImpl.java` | Spring 4.3 / Java 1.8 제네릭 `UserInfo` 형변환 보정 (1015라인) | `[x]` | `[x]` | **완료** |
+| **Step 1-3** | `WebContent/ui/monform.jsp`, `login.jsp`, `loginProcess.jsp`, `logoutProcess.jsp` | jQuery `1.10.2` ➡️ `1.12.4` 스크립트 경로 변경 (JSP 4개) | `[ ]` | `[ ]` | 👉 **내일 착수 예정** |
 | **Step 1-4** | `WebContent/js/jquery.kdb.MonArch800.js` | 로그인 화면 아이디 저장 체크박스(`#chk-save`) 활성화 및 쿠키(`SAVE_ID`) 연동 | `[ ]` | `[ ]` | 대기 |
 | **Step 2-1** | `WebContent/WEB-INF/lib/` | 구형 POI 3.8 `_20261029` 백업 후 `POI 4.1.2 신규 라이브러리/` 7종 배치 | `[ ]` | `[ ]` | 대기 |
 | **Step 2-2** | `src/co/kr/kydbm/common/CommonExcelUtil.java` | POI 4.1.2 호환을 위한 `CellType` Enum 문법 수정 | `[ ]` | `[ ]` | 대기 |

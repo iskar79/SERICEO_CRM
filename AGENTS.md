@@ -192,7 +192,9 @@ VDI 내부망 코드를 카메라로 촬영하여 전달받는 경우, 단순 OC
 
 ### 3) 지금 바로 착수할 다음 스텝 (Next Action) & 2단계 검증 게이트(`로컬 수정` ➡️ `VDI 붙여넣기 확인`)
 `1_TASK_SYSTEM_UPGRADE.md`에 따라 **Step 1 (시스템 버전 업그레이드)**을 아래 **4개의 세부 스텝**으로 나누어 **한 번에 하나씩(Step-by-Step)** 진행합니다:
-* 👉 **[진행 대기 - 최우선 착수 대상] Step 1-1** (`[① 로컬: 대기 / ② VDI: 대기]`):
+* **[완료] Step 1-1** (`[① 로컬: 완료(x) / ② VDI: 완료(x)]`):
+* **[완료] Step 1-1b (`MappingJacksonJsonViewEx.java`)** (`[① 로컬: 완료(x) / ② VDI: 완료(x)]`):
+* 👉 **[진행 중 - VDI 반영 대기] Step 1-2 (`Monarch820-servlet.xml`)** (`[① 로컬: 완료(x) / ② VDI: 대기( )]`):
   * `WebContent/WEB-INF/lib/` 내 구형 Spring `3.1.1`(21개) 및 구형 `commons-fileupload-1.3.1.jar`, `commons-io-2.2.jar` 파일명 뒤에 `_20261029`를 붙여 백업 보존(삭제 금지)하고, `WebContent/WEB-INF/lib/Spring 4.3.30 신규 라이브러리/` 안의 신규 JAR 20종을 `WebContent/WEB-INF/lib/` 직하위로 배치.
 * **[대기] Step 1-2** (`[① 로컬: 대기 / ② VDI: 대기]`):
   * `WebContent/WEB-INF/Monarch820-servlet.xml` 상단 Spring XML 스키마(`xsd`) `3.0` ➡️ `4.3` 상향 (`khma` 주석 적용 및 VDI 클립보드 복사·붙여넣기 가이드 제시).
@@ -200,3 +202,15 @@ VDI 내부망 코드를 카메라로 촬영하여 전달받는 경우, 단순 OC
   * `WebContent/ui/monform.jsp`, `login.jsp`, `loginProcess.jsp`, `logoutProcess.jsp` 내 jQuery `1.10.2` ➡️ `1.12.4` 스크립트 경로 변경 (`khma` 주석 적용 및 VDI 클립보드 복사·붙여넣기 가이드 제시).
 * **[대기] Step 1-4** (`[① 로컬: 대기 / ② VDI: 대기]`):
   * `WebContent/js/jquery.kdb.MonArch800.js` 내 `$.Login` 함수에서 로그인 화면 아이디 저장 체크박스(`#chk-save`) 주석 해제 및 쿠키(`SAVE_ID`) 저장/불러오기 연동 (`Mon_LinkCRM_Maven` 동일 방식, `khma` 주석 적용 후 VDI 톰캣 재기동 테스트).
+
+### 3) 지금 바로 착수할 다음 스텝 (Next Action) & 2단계 검증 게이트(`로컬 수정` ➡️ `VDI 붙여넣기 확인`)
+`1_TASK_SYSTEM_UPGRADE.md`에 따라 **Step 1 (시스템 버전 업그레이드)**을 아래 세부 스텝으로 나누어 **한 번에 하나씩(Step-by-Step)** 진행합니다:
+* **[완료] Step 1-1** (`[① 로컬: 완료(x) / ② VDI: 완료(x)]`): 구형 Spring 3.1.1 JAR 백업 및 Spring 4.3.30 신규 라이브러리 20종 배치
+* **[완료] Step 1-1b (`MappingJacksonJsonViewEx.java`)** (`[① 로컬: 완료(x) / ② VDI: 완료(x)]`): `AbstractView` 상속 전환 및 Jackson 1.x 호환성 유지
+* **[완료] Step 1-2 (`Monarch820-servlet.xml`)** (`[① 로컬: 완료(x) / ② VDI: 완료(x)]`): Spring 4.3 xsd, `ContentNegotiationManager`, `mvc:annotation-driven` 적용 및 미사용 Quartz 스케줄러 비활성화
+* **[완료] Step 1-2b (`MonArchDaoImpl.java`)** (`[① 로컬: 완료(x) / ② VDI: 완료(x)]`): Java 1.8 / Spring 4.3 제네릭 `UserInfo` 형변환 보정 (1015라인)
+  * 👉 **VDI 톰캣 9 서버 에러 없이 정상 기동 성공 확인 완료 (2026-10-29 16:00)**
+* 👉 **[내일 착수 예정] Step 1-3** (`[① 로컬: 대기 / ② VDI: 대기]`):
+  * `WebContent/ui/monform.jsp`, `login.jsp`, `loginProcess.jsp`, `logoutProcess.jsp` 내 jQuery `1.10.2` ➡️ `1.12.4` 스크립트 경로 변경 (`khma` 주석 적용 및 VDI 클립보드 복사·붙여넣기 가이드 제시).
+* **[대기] Step 1-4** (`[① 로컬: 대기 / ② VDI: 대기]`):
+  * `WebContent/js/jquery.kdb.MonArch800.js` 내 `$.Login` 함수에서 로그인 화면 아이디 저장 체크박스(`#chk-save`) 주석 해제 및 쿠키(`SAVE_ID`) 연동 (`Mon_LinkCRM_Maven` 동일 방식, `khma` 주석 적용 후 VDI 톰캣 재기동 테스트).

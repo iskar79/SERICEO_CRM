@@ -1011,8 +1011,9 @@ public class MonArchDaoImpl   extends DataSourceSupport{
 		log.debug("★★★★★★★★★★：" + enCryptedPw);
 		
 
-		//UserInfo ui = namedParameterJdbcTemplate.queryForObject(sb.toString(), userInfo, new BeanPropertyRowMapper(UserInfo.class));
-		UserInfo ui = namedParameterJdbcTemplate.queryForObject(sb.toString(), userInfo, new BeanPropertyRowMapper(UserInfo.class));
+		// 20261029 khma : Spring 4.3 및 Java 1.8 제네릭 타입 호환을 위해 UserInfo 형변환 적용 (기존 코드 보존)
+		// UserInfo ui = namedParameterJdbcTemplate.queryForObject(sb.toString(), userInfo, new BeanPropertyRowMapper(UserInfo.class));
+		UserInfo ui = (UserInfo) namedParameterJdbcTemplate.queryForObject(sb.toString(), userInfo, new BeanPropertyRowMapper<UserInfo>(UserInfo.class));
 		return ui;
 	}
 	

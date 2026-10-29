@@ -41,9 +41,11 @@
 | :---: | :--- | :--- | :---: | :---: | :---: |
 | **Step 0-1** | `.project`, `.classpath`, `.settings/*` | 구형 VJET 제거, 출력경로(`WEB-INF/classes`) 및 컴파일러 `1.7` 설정 | `[x]` | `[x]` | **완료** |
 | **Step 0-2** | `sericeo_crm_VDI반입용_20261029.zip` | 운영 소스 100% 동기화본 + 신규 JAR 포함 반입 및 VDI 베이스라인 기동 확인 | `[x]` | `[x]` | **완료** |
-| **Step 1-1** | `WebContent/WEB-INF/lib/` | 구형 Spring 3.1.1(21개) & Commons(2개) `_20261029` 백업 후 신규 JAR 20종 배치 | `[ ]` | `[ ]` | 👉 **최우선 착수 대기** |
-| **Step 1-2** | `WebContent/WEB-INF/Monarch820-servlet.xml` | Spring XML 스키마(`xsd`) 버전 상향 (`3.0` ➡️ `4.3`) | `[ ]` | `[ ]` | 대기 |
-| **Step 1-3** | `WebContent/ui/monform.jsp`, `login.jsp`, `loginProcess.jsp`, `logoutProcess.jsp` | jQuery 스크립트 경로 상향 (`1.10.2` ➡️ `1.12.4`, 4개 JSP) | `[ ]` | `[ ]` | 대기 |
+| **Step 1-1** | `WebContent/WEB-INF/lib/` | 구형 Spring 3.1.1(22개) & Commons(2개) `_20261029` 백업 후 신규 JAR 20종 배치 | `[x]` | `[x]` | **완료** |
+| **Step 1-1b**| `src/co/kr/kydbm/core/utils/MappingJacksonJsonViewEx.java` | Spring 4.3.30 호환을 위해 `AbstractView` 상속 전환 (Jackson 1.x 유지) | `[x]` | `[x]` | **완료** |
+| **Step 1-2** | `WebContent/WEB-INF/Monarch820-servlet.xml` | XML 스키마 `4.3`, `ContentNegotiationManager`, `mvc:annotation-driven` 적용 | `[x]` | `[x]` | **완료** |
+| **Step 1-2b**| `src/co/kr/kydbm/core/dao/MonArchDaoImpl.java` | Spring 4.3 / Java 1.8 제네릭 `UserInfo` 형변환 보정 (1015라인) | `[x]` | `[x]` | **완료** |
+| **Step 1-3** | `WebContent/ui/monform.jsp`, `login.jsp`, `loginProcess.jsp`, `logoutProcess.jsp` | jQuery 스크립트 경로 상향 (`1.10.2` ➡️ `1.12.4`, 4개 JSP) | `[ ]` | `[ ]` | 👉 **내일 착수 예정** |
 | **Step 1-4** | `WebContent/js/jquery.kdb.MonArch800.js` | 로그인 화면 아이디 저장 체크박스(`#chk-save`) 활성화 및 쿠키(`SAVE_ID`) 연동 | `[ ]` | `[ ]` | 대기 |
 | **Step 2-1** | `WebContent/WEB-INF/lib/` | 구형 POI 3.8 `_20261029` 백업 후 `POI 4.1.2 신규 라이브러리/` 7종 배치 | `[ ]` | `[ ]` | 대기 |
 | **Step 2-2** | `src/co/kr/kydbm/common/CommonExcelUtil.java` | POI 4.1.2 호환을 위한 `CellType` Enum 문법 수정 | `[ ]` | `[ ]` | 대기 |
@@ -65,8 +67,10 @@
 > 📘 참조 가이드: `1_TASK_SYSTEM_UPGRADE.md`
 * [x] `WebContent/WEB-INF/lib/Spring 4.3.30 신규 라이브러리/` ➡️ Spring 4.3.30.RELEASE JAR 18종 + `commons-fileupload-1.5.jar`, `commons-io-2.15.1.jar` 사전 반입 완료
 * [x] `WebContent/js/jquery-1.12.4.min.js` ➡️ jQuery 1.12.4 파일 사전 반입 완료
-* [ ] **[Step 1-1]** `WebContent/WEB-INF/lib/` ➡️ 구형 Spring 3.1.1(21개) & Commons(2개) `_20261029` 백업 후 신규 JAR 20종 `lib/` 직하위 배치 (`[① 로컬: 대기 / ② VDI: 대기]`)
-* [ ] **[Step 1-2]** `WebContent/WEB-INF/Monarch820-servlet.xml` ➡️ Spring 스키마(`xsd`) 버전 상향 (`3.0` ➡️ `4.3`) (`[① 로컬: 대기 / ② VDI: 대기]`)
+* [x] **[Step 1-1]** `WebContent/WEB-INF/lib/` ➡️ 구형 Spring 3.1.1(22개) & Commons(2개) `_20261029` 백업 후 신규 JAR 20종 `lib/` 직하위 배치 (`[① 로컬: 완료(x) / ② VDI: 완료(x)]`)
+* [x] **[Step 1-1b]** `src/co/kr/kydbm/core/utils/MappingJacksonJsonViewEx.java` ➡️ Spring 4.3.30 호환 `AbstractView` 상속 전환 (`[① 로컬: 완료(x) / ② VDI: 완료(x)]`)
+* [x] **[Step 1-2]** `WebContent/WEB-INF/Monarch820-servlet.xml` ➡️ Spring 스키마(`xsd`) `4.3`, `ContentNegotiationManager`, `mvc:annotation-driven` 적용 (`[① 로컬: 완료(x) / ② VDI: 완료(x)]`)
+* [x] **[Step 1-2b]** `src/co/kr/kydbm/core/dao/MonArchDaoImpl.java` ➡️ Spring 4.3 / Java 1.8 제네릭 `UserInfo` 형변환 보정 (`[① 로컬: 완료(x) / ② VDI: 완료(x)]`)
 * [ ] **[Step 1-3]** `WebContent/ui/monform.jsp`, `login.jsp`, `loginProcess.jsp`, `logoutProcess.jsp` ➡️ jQuery 스크립트 경로 상향 (`1.10.2` ➡️ `1.12.4`) (`[① 로컬: 대기 / ② VDI: 대기]`)
 * [ ] **[Step 1-4]** `WebContent/js/jquery.kdb.MonArch800.js` ➡️ 로그인 화면 아이디 저장 체크박스(`#chk-save`) 활성화 및 쿠키(`SAVE_ID`) 연동 (`[① 로컬: 대기 / ② VDI: 대기]`)
 
@@ -99,7 +103,11 @@
 
 | 일자 | 작업자 | 대상 파일 경로 | 구분 | 위치 (메서드/라인) | 변경 내용 요약 (초급자도 이해할 수 있게 명확히 작성) |
 | :---: | :---: | :--- | :---: | :--- | :--- |
-| 20261029 | khma | `.classpath`, `.settings/*` | 수정 | `output` 경로 및 컴파일 타깃 | VDI 이클립스 설정과 동일하게 클래스 출력 경로(`WebContent/WEB-INF/classes`) 및 컴파일 타깃(`1.7`) 일원화 |
+| 20261029 | khma | `src/co/kr/kydbm/core/dao/MonArchDaoImpl.java` | 수정 | 1015L (`getUserInfo`) | Spring 4.3 및 Java 1.8 제네릭 강화에 따른 `UserInfo` 반환값 형변환 보정 (기존 코드 주석 보존) |
+| 20261029 | khma | `WebContent/WEB-INF/Monarch820-servlet.xml` | 수정 | 섹션 3, 섹션 5 | Spring 4.3.xsd 스키마 상향, `ContentNegotiationManager` 적용, `<mvc:annotation-driven />` 적용 및 미사용 Quartz 스케줄러 비활성화 주석 보존 |
+| 20261029 | khma | `src/co/kr/kydbm/core/utils/MappingJacksonJsonViewEx.java` | 수정 | 전체 클래스 | Spring 4.3.30 호환을 위해 `AbstractView` 직접 상속 및 Jackson 1.x 직렬화 호환성 100% 자체 구현 (기존 코드 주석 보존) |
+| 20261029 | khma | `WebContent/WEB-INF/lib/` | 수정 | `WEB-INF/lib/` | 구형 Spring 3.1.1(22종), Commons Fileupload 1.3.1, IO 2.2 `_20261029` 백업 보존 후 Spring 4.3.30 20종 JAR 배치 |
+| 20261029 | khma | `.classpath`, `.settings/*` | 수정 | `output` 경로 및 컴파일 타깃 | VDI 이클립스 설정과 동일하게 클래스 출력 경로(`WebContent/WEB-INF/classes`) 및 컴파일 타깃(`1.7`/`1.8`) 일원화 |
 | 20261029 | khma | `WebContent/WEB-INF/lib/Spring 4.3.30 신규 라이브러리/`, `WebContent/js/jquery-1.12.4.min.js` | 추가 | `WEB-INF/lib/`, `js/` | Step 1 업그레이드용 Spring 4.3.30.RELEASE(18종), Commons Fileupload 1.5/IO 2.15.1, jQuery 1.12.4 사전 다운로드 및 반입 |
 | 20261029 | khma | `WebContent/FileData/`, `WebContent/WEB-INF/lib/` | 정리 | 첨부/백업파일 | 불필요 테스트 첨부/구형 설치파일(96MB) 및 중복 백업 파일(`*_20260922` 등) 정리로 VDI 반입 용량 경량화 |
 | 20261029 | khma | `ARCHITECTURE.md`, `3_TASK_SECUREDB_API.md`, `3_ALT_SECUREDB_UDF.md` | 보강 | 8장 테이블/프로시저 명세 외 | `운영쿼리정보/` 실제 운영 테이블(7종+`A_FAMILY`/`US_USER`) 및 프로시저(5종) 스키마/암호화 대상 컬럼 매핑 및 배치·엑셀업로드 영향도 반영 |
@@ -131,34 +139,14 @@
 | 20261002 | khma | `jquery.kdb.superContaner.js` | 사전점검 | 218L, 12053L | 기존 운영 소스(20241115 페이지 볼드 및 _logOld 수정) 보존 상태 대조 확인 |
 | 20261001 | khma | `.project` | 수정 | 빌더/네이처 | 최신 이클립스 호환성을 위한 구형 VJET 및 JSDT 찌꺼기 플러그인 설정 제거 |
 
-> 📝 **새로운 작업 작성 예시**:  
-> `| 20261007 | khma | src/co/kr/kydbm/common/CommonExcelUtil.java | 수정 | getCellData() | POI 4.1.2 CellType Enum 마이그레이션 적용 |`
-
 ---
 
 ## 🔍 3. 작업 건별 세부 변경 내역 (Diff 요약)
 
-실제 코드 변경이 발생했을 때, 어떤 코드가 어떻게 바뀌었는지 Before / After 또는 작업 내용을 아래에 상세히 기록합니다.
-
-### [최신 운영 원본 100% 동기화] khma - 운영 백업본(`sericrm_20261021/`) 기준 전수 대조 및 1:1 동기화 완료
+### [2026.10.29] Spring 4.3.30 업그레이드 완료 (Step 1-1 ~ Step 1-2)
 * **대상 파일**:
-  * **핵심 JS/CSS/설정 (8종)**:
-    * `WebContent/js/jquery.kdb.superContaner.js` (DownCsv 확장, 20250528 다음 주소 API 주석, 20250529 에디터 수정)
-    * `WebContent/js/MonArch.js` (20250528 다음 주소 API 로딩 주석)
-    * `WebContent/Resource.js` (WordOption 및 20250529 에디터 설정)
-    * `WebContent/js/jquery.kdb.resizingCell.js` (20250626 tinymce 테이블 리사이즈 주석)
-    * `WebContent/js/thirdparties/tinymce4/tinymce.min.js`
-    * `WebContent/js/thirdparties/tinymce4/skins/lightgray/content.min.css`
-    * `WebContent/WEB-INF/Monarch820-servlet.xml` (DBCP `validationQuery` 및 `NLS_DATE_FORMAT` 초기화 설정)
-    * `WebContent/WEB-INF/log4j.properties` (20250609 로그 레벨 INFO 전환)
-  * **백엔드 프로퍼티 (2종)**:
-    * `src/monarch.properties`, `src/properties/jdbc.properties`
-  * **정적 HTML/CSS 및 리소스/라이브러리**:
-    * `WebContent/CustSearchlocal.html`, `WebContent/SurveyAnsform.htm`, `WebContent/error.htm`, `WebContent/testFilter.html`
-    * `WebContent/ui/popup/CustSearch.html`, `ReportView.html`, `ReportViewDt.html`, `ReportViewDt - 복사본.html`, `testCust.html`
-    * `WebContent/css/Common.css`, `WebContent/js/jquery.kdb.filter.js`, `WebContent/image/block_loading.gif`
-    * `WebContent/FileData/template/*` (운영 최신 엑셀 업로드 양식 일괄 반영)
-    * `WebContent/WEB-INF/lib/ojdbc8.jar` (기존 `ojdbc6.jar` ➡️ `ojdbc6.jar_20261029` 백업 보존) 및 POI 3.8 원본 JAR 복원
-* **작업 구분**: **운영 최신 원본 소스 100% 일치화 (기능 작업 착수 전 베이스라인 확립)**
-* **상세 내용**:
-  * `sericrm_20261021` 운영 백업본과 `WebContent/` 전체 파일 간 MD5 해시 불일치 건수 **0건** 달성 확인
+  * `WebContent/WEB-INF/lib/` (Spring 4.3.30 JAR 20종 배치, 구형 3.1.1 `_20261029` 백업 보존)
+  * `src/co/kr/kydbm/core/utils/MappingJacksonJsonViewEx.java` (`AbstractView` 상속 전환)
+  * `WebContent/WEB-INF/Monarch820-servlet.xml` (Spring 4.3 xsd, `ContentNegotiationManager`, `mvc:annotation-driven` 적용)
+  * `src/co/kr/kydbm/core/dao/MonArchDaoImpl.java` (Java 1.8 제네릭 `UserInfo` 형변환 보정)
+* **작업 결과**: **VDI 톰캣 9 서버 에러 없이 정상 기동 성공 확인 완료 (2026.10.29)**

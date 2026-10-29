@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<!-- ========================================================================================== -->
+<!-- [SERICEO CRM (MonArch 8.2.0)] Spring MVC 웹 애플리케이션 컨텍스트 설정 (Monarch820-servlet.xml) -->
+<!-- ========================================================================================== -->
+<!-- 20261029 khma : Spring 4.3.30.RELEASE 업그레이드에 따른 XML 스키마(xsd) 3.0 -> 4.3 상향 -->
+<!--
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
 	xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
@@ -15,23 +20,44 @@
        http://www.springframework.org/schema/context/spring-context-3.0.xsd
        http://www.springframework.org/schema/mvc
        http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" 
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx-4.3.xsd
+       http://www.springframework.org/schema/aop
+       http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context-4.3.xsd
+       http://www.springframework.org/schema/mvc
+       http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd">
 
 
-	<!-- ========================= JDBC RESOURCE DEFINITIONS ========================= -->
+	<!-- ========================================================================================== -->
+	<!-- [섹션 1] 데이터베이스(JDBC) 리소스, Jasypt 암복호화 및 트랜잭션/템플릿 정의                -->
+	<!-- ========================================================================================== -->
 
-	<!--  프로퍼티 암호화 처리 start -->
+	<!-- 1-1. Jasypt 프로퍼티 암호화 설정 (jdbc.properties 내 ENC(...) 암호화 문자열 복호화용) -->
 	<bean id="environmentVariablesConfiguration"
-      class="org.jasypt.encryption.pbe.config.EnvironmentStringPBEConfig">
-        <property name="algorithm" value="PBEWithMD5AndDES" />
-        <property name="passwordEnvName" value="APP_ENCRYPTION_PASSWORD" />
-    </bean>
+		class="org.jasypt.encryption.pbe.config.EnvironmentStringPBEConfig">
+		<property name="algorithm" value="PBEWithMD5AndDES" />
+		<property name="passwordEnvName" value="APP_ENCRYPTION_PASSWORD" />
+	</bean>
   
-    <bean id="configurationEncryptor"
-      class="org.jasypt.encryption.pbe.StandardPBEStringEncryptor">
-        <property name="config" ref="environmentVariablesConfiguration" />
-        <property name="password" value="kydbmJasyptPass" />
-    </bean>
-   	<bean id="propertyConfigurer"
+	<bean id="configurationEncryptor"
+		class="org.jasypt.encryption.pbe.StandardPBEStringEncryptor">
+		<property name="config" ref="environmentVariablesConfiguration" />
+		<property name="password" value="kydbmJasyptPass" />
+	</bean>
+
+	<bean id="propertyConfigurer"
 		class="org.jasypt.spring3.properties.EncryptablePropertyPlaceholderConfigurer">
 		<constructor-arg ref="configurationEncryptor" />
 		<property name="locations">
@@ -40,18 +66,8 @@
 			</list>
 		</property>
 	</bean>
-    <!--  프로퍼티 암호화 처리 end -->
     
-<!--    	<bean id="propertyConfigurer" -->
-<!-- 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"> -->
-<!-- 		<property name="locations"> -->
-<!-- 			<list> -->
-<!-- 				<value>/WEB-INF/jdbc.properties</value> -->
-<!-- 			</list> -->
-<!-- 		</property> -->
-<!-- 	</bean> -->
-	
-    
+	<!-- 1-2. 메인 Oracle DataSource (Commons DBCP 커넥션 풀 및 세션 날짜 포맷 초기화) -->
 	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
 		destroy-method="close">
 		<property name="driverClassName" value="${jdbc.driverClassName}" />
@@ -60,51 +76,30 @@
 		<property name="password" value="${jdbc.password}" />
 		<property name="maxActive" value="500" />
 		<property name="maxIdle" value="100" />
-    
 		<property name="validationQuery" value="SELECT 1 FROM DUAL" />
 		<property name="testOnBorrow" value="true" />
 		<property name="testWhileIdle" value="true" />
 		<property name="timeBetweenEvictionRunsMillis" value="60000" />
-
 		<property name="connectionInitSqls">
 			<list>
 				<value>ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD'</value>
 			</list>
 		</property>
 	</bean>
-	
-<!-- 	<bean id="monOraDataSource" class="org.apache.commons.dbcp.BasicDataSource" -->
-<!-- 		destroy-method="close"> -->
-<!-- 		<property name="driverClassName" value="${jdbc.oracle.driverClassName}" /> -->
-<!-- 		<property name="url" value="${jdbc.oracle.url}" /> -->
-<!-- 		<property name="username" value="${jdbc.oracle.username}" /> -->
-<!-- 		<property name="password" value="${jdbc.oracle.password}" /> -->
-<!-- 		<property name="maxActive" value="500" /> -->
-<!-- 		<property name="maxIdle" value="100" /> -->
-<!-- 	</bean> -->
 
-<!-- 	<bean id="mon820DataSource" class="org.apache.commons.dbcp.BasicDataSource" -->
-<!-- 		destroy-method="close"> -->
-<!-- 		<property name="driverClassName" value="${jdbc.monarch.driverClassName}" /> -->
-<!-- 		<property name="url" value="${jdbc.monarch.url}" /> -->
-<!-- 		<property name="username" value="${jdbc.monarch.username}" /> -->
-<!-- 		<property name="password" value="${jdbc.monarch.password}" /> -->
-<!-- 		<property name="maxActive" value="500" /> -->
-<!-- 		<property name="maxIdle" value="100" /> -->
-<!-- 	</bean> -->
-
-	<!--트랜젝션메니져 -->
+	<!-- 1-3. 트랜잭션 매니저 및 트랜잭션 템플릿 -->
 	<bean id="transactionManager"
 		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
 		<property name="dataSource" ref="dataSource" />
 	</bean>
+
 	<bean id="transactionTemplateRequired"
 		class="org.springframework.transaction.support.TransactionTemplate">
 		<property name="transactionManager" ref="transactionManager" />
 		<property name="propagationBehaviorName" value="PROPAGATION_REQUIRED" />
 	</bean>
 
-	<!--JDBC템플릿 -->
+	<!-- 1-4. Spring JDBC 템플릿 (일반 쿼리 및 @PARAM@ 이름 기반 파라미터 바인딩 실행용) -->
 	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
 		<constructor-arg ref="dataSource" />
 	</bean>
@@ -114,8 +109,7 @@
 		<constructor-arg ref="dataSource" />
 	</bean>
 
-
-
+	<!-- 1-5. Oracle 대용량 LOB(CLOB/BLOB) 처리 핸들러 -->
 	<bean id="nativeJdbcExtractor"
 		class="org.springframework.jdbc.support.nativejdbc.CommonsDbcpNativeJdbcExtractor"
 		lazy-init="true" />
@@ -127,12 +121,18 @@
 		</property>
 	</bean>
 
-	<!-- com.skyunoe.spring 패키지의 하위 bean 자동 등록 -->
+
+	<!-- ========================================================================================== -->
+	<!-- [섹션 2] 컴포넌트 자동 스캔 & 로그인 세션 검증 인터셉터 (LoginCheckInterceptor)            -->
+	<!-- ========================================================================================== -->
+
+	<!-- co.kr.kydbm 패키지 하위 @Controller, @Service, @Component 어노테이션 빈 자동 스캔 -->
 	<context:component-scan base-package="co.kr.kydbm" />
 
+	<!-- 인증 세션(UserInfo) 검증 인터셉터 매핑 -->
 	<mvc:interceptors>
 		<mvc:interceptor>
-			<!-- json-->
+			<!-- JSON 데이터/메타 요청 (*.json) -->
 			<mvc:mapping path="/DATACRUD.json" />
 			<mvc:mapping path="/M5Hash.json" />
 			<mvc:mapping path="/GetJs.json" />
@@ -140,7 +140,7 @@
 			<mvc:mapping path="/GetHtml.json" />
 			<mvc:mapping path="/sendIndvEmail.json" />
 			<mvc:mapping path="/getUserInfo.json" />
-			<!-- mon -->
+			<!-- 화면 이동 및 파일 업/다운로드 요청 (*.mon) -->
 			<mvc:mapping path="/upload.mon" />
 			<mvc:mapping path="/fileupload.mon" />
 			<mvc:mapping path="/filedownload.mon" />
@@ -152,28 +152,53 @@
 			<bean class="co.kr.kydbm.core.interceptor.LoginCheckInterceptor" />
 		</mvc:interceptor>
 	</mvc:interceptors>
-	
+
+
+	<!-- ========================================================================================== -->
+	<!-- [섹션 3] 예외 처리기, 핸들러 매핑 및 View Resolver (JSP / JSON 응답 분기)                  -->
+	<!-- ========================================================================================== -->
+
+	<!-- 전역 예외 처리기 -->
 	<bean id="exceptionResolver" class="co.kr.kydbm.core.exception.ExceptionResolver">
 	</bean>
 	
-	<!-- handler mapping -->
+	<!-- 어노테이션(@RequestMapping) 기반 핸들러 매핑 -->
 	<bean id="handlerMapping"
 		class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping" />
 
-	<!-- view resolver -->
-	<bean
-		class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+	<!-- 20261029 khma Start : Spring 4.3 호환을 위한 ContentNegotiationManager 설정 추가 -->
+	<bean id="contentNegotiationManager"
+		class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
+		<property name="favorPathExtension" value="true" />
+		<property name="ignoreAcceptHeader" value="true" />
+		<property name="defaultContentType" value="text/html" />
 		<property name="mediaTypes">
 			<map>
 				<entry key="atom" value="application/atom+xml" />
 				<entry key="html" value="text/html" />
- 				<!--  <entry key="mon" value="text/html" /> -->
 				<entry key="json" value="application/json" />
 			</map>
 		</property>
+	</bean>
+	<!-- 20261029 khma End : Spring 4.3 호환을 위한 ContentNegotiationManager 설정 추가 -->
+
+	<!-- 복합 View Resolver: 일반 화면은 /ui/*.jsp로, JSON 요청은 MappingJacksonJsonViewEx로 렌더링 -->
+	<bean
+		class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+		<!-- 20261029 khma : Spring 4.3에서 제거된 mediaTypes 프로퍼티를 contentNegotiationManager 참조로 변경 -->
+		<!--
+		<property name="mediaTypes">
+			<map>
+				<entry key="atom" value="application/atom+xml" />
+				<entry key="html" value="text/html" />
+				<entry key="json" value="application/json" />
+			</map>
+		</property>
+		-->
+		<property name="contentNegotiationManager" ref="contentNegotiationManager" />
 		<property name="viewResolvers">
 			<list>
-				<bean class="org.springframework.web.servlet.view.BeanNameViewResolver" >
+				<bean class="org.springframework.web.servlet.view.BeanNameViewResolver">
 				</bean>
 				<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
 					<property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
@@ -186,99 +211,73 @@
 			<list>
 				<bean id="jsonView" 
 					class="co.kr.kydbm.core.utils.MappingJacksonJsonViewEx">
-<!-- 					class="org.springframework.web.servlet.view.json.MappingJacksonJsonView"> -->
-<!-- 					<bean class="co.kr.kydbm.core.utils.MappingJacksonJsonViewEx"> -->
-					<property name="prefixJson" value="false" /><!-- 헤더에{}&& 가 
-						붙는현상..false로 하면 안보임 -->
+					<property name="prefixJson" value="false" /><!-- 헤더에{}&& 가 붙는현상..false로 하면 안보임 -->
 				</bean>
 			</list>
 		</property>
 	</bean>
 	
-	<!-- Dao Bean 설정 -->
+
+	<!-- ========================================================================================== -->
+	<!-- [섹션 4] 핵심 DAO(Data Access Object) Bean 및 파일 업로드 리졸버 설정                      -->
+	<!-- ========================================================================================== -->
+
+	<!-- MonArch 메타데이터 동적 쿼리 실행 핵심 DAO -->
 	<bean id="MonArchDao" class="co.kr.kydbm.core.dao.MonArchDaoImpl">
-<!-- 		<property name="dataSource" ref="dataSource" /> -->
 		<property name="lobHandler" ref="lobHandler" />
 	</bean>
+
+	<!-- 다중 데이터소스 지원 DAO -->
 	<bean id="MonArchExtDao" class="co.kr.kydbm.core.dao.DataSourceSupport">
 		<property name="dataSource" ref="dataSource" />
-		<!--<property name="monOraDataSource" ref="monOraDataSource" /> -->
 	</bean>
+
+	<!-- 엑셀 대량 데이터 업로드 처리 DAO -->
 	<bean id="DataUploadDao" class="co.kr.kydbm.core.dao.DataUploadDaoImpl">
 		<property name="dataSource" ref="dataSource" />
 	</bean>
 
-	<!-- <bean id="LegacyIfDao" class="co.kr.kydbm.lghausys.scheduler.Dao.LegacyIfDaoImpl"> 
-		<property name="osbdbDataSource" ref="osbdbDataSource" /> <property name="lgchhomeDataSource" 
-		ref="lgchhomeDataSource" /> <property name="dataSource" ref="dataSource" 
-		/> </bean> -->
-		
-<!-- 	<bean id="MonArchExtDao" class="co.kr.kydbm.core.dao.MonArchExtDaoImpl"> -->
-<!-- 		<property name="mon820DataSource" ref="mon820DataSource" /> -->
-<!-- 	</bean> -->
-
-
-
-	<!-- Configure the multipart resolver -->
+	<!-- 멀티파트 첨부파일 업로드 리졸버 (최대 업로드 크기: 30MB, UTF-8) -->
 	<bean id="multipartResolver"
 		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
-		<!-- one of the properties available; the maximum file size in bytes 30MB -->
 		<property name="defaultEncoding" value="UTF-8" />
 		<property name="maxUploadSize" value="30000000" />
 	</bean>
 
 
-	<!-- Schedule -->
-	<!-- 1. 스케쥴 대상이 되는 클래스 정의 Start -->
-	<!-- 모나크 공통스케쥴러 Job -->
-<!-- 	<bean id="cronTest01Job" class="org.springframework.scheduling.quartz.JobDetailBean"> -->
-<!-- 	<property name="jobClass" value="co.kr.kydbm.scheduler.job.MonarchCommonJob" /> -->
-<!-- 	<property name="jobDataAsMap"> -->
-<!-- 		<map> -->
-<!-- 			<entry key="usite"  value="13" /> -->
-<!-- 			<entry key="serviceName"  value="M_SRVMGMT" /> -->
-<!-- 			<entry key="methodName"  value="LIST" /> -->
-<!-- 		</map> -->
-<!-- 	</property> -->
-<!-- 	</bean> -->
-	<!-- 다중커넥션 스케쥴러 예제 Job -->
-<!-- 	<bean id="cronOracleToMariaDBTestJob" class="org.springframework.scheduling.quartz.JobDetailBean"> -->
-<!-- 	<property name="jobClass" value="co.kr.kydbm.scheduler.job.OracleToMariaDBJob" /> -->
-<!-- 	</bean> -->
-	
-	<!-- 개별다이렉트 메일 발송 Job -->
+	<!-- ========================================================================================== -->
+	<!-- [섹션 5] Quartz 백그라운드 스케줄러 설정 (Spring 4.3 FactoryBean 규격 적용)                -->
+	<!-- ========================================================================================== -->
+
+	<!-- 5-1. 개별 다이렉트 메일 발송 Job 정의 -->
+	<!-- 20261029 khma : Spring 4.3 호환을 위해 JobDetailBean -> JobDetailFactoryBean 변경 -->
+	<!--
 	<bean id="cronSendDirectMailJob" class="org.springframework.scheduling.quartz.JobDetailBean">
 		<property name="jobClass" value="co.kr.kydbm.scheduler.job.SendDirectMailJob" />
 	</bean>
+	-->
+	<bean id="cronSendDirectMailJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass" value="co.kr.kydbm.scheduler.job.SendDirectMailJob" />
+		<property name="durability" value="true" />
+	</bean>
 	
-	<!-- 1. 스케쥴 대상이 되는 클래스 정의 End -->
-	
-	
-	<!-- 2. 스케쥴 시간 설정 Start -->
-	<!-- 개별다이렉트 메일 발송 실행시간 설정 -->
-<!-- 	<bean id="cronTest01JobTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean"> -->
-<!-- 		<property name="jobDetail" ref="cronTest01Job" /> -->
-<!-- 		<property name="cronExpression" value="0/10 * * * * ?"/> -->
-<!-- 	</bean> -->
-	
-<!-- 	<bean id="cronOracleToMariaDBTestJobTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean"> -->
-<!-- 		<property name="jobDetail" ref="cronOracleToMariaDBTestJob" /> -->
-<!-- 		<property name="cronExpression" value="0/10 * * * * ?"/> -->
-<!-- 	</bean> -->
-	
-	<!-- 개별다이렉트 메일 발송 실행시간 설정 -->
+	<!-- 5-2. 개별 다이렉트 메일 발송 실행 주기 설정 -->
+	<!-- 20261029 khma : Spring 4.3 호환을 위해 CronTriggerBean -> CronTriggerFactoryBean 변경 -->
+	<!--
 	<bean id="SendDirectMailJobTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
 		<property name="jobDetail" ref="cronSendDirectMailJob" />
 		<property name="cronExpression" value="0/30 * * * * ?"/>
 	</bean>
-	<!-- 2. 스케쥴 시간 설정 End -->
+	-->
+	<bean id="SendDirectMailJobTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="cronSendDirectMailJob" />
+		<property name="cronExpression" value="0/30 * * * * ?"/>
+	</bean>
 	
-	<!-- 3. 스케쥴 실행  Start -->
+	<!-- 5-3. 스케줄러 팩토리 빈 (운영 설정과 동일하게 트리거는 비활성화 상태 유지) -->
 	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
 		<property name="triggers">
 			<list>
-<!-- 				<ref bean="cronTest01JobTrigger" /> -->
-<!-- 				<ref bean="cronOracleToMariaDBTestJobTrigger" /> -->
 				<!--<ref bean="SendDirectMailJobTrigger" />-->
 			</list>
 		</property>
@@ -292,13 +291,14 @@
 			</props>
 		</property>
 	</bean>
-	<!-- 3. 스케쥴 실행  End -->
 
 
-	<!-- 서버기동초기화 -->
+	<!-- ========================================================================================== -->
+	<!-- [섹션 6] 서버 기동 시 메타데이터 메모리 캐싱 초기화 (Initializer)                          -->
+	<!-- ========================================================================================== -->
+
+	<!-- WAS 기동 시 공통코드(MetaCommCode), 라벨(MetaCommLabel), 메시지(MetaCommMsg) 메모리 적재 -->
 	<bean id="InitProc" class="co.kr.kydbm.core.meta.Initializer"
 		init-method="init">
 	</bean>
 </beans>
-
-
