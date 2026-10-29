@@ -165,9 +165,11 @@ VDI 내부망 코드를 카메라로 촬영하여 전달받는 경우, 단순 OC
 
 ---
 
-## 7. 다중 PC 간 Git 공유 및 실시간 작업 진행 상태 (자동 인수인계 대장)
+## 7. 다중 PC 간 Git 공유 및 실시간 작업 진행 상태 (`HANDOVER_SYNC.md` 양방향 동기화 필수)
 
-> **중요**: 본 프로젝트는 두 대 이상의 외부 PC에서 안티그래비티(Antigravity)를 통해 번갈아 작업합니다. `AGENTS.md`는 안티그래비티 실행 시 자동으로 시스템 규칙(`<user_rules>`)에 로드되므로, **각 단일 스텝 작업이 끝날 때마다 반드시 본 7번 섹션의 [현재 진행 상태]와 `CHANGELOG_KHMA.md`를 함께 갱신한 뒤 `git push github master`를 수행**해야 합니다.
+> **중요**: 본 프로젝트는 두 대 이상의 외부 PC에서 안티그래비티(Antigravity)를 통해 번갈아 작업합니다. `AGENTS.md`는 안티그래비티 실행 시 자동으로 시스템 규칙(`<user_rules>`)에 로드됩니다.
+> 1. **작업 시작 시 (`PC A` ↔ `PC B` 전환 후 시작할 때)**: 가장 먼저 **`git pull github master`**를 실행하고 **`HANDOVER_SYNC.md`**와 `CHANGELOG_KHMA.md`를 읽어 다른 PC에서 진행된 최신 내역을 동기화합니다.
+> 2. **단일 스텝 완료 또는 작업 종료 시**: 반드시 **`HANDOVER_SYNC.md`**, 본 **`AGENTS.md`(7번 섹션)**, **`CHANGELOG_KHMA.md`**를 최신 진행 상태로 갱신한 뒤 **`git push github master`**를 수행하여 상대방 PC에서도 즉시 이어받을 수 있도록 합니다.
 
 ### 1) Git 원격 저장소(Remote) 구성 및 동기화 명령어
 * **외부 PC 간 공유용 GitHub (`github`)**: `https://github.com/iskar79/SERICEO_CRM.git` (브랜치: `master`)
