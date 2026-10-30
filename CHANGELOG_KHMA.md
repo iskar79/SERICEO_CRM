@@ -146,6 +146,15 @@
 
 ## 🔍 3. 작업 건별 세부 변경 내역 (Diff 요약)
 
+### [2026.10.30] jQuery 1.12.4 보안 패치, 아이디 저장, 비밀번호 통합 검증 및 레거시 주석 전수 정리 (Step 1-3, Step 1-4, Step 4)
+* **대상 파일**:
+  * `WebContent/ui/monform.jsp`, `login.jsp`, `loginProcess.jsp`, `logoutProcess.jsp` (jQuery 1.12.4 경로 교체)
+  * `WebContent/js/jquery.kdb.MonArch800.js` (`$.Login` 내 `#chk-save` 아이디 저장 및 `validatePassword` 통합 검증 적용)
+  * `WebContent/js/jquery.kdb.MonArch800.js` (2020년 이전 레거시 주석 225줄 전수 제거 및 JDK 11 컴파일 파싱 검증 완료)
+* **작업 결과**:
+  * 4개 JSP 및 `MonArch800.js` VDI 이클립스 반영 완료 (`[① 로컬: 완료(x) / ② VDI: 완료(x)]`)
+  * `MON_COM_사용자정보POPUP_TBL` 구조체 연동 방안 분석 완료 (`M_STRUCTURE` DB 테이블 `beforeSaveCallBack: "validatePassword"` 연동)
+
 ### [2026.10.29] Spring 4.3.30 업그레이드 완료 (Step 1-1 ~ Step 1-2)
 * **대상 파일**:
   * `WebContent/WEB-INF/lib/` (Spring 4.3.30 JAR 20종 배치, 구형 3.1.1 `_20261029` 백업 보존)

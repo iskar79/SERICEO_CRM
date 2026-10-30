@@ -211,7 +211,7 @@ VDI 내부망 코드를 카메라로 촬영하여 전달받는 경우, 단순 OC
   * 스텝 완료 후 반영: `git add -A && git commit -m "..." && git push github master`
 * **사내 내부망 GitLab (`origin`)**: `http://gitlab.multicampus.com/sericeo_crm/sericeo_crm` (외부망 PC에서는 접속 불가하므로 반드시 `github` 리모트를 사용할 것)
 
-### 2) 현재까지 완료된 작업 상태 (Last Updated: 2026-10-29)
+### 2) 현재까지 완료된 작업 상태 (Last Updated: 2026-10-30)
 * **[완료] Step 0-1 (운영 최신 소스 100% 동기화 및 경량화)**:
   * 운영 백업본(`sericrm_20261021`) 기준 `src/`, `WebContent/` 100% 동기화 완료.
   * 운영 DB 테이블/프로시저 스크립트 12종은 `운영쿼리정보/` 폴더로 분리 보존하고, 불필요 설치파일/테스트 첨부파일(96MB) 및 중복 백업 파일 제거 완료.
