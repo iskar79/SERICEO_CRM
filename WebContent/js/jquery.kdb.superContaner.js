@@ -6945,7 +6945,7 @@ $(document).on("blur", ".t_Money", function (e) {
             
     },
     // ----------------------------------------------------
-    // 20261030 khma Start : 보안 엑셀 다운로드 (공통코드 XLS_PURPOSE/XLS_TARGET 연동 및 2단계 순차 팝업)
+    // 20261030 khma Start : 보안 엑셀 다운로드 (공통코드 XLS_PURPOSE/XLS_TARGET 동적 연동 및 2단계 순차 팝업)
     DownXlsNew: function (oCmd) {
       var _Obj = $(this);
       var _RCD_CNT = $('.pgMsg.records', _Obj).text();
@@ -7047,41 +7047,38 @@ $(document).on("blur", ".t_Money", function (e) {
       // -----------------------------------------------------------------
       $("#excelModalLayer, #excelModalDim").remove();
 
-      // 공통코드 취득 (XLS_PURPOSE, XLS_TARGET)
-      var usageCodes = [
-        { CODE: "INFO", DECODE: "정보성" },
-        { CODE: "OFF_PROMO", DECODE: "오프라인 홍보용" },
-        { CODE: "ADV_PROMO", DECODE: "광고성 홍보용" },
-        { CODE: "ETC", DECODE: "기타" }
-      ];
-      var targetCodes = [
-        { CODE: "ALL", DECODE: "전체" },
-        { CODE: "EMAIL", DECODE: "이메일 수신" },
-        { CODE: "SMS", DECODE: "SMS 수신" },
-        { CODE: "TEL", DECODE: "전화 수신" }
-      ];
-
-      if (typeof $.SvcGetCodes === "function") {
-        try {
-          $.SvcGetCodes("XLS_PURPOSE,XLS_TARGET", function (data) {
-            if (data && data.resultData && data.resultData.length > 0) {
-              var dynUsage = [];
-              var dynTarget = [];
-              $.each(data.resultData, function (idx, item) {
-                if (item.CODE_GRP === "XLS_PURPOSE") {
-                  dynUsage.push({ CODE: item.CODE, DECODE: item.DECODE });
-                } else if (item.CODE_GRP === "XLS_TARGET") {
-                  dynTarget.push({ CODE: item.CODE, DECODE: item.DECODE });
+      // -----------------------------------------------------------------
+      // 공통코드 취득 (사내 표준 _M.Codes 캐시 확인 및 $.SvcGetCodes 동기 조회)
+      // -----------------------------------------------------------------
+      if (_M.Codes["XLS_PURPOSE"] == undefined || _M.Codes["XLS_TARGET"] == undefined) {
+        $.SvcGetCodes("XLS_PURPOSE,XLS_TARGET", function (data) {
+          if (data && data.resultData) {
+            $.each(data.resultData, function (index, value) {
+              if (_M.Codes[value.CODE_GRP] == undefined) {
+                _M.Codes[value.CODE_GRP] = new Array();
+              }
+              var flag = false;
+              $.each(_M.Codes[value.CODE_GRP], function (i, codegrp) {
+                if (codegrp.CODE == value["CODE"]) {
+                  flag = true;
+                  return;
                 }
               });
-              if (dynUsage.length > 0) usageCodes = dynUsage;
-              if (dynTarget.length > 0) targetCodes = dynTarget;
-            }
-          }, _M.aSync.sync);
-        } catch (e) {
-          // 조회 오류 시 Fallback 유지
-        }
+              if (!flag) {
+                _M.Codes[value.CODE_GRP].push({
+                  CODE: $.decHTML(value["CODE"]),
+                  DECODE: $.decHTML(value["DECODE"]),
+                  UPCODE: $.decHTML(value["UPCODE"])
+                });
+              }
+            });
+          }
+        }, _M.aSync.sync);
       }
+
+      // 사내 공통코드 객체에서 직접 취득 (하드코딩 완전 제거)
+      var usageCodes = _M.Codes["XLS_PURPOSE"] || [];
+      var targetCodes = _M.Codes["XLS_TARGET"] || [];
 
       // [1단계 팝업 HTML] 다운로드 사유/대상/목적 입력
       var step1Html = '<div id="excelModalLayer" style="position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); width:400px; background:#fff; border:2px solid #2b579a; padding:22px 24px; z-index:99999; box-shadow:0 0 20px rgba(0,0,0,0.45); border-radius:6px; font-family:\'맑은 고딕\', Malgun Gothic, sans-serif; font-size:12px; color:#333;">';
@@ -7253,7 +7250,7 @@ $(document).on("blur", ".t_Money", function (e) {
         $("#excelModalLayer, #excelModalDim").remove();
       });
     },
-    // 20261030 khma End : 보안 엑셀 다운로드 (공통코드 XLS_PURPOSE/XLS_TARGET 연동 및 2단계 순차 팝업)
+    // 20261030 khma End : 보안 엑셀 다운로드 (공통코드 XLS_PURPOSE/XLS_TARGET 동적 연동 및 2단계 순차 팝업)
 
     /* ------------------------------------------------------- */
     /* Excel이나 CSV등의 데이터파일을 디비에 저장할때 사용 */
