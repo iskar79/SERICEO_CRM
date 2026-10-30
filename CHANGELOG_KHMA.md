@@ -174,3 +174,12 @@
 * **작업 결과**:
   * Step 2-1 & 2-2: VDI 이클립스 반영 및 구동 확인 완료 (`[① 로컬: 완료(x) / ② VDI: 완료(x)]`)
   * Step 2-3 ~ 2-5: 로컬 안티그래비티 작업 및 JDK 11 컴파일 검증 완료 (0 ERRORS, VDI 반영 대기)
+
+### [2026.10.30] 미사용 레거시 파일 삭제 및 사장된 주석 312줄 전수 정리
+* **대상 파일**:
+  * `src/co/kr/kydbm/core/filecontrol/ExcelDownload2.java` (프로젝트 내 호출 0건 미사용 레거시 파일 완전 삭제)
+  * `src/co/kr/kydbm/core/filecontrol/ExcelDownload.java` (구형 downExcel 및 setExcelHeader/setExcelData 사장된 주석 159줄 전수 정리, 상세 Javadoc 완비)
+  * `src/co/kr/kydbm/core/filecontrol/UploadController.java` (구형 downExcel 주석 160줄 전수 정리, 보안 파라미터 취득 상세 주석 완비)
+* **작업 결과**:
+  * 레거시 주석 총 319줄 삭제 완료 및 코드 가독성 대폭 향상
+  * JDK 11 컴파일 검증 0건 에러 재확인 완료

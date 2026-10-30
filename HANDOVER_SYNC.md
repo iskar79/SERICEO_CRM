@@ -45,10 +45,13 @@
    - 공통코드 그룹 ID(`XLS_PURPOSE`, `XLS_TARGET`) `$.SvcGetCodes` 동적 로딩 + Fallback 기본값 연동.
    - 2단계 순차 팝업 (1단계: 용도/대상/목적 10자 이상 ➡️ 2단계: 엑셀 열람 암호 4자 이상 필수).
 
-7. **Step 2-4 & Step 2-5: `UploadController.java` 및 `ExcelDownload.java` 보안 엑셀 다운로드 백엔드 구현 완료 (로컬 수정 완료, 컴파일 0건 검증 완료)**:
+7. **Step 2-4 & Step 2-5: `UploadController.java` 및 `ExcelDownload.java` 보안 엑셀 다운로드 백엔드 구현 및 레거시 주석 319줄 전수 정리 완료 (로컬 수정 완료, 컴파일 0건 검증 완료)**:
    - `UploadController.java`: `excelUsage`, `excelTarget`, `excelReason`, `excelPassword` 파라미터 취득 및 `ExcelDownload.downExcel`에 전달.
+   - `UploadController.java`: 사장된 구형 `downExcel` 주석 160줄 전수 삭제 및 상세 설명 주석 보강.
    - `ExcelDownload.java`: 기존 7개 파라미터 `downExcel` 하위호환 유지, 8개 오버로딩 `downExcel` 추가.
-   - `excelPassword` 입력 시 POI 4.1.2 Agile AES 암호화 워크북(`SXSSFWorkbook` 100행 스트리밍) 및 `POIFSFileSystem` 암호화 스트림 방출 구현.
+   - `ExcelDownload.java`: `excelPassword` 입력 시 POI 4.1.2 Agile AES 암호화 워크북(`SXSSFWorkbook` 100행 스트리밍) 및 `POIFSFileSystem` 암호화 스트림 방출 구현.
+   - `ExcelDownload.java`: 사장된 구형 `downExcel` 및 헤더/데이터 주석 159줄 전수 삭제 및 상세 Javadoc 완비.
+   - `ExcelDownload2.java`: 프로젝트 내 참조 0건 미사용 파일 완전 삭제 완료.
    - JDK 11 `javac` 컴파일 검증 완료 (0 ERRORS).
 
 ---

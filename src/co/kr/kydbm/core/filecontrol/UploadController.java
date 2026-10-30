@@ -1026,164 +1026,18 @@ public class UploadController
       
       return new ModelAndView("fileDownloadView","info",null);
 	}
-//	/**
-//	 * 액셀다운로드
-//	 * @param Q1
-//	 * @throws Exception 
-//	 */
-//	@RequestMapping("/exceldown")
-//	public void downExcel(@RequestParam("XmlParms") String XmlParms, HttpServletRequest request,HttpServletResponse response) throws Exception {
-//		String xmlParams  =URLDecoder.decode(XmlParms, "UTF-8");
-//		xmlParams = parsingForJonType(xmlParams);
-//		
-//		List<Map<String,Object>> ds = null;
-//		String SqlComm = "";
-//		String rlt = "";
-//		int nRlt = 0;
-//		String Service = "";
-//		String Method  = "";
-//		String UID = "";
-//		String USITE = "";
-//		String KEY = "";
-//		String KeyString = "";
-//		String type = "";
-//		//20231025 khma 추가 로그용 
-//		String MENUID = "";
-//		String STEPMENU = "";
-//		String ACTIONNAME = "";
-//		
-//		long 서비스시작시간 = System.currentTimeMillis();//서비스시작시간
-//		
-//		//json 데이터를 읽어서 타입변경하기
-//		Map<String, String> obj;
-//		ObjectMapper om = new ObjectMapper();
-//		ServiceInfo  si= null;
-//		monArchDao = new MonArchDaoImpl();
-//		om.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
-//		obj = om.readValue(xmlParams, new TypeReference<Map<String, Object>>(){}); //맵으로 가져옴
-//		Service = obj.get("service");
-//		
-////		Method = obj.get("method");
-//		Method = obj.get("ExcelService");
-//		
-//		Calendar calendar = Calendar.getInstance();
-//		SimpleDateFormat sd = new SimpleDateFormat("yyyyMMddHHmmss");
-//		String currentTimestamp = sd.format(calendar.getTime());
-//		String fileName = "";
-//		
-//		if(obj.containsKey("xlsName") && StringUtils.isNotEmpty(obj.get("xlsName"))){
-//			//xlsName이 지정되어있으면 파일명을 xlsName으로 하고 없으면 Method명으로 함
-//			fileName += obj.get("xlsName");
-//		}else{
-//			fileName += Method;
-//		}
-//		fileName += "_"+ currentTimestamp.substring(0, 8) +"_"+ currentTimestamp.substring(8);
-//		
-//		UID = obj.get("UID");
-//		USITE = obj.get("USITE");
-//		type = obj.get("type");
-//		
-//		MENUID = obj.get("MENUID");
-//		STEPMENU = obj.get("STEPMENU");
-//		ACTIONNAME = obj.get("ACTIONNAME");
-//		
-//		
-//		si = monArchDao.ReadQuery(Service, Method, USITE);
-//		
-//		if (si == null)
-//		{
-//			String _msg = "MonArch[CRUD Service] : " + Service + " - " + Method + "에 해당되는 서비스쿼리를 찾을수 없습니다.";
-//			log.error(_msg);
-//			
-//			throw new RuntimeException(_msg);
-////            throw new Exception(_msg);
-//		}
-//		
-//		//액셀다운처리
-//		int exviewpage = 1;
-//		int expagecnt = 99999999;
-//		//orderby에 대한 SQL injection방지에 대해서... 20180124 jwkim Start
-//		String prevOrderType = obj.get("_order");
-//		String newOrderType = obj.get("_sort");
-//		String OrderStr = prevOrderType;
-//		if(StringUtils.isNotEmpty(newOrderType)){
-//			OrderStr = CommonUtil.getOrderByStatement(newOrderType);
-//		}
-//		//orderby에 대한 SQL injection방지에 대해서... 20180124 jwkim End
-//		
-//		//1. 데이터 취득
-//		try {
-//			String strSql= si.getSql();
-//			if(StringUtils.isNotEmpty(obj.get("DOWNCOLS"))){
-//				//TODO 서비스 파라메터에 DOWNCOLS의 데이터가 존재할경우
-//				//TODO 쿼리의 @DOWNCOLS@부분을 해당데이터로 Replace한다
-//				strSql =  strSql.replaceAll("@DOWNCOLS@", obj.get("DOWNCOLS"));
-//			}
-//			ds  = monArchDao.exeList(strSql, obj, OrderStr, exviewpage , expagecnt);
-////    	  ds  = monArchDao.exeList(si.getSql(), obj, OrderStr, exviewpage , expagecnt);
-//			
-////      // 2. 액셀다운로드 처리 
-//			if(obj.containsKey("extClass") && StringUtils.isNotEmpty(obj.get("extClass"))){
-//				//extClass(확장클래스)가 지정되어있으면 아래의 액셀다운로드 클래스를 사용하지 않고 지정된 클래스를 사용한다.
-//				
-//				String executeClassName = obj.get("extClass");
-//				// 1. 리플렉션 대상클래스명을 파라메터로 지정하여 클래스를 취득
-//				Class targetClass = Class.forName(executeClassName);
-//				// 2. 대상 클래스의 객채를 생성
-//				Object targetInstance = targetClass.newInstance();
-//				//3. 대상객체에서 사용할 메소드의 파라메터타입을 맵핑
-//				Class paramTypes[] = new Class[5];
-//				paramTypes[0] = List.class;
-//				paramTypes[1] = String.class;
-//				paramTypes[2] = String.class;
-//				paramTypes[3] = HttpServletRequest.class;
-//				paramTypes[4] = HttpServletResponse.class;
-//				//4. 사용할 메소드명과 파라메터타입을 파라메터로 설정하여 대상객체에서 사용할 메소드를 취득
-//				Method targetMthod = targetClass.getMethod("downExcel", paramTypes);
-//				// 5. invoke함수를 호출하요 해당 메소드를 실행한다.
-//				Boolean rst = (Boolean) targetMthod.invoke(targetInstance, ds, fileName, type , request, response);    		  
-//				
-//			}else{
-//				ExcelDownload excelDownload = new ExcelDownload();
-//				excelDownload.downExcel(ds, fileName ,type, request, response);
-//			}
-//			
-//			long 서비스종료시간 = System.currentTimeMillis();//서비스종료시간
-//			long 서비스소요시간 = 서비스종료시간 - 서비스시작시간;
-//			사용로그(Service, Method, KEY, xmlParams, USITE, UID, 서비스소요시간, MENUID, STEPMENU, ACTIONNAME);
-////      rlt = "{" + string.Format(@"'rlt':'EXCEL', 'RltCount':{0}", "0") + "}";
-////      String tempSql = "{'rlt':'EXCEL', 'RltCount':{0}}";
-////      rlt =  java.text.MessageFormat.format(tempSql, String.valueOf(ds.size()));
-//			
-//		} catch (DataAccessException e) {
-//			//데이터엑세스 예외처리
-//			e.printStackTrace();
-//			
-//			String sqlCommand = "";
-//			if(null != si ) sqlCommand = si.getSql();
-//			
-//			String msg = "MonArch[CRUD Service] : " + e.getMessage() + "\r\r ----------------- \r Service = " + Service + "\r Method = " + Method;
-//			log.error(msg,e);
-//			SvcCRUD svcCRUD = new SvcCRUD();
-//			svcCRUD.Log("DATACRUD", sqlCommand, msg, USITE, UID);
-//			throw new Exception(msg);			
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			log.error(e.getMessage());
-//			throw new Exception(e.getMessage());		
-//		}
-//		
-//	}
-	
+
+	/**
+	 * JSON �뙆�떛�쓣 �쐞�븳 媛쒗뻾 諛� �꺆 臾몄옄 �씠�뒪耳��씠�봽 泥섎━
+	 * @param xmlParams �썝蹂� 臾몄옄�뿴
+	 * @return 移섑솚�맂 臾몄옄�뿴
+	 */
 	private String parsingForJonType(String xmlParams) {
 		String rstData = xmlParams;
 		rstData = rstData.replaceAll("\\n", "\\\\n");
 		rstData = rstData.replaceAll("\\t", "\\\\t");
 		return rstData;
 	}
-	
-	// Exception 처리 메소드 
-	@ExceptionHandler(Exception.class)
 	public ModelAndView handleException(Exception e, HttpServletResponse response){
 	
 		// e 객체에 익셉션에러 들어있음
