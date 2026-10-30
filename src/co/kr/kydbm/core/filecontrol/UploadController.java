@@ -55,10 +55,10 @@ import co.kr.kydbm.core.utils.PropertyUtil;
 import co.kr.kydbm.core.utils.QueryGenerator;
  
 /**
- *  파일 업로드 콘트롤러 클래스
- * @author KyoungHo_Ma
- * @version 1.0.0 2023-12-01
- * @since version 1.0.0
+ * 파일 업로드 및 엑셀 다운로드 콘트롤러 클래스
+ * version 2.0 2026-10-30
+ * Authors : Ma KyoungHo
+ * Company : KYDBM
  */
 @Controller
 public class UploadController
@@ -514,23 +514,14 @@ public class UploadController
 	
 	
 	/**
-	 * 파일사이즈 체크
-	 * @param Filename
-	 * @param Urlname
-	 * @param Note
-	 * @param ParentType
-	 * @param ParentKey
-	 * @param WebFolder
-	 * @param UID
-	 * @throws IOException
+	 * 파일사이즈 체크 메소드
+	 * @param XmlParms 요청 파라미터 (Filename JSON 문자열)
+	 * @return ModelAndView 파일 크기(bytes) 또는 미존재 시 -1
+	 * @throws Exception
 	 */
 	@RequestMapping("/checkfilesize")
-//	public long checkFilesize(@RequestParam("Filename") MultipartFile Filename	) throws IOException {
-		public ModelAndView checkFilesize(@RequestBody  String XmlParms) throws Exception {
-		
-//		String xmlParams  =URLDecoder.decode(XmlParms, "UTF-8");
-		String xmlParams  =XmlParms;
-		//xmlParams = parsingForJonType(xmlParams);
+	public ModelAndView checkFilesize(@RequestBody String XmlParms) throws Exception {
+		String xmlParams = XmlParms;
 		ObjectMapper om = new ObjectMapper();
 		Map<String, String> obj;
 		String filepath =null;
@@ -743,7 +734,6 @@ public class UploadController
 			response.setHeader("Pragma", "no-cache;");
 			response.setHeader("Expires", "-1;");
 			zipOutputStream.flush();
-			//os.flush();
 		}catch(Exception e){
 			log.error("파일다운로드 중 예기치 못한 에러가 발생하였습니다." ,e);
 		}finally{
@@ -782,14 +772,18 @@ public class UploadController
 		}catch(IOException ioe){
 			log.error("파일다운로드 중 예기치 못한 에러가 발생하였습니다." ,ioe);
 		} finally {
-//			os.close();
 		}
 	}
 
 	/**
-	 * 액셀다운로드
-	 * @param Q1
-	 * @throws Exception 
+	 * 20261030 khma : 보안 엑셀 다운로드 (XLS_PURPOSE, XLS_TARGET, 사유, 암호화 지원)
+	 * 그리드 조회 데이터를 기반으로 일반 엑셀(JXL) 또는 Agile AES 암호화 엑셀(POI 4.1.2 SXSSFWorkbook)을 생성하여 다운로드한다.
+	 * 
+	 * @param XmlParms 엑셀 다운로드 요청 JSON 파라미터 (xlsService, xlsMethod, dispCols, excelUsage, excelTarget, excelReason, excelPassword 등)
+	 * @param request HttpServletRequest
+	 * @param response HttpServletResponse
+	 * @return ModelAndView 파일 다운로드 뷰
+	 * @throws Exception
 	 */
 	@RequestMapping("/exceldown")
 	public ModelAndView downExcel(@RequestParam("XmlParms") String XmlParms, HttpServletRequest request,HttpServletResponse response) throws Exception {
@@ -828,7 +822,6 @@ public class UploadController
 		MonArchDaoImpl monArchDao = new MonArchDaoImpl();
 		om.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
 		obj = om.readValue(xmlParams, new TypeReference<Map<String, Object>>(){}); //맵으로 가져옴
-//		xlsService = obj.get("service");
 		
 		Calendar calendar = Calendar.getInstance();
 		SimpleDateFormat sd = new SimpleDateFormat("yyyyMMddHHmmss");
@@ -910,7 +903,6 @@ public class UploadController
             log.error(_msg);
             
             throw new RuntimeException(_msg);
-//            throw new Exception(_msg);
         }
         
         //액셀다운처리
@@ -945,7 +937,6 @@ public class UploadController
   				newHeaderInfo.add(map);
   			}
   			// list쿼리를 감싸는 형태로 수정함 : 원래 엑셀 다운 시에 쿼리 실행하는 부분(rnum 붙은 부분 확인해야함)
-  			//strSql =  strSql.replaceAll("@DOWNCOLS@", comsql);
   			strSql = (comsql + strSql + " ) A");
   			
   			arrHeaderInfo = newHeaderInfo;
@@ -953,7 +944,6 @@ public class UploadController
   		
    	 //확장필드 처리 Start 2016107 khma
    	String extFilterObj = obj.get("extFilters");
-   	//extFilterObj = parsingForJonType(extFilterObj);
    	Map<String, Object> extFilters = new HashMap<String,Object>();
    	ArrayList<Map<String, Object>> arrExtFilters = new ArrayList<Map<String,Object>>();
    	if( StringUtils.isNotEmpty(extFilterObj)){
@@ -965,9 +955,7 @@ public class UploadController
    	
    	
     	  ds  = monArchDao.exeList(strSql, obj, OrderStr, exviewpage , expagecnt ,arrExtFilters);
-//    	  ds  = monArchDao.exeList(si.getSql(), obj, OrderStr, exviewpage , expagecnt);
 		
-//      // 2. 액셀다운로드 처리 
     	  if(obj.containsKey("extClass") 
     			  && StringUtils.isNotEmpty(obj.get("extClass")) 
     			  && CommonUtil.checkExtClass(EXCEL_DOWN_CLASS_WHITE_LIST, obj.get("extClass"))){ //20150406 외부클래스 사용시에는 whitelist목록으로 사용할것(시큐어코딩지침대응)
@@ -1002,9 +990,6 @@ public class UploadController
          long 서비스종료시간 = System.currentTimeMillis();//서비스종료시간
          long 서비스소요시간 = 서비스종료시간 - 서비스시작시간;
          사용로그(xlsService, xlsMethod, KEY, xmlParams, USITE, UID, 서비스소요시간, MENUID, STEPMENU, ACTIONNAME);
-//      rlt = "{" + string.Format(@"'rlt':'EXCEL', 'RltCount':{0}", "0") + "}";
-//      String tempSql = "{'rlt':'EXCEL', 'RltCount':{0}}";
-//      rlt =  java.text.MessageFormat.format(tempSql, String.valueOf(ds.size()));
       
       } catch (DataAccessException e) {
 			//데이터엑세스 예외처리
@@ -1028,9 +1013,9 @@ public class UploadController
 	}
 
 	/**
-	 * JSON �뙆�떛�쓣 �쐞�븳 媛쒗뻾 諛� �꺆 臾몄옄 �씠�뒪耳��씠�봽 泥섎━
-	 * @param xmlParams �썝蹂� 臾몄옄�뿴
-	 * @return 移섑솚�맂 臾몄옄�뿴
+	 * JSON 파싱을 위한 개행 및 탭 문자 이스케이프 처리
+	 * @param xmlParams 원본 문자열
+	 * @return 치환된 문자열
 	 */
 	private String parsingForJonType(String xmlParams) {
 		String rstData = xmlParams;
