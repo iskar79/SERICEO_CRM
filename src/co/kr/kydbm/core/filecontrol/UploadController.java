@@ -397,23 +397,28 @@ public class UploadController
 	
 
 	/**
-	 * 모나크 기존 DB저장방식의 파일 업로드
-	 * @param Filename
-	 * @param Urlname
-	 * @param Note
-	 * @param ParentType
-	 * @param ParentKey
-	 * @param WebFolder
-	 * @param UID
-	 * @throws IOException
+	 * 이미지 갤러리 및 DB BLOB 파일 업로드 (M_IMAGE_GAL)
+	 * 
+	 * 파일 바이너리(BLOB) 또는 이미지 URL 경로를 M_IMAGE_GAL 테이블에 등록한다.
+	 * ※ 참고: 계층형 파일 관리(상위 업무/폴더 연계) 기능 확장을 위해 ParentType, ParentKey, WebFolder 파라미터가
+	 *   설계되었으나, 프론트엔드 미전달 시 400 에러 방지 및 단일 업로드 호환성을 위해 주석 보존(20230816 khma) 상태임.
+	 * 
+	 * @param multiPartFile 업로드 대상 멀티파트 파일 (BLOB 데이터)
+	 * @param Urlname 이미지 URL 링크 경로 (경로 방식 등록 시 사용)
+	 * @param Note 파일 부가 설명 (FILE_DESC)
+	 * @param UID 등록 사용자 ID
+	 * @param USITE 회원사 사이트 번호
+	 * @throws IOException 입출력 예외
+	 * @throws Exception 데이터베이스 처리 예외
 	 */
 	@RequestMapping("/upload")
 	public void uploadFile(@RequestParam("Filename") MultipartFile multiPartFile
 			,@RequestParam("Urlname") String Urlname
 			,@RequestParam("Note") String Note
-	//		,@RequestParam("ParentType") String ParentType	//20230816 khma
-	//		,@RequestParam("ParentKey") String ParentKey	//20230816 khma
-	//		,@RequestParam("WebFolder") String WebFolder	//20230816 khma
+			// 20230816 khma : 계층형 파일 관리(상위 업무/폴더 연계) 확장용 파라미터 (프론트 미전달 시 400 에러 방지를 위해 보존 주석 처리)
+	//		,@RequestParam("ParentType") String ParentType
+	//		,@RequestParam("ParentKey") String ParentKey
+	//		,@RequestParam("WebFolder") String WebFolder
 			,@RequestParam("UID") String UID,@RequestParam("USITE") String USITE) throws IOException, Exception {
 		
 		String fname = multiPartFile.getOriginalFilename();
@@ -423,9 +428,10 @@ public class UploadController
 		String contentType = multiPartFile.getContentType();
 		
 		String desc = Note;
-//		String 상위정보 = ParentType; //20230816 khma
-//		String 상위키 = ParentKey; 	 //20230816 khma
-//		String 폴더경로 = WebFolder;	//20230816 khma
+		// 20230816 khma : 계층형 파일 관리 활성화 시 변수 매핑
+//		String 상위정보 = ParentType;
+//		String 상위키 = ParentKey;
+//		String 폴더경로 = WebFolder;
 		String regUser = UID;
 		String 회원사번호 = USITE;
 		//TODO 파일관리와 이미지겔러리를 같은 처리에서 사용되고 있으나, 유형이 경로일때는 무조건 이미지겔러리로 들어감.
@@ -448,6 +454,7 @@ public class UploadController
 				QueryGenerator.genSequenceCol(DB_TYPE, "M_IMAGE_GAL_NO", true) +
 				"FILE_NAME, FILE_SIZE, FILE_CONTENT_TYPE, FILE_TYPE_CODE, LINK_URL, " +
 				"FILE_DESC, " +
+				// 20230816 khma : M_IMAGE_GAL 테이블 계층 컬럼 추가 시 활성화
 //				"상위정보, " +
 //				"상위키," +
 //				" 폴더경로" +
@@ -465,13 +472,13 @@ public class UploadController
 			mParam.put("FILE_NAME", fname);
 			mParam.put("FILE_SIZE", fileszie);
 			mParam.put("FILE_CONTENT_TYPE", contentType);
-			//mParam.put("내용", Filename);
 			mParam.put("FILE_TYPE_CODE", fileType);
 			mParam.put("LINK_URL", uname);
 			mParam.put("FILE_DESC", desc);
-//			mParam.put("상위정보", 상위정보);  //20230816 khma
-//			mParam.put("상위키", 상위키);		  //20230816 khma
-//			mParam.put("폴더경로", 폴더경로); //20230816 khma
+			// 20230816 khma : M_IMAGE_GAL 계층 파라미터 바인딩
+//			mParam.put("상위정보", 상위정보);
+//			mParam.put("상위키", 상위키);
+//			mParam.put("폴더경로", 폴더경로);
 			mParam.put("REG_USER", regUser);
 			mParam.put("UPD_USER", regUser);
 			mParam.put("M_USITE_NO", USITE); //20180320 khma 추가
@@ -502,7 +509,6 @@ public class UploadController
 		String filepath =null;
 		long filesize = 0;
 		
-		//om.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
 		om.configure(JsonParser.Feature.ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER, true);
 		obj = om.readValue(xmlParams, new TypeReference<Map<String, Object>>(){}); //맵으로 가져옴
 		
