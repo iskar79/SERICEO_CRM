@@ -4356,125 +4356,7 @@ function isDate(val){
 	return ret;
 }
 
-// 20261030 khma : 비밀번호 복잡도 및 변경 검증 로직 단일 함수 통합 (폼/다중인자/단일복잡도 다형성 지원)
-/*
-function validatePassword(pw, options)
-{
-	debugger;
-	var result = true;
-
-	var o = {
-				lower: 0,
-				upper: 0,
-				alpha: 0,
-				numeric: 0,
-				special: 0,
-				length: [8, Infinity],
-				custom: [],
-				badWords: [],
-				badSequenceLength: 0,
-				noQwertySequences: true,
-				noSequential: true
-			};
-			
-	for (var property in options)
-	{
-		o[property] = options[property];
-	}
-	
-	var	re = {
-				lower:   /[a-z]/g,
-				upper:   /[A-Z]/g,
-				alpha:   /[A-Z]/gi,
-				numeric: /[0-9]/g,
-				special: /[\W_]/g
-			 };
-			 
-	var rule, i;
-
-	// 암호길이검사
-	if (pw.length < o.length[0] || pw.length > o.length[1])
-		result = false;//return false;
-	// 문자/숫자/특수문자 조합 검사
-	if(!pw.match(/([a-zA-Z0-9].*[!,@,#,$,%,^,&,*,?,_,~])|([!,@,#,$,%,^,&,*,?,_,~].*[a-zA-Z0-9])/)){
-		result = false;
-	}
-	
-	// 금지어인지 검사
-	for (i = 0; i < o.badWords.length; i++) 
-		if (pw.toLowerCase().indexOf(o.badWords[i].toLowerCase()) > -1)
-			result = false;//return false;
-	
-
-	// 암호의 연속성 여부 검사
-	var SamePass_0 = 0; //동일문자 카운트
-	var SamePass_1 = 0; //연속성(+) 카운드
-	var SamePass_2 = 0; //연속성(-) 카운드
-	 
-	var chr_pass_0;
-	var chr_pass_1;
-	 
-	for(var i=0; i < pw.length; i++) 
-	{
-		chr_pass_0 = pw.charAt(i);
-		chr_pass_1 = pw.charAt(i+1);
-	
-		//동일문자 카운트
-		if(chr_pass_0 == chr_pass_1) 
-		{
-			SamePass_0 = SamePass_0 + 1
-		}
-	}
-	if(SamePass_0 > 2) 
-	{
-		result = false;
-	}
-	
-	if (o.badSequenceLength) {
-		var	lower   = "abcdefghijklmnopqrstuvwxyz",
-			upper   = lower.toUpperCase(),
-			numbers = "0123456789",
-			qwerty  = "qwertyuiopasdfghjklzxcvbnm",
-			start   = o.badSequenceLength - 1,
-			seq     = "_" + pw.slice(0, start);
-		for (i = start; i < pw.length; i++) {
-			seq = seq.slice(1) + pw.charAt(i);
-			if (
-				lower.indexOf(seq)   > -1 ||
-				upper.indexOf(seq)   > -1 ||
-				numbers.indexOf(seq) > -1 ||
-				(o.noQwertySequences && qwerty.indexOf(seq) > -1)
-			) {
-				result = false;//return false;
-			}
-		}
-	}
-	
-	if(pw.search(re.alpha) < 0 
-		//khma 대소문자구분에서 영문존재만 체크 하도록 수정
-		//|| pw.search(re.lower) < 0 
-		//|| pw.search(re.upper) < 0 
-		|| (pw.search(re.lower) < 0
-		&& pw.search(re.upper) < 0) 
-		
-		|| pw.search(re.special) < 0 
-		|| pw.search(re.numeric) < 0)
-	{
-		result = false;//return false;
-	}
-	
-	if (!result)
-	{
-		alert("입력한 암호를 확인해 주십시오.\n\n" + 
-		      "-----------------------------------------\n\n" + 
-		      "1) 암호는 최소 8글자 이상이여야 합니다.\n\n" +
-		      "2) 3회이상 연속된 숫자나 알파벳을 입력할 수 없습니다.\n\n" +
-		      "3) 암호는 최소 숫자/소문자/대문자/특수문자를 각각 하나씩 포함해야 합니다."); 
-	}
-
-	return (result);				
-}
-*/
+// 20261030 khma Start : 비밀번호 검증 단일 다형성 통합 함수 (폼 객체 / 문자열 일괄 및 단일 복잡도 지원)
 /**
  * 비밀번호 검증 통합 함수 (단일 복잡도 검증 및 폼 전체 통합 검증 동시 지원)
  * 1) 폼 객체 전달 시: validatePassword(obj) -> 현재암호/새암호/확인암호/재사용방지/복잡도 일괄 검증
@@ -4641,11 +4523,12 @@ function validatePassword(param1, param2, param3) {
 	return result;
 }
 
-// 하위 호환성을 위한 alias
-var validatePasswordSuite = validatePassword;
+// 20261030 khma End : 비밀번호 검증 단일 다형성 통합 함수 (폼 객체 / 문자열 일괄 및 단일 복잡도 지원)
 
- //20180124 jwkim sort형식 Start
- function getSortOption(arrSort){
+/**
+ * 정렬 옵션 객체 배열을 문자열(name:필드명,sorting:정렬방식/...) 포맷으로 변환한다.
+ */
+function getSortOption(arrSort) {
      var sort= "";
     if(undefined != arrSort){
 	    $.each(arrSort, function(i, v) {
