@@ -72,6 +72,6 @@
 | **Step 2-2** | `src/co/kr/kydbm/common/CommonExcelUtil.java` | POI 4.1.2 호환을 위한 `CellType` Enum 및 `DateUtil` 문법 수정 | `[x]` | `[x]` | **완료** |
 | **Step 2-3** | `WebContent/js/jquery.kdb.jobButton.js` | `DownXlsNew` 권한 체크 분기 추가 및 레거시 주석 정리 (Line 43) | `[x]` | `[x]` | **완료** |
 | **Step 2-4** | `src/co/kr/kydbm/core/filecontrol/UploadController.java` | 엑셀 파라미터 4종 수신/전달, 표준 헤더, Javadoc 상세화, 레거시 주석 정리 | `[x]` | `[x]` | **완료** |
-| **Step 2-5** | `src/co/kr/kydbm/core/filecontrol/ExcelDownload.java` | POI 4.1.2 Agile AES 암호화 워크북 생성/스트림 방출, 표준 헤더, Javadoc 완비 | `[x]` | `[ ]` | **대기** |
+| **Step 2-5** | `src/co/kr/kydbm/core/filecontrol/ExcelDownload.java` | POI 4.1.2 Agile AES 암호화 워크북 생성/스트림 방출, 표준 헤더, Javadoc 완비 | `[x]` | `[x]` | **완료** |
 | **Step 2-3** | `WebContent/js/jquery.kdb.superContaner.js` | `DownXlsNew` 신규 메서드 추가 (공통코드 `XLS_PURPOSE`/`XLS_TARGET` + 2단계 모달) | `[x]` | `[ ]` | **대기** |
 | **Step 3** | `MonArchDaoImpl.java`, `FilterGenerator.java`, 프로시저/배치 등 | KSign SecureDB 개인정보 암복호화 공통 모듈 및 프로시저/엑셀업로드 적용 | `[ ]` | `[ ]` | 대기 |

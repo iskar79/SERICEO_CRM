@@ -5,13 +5,13 @@
 /*
  * superContaner
  *
- * version 0.1 2016-03-10
- * Requires jQuery v1.4.2 or later
+ * version 2.0 2026-10-30
+ * Requires jQuery v1.12.4 or later
  * Dual licensed under the MIT and GPL licenses:
  * http://www.opensource.org/licenses/mit-license.php
  * http://www.gnu.org/licenses/gpl.html
- * Authors: Kim Seoung Min
- * Company : Kongyoung DB
+ * Authors: Ma KyoungHo
+ * Company : KYDBM
  */
 
 // ---------------------------------------------------------------------
