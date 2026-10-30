@@ -1,4 +1,4 @@
-﻿package co.kr.kydbm.core.utils;
+package co.kr.kydbm.core.utils;
 import java.io.*;
 import java.net.URISyntaxException;
 import java.net.URL;
