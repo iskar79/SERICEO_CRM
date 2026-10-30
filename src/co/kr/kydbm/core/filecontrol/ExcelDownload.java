@@ -486,8 +486,6 @@ public class ExcelDownload {
 			setCellFormat(notiFormat, jxl.format.Colour.WHITE, jxl.format.BorderLineStyle.NONE, jxl.format.Alignment.LEFT); // 공지셀 포멧
 			setCellFormat(headerFormat, jxl.format.Colour.YELLOW, jxl.format.BorderLineStyle.THIN, jxl.format.Alignment.CENTRE); // 헤더셀 포멧
 			setCellFormat(dataFormat, jxl.format.Colour.WHITE, jxl.format.BorderLineStyle.THIN, null); // 데이터셀 포멧
-			// 각 셀칼럼의 사이즈
-			// sheet.setColumnView(0,8);
 
 			// 헤더를 그린다.
 			if (arrHeaderInfo.size() > 0) {
@@ -498,16 +496,7 @@ public class ExcelDownload {
 				} else {
 					setExcelHeaderEmpty(sheet, headerFormat, arrHeaderInfo);
 				}
-				//신규 엑셀다운로드 방식 미사용
-			//	setExcelHeader(sheet, headerFormat, notiFormat, showDataList, arrHeaderInfo, xlsType);
 			}
-			// 데이터를 그린다.
-//			if (showDataList.size() > 0) {
-//				//기존의 엑셀다운로드 방식 사용
-//				setExcelDataOld(sheet, dataFormat, showDataList);
-//				//신규 엑셀다운로드 방식 미사용
-//			//	setExcelData(sheet, dataFormat, showDataList, arrHeaderInfo, xlsType);
-//			}
 			workbook.write();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -664,60 +653,7 @@ public class ExcelDownload {
 			}
 		}
 	}
-	/**
-	 * 액셀의 데이터 부분을 그리는 메소드
-	 * 
-	 * @param sheet
-	 * @param headerFormat
-	 * @param ds
-	 * @throws WriteException
-	 * @throws RowsExceededException
-	 */
-//	private void setExcelData(WritableSheet sheet,
-//			WritableCellFormat cellFormat, List<Map<String, Object>> ds,
-//			String xlsType )
-//			throws RowsExceededException, WriteException {
-//
-//		Object[] keys = ds.get(0).keySet().toArray();
-//		jxl.write.Label label = null;
-//		jxl.write.Number number = null;
-//		// jxl.write.Blank blank=null;
-//		String keyName = "";
-//
-//		for (int i = 0; i < ds.size(); i++) {
-//			int colNum = 0; // RNUM과 RCOUNT칼럼제거 하기위한 카운트
-//
-//			for (int j = 0; j < keys.length; j++) {
-//				String data = " ";
-//
-//				keyName = keys[j].toString();
-//				if ("RNUM".equals(keyName) || "RCOUNT".equals(keyName)) { // RNUM과 RCOUNT칼럼제거
-//					colNum++;
-//				} else {
-//					if (null != ds.get(i).get(keyName))
-//						data = ds.get(i).get(keyName).toString();
-//					if (NumberUtils.isNumber(data)) {
-//						try {
-//							number = new jxl.write.Number(j - colNum, i + 1,
-//									Double.parseDouble(data), cellFormat);
-//							sheet.addCell(number);
-//
-//						} catch (NumberFormatException e) {
-//							// 정상적인 넘버 포멧형태가 아니므로 라벨로 표시함
-//							label = new jxl.write.Label(j - colNum, i + 1,
-//									data, cellFormat);
-//							sheet.addCell(label);
-//						}
-//					} else {
-//						label = new jxl.write.Label(j - colNum, i + 1, data,
-//								cellFormat);
-//						sheet.addCell(label);
-//					}
-//
-//				}
-//			}
-//		}
-//	}
+
 
 	   
 	/**
