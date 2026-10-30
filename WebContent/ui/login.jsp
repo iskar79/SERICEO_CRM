@@ -54,8 +54,8 @@ if ( resultInfo != null ) {
 			<input type="password" class="loginPS error" placeholder="비밀번호를 입력해 주세요">
 			<p class="text error">※ 비밀번호는 대소문자를 구분합니다.</p>
 		</div>
-		<a href="#" class="loginBTN btn-login">로그인 하기</a>
 		<span class="checkbox"><input type="checkbox" id="chk-save"><label for="chk-save">아이디 저장</label></span>
+		<a href="#" class="loginBTN btn-login">로그인 하기</a>
 	</div>
 </body>
 </html>

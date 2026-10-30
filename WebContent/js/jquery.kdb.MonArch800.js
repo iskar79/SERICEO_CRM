@@ -3902,9 +3902,7 @@
         var _pw = $('<input type="password" class="loginPS" placeholder="비밀번호를 입력해 주세요">').appendTo(_o3);
         $('<p class="text">※ 비밀번호는 대소문자를 구분합니다.</p>').appendTo(_o3);
 
-        var _o4 = $('<a href="#" class="loginBTN btn-login">로그인 하기</a>').appendTo(_o);
-        
-        // 20261030 khma Start : 로그인 화면 아이디 저장 체크박스 활성화 및 쿠키(SAVE_ID) 복원
+        // 20261030 khma Start : 비밀번호 입력창 아래 아이디 저장 체크박스 배치 및 쿠키(SAVE_ID) 복원
         var _o5 = $('<span class="checkbox"><input type="checkbox" id="chk-save"><label for="chk-save">아이디 저장</label></span>').appendTo(_o);
 
         var matchId = document.cookie.match(new RegExp('(^| )SAVE_ID=([^;]+)'));
@@ -3912,7 +3910,9 @@
             _id.val(matchId[2]);
             setTimeout(function() { $("#chk-save").prop("checked", true); }, 10);
         }
-        // 20261030 khma End : 로그인 화면 아이디 저장 체크박스 활성화 및 쿠키(SAVE_ID) 복원
+        // 20261030 khma End : 비밀번호 입력창 아래 아이디 저장 체크박스 배치 및 쿠키(SAVE_ID) 복원
+
+        var _o4 = $('<a href="#" class="loginBTN btn-login">로그인 하기</a>').appendTo(_o);
 
         ////$("<div><input type='text' for='login' class='loginSCODE b-t b-r b-l b-b b-co b-co-basic' /></div>").appendTo(_o5);
         //$("<div><input type='text' for='login' class='loginID b-t b-r b-l b-b b-co b-co-basic' /></div>").appendTo(_o5);
