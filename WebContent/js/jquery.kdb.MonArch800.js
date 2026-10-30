@@ -1,13 +1,13 @@
-﻿/// <reference path="../Resource.js" />
+/// <reference path="../Resource.js" />
 /// <reference path="MonArchResource.js" />
 /* jQuery grid plugin: 
-* version 0.1 2016-07-21
-* Requires jQuery v1.6.2 or later
+* version 2.0 2026-10-30
+* Requires jQuery v1.12.4 or later
 * Dual licensed under the MIT and GPL licenses:
 * http://www.opensource.org/licenses/mit-license.php
 * http://www.gnu.org/licenses/gpl.html
-* Authors: Kim Seoung Min
-* Company : Kongyoung DB
+* Authors: Ma KyoungHo
+* Company : KYDBM
 */
 
 (function ($, undefined) {
@@ -3904,8 +3904,15 @@
 
         var _o4 = $('<a href="#" class="loginBTN btn-login">로그인 하기</a>').appendTo(_o);
         
-        //khma	20240315 로그인 페이지 아이디 저장 체크박스 주석 처리 ==> 추후 해당 옵션 처리 필요 
-        //var _o4 = $('<span class="checkbox"><input type="checkbox" id="chk-save"><label for="chk-save">아이디 저장</label></span>').appendTo(_o);
+        // 20261030 khma Start : 로그인 화면 아이디 저장 체크박스 활성화 및 쿠키(SAVE_ID) 복원
+        var _o5 = $('<span class="checkbox"><input type="checkbox" id="chk-save"><label for="chk-save">아이디 저장</label></span>').appendTo(_o);
+
+        var matchId = document.cookie.match(new RegExp('(^| )SAVE_ID=([^;]+)'));
+        if (matchId) {
+            _id.val(matchId[2]);
+            setTimeout(function() { $("#chk-save").prop("checked", true); }, 10);
+        }
+        // 20261030 khma End : 로그인 화면 아이디 저장 체크박스 활성화 및 쿠키(SAVE_ID) 복원
 
         ////$("<div><input type='text' for='login' class='loginSCODE b-t b-r b-l b-b b-co b-co-basic' /></div>").appendTo(_o5);
         //$("<div><input type='text' for='login' class='loginID b-t b-r b-l b-b b-co b-co-basic' /></div>").appendTo(_o5);
@@ -3921,12 +3928,17 @@
             }
         });
         $(".loginBTN").click(function (e) {
-            //$.cookie('UKEY', '');
-
             var _id = $(".login .loginID").val();
             var _pass = $(".login .loginPS").val();
-            //var _scode = $(".login .loginSCODE").val();
             var _scode = 'SERICEO';
+
+            // 20261030 khma Start : 아이디 저장 체크 여부에 따른 쿠키(SAVE_ID) 저장 및 삭제 처리
+            if ($("#chk-save").is(":checked")) {
+                document.cookie = "SAVE_ID=" + _id + "; path=/; max-age=31536000";
+            } else {
+                document.cookie = "SAVE_ID=; path=/; max-age=0";
+            }
+            // 20261030 khma End : 아이디 저장 체크 여부에 따른 쿠키(SAVE_ID) 저장 및 삭제 처리
 
             _Biz.인증.로그인(_id, _pass, _scode);
             /*
@@ -4344,6 +4356,8 @@ function isDate(val){
 	return ret;
 }
 
+// 20261030 khma : 비밀번호 복잡도 및 변경 검증 로직 단일 함수 통합 (폼/다중인자/단일복잡도 다형성 지원)
+/*
 function validatePassword(pw, options)
 {
 	debugger;
@@ -4460,6 +4474,175 @@ function validatePassword(pw, options)
 
 	return (result);				
 }
+*/
+/**
+ * 비밀번호 검증 통합 함수 (단일 복잡도 검증 및 폼 전체 통합 검증 동시 지원)
+ * 1) 폼 객체 전달 시: validatePassword(obj) -> 현재암호/새암호/확인암호/재사용방지/복잡도 일괄 검증
+ * 2) 문자열 3개 전달 시: validatePassword(newPass, confirmPass, currPass) -> 일괄 검증
+ * 3) 단일 문자열 전달 시: validatePassword(pw, options) -> 순수 복잡도 규칙만 검증
+ */
+function validatePassword(param1, param2, param3) {
+	// [A] 폼 객체(obj)가 전달되었거나 3개의 암호 문자열이 전달된 경우 -> 전체 통합 검증 수행
+	var isFormMode = (param1 && typeof param1 === "object");
+	var isTripleMode = (typeof param1 === "string" && typeof param2 === "string" && arguments.length >= 2);
+
+	if (isFormMode || isTripleMode) {
+		var curr = "";
+		var newP = "";
+		var conf = "";
+
+		if (isFormMode) {
+			var $form = $(param1);
+			function extractVal(fldName) {
+				var val = $(".fieldContaner[field='" + fldName + "'] input", $form).val();
+				if (!val) val = $(".fieldContaner[field='" + fldName + "']", $form).val();
+				if (!val) val = $form.find("[name='" + fldName + "']").val();
+				if (!val) val = $form.find("[field='" + fldName + "']").val();
+				return val ? $.trim(val) : "";
+			}
+			curr = extractVal("USER_PASSWORD");
+			newP = extractVal("NEW_USER_PASSWORD");
+			conf = extractVal("NEW_USER_PASSWORD_CONFIRM");
+		} else {
+			newP = param1 ? $.trim(param1) : "";
+			conf = param2 ? $.trim(param2) : "";
+			curr = param3 ? $.trim(param3) : "";
+		}
+
+		// 1. 암호 변경을 시도하지 않는 경우 (모두 공백이면 정상 통과)
+		if (!curr && !newP && !conf) {
+			return true;
+		}
+
+		// 2. 현재 암호 누락 체크
+		if (newP && !curr) {
+			alert("비밀번호를 변경하려면 현재 암호를 입력해 주십시오.");
+			return false;
+		}
+
+		// 3. 새 암호 누락 체크
+		if (curr && !newP) {
+			alert("새로운 암호를 입력해 주십시오.");
+			return false;
+		}
+
+		// 4. 새 암호와 확인 암호 일치 검사
+		if (newP !== conf) {
+			alert("입력한 새 암호와 암호 확인이 일치하지 않습니다.");
+			return false;
+		}
+
+		// 5. 이전 암호 재사용 금지 검사
+		if (curr === newP) {
+			alert("이전 암호와 동일한 암호는 재사용할 수 없습니다.");
+			return false;
+		}
+
+		// 6. 새 암호 복잡도 검사 (자기 자신을 단일 문자열 모드로 재귀 호출)
+		return validatePassword(newP);
+	}
+
+	// [B] 단일 문자열(pw) 전달 시 -> 순수 암호 복잡도 규칙 검증
+	var pw = param1 || "";
+	var options = param2 || {};
+	var result = true;
+
+	var o = {
+		lower: 0,
+		upper: 0,
+		alpha: 0,
+		numeric: 0,
+		special: 0,
+		length: [8, Infinity],
+		custom: [],
+		badWords: [],
+		badSequenceLength: 0,
+		noQwertySequences: true,
+		noSequential: true
+	};
+
+	for (var property in options) {
+		o[property] = options[property];
+	}
+
+	var re = {
+		lower: /[a-z]/g,
+		upper: /[A-Z]/g,
+		alpha: /[A-Z]/gi,
+		numeric: /[0-9]/g,
+		special: /[\W_]/g
+	};
+
+	var rule, i;
+
+	// 암호길이검사 (최소 8자리)
+	if (pw.length < o.length[0] || pw.length > o.length[1]) {
+		result = false;
+	}
+
+	// 문자/숫자/특수문자 조합 검사
+	if (!pw.match(/([a-zA-Z0-9].*[!,@,#,$,%,^,&,*,?,_,~])|([!,@,#,$,%,^,&,*,?,_,~].*[a-zA-Z0-9])/)) {
+		result = false;
+	}
+
+	// 금지어인지 검사
+	for (i = 0; i < o.badWords.length; i++) {
+		if (pw.toLowerCase().indexOf(o.badWords[i].toLowerCase()) > -1) {
+			result = false;
+		}
+	}
+
+	// 암호의 연속성 여부 검사
+	var SamePass_0 = 0;
+	var chr_pass_0, chr_pass_1;
+	for (i = 0; i < pw.length; i++) {
+		chr_pass_0 = pw.charAt(i);
+		chr_pass_1 = pw.charAt(i + 1);
+		if (chr_pass_0 == chr_pass_1) {
+			SamePass_0 = SamePass_0 + 1;
+		}
+	}
+	if (SamePass_0 > 2) {
+		result = false;
+	}
+
+	if (o.badSequenceLength) {
+		var lower = "abcdefghijklmnopqrstuvwxyz",
+			upper = lower.toUpperCase(),
+			numbers = "0123456789",
+			qwerty = "qwertyuiopasdfghjklzxcvbnm",
+			start = o.badSequenceLength - 1,
+			seq = "_" + pw.slice(0, start);
+		for (i = start; i < pw.length; i++) {
+			seq = seq.slice(1) + pw.charAt(i);
+			if (
+				lower.indexOf(seq) > -1 ||
+				upper.indexOf(seq) > -1 ||
+				numbers.indexOf(seq) > -1 ||
+				(o.noQwertySequences && qwerty.indexOf(seq) > -1)
+			) {
+				result = false;
+			}
+		}
+	}
+
+	if (pw.search(re.alpha) < 0 || (pw.search(re.lower) < 0 && pw.search(re.upper) < 0) || pw.search(re.special) < 0 || pw.search(re.numeric) < 0) {
+		result = false;
+	}
+
+	if (!result) {
+		alert("입력한 암호를 확인해 주십시오.\n\n" +
+			  "-----------------------------------------\n\n" +
+			  "1) 암호는 최소 8글자 이상이여야 합니다.\n\n" +
+			  "2) 3회이상 연속된 숫자나 알파벳을 입력할 수 없습니다.\n\n" +
+			  "3) 암호는 최소 숫자/소문자/대문자/특수문자를 각각 하나씩 포함해야 합니다.");
+	}
+
+	return result;
+}
+
+// 하위 호환성을 위한 alias
+var validatePasswordSuite = validatePassword;
 
  //20180124 jwkim sort형식 Start
  function getSortOption(arrSort){

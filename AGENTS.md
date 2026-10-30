@@ -7,15 +7,15 @@
 
 ## 1. 코드 수정/삭제/추가 시 필수 주석 규칙
 
-1. **직접 삭제 금지 (기존 소스 보존)**
-   - 기존 코드를 완전히 삭제하는 것은 절대 금지됩니다.
-   - 코드를 제거하거나 변경해야 할 경우, **기존 코드는 주석 처리(`//` 또는 `/* ... */`, JSP/XML 주석 등)**하여 보존해야 합니다.
+1. **기존 소스 보존 및 오래된 주석 정리 원칙**
+   - 코드를 변경하거나 제외할 때 현재 운영 로직과 연관된 기존 핵심 코드는 주석 처리(`//` 또는 `/* ... */`, JSP/XML 주석 등)하여 보존합니다.
+   - **오래된 레거시 주석 정리 허용**: 수정 대상 영역 주변의 사장되었거나 불필요한 과거 주석, 미사용 디버깅용 임시 주석 등은 코드 가독성을 높이기 위해 삭제/정리해도 무방합니다.
 
-2. **주석 기본 순서 원칙: [날짜] [작성자(khma)] 최우선 배치**
+2. **주석 기본 순서 원칙 및 상세 설명 필수: [날짜] [작성자(khma)] 최우선 배치**
    - 모든 주석은 예외 없이 **`날짜`가 가장 먼저, 그 다음 `khma`가 위치**해야 합니다.
-   - 순서: `[날짜] [khma] : [사유 및 내용]` (또는 필요 시 Start / End)
+   - 순서: `[날짜] [khma] : [상세 수정 사유 및 구체적 변경 내용]` (또는 필요 시 Start / End)
+   - 코드만 보고도 변경 의도와 세부 동작을 바로 파악할 수 있도록 **상세하고 구체적인 설명**을 함께 작성합니다.
    - 불필요한 영문 태그(`Why:`, `What:`, `[START-DEPRECATED]` 등)는 AI 티가 나므로 절대 사용하지 않습니다.
-
 3. **AI 흔적 절대 금지 (사내 개발자 khma 스타일 100% 일치)**
    - 주석, 커밋, 문서, 코드 어디에도 'AI', 'ChatGPT', 'Gemini', 'LLM', 'Assistant', '자동생성' 등의 단어가 일절 포함되어서는 안 됩니다.
    - 프로젝트 소스 내 기존 `khma` 작성 스타일을 그대로 따릅니다.
@@ -58,6 +58,40 @@ String realPath = defaultFilePath + "/" + uploadFolder; // 20261001 khma {사유
 // 20261001 khma Start : {기능/수정내용}
 신규_메서드_또는_로직();
 // 20261001 khma End : {기능/수정내용}
+```
+
+### ⑤ 신규 필드 및 생성자/메서드 부가 설명 주석 (Javadoc 스타일 적극 권장)
+신규 변수, 멤버 필드, 생성자, 메서드를 추가하거나 주요 로직을 구성할 때 그 역할과 세부 동작 방식을 쉽게 파악할 수 있도록 부가 설명을 함께 작성합니다.
+```java
+	/** JSON 출력 인코딩 (UTF-8 기본) */
+	private JsonEncoding encoding = JsonEncoding.UTF8;
+
+	/**
+	 * 기본 생성자: Content-Type을 application/json으로 설정하고 경로 변수 노출을 비활성화한다.
+	 */
+	public MappingJacksonJsonViewEx() {
+		setContentType(DEFAULT_CONTENT_TYPE);
+		setExposePathVariables(false);
+	}
+```
+
+### ⑥ 소스 파일 헤더 주석 표준 규칙 (JS, CSS, Java 공통)
+주요 프론트엔드 라이브러리, 모듈 및 Java 클래스 상단의 라이선스/헤더 주석은 아래 표준으로 일원화합니다:
+* **Version**: `version 2.0 YYYY-MM-DD` (개정일자)
+* **Requires**: `Requires jQuery v1.12.4 or later` (JS 라이브러리인 경우)
+* **Authors**: `Ma KyoungHo`
+* **Company**: `KYDBM`
+
+```javascript
+/* jQuery grid plugin: 
+* version 2.0 2026-10-30
+* Requires jQuery v1.12.4 or later
+* Dual licensed under the MIT and GPL licenses:
+* http://www.opensource.org/licenses/mit-license.php
+* http://www.gnu.org/licenses/gpl.html
+* Authors: Ma KyoungHo
+* Company : KYDBM
+*/
 ```
 
 ### XML / JSP / Properties 파일
@@ -190,27 +224,17 @@ VDI 내부망 코드를 카메라로 촬영하여 전달받는 경우, 단순 OC
   * VDI 이클립스에서 **Default output folder(`WebContent/WEB-INF/classes`)** 및 **Java Compiler `1.7`** 설정으로 현재 운영 베이스라인 톰캣 9 서버가 에러 없이 정상 구동됨을 확인 완료 (2026-10-29, 로컬 `.classpath` 및 `.settings/*` 동기화 완료).
   * ⚠️ **VDI 오라클 접속 주소**: 운영(`26.2.51.37:1622`)과 달리 VDI에서는 `70.2.251.122:4034`로 접속하며 VDI 이클립스 내 `src/properties/jdbc.properties`에 변경 적용 완료됨 (덮어쓰기 금지).
 
-### 3) 지금 바로 착수할 다음 스텝 (Next Action) & 2단계 검증 게이트(`로컬 수정` ➡️ `VDI 붙여넣기 확인`)
-`1_TASK_SYSTEM_UPGRADE.md`에 따라 **Step 1 (시스템 버전 업그레이드)**을 아래 **4개의 세부 스텝**으로 나누어 **한 번에 하나씩(Step-by-Step)** 진행합니다:
-* **[완료] Step 1-1** (`[① 로컬: 완료(x) / ② VDI: 완료(x)]`):
-* **[완료] Step 1-1b (`MappingJacksonJsonViewEx.java`)** (`[① 로컬: 완료(x) / ② VDI: 완료(x)]`):
-* 👉 **[진행 중 - VDI 반영 대기] Step 1-2 (`Monarch820-servlet.xml`)** (`[① 로컬: 완료(x) / ② VDI: 대기( )]`):
-  * `WebContent/WEB-INF/lib/` 내 구형 Spring `3.1.1`(21개) 및 구형 `commons-fileupload-1.3.1.jar`, `commons-io-2.2.jar` 파일명 뒤에 `_20261029`를 붙여 백업 보존(삭제 금지)하고, `WebContent/WEB-INF/lib/Spring 4.3.30 신규 라이브러리/` 안의 신규 JAR 20종을 `WebContent/WEB-INF/lib/` 직하위로 배치.
-* **[대기] Step 1-2** (`[① 로컬: 대기 / ② VDI: 대기]`):
-  * `WebContent/WEB-INF/Monarch820-servlet.xml` 상단 Spring XML 스키마(`xsd`) `3.0` ➡️ `4.3` 상향 (`khma` 주석 적용 및 VDI 클립보드 복사·붙여넣기 가이드 제시).
-* **[대기] Step 1-3** (`[① 로컬: 대기 / ② VDI: 대기]`):
-  * `WebContent/ui/monform.jsp`, `login.jsp`, `loginProcess.jsp`, `logoutProcess.jsp` 내 jQuery `1.10.2` ➡️ `1.12.4` 스크립트 경로 변경 (`khma` 주석 적용 및 VDI 클립보드 복사·붙여넣기 가이드 제시).
-* **[대기] Step 1-4** (`[① 로컬: 대기 / ② VDI: 대기]`):
-  * `WebContent/js/jquery.kdb.MonArch800.js` 내 `$.Login` 함수에서 로그인 화면 아이디 저장 체크박스(`#chk-save`) 주석 해제 및 쿠키(`SAVE_ID`) 저장/불러오기 연동 (`Mon_LinkCRM_Maven` 동일 방식, `khma` 주석 적용 후 VDI 톰캣 재기동 테스트).
-
-### 3) 지금 바로 착수할 다음 스텝 (Next Action) & 2단계 검증 게이트(`로컬 수정` ➡️ `VDI 붙여넣기 확인`)
-`1_TASK_SYSTEM_UPGRADE.md`에 따라 **Step 1 (시스템 버전 업그레이드)**을 아래 세부 스텝으로 나누어 **한 번에 하나씩(Step-by-Step)** 진행합니다:
+### 3) 현재 진행 상태 및 2단계 검증 게이트(`로컬 수정` ➡️ `VDI 붙여넣기 확인`)
 * **[완료] Step 1-1** (`[① 로컬: 완료(x) / ② VDI: 완료(x)]`): 구형 Spring 3.1.1 JAR 백업 및 Spring 4.3.30 신규 라이브러리 20종 배치
 * **[완료] Step 1-1b (`MappingJacksonJsonViewEx.java`)** (`[① 로컬: 완료(x) / ② VDI: 완료(x)]`): `AbstractView` 상속 전환 및 Jackson 1.x 호환성 유지
 * **[완료] Step 1-2 (`Monarch820-servlet.xml`)** (`[① 로컬: 완료(x) / ② VDI: 완료(x)]`): Spring 4.3 xsd, `ContentNegotiationManager`, `mvc:annotation-driven` 적용 및 미사용 Quartz 스케줄러 비활성화
 * **[완료] Step 1-2b (`MonArchDaoImpl.java`)** (`[① 로컬: 완료(x) / ② VDI: 완료(x)]`): Java 1.8 / Spring 4.3 제네릭 `UserInfo` 형변환 보정 (1015라인)
   * 👉 **VDI 톰캣 9 서버 에러 없이 정상 기동 성공 확인 완료 (2026-10-29 16:00)**
-* 👉 **[내일 착수 예정] Step 1-3** (`[① 로컬: 대기 / ② VDI: 대기]`):
-  * `WebContent/ui/monform.jsp`, `login.jsp`, `loginProcess.jsp`, `logoutProcess.jsp` 내 jQuery `1.10.2` ➡️ `1.12.4` 스크립트 경로 변경 (`khma` 주석 적용 및 VDI 클립보드 복사·붙여넣기 가이드 제시).
-* **[대기] Step 1-4** (`[① 로컬: 대기 / ② VDI: 대기]`):
-  * `WebContent/js/jquery.kdb.MonArch800.js` 내 `$.Login` 함수에서 로그인 화면 아이디 저장 체크박스(`#chk-save`) 주석 해제 및 쿠키(`SAVE_ID`) 연동 (`Mon_LinkCRM_Maven` 동일 방식, `khma` 주석 적용 후 VDI 톰캣 재기동 테스트).
+* **[완료] Step 1-3 (4개 JSP)** (`[① 로컬: 완료(x) / ② VDI: 완료(x)]`):
+  * `WebContent/ui/monform.jsp`, `login.jsp`, `loginProcess.jsp`, `logoutProcess.jsp` 내 jQuery `1.10.2` ➡️ `1.12.4` 스크립트 경로 교체 및 VDI 반영 완료.
+* **[완료] Step 1-4 (`MonArch800.js`)** (`[① 로컬: 완료(x) / ② VDI: 완료(x)]`):
+  * `WebContent/js/jquery.kdb.MonArch800.js` 내 `$.Login` 함수에서 아이디 저장 체크박스(`#chk-save`) 활성화 및 쿠키(`SAVE_ID`) 연동 VDI 반영 완료.
+* **[완료] Step 4 (`MonArch800.js`)** (`[① 로컬: 완료(x) / ② VDI: 완료(x)]`):
+  * `WebContent/js/jquery.kdb.MonArch800.js` 내 `validatePassword` 비밀번호 복잡도 및 폼 전체 통합 검증 함수 VDI 반영 완료.
+* **[차주 착수 예정] Step 2-1 ~ Step 2-5**:
+  * Apache POI 4.1.2 업그레이드 및 엑셀 다운로드 AES 암호화, 4단 보안 모달, 감사로그 연동.

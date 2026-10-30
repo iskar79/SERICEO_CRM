@@ -15,15 +15,18 @@
 	content="width=device-width, initial-scale=0.7, minimum-scale=0.4, maximum-scale=3">
 
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<!-- <meta http-equiv="X-FRAME-OPTIONS" content="DENY" /> -->
-
 <link rel="apple-touch-icon" href="MonArch-blue57x57.ico" />
-<!-- <link rel="shortcut icon" href="favicon.ico" /> -->
 <title>::: SERICEO CRM :::</title>
-<!-- <link id="CSSlink" type="text/css" href="css/Theme_Redwine.css" rel="stylesheet" /> -->
+
+<!-- 테마 및 공통 스타일시트 -->
 <link id="CSSlink" type="text/css" href="css/Theme_CEO.css" rel="stylesheet" />
 <link type="text/css" href="css/Common.css" rel="stylesheet" />
-<script type="text/javascript" src="js/jquery-1.10.2.min.js"></script>
+
+<!-- 20261030 khma : 보안 취약점 개선을 위해 jQuery 1.10.2 -> 1.12.4로 업그레이드 -->
+<!-- <script type="text/javascript" src="js/jquery-1.10.2.min.js"></script> -->
+<script type="text/javascript" src="js/jquery-1.12.4.min.js"></script>
+
+<!-- CRM 공통 베이스 라이브러리 및 로그인 처리 스크립트 -->
 <script type="text/javascript" src="js/jquery.kdb.MonArch800.js"></script>
 <script type="text/javascript" src="js/MonLogin.js"></script>
 

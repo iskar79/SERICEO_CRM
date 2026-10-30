@@ -45,15 +45,15 @@
 | **Step 1-1b**| `src/co/kr/kydbm/core/utils/MappingJacksonJsonViewEx.java` | Spring 4.3.30 호환을 위해 `AbstractView` 상속 전환 (Jackson 1.x 유지) | `[x]` | `[x]` | **완료** |
 | **Step 1-2** | `WebContent/WEB-INF/Monarch820-servlet.xml` | XML 스키마 `4.3`, `ContentNegotiationManager`, `mvc:annotation-driven` 적용 | `[x]` | `[x]` | **완료** |
 | **Step 1-2b**| `src/co/kr/kydbm/core/dao/MonArchDaoImpl.java` | Spring 4.3 / Java 1.8 제네릭 `UserInfo` 형변환 보정 (1015라인) | `[x]` | `[x]` | **완료** |
-| **Step 1-3** | `WebContent/ui/monform.jsp`, `login.jsp`, `loginProcess.jsp`, `logoutProcess.jsp` | jQuery 스크립트 경로 상향 (`1.10.2` ➡️ `1.12.4`, 4개 JSP) | `[ ]` | `[ ]` | 👉 **내일 착수 예정** |
-| **Step 1-4** | `WebContent/js/jquery.kdb.MonArch800.js` | 로그인 화면 아이디 저장 체크박스(`#chk-save`) 활성화 및 쿠키(`SAVE_ID`) 연동 | `[ ]` | `[ ]` | 대기 |
-| **Step 2-1** | `WebContent/WEB-INF/lib/` | 구형 POI 3.8 `_20261029` 백업 후 `POI 4.1.2 신규 라이브러리/` 7종 배치 | `[ ]` | `[ ]` | 대기 |
+| **Step 1-3** | `WebContent/ui/monform.jsp`, `login.jsp`, `loginProcess.jsp`, `logoutProcess.jsp` | jQuery 스크립트 경로 상향 (`1.10.2` ➡️ `1.12.4`, 4개 JSP) | `[x]` | `[x]` | **완료** |
+| **Step 1-4** | `WebContent/js/jquery.kdb.MonArch800.js` | 로그인 화면 아이디 저장 체크박스(`#chk-save`) 활성화 및 쿠키(`SAVE_ID`) 연동 | `[x]` | `[x]` | **완료** |
+| **Step 4** | `WebContent/js/jquery.kdb.MonArch800.js` | `validatePassword` 비밀번호 검증 로직 단일 통합 (폼/다중인자/단일복잡도 다형성 지원) | `[x]` | `[x]` | **완료** |
+| **Step 2-1** | `WebContent/WEB-INF/lib/` | 구형 POI 3.8 `_20261029` 백업 후 `POI 4.1.2 신규 라이브러리/` 7종 배치 | `[ ]` | `[ ]` | 차주 착수 |
 | **Step 2-2** | `src/co/kr/kydbm/common/CommonExcelUtil.java` | POI 4.1.2 호환을 위한 `CellType` Enum 문법 수정 | `[ ]` | `[ ]` | 대기 |
 | **Step 2-3** | `WebContent/js/jquery.kdb.superContaner.js` | `DownXls` 함수 블록 내 4단 보안 모달 팝업 및 감사로그 연동 | `[ ]` | `[ ]` | 대기 |
 | **Step 2-4** | `src/co/kr/kydbm/core/filecontrol/UploadController.java` | 엑셀 비밀번호(`excelPassword`) 파라미터 수신 연동 | `[ ]` | `[ ]` | 대기 |
 | **Step 2-5** | `src/co/kr/kydbm/core/filecontrol/ExcelDownload.java` | POI 4.1.2 Agile AES 암호화 워크북 생성 및 스트림 방출 엔진 | `[ ]` | `[ ]` | 대기 |
 | **Step 3** | `MonArchDaoImpl.java`, `FilterGenerator.java`, 프로시저/배치 등 | KSign SecureDB 개인정보 암복호화 공통 모듈 및 프로시저/엑셀업로드 적용 | `[ ]` | `[ ]` | 대기 |
-| **Step 4** | `WebContent/js/jquery.kdb.MonArch800.js` | `validatePassword` 비밀번호 검증 로직 단일 통합 (고객사 승인 대기) | `[ ]` | `[ ]` | 승인대기 |
 
 ### 📖 Step 0. 사전 환경 정상화 및 아키텍처 숙지 (완료)
 > 📘 관련 문서: `ARCHITECTURE.md`, `AGENTS.md`, `0_MASTER_EXECUTION_PLAN.md`
@@ -71,8 +71,8 @@
 * [x] **[Step 1-1b]** `src/co/kr/kydbm/core/utils/MappingJacksonJsonViewEx.java` ➡️ Spring 4.3.30 호환 `AbstractView` 상속 전환 (`[① 로컬: 완료(x) / ② VDI: 완료(x)]`)
 * [x] **[Step 1-2]** `WebContent/WEB-INF/Monarch820-servlet.xml` ➡️ Spring 스키마(`xsd`) `4.3`, `ContentNegotiationManager`, `mvc:annotation-driven` 적용 (`[① 로컬: 완료(x) / ② VDI: 완료(x)]`)
 * [x] **[Step 1-2b]** `src/co/kr/kydbm/core/dao/MonArchDaoImpl.java` ➡️ Spring 4.3 / Java 1.8 제네릭 `UserInfo` 형변환 보정 (`[① 로컬: 완료(x) / ② VDI: 완료(x)]`)
-* [ ] **[Step 1-3]** `WebContent/ui/monform.jsp`, `login.jsp`, `loginProcess.jsp`, `logoutProcess.jsp` ➡️ jQuery 스크립트 경로 상향 (`1.10.2` ➡️ `1.12.4`) (`[① 로컬: 대기 / ② VDI: 대기]`)
-* [ ] **[Step 1-4]** `WebContent/js/jquery.kdb.MonArch800.js` ➡️ 로그인 화면 아이디 저장 체크박스(`#chk-save`) 활성화 및 쿠키(`SAVE_ID`) 연동 (`[① 로컬: 대기 / ② VDI: 대기]`)
+* [x] **[Step 1-3]** `WebContent/ui/monform.jsp`, `login.jsp`, `loginProcess.jsp`, `logoutProcess.jsp` ➡️ jQuery 스크립트 경로 상향 (`1.10.2` ➡️ `1.12.4`) (`[① 로컬: 완료(x) / ② VDI: 완료(x)]`)
+* [x] **[Step 1-4]** `WebContent/js/jquery.kdb.MonArch800.js` ➡️ 로그인 화면 아이디 저장 체크박스(`#chk-save`) 활성화 및 쿠키(`SAVE_ID`) 연동 (`[① 로컬: 완료(x) / ② VDI: 완료(x)]`)
 
 ### 🥈 Step 2. 엑셀 다운로드 보안 적용 (기능 개발)
 > 📘 참조 가이드: `2_TASK_EXCEL_DOWNLOAD_PWD.md`
@@ -93,7 +93,7 @@
 
 ### ⏳ Step 4. 비밀번호 검증 로직 단일 통합 (고객사 승인 대기)
 > 📘 참조 가이드: `4_TASK_PASSWORD_VALIDATION_UNIFICATION.md`
-* [ ] `WebContent/js/jquery.kdb.MonArch800.js` ➡️ `validatePassword` 통합 함수(폼/다중인자/단일복잡도 다형성 지원) 교체 적용 (고객사 승인 후 작업 예정)
+* [x] **[Step 4]** `WebContent/js/jquery.kdb.MonArch800.js` ➡️ `validatePassword` 비밀번호 복잡도 및 폼 전체 통합 검증 함수 교체 적용 완료 (`[① 로컬: 완료(x) / ② VDI: 완료(x)]`)
 
 ---
 
@@ -103,6 +103,9 @@
 
 | 일자 | 작업자 | 대상 파일 경로 | 구분 | 위치 (메서드/라인) | 변경 내용 요약 (초급자도 이해할 수 있게 명확히 작성) |
 | :---: | :---: | :--- | :---: | :--- | :--- |
+| 20261030 | khma | `WebContent/js/jquery.kdb.MonArch800.js` | 수정 | 4347L~4462L (`validatePassword`) | 비밀번호 복잡도 및 변경 검증 로직 단일 함수 통합 (폼/다중인자/단일복잡도 다형성 지원, 기존 코드 주석 보존) |
+| 20261030 | khma | `WebContent/js/jquery.kdb.MonArch800.js` | 수정 | 3907L, 3928L (`$.Login`) | 로그인 화면 아이디 저장 체크박스(`#chk-save`) 활성화 및 쿠키(`SAVE_ID`) 저장/복원 연동 |
+| 20261030 | khma | `WebContent/ui/monform.jsp` 외 3개 JSP | 수정 | `<head>` script src | 보안 취약점 개선을 위해 jQuery 1.10.2 -> 1.12.4 업그레이드 경로 교체 (기존 태그 주석 보존) |
 | 20261029 | khma | `src/co/kr/kydbm/core/dao/MonArchDaoImpl.java` | 수정 | 1015L (`getUserInfo`) | Spring 4.3 및 Java 1.8 제네릭 강화에 따른 `UserInfo` 반환값 형변환 보정 (기존 코드 주석 보존) |
 | 20261029 | khma | `WebContent/WEB-INF/Monarch820-servlet.xml` | 수정 | 섹션 3, 섹션 5 | Spring 4.3.xsd 스키마 상향, `ContentNegotiationManager` 적용, `<mvc:annotation-driven />` 적용 및 미사용 Quartz 스케줄러 비활성화 주석 보존 |
 | 20261029 | khma | `src/co/kr/kydbm/core/utils/MappingJacksonJsonViewEx.java` | 수정 | 전체 클래스 | Spring 4.3.30 호환을 위해 `AbstractView` 직접 상속 및 Jackson 1.x 직렬화 호환성 100% 자체 구현 (기존 코드 주석 보존) |
