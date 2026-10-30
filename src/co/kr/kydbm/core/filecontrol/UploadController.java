@@ -112,13 +112,11 @@ public class UploadController
 		SimpleDateFormat sd = new SimpleDateFormat("yyyyMMddHHmmssSSS");
 		String currentTimestamp = sd.format(calendar.getTime());
 		String uploadFolder = "/"+baseFolder+"/" +years +"/" + months;
-//		String realPath = request.getSession().getServletContext().getRealPath( uploadFolder ); //20140207 khma 패스를 request정보가 아닌 URL이 아닌 설정값으로 변경
 		String defaultFilePath = configProperties.getProperty("monarch.fileupload.path");
 		String realPath = defaultFilePath + "/" + uploadFolder ; //20140207 khma 패스를 request정보가 아닌 URL이 아닌 설정값으로 변경
 		String realfileName = currentTimestamp+ "_"+ Filename.getOriginalFilename(); 
 		String fileSize = String.valueOf(Filename.getSize());
 		long lFileSize =Long.parseLong(fileSize);;
-//		PropertyUtil propertyUtil  = new PropertyUtil("monarch.properties");
 		long limitSize = 500000;
 		String strLimitSize = configProperties.getProperty("monarch.fileupload.limitsize");
 		if(StringUtils.isNotEmpty(strLimitSize) && StringUtils.isNumeric(strLimitSize)){
@@ -156,7 +154,6 @@ public class UploadController
 				if(!dir.isDirectory()){
 					dir.mkdirs();
 				}
-				//		 request.getSession().getServletContext().getRealPath("/APP_Data/") + System.getProperty("file.separator") + fileName+".csv";
 				if(writeFile(Filename, realPath, realfileName)){
 					// 파일관리 테이블에 정보 등록
 					String service = "MON_COMMON";
@@ -177,15 +174,6 @@ public class UploadController
 					mapParam.put("FILE_SEARCH_KEY", fileSearchKey);
 					mapParam.put("USE_FLAG", "1");
 					monArchDao.exeUpdate(sqlCommnand, mapParam);
-//		 		response.setContentType("text/html; charset=UTF-8");
-//		 	    PrintWriter out;
-//				try {
-//					out = response.getWriter();
-//					out.write("<script language='javascript'>alert('success');</script>");
-//					out.close();
-//				} catch (IOException e) {
-//					e.printStackTrace();
-//				}
 				}
 			}
 		}
@@ -273,7 +261,6 @@ public class UploadController
 		SimpleDateFormat sd = new SimpleDateFormat("yyyyMMddHHmmssSSS");
 		String currentTimestamp = sd.format(calendar.getTime());
 		String uploadFolder = years + "/" + months;
-//		String realPath = request.getSession().getServletContext().getRealPath( uploadFolder ); //20140207 khma 패스를 request정보가 아닌 URL이 아닌 설정값으로 변경
 		String defaultFilePath = configProperties.getProperty("monarch.fileupload.path");
 		String realPath = defaultFilePath + "/" +uploadFolder ; 
 		String uploadFileName = Filename.getOriginalFilename();
@@ -281,7 +268,6 @@ public class UploadController
 		String realfileName = currentTimestamp;
 		String fileSize = String.valueOf(Filename.getSize());
 		long lFileSize = Long.parseLong(fileSize);
-//		PropertyUtil propertyUtil  = new PropertyUtil("monarch.properties");
 		long limitSize = 500000;
 		String strLimitSize = configProperties.getProperty("monarch.fileupload.limitsize");
 		if(StringUtils.isNotEmpty(strLimitSize) && StringUtils.isNumeric(strLimitSize)){
@@ -320,7 +306,6 @@ public class UploadController
 				if(!dir.isDirectory()){
 					dir.mkdirs();
 				}
-				//		 request.getSession().getServletContext().getRealPath("/APP_Data/") + System.getProperty("file.separator") + fileName+".csv";
 				if(writeFile(Filename, realPath, realfileName)){
 					// 파일관리 테이블에 정보 등록
 					String service = "MON_COMMON";
@@ -341,15 +326,6 @@ public class UploadController
 					mapParam.put("USITE", USITE);
 					mapParam.put("UPPER_INFO", fileSearchKey);
 					monArchDao.exeUpdate(sqlCommnand, mapParam);
-//		 		response.setContentType("text/html; charset=UTF-8");
-//		 	    PrintWriter out;
-//				try {
-//					out = response.getWriter();
-//					out.write("<script language='javascript'>alert('success');</script>");
-//					out.close();
-//				} catch (IOException e) {
-//					e.printStackTrace();
-//				}
 				}
 			}
 		}
@@ -503,7 +479,6 @@ public class UploadController
 			MonArchDaoImpl monArchDao = new MonArchDaoImpl();
 			int rst =0;
 			try {
-//				FileInputStream fis = multiPartFile.getBytes();
 				rst = monArchDao.uploadFile(sqlCommand, mParam,multiPartFile);
 			} catch (Exception e) {
 				log.error("파일을 DB에 저장하는 중 오류가 발생하였습니다." ,e);
@@ -577,10 +552,8 @@ public class UploadController
 			String disposition = getDisposition(fileName, getBrowser(request));
 			response.setContentLength(ifilesize);
 			response.reset() ;
-	//		response.setContentType("application/vnd.msexcel");
 			response.setContentType("application/octet-stream-dummy");
 			response.setHeader("content", "text/html; charset=utf-8");
-	//		response.setHeader("Content-Disposition", "attachment; filename=\"" + new String(fileName.getBytes("UTF-8"), "ISO-8859-1")+ "\"");
 			response.setHeader("Content-Disposition", disposition);
 			response.setHeader("Content-Length", ""+ifilesize );
 			response.setHeader("Content-Transfer-Encoding", "binary;");
@@ -632,10 +605,8 @@ public class UploadController
 			String disposition = getDisposition(fileName, getBrowser(request));
 			response.setContentLength(ifilesize);
 			response.reset() ;
-	//		response.setContentType("application/vnd.msexcel");
 			response.setContentType("application/octet-stream-dummy");
 			response.setHeader("content", "text/html; charset=utf-8");
-	//		response.setHeader("Content-Disposition", "attachment; filename=\"" + new String(fileName.getBytes("UTF-8"), "ISO-8859-1")+ "\"");
 			response.setHeader("Content-Disposition", disposition);
 			response.setHeader("Content-Length", ""+ifilesize );
 			response.setHeader("Content-Transfer-Encoding", "binary;");
@@ -714,15 +685,7 @@ public class UploadController
 				fis.close();
 			}
 			
-			//String targetFilePath = mapFileInfo.get("FILE_PATH").toString();
 			String zipFileName = "data.zip";
-			//String realPath = defaultFilePath + targetFilePath ;  //20140207 khma 패스를 request정보가 아닌 URL이 아닌 설정값으로 변경
-			
-			/*File file = new File(realPath);
-			int ifilesize = (int)file.length();
-			byte b[] = new byte[ifilesize];
-			fis = new FileInputStream(file);
-			os = response.getOutputStream();*/
 			String disposition = getDisposition(zipFileName, getBrowser(request));
 			response.setContentLength((int)zipFileSize);
 			response.reset() ;
@@ -1048,7 +1011,6 @@ public class UploadController
 	            byte fileData[] = file.getBytes();
 	            
 	            fos = new FileOutputStream(path + "/" + fileName);
-//	            fos = new FileOutputStream(path  + fileName);
 	             
 	            fos.write(fileData);
 	           
@@ -1064,7 +1026,6 @@ public class UploadController
 	                try{
 	                    fos.close();
 	                }catch(Exception e){}
-	                	//rstFlag = false;
 	                }
 	        }// try end;
 	         return rstFlag;
