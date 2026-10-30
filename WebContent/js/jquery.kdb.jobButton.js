@@ -7,6 +7,18 @@
 
 (function ($) {
     $.fn.extend({
+        /**
+         * 화면 상단/하단 기능 버튼(Jobs) 동적 생성 및 권한 제어 메서드
+         * @param {jQuery|HTMLElement} jobsArea 버튼이 렌더링될 대상 컨테이너 영역
+         * @param {boolean} [bottom] 하단 버튼 영역 여부 (미지정 시 상단 jobs, true 시 jobsBottom)
+         * 
+         * [동작 설명]
+         * 1. 컨테이너의 jsonData 메타데이터를 기반으로 정의된 jobs 목록을 순회하여 버튼 동적 생성
+         * 2. Security 퍼미션(C/R/U/D) 검증을 거쳐 권한이 없는 기능 버튼은 생성 제외
+         * 3. 시스템 개발자(dvl) 및 엑셀 출력 권한자(xlauth) 권한 분기 처리
+         *    - 20261030 khma : 보안 엑셀 다운로드(DownXlsNew) 권한 분기 추가 (xlauth 권한 체크)
+         * 4. 드래그앤드롭 공유(Share), 버튼 마우스 이벤트, 엑셀 업로드 옵션 바인딩
+         */
         makeButtons: function (jobsArea, bottom) {
             _Obj = $(this);
             var option = $(this).data("jsonData");
@@ -39,8 +51,11 @@
                         }
                     }
                     if (value.inComm == 'getJson' && _M.UserInfo.dvl < 1) return true; //시스템개발자인 경우에만 개발버튼 보이도록
-                    // 20261030 khma : 보안 엑셀 다운로드(DownXlsNew) 권한 분기 추가 (xlauth 권한 체크)
-                    if ((value.inComm == 'DownXls' || value.inComm == 'DownXlsNew') && _M.UserInfo.xlauth < 1) return true; //엑셀출력관리자인 경우에만 엑셀버튼 보이도록
+                    
+                    // 20261030 khma : 보안 엑셀 다운로드(DownXlsNew) 권한 분기 추가
+                    // - 기존 DownXls 외에 2단계 보안 모달 및 Agile AES 암호화가 적용된 DownXlsNew 버튼에 대해서도
+                    //   엑셀 출력 권한(xlauth >= 1)이 있는 사용자에게만 버튼이 노출되도록 제어한다.
+                    if ((value.inComm == 'DownXls' || value.inComm == 'DownXlsNew') && _M.UserInfo.xlauth < 1) return true;
 					
                     if ($('.cmdspan:last .cmdicon', jobsArea).hasClass('btn-block') && value.css == 'btn-block') return;
                     var _butSet = $(jobsArea).find('.buttonset');
@@ -85,7 +100,7 @@
                     .attr("inComm", value.inComm != undefined ? value.inComm : "")
                     .attr("display", value.display != undefined ? value.display : null);
 					
-					// 20240404 khma : 엑셀 업로드 관련 속성 추가 옵션
+					// 20240404 khma : 엑셀 업로드 관련 속성 추가 옵션 (upMode, service, method, procName, jobType, title)
 					if(value.xlsOption != undefined){
 						_cmdwrap.find("input")
 						.attr("upMode", value.xlsOption.upMode != undefined ? value.xlsOption.upMode : "single")
@@ -184,6 +199,14 @@
 
         },
 
+        /**
+         * 컨테이너 뷰 상태(viewstatus: view/edit)에 따른 버튼 표시/숨김 제어 메서드
+         * @param {jQuery} Obj 대상 뷰/컨테이너 jQuery 객체
+         * 
+         * [동작 설명]
+         * 1. 팝업 또는 컨텍스트 메뉴인 경우 모든 버튼 표시 유지
+         * 2. 각 버튼의 display 속성값과 컨테이너의 현재 상태(viewstatus)를 비교하여 대상 버튼만 show 처리
+         */
         displayButtons: function (Obj) {
 
 		var parent;
@@ -228,6 +251,18 @@
             }
         },
         
+        /**
+         * 특정 버튼의 활성화/비활성화 및 표시/숨김 상태를 동적으로 제어하는 메서드
+         * @param {Object|string|jQuery} args 버튼 셀렉터 정보 또는 설정 객체
+         *        - Object 형태: { settings: [ { target: "btnId", changeTo: "show|hide|able|disable" }, ... ] }
+         *        - string|jQuery 형태: 버튼 셀렉터 문자열 또는 jQuery 객체 (optionalArgs와 함께 사용)
+         * @param {string} [optionalArgs] 단일 제어 명령 ('show' | 'hide' | 'able' | 'disable')
+         * 
+         * [동작 설명]
+         * - 'show' / 'able' : 버튼을 표시하고 opacity를 1로 설정하여 활성화
+         * - 'hide' : 버튼을 화면에서 숨김 처리
+         * - 'disable' : 버튼을 표시하되 opacity를 0.4로 낮추어 비활성화 상태 표시
+         */
         setButtonState: function(args, optionalArgs) {
         	var errorMsg = '버튼 처리 정보가 없습니다.';
         	
