@@ -1,16 +1,15 @@
-﻿// 2013.09.27 dmjung :: jobMake 플러그인 화 작업중...
+/* jQuery jobButton plugin: 
+* version 2.0 2026-10-30
+* Requires jQuery v1.12.4 or later
+* Authors: Ma KyoungHo
+* Company : KYDBM
+*/
 
 (function ($) {
     $.fn.extend({
         makeButtons: function (jobsArea, bottom) {
             _Obj = $(this);
             var option = $(this).data("jsonData");
-            // 2013.10.01 dmjung :: 최초 로드시 readonly 상태인지 아닌지 파악한다.
-            //if (option.isEditMode != true) {
-            //    _Obj.attr('viewstatus', 'view');
-            //} else {
-            //    _Obj.attr('viewstatus', 'edit');
-            //}
             if (bottom == undefined) {
                 $.each(option.jobs, function (index, value) {
                     if (value == undefined) return;
@@ -40,7 +39,8 @@
                         }
                     }
                     if (value.inComm == 'getJson' && _M.UserInfo.dvl < 1) return true; //시스템개발자인 경우에만 개발버튼 보이도록
-                    if ((value.inComm == 'DownXls' || value.inComm == 'DownXlsNew') && _M.UserInfo.xlauth < 1) return true; //엑셀출력관리자인 경우에만 개발버튼 보이도록
+                    // 20261030 khma : 보안 엑셀 다운로드(DownXlsNew) 권한 분기 추가 (xlauth 권한 체크)
+                    if ((value.inComm == 'DownXls' || value.inComm == 'DownXlsNew') && _M.UserInfo.xlauth < 1) return true; //엑셀출력관리자인 경우에만 엑셀버튼 보이도록
 					
                     if ($('.cmdspan:last .cmdicon', jobsArea).hasClass('btn-block') && value.css == 'btn-block') return;
                     var _butSet = $(jobsArea).find('.buttonset');
@@ -78,18 +78,15 @@
                             }
                         });
                     }
-                    // 2013.01.01 dmjung :: JDM btn-block 대체 요소 자동 추가, CSS로 각 테마에서 컨트롤 가능케하는 목적
                     $("<span class='cmdspan-block align-middle' number='" + index + "'></span>").appendTo(_butSet);
-                    // 2024.02.26 아이콘 삭제 $("<span class='cmdicon icon i-20 '></span>").appendTo(_cmdwrap).addClass(value.css).attr("index", value.index);
                     $("<input type='button' class='cmdbtn cmdspan-ft' />").appendTo(_cmdwrap)
                     .attr("value", value.name)
                     .attr("index", value.index)
                     .attr("inComm", value.inComm != undefined ? value.inComm : "")
                     .attr("display", value.display != undefined ? value.display : null);
 					
-					//khma 엑셀 업로드 관련 속성 추가 옵션 20240404
+					// 20240404 khma : 엑셀 업로드 관련 속성 추가 옵션
 					if(value.xlsOption != undefined){
-						//debugger;
 						_cmdwrap.find("input")
 						.attr("upMode", value.xlsOption.upMode != undefined ? value.xlsOption.upMode : "single")
 						.attr("service", value.xlsOption.service != undefined ? value.xlsOption.service : "MON_COMMON")
@@ -159,7 +156,6 @@
                             }
                         });
                     }
-                    // 2024.02.27 버튼 아이콘 삭제 $("<span class='cmdicon icon i-20 '></span>").appendTo(_cmdwrap).addClass(value.css).attr("index", value.index);
                     $("<input type='button' class='cmdbtn cmdspan-ft' />").appendTo(_cmdwrap)
                             .attr("value", value.name)
                             .attr("index", value.index)
@@ -178,7 +174,6 @@
                 $(this).css('border', '1px solid transparent').css('border-bottom', '1px solid #acacac').css('border-right', '1px solid #acacac');
             });
             $('.cmdspan').mouseleave(function () {
-                // 2013.01.01 dmjung :: PTS 테마에서는 마우스 떠날 때 기존 border 값이 유지되어야 하므로 조건문 추가 
                 var cssName = $('#CSSlink').attr('href');
                 if (cssName == '/css/Theme_Thebuttons.css') {
                     $(this).css('border', '1px solid #B0B0B0');
@@ -203,7 +198,6 @@
             var mainObj = Obj.parents('.Wraper');
             var leftObj = Obj.parents('.left');
 
-
             if (mainObj.size() > 0) {
                 parent = mainObj;
             } else {
@@ -212,7 +206,6 @@
             $('.cmdspan', parent).each(function (index, button) {
                 var display = $(button).find('input').attr('display');
                 if (display != undefined || display != null) {
-                    // 2013.10.02 dmjung :: Status 식별자를 갖고 있는 버튼을 Sorting out.
                     if (status != undefined || status != null) {
                         if (display.indexOf(status) > -1) showTargetButton(button);
                     } else {
@@ -224,63 +217,18 @@
             });
 
             function showTargetButton(button) {
-                // 2013.10.02 dmjung :: Status 식별자와 동일한 display 속성을 가진 버튼만 취득해서 show 처리.
                 $(button).show();
                 $(button).next().show();
             }
 
             function hideAll(Obj) {
-                // 2013.10.02 dmjung :: 버튼 초기화 처리.
-                //var option = $(Obj).data('jsonData');
-               
-				//20140915 khma :: 제대로 된 cmdspan영역을 취득하지 못하고 있으므로 대응처리
+				// 20140915 khma : 제대로 된 cmdspan영역을 취득하지 못하고 있으므로 대응처리
 				$('.cmdspan', Obj).hide();
 				$('.cmdspan-block', Obj).hide();
-
-			 /* var mainObj = Obj.parents('.Wrapper');
-                var leftObj = Obj.parents('.left');
-
-                if (mainObj.size() > 0) {
-                    $('.cmdspan', mainObj).hide();
-                    $('.cmdspan-block', mainObj).hide();
-                } else {
-                    $('.cmdspan', leftObj).hide();
-                    $('.cmdspan-block', leftObj).hide();
-                }*/
-
-
-                //if (option.mainViewID) {
-                //    $(option.mainViewID).find('.cmdspan').hide();
-                //    $(option.mainViewID).find('.cmdspan-block').hide();
-                //}
             }
         },
         
         setButtonState: function(args, optionalArgs) {
-        	// args 는, 			버튼 객체와 처리하고 싶은 옵션을 담은 plainObject.
-        	// optionalArgs 는,	처리하고 싶은 옵션. 이 때는 args 가 jquery object 이거나, selector 정보이다.
-        	
-        	/* args 의 plainObject 구조        	
-        	  	args = {
-        	  		settings : [
-				        { target : "btn1", changeTo : "hide" },
-				        { target : "btn2", changeTo : "open" },
-				        .
-				        .
-				        .
-				        .
-				        { target : "btn9", changeTo : "disabled" }
-				    ]
-        	  	}
-        	  	
-        	  	// target 에는 버튼의 DOM id 혹은 class 등과 같이 셀렉터 정보를 입력한다.
-        	  	// changeTo 에는 해당 버튼을 제어하고 싶은 옵션을 지정한다.
-        	 */
-        	        	        	
-        	/* args, optionalArgs 파라메터가 들어올 경우
-        	 	args 에는  버튼의 DOM id 혹은 class 등과 같이 셀렉터 정보를 입력한다.
-        	 	optionalArgs 에는 해당 버튼을 제어하고 싶은 옵션을 지정한다.
-        	 */        	
         	var errorMsg = '버튼 처리 정보가 없습니다.';
         	
         	function processButtons(button, action) {
@@ -302,7 +250,7 @@
 	        			break;
         		}
         	}
-    		
+        	
         	if ( undefined != optionalArgs ) {
         		var object;
         		args instanceof jQuery ? object = args : object = $(args);
