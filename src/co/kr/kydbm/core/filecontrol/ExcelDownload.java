@@ -131,7 +131,6 @@ public class ExcelDownload {
 			try {
 
 				if (makeCSV(filePath, service, ds)) {
-					//TODO CSV에 대한  확인 분석 필요..
 					File file = new File(filePath);
 					int ifilesize = (int) file.length();
 					byte b[] = new byte[ifilesize];
@@ -523,10 +522,8 @@ public class ExcelDownload {
 	 * @throws RowsExceededException 
 	    */
 	   private void setExcelHeaderOld(WritableSheet sheet, WritableCellFormat cellFormat, List<Map<String, Object>> ds) throws RowsExceededException, WriteException {
-			// TODO Auto-generated method stub
 			Object[] keys = ds.get(0).keySet().toArray();
 			jxl.write.Label label =null;
-			//		jxl.write.Blank blank=null;
 			String keyName="";
 			int colSize = 10;
 			int colNum = 0; //RNUM과 RCOUNT칼럼제거 하기위한 카운트
@@ -546,7 +543,6 @@ public class ExcelDownload {
 	   }
 
 	   private void setExcelHeaderEmpty(WritableSheet sheet, WritableCellFormat cellFormat, List<Map<String, Object>> ds) throws RowsExceededException, WriteException {
-			// TODO Auto-generated method stub
 			jxl.write.Label label =null;
 			String keyName = "";
 			
@@ -582,17 +578,16 @@ public class ExcelDownload {
 		jxl.write.Label noti = null;
 		jxl.write.Label label = null;
 		jxl.write.Label field = null;
-		// jxl.write.Blank blank=null;
 		
 		if(CommonConst.XLS_TYPE.DATA.getVal().equals(xlsType)){
-			//todo 데이터의 1번째 데이터를 헤더정보로 설정 2행
-			//todo 데이터의 2번째 데이터를 field컬럼명로 설정 1행
+			// 1번째 행 데이터: 헤더 라벨정보로 설정 (2행)
+			// 2번째 행 데이터: field 컬럼명으로 설정 (1행)
 			Object[] fieldKeys = ds.get(0).keySet().toArray();
 			String keyName = "";
 			String labelName = "";
 			
 			int colNum = 0; // RNUM과 RCOUNT칼럼제거 하기위한 카운트
-			//todo 최상위 주의사항 기록
+			// 최상단 주의사항 문구 셀 삽입
 			noti = new jxl.write.Label(0, 0, "※A열은 절대 수정하지 마십시요.", notiCellFormat);
 			sheet.addCell(noti);
 			
@@ -601,9 +596,6 @@ public class ExcelDownload {
 				keyName = fieldKeys[i].toString();
 				labelName = ds.get(0).get(keyName).toString();
 				
-//				if(i == 0){
-//					labelName ="데이터키"; //첫번째 컬럼은 무조건 데이터키로 셋팅한다.
-//				}
 				
 				if ("RNUM".equals(keyName) || "RCOUNT".equals(keyName) ||   "SORT".equals(keyName)) { // RNUM과
 					// RCOUNT칼럼제거
@@ -613,11 +605,6 @@ public class ExcelDownload {
 					label = new jxl.write.Label(i - colNum, 2, labelName, headerCellFormat);
 					sheet.addCell(field);
 					sheet.addCell(label);
-					// if(!keyName.isEmpty()) colSize = keyName.length()*3 ;
-					// //jdk1.6
-//					if (!StringUtils.isEmpty(keyName)){
-//						colSize = keyName.length() * 2; // jdk.15
-//					}
 					if (!StringUtils.isEmpty(labelName)){
 						if(keyName.length() < labelName.length()){
 							colSize = labelName.length() * 3; // jdk.15
@@ -628,7 +615,7 @@ public class ExcelDownload {
 				}
 			}
 		}else{
-			//todo client에서 취득한 헤더정보 건수로 데이터를 처리함.
+			// 클라이언트에서 전달받은 헤더 컬럼 정보(arrCols) 기반 헤더 셀 생성
 			for (int i = 0; i < arrCols.size(); i++) {
 				
 				String strLabel = arrCols.get(i).get("label").toString();
@@ -645,8 +632,6 @@ public class ExcelDownload {
 					sheet.addCell(label);
 				}
 				
-				// if(!keyName.isEmpty()) colSize = keyName.length()*3 ;
-				// //jdk1.6
 				if (!StringUtils.isEmpty(strLabel))
 					colSize = strLabel.length() * 3; // jdk.15
 				sheet.setColumnView(iColNo + colPos, colSize);
@@ -671,7 +656,6 @@ public class ExcelDownload {
 		Object[] keys = ds.get(0).keySet().toArray();
 		jxl.write.Label label =null;
 		jxl.write.Number number =null;
-//		jxl.write.Blank blank=null;
 		String keyName="";
 		jxl.write.WritableCellFormat dataFormat= new WritableCellFormat();
 		for (int i = 0; i < ds.size(); i++) {
@@ -716,7 +700,6 @@ public class ExcelDownload {
 		Object[] keys = ds.get(0).keySet().toArray();
 		jxl.write.Label label = null;
 		jxl.write.Number number = null;
-		// jxl.write.Blank blank=null;
 		String keyName = "";
 		
 		if(CommonConst.XLS_TYPE.DATA.getVal().equals(xlsType)){
