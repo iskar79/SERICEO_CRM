@@ -879,6 +879,25 @@ public class UploadController
 		MENUID = obj.get("MENUID");
 		STEPMENU = obj.get("STEPMENU");
 		ACTIONNAME = obj.get("ACTIONNAME");
+
+		// 20261030 khma Start : 보안 엑셀 다운로드 (용도, 대상, 사유, 암호) 파라미터 취득
+		String excelUsage = "";
+		String excelTarget = "";
+		String excelReason = "";
+		String excelPassword = "";
+		if (obj.containsKey("excelUsage") && StringUtils.isNotEmpty(obj.get("excelUsage"))) {
+			excelUsage = URLDecoder.decode(obj.get("excelUsage"), "UTF-8");
+		}
+		if (obj.containsKey("excelTarget") && StringUtils.isNotEmpty(obj.get("excelTarget"))) {
+			excelTarget = URLDecoder.decode(obj.get("excelTarget"), "UTF-8");
+		}
+		if (obj.containsKey("excelReason") && StringUtils.isNotEmpty(obj.get("excelReason"))) {
+			excelReason = URLDecoder.decode(obj.get("excelReason"), "UTF-8");
+		}
+		if (obj.containsKey("excelPassword") && StringUtils.isNotEmpty(obj.get("excelPassword"))) {
+			excelPassword = URLDecoder.decode(obj.get("excelPassword"), "UTF-8");
+		}
+		// 20261030 khma End : 보안 엑셀 다운로드 (용도, 대상, 사유, 암호) 파라미터 취득
 		
 		//xlsServuce, xlsMethod를 조건으로 쿼리정보를 취득한다.
 		si = monArchDao.ReadQuery(xlsService, xlsMethod, USITE);
@@ -973,7 +992,11 @@ public class UploadController
 
   		}else{
 	      ExcelDownload excelDownload = new ExcelDownload();
+	      // 20261030 khma : 보안 엑셀 다운로드 암호 전달 (excelPassword)
+	      /*
 	      excelDownload.downExcel(ds, fileName ,type, request, response, arrHeaderInfo, xlsType);
+	      */
+	      excelDownload.downExcel(ds, fileName ,type, request, response, arrHeaderInfo, xlsType, excelPassword);
   		}
 	      
          long 서비스종료시간 = System.currentTimeMillis();//서비스종료시간

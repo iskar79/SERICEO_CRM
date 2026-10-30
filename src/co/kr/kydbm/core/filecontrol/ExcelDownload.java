@@ -33,6 +33,23 @@ import org.apache.log4j.Logger;
 import org.apache.poi.util.StringUtil;
 import org.springframework.stereotype.Controller;
 
+// 20261030 khma Start : Apache POI 4.1.2 Agile AES 암호화 관련 import
+import org.apache.poi.ss.usermodel.BorderStyle;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.apache.poi.poifs.crypt.EncryptionInfo;
+import org.apache.poi.poifs.crypt.EncryptionMode;
+import org.apache.poi.poifs.crypt.Encryptor;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+// 20261030 khma End : Apache POI 4.1.2 Agile AES 암호화 관련 import
+
 import co.kr.kydbm.common.CommonConst;
 import co.kr.kydbm.common.CommonUtil;
 import au.com.bytecode.opencsv.CSVWriter;
@@ -170,11 +187,27 @@ public class ExcelDownload {
 //		return true;
 //	}
 
+	// 20261030 khma : 기존 7개 파라미터 downExcel 하위 호환성 유지 (암호 미설정 기본 호출)
 	public boolean downExcel(List<Map<String, Object>> ds, String service,
 			String type, HttpServletRequest request,
 			HttpServletResponse response,
 			ArrayList<Map<String, Object>> arrHeaderInfo,
 			String xlsType) throws Exception {
+		return downExcel(ds, service, type, request, response, arrHeaderInfo, xlsType, null);
+	}
+
+	// 20261030 khma Start : 보안 엑셀 다운로드 (excelPassword 전달 시 POI 4.1.2 Agile AES 암호화 다운로드)
+	public boolean downExcel(List<Map<String, Object>> ds, String service,
+			String type, HttpServletRequest request,
+			HttpServletResponse response,
+			ArrayList<Map<String, Object>> arrHeaderInfo,
+			String xlsType, String excelPassword) throws Exception {
+
+		// 20261030 khma : excelPassword가 입력된 경우 POI 4.1.2 Agile AES 암호화 엑셀 다운로드 분기 처리
+		if (StringUtils.isNotEmpty(excelPassword) && !"CSV".equals(StringUtils.upperCase(type))) {
+			return makeEncryptedExcel(ds, service, request, response, arrHeaderInfo, xlsType, excelPassword);
+		}
+
 		String fileName = service;
 		String fullFilePath = "";
 		String filePath = "";
@@ -350,6 +383,170 @@ public class ExcelDownload {
 		}
 		return true;
 	}
+
+	// 20261030 khma Start : Apache POI 4.1.2 Agile AES 암호화 엑셀 생성 (SXSSFWorkbook 대용량 스트리밍)
+	/**
+	 * POI 4.1.2 Agile AES 암호화 엑셀(.xlsx) 파일을 생성하여 클라이언트로 스트리밍 다운로드한다.
+	 * 
+	 * @param ds 조회 데이터 리스트
+	 * @param fileName 파일명
+	 * @param request HTTP 요청 객체
+	 * @param response HTTP 응답 객체
+	 * @param arrHeaderInfo 헤더 컬럼 정보 리스트
+	 * @param xlsType 엑셀 타입 (report / data)
+	 * @param excelPassword 엑셀 파일 열람 비밀번호
+	 * @return 정상 다운로드 완료 여부
+	 * @throws Exception
+	 */
+	private boolean makeEncryptedExcel(List<Map<String, Object>> ds, String fileName,
+			HttpServletRequest request, HttpServletResponse response,
+			ArrayList<Map<String, Object>> arrHeaderInfo, String xlsType,
+			String excelPassword) throws Exception {
+
+		log.debug("makeEncryptedExcel (POI 4.1.2 Agile AES) ==> khma");
+
+		SXSSFWorkbook workbook = null;
+		POIFSFileSystem fs = null;
+		try {
+			workbook = new SXSSFWorkbook(100);
+			Sheet sheet = workbook.createSheet("Sheet1");
+
+			// 스타일 설정 (헤더: 연노랑 배경, 굵은 글씨, 가운데 정렬, 테두리)
+			CellStyle headerStyle = workbook.createCellStyle();
+			Font headerFont = workbook.createFont();
+			headerFont.setBold(true);
+			headerStyle.setFont(headerFont);
+			headerStyle.setFillForegroundColor(IndexedColors.LEMON_CHIFFON.getIndex());
+			headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+			headerStyle.setAlignment(HorizontalAlignment.CENTER);
+			headerStyle.setBorderTop(BorderStyle.THIN);
+			headerStyle.setBorderBottom(BorderStyle.THIN);
+			headerStyle.setBorderLeft(BorderStyle.THIN);
+			headerStyle.setBorderRight(BorderStyle.THIN);
+
+			// 스타일 설정 (데이터: 얇은 테두리)
+			CellStyle dataStyle = workbook.createCellStyle();
+			dataStyle.setBorderTop(BorderStyle.THIN);
+			dataStyle.setBorderBottom(BorderStyle.THIN);
+			dataStyle.setBorderLeft(BorderStyle.THIN);
+			dataStyle.setBorderRight(BorderStyle.THIN);
+
+			List<String> keyList = new ArrayList<String>();
+			List<String> labelList = new ArrayList<String>();
+
+			// 1. 헤더 컬럼 목록 구성
+			if (arrHeaderInfo != null && arrHeaderInfo.size() > 0) {
+				for (int i = 0; i < arrHeaderInfo.size(); i++) {
+					Map<String, Object> colMap = arrHeaderInfo.get(i);
+					String field = (colMap.get("field") != null) ? colMap.get("field").toString() : "";
+					String label = (colMap.get("label") != null) ? colMap.get("label").toString() : field;
+					if ("RNUM".equals(field) || "RCOUNT".equals(field) || "ROWNUM".equals(field)) {
+						continue;
+					}
+					keyList.add(field);
+					labelList.add(label);
+				}
+			} else if (ds != null && ds.size() > 0) {
+				for (Object k : ds.get(0).keySet()) {
+					String keyName = k.toString();
+					if ("RNUM".equals(keyName) || "RCOUNT".equals(keyName) || "ROWNUM".equals(keyName) || "SORT".equals(keyName)) {
+						continue;
+					}
+					keyList.add(keyName);
+					labelList.add(keyName);
+				}
+			}
+
+			int colCount = labelList.size();
+			int[] maxLens = new int[colCount];
+
+			// 2. 헤더 행 작성
+			Row headerRow = sheet.createRow(0);
+			for (int c = 0; c < colCount; c++) {
+				Cell cell = headerRow.createCell(c);
+				String lbl = labelList.get(c);
+				cell.setCellValue(lbl);
+				cell.setCellStyle(headerStyle);
+				maxLens[c] = (lbl != null) ? lbl.getBytes().length : 4;
+			}
+
+			// 3. 데이터 행 작성
+			if (ds != null && ds.size() > 0) {
+				for (int r = 0; r < ds.size(); r++) {
+					Map<String, Object> rowMap = ds.get(r);
+					Row row = sheet.createRow(r + 1);
+					for (int c = 0; c < colCount; c++) {
+						Cell cell = row.createCell(c);
+						cell.setCellStyle(dataStyle);
+						String key = keyList.get(c);
+						Object val = rowMap.get(key);
+						if (val != null) {
+							String strVal = val.toString();
+							int byteLen = strVal.getBytes().length;
+							if (byteLen > maxLens[c]) {
+								maxLens[c] = Math.min(byteLen, 50);
+							}
+							if (NumberUtils.isNumber(strVal) && !strVal.startsWith("0")) {
+								try {
+									cell.setCellValue(Double.parseDouble(strVal));
+								} catch (Exception ex) {
+									cell.setCellValue(strVal);
+								}
+							} else {
+								cell.setCellValue(strVal);
+							}
+						} else {
+							cell.setCellValue("");
+						}
+					}
+				}
+			}
+
+			// 컬럼 너비 설정 (최소 10자 ~ 최대 60자 너비)
+			for (int c = 0; c < colCount; c++) {
+				int w = Math.min(60 * 256, Math.max(10 * 256, (maxLens[c] + 4) * 256));
+				sheet.setColumnWidth(c, w);
+			}
+
+			// 4. Agile AES 암호화 스트림 생성 및 응답 전송
+			fs = new POIFSFileSystem();
+			EncryptionInfo info = new EncryptionInfo(EncryptionMode.agile);
+			Encryptor enc = info.getEncryptor();
+			enc.confirmPassword(excelPassword);
+
+			OutputStream encOs = enc.getDataStream(fs);
+			workbook.write(encOs);
+			encOs.close();
+
+			String xlsxFileName = fileName + ".xlsx";
+			String disposition = getDisposition(xlsxFileName, getBrowser(request));
+
+			response.reset();
+			response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+			response.setHeader("Content-Disposition", disposition);
+			response.setHeader("Content-Transfer-Encoding", "binary;");
+			response.setHeader("Pragma", "no-cache;");
+			response.setHeader("Expires", "-1;");
+
+			OutputStream out = response.getOutputStream();
+			fs.writeFilesystem(out);
+			out.flush();
+
+		} catch (Exception e) {
+			log.error("보안 엑셀 암호화 다운로드 중 오류 발생: " + e.getMessage(), e);
+			throw new Exception("보안 엑셀 다운로드 처리 중 오류가 발생하였습니다: " + e.getMessage(), e);
+		} finally {
+			if (fs != null) {
+				try { fs.close(); } catch (Exception e) {}
+			}
+			if (workbook != null) {
+				try { workbook.dispose(); } catch (Exception e) {}
+				try { workbook.close(); } catch (Exception e) {}
+			}
+		}
+		return true;
+	}
+	// 20261030 khma End : Apache POI 4.1.2 Agile AES 암호화 엑셀 생성 (SXSSFWorkbook 대용량 스트리밍)
 
 	/**
 	 * 액셀파일을 생성하는 메소드

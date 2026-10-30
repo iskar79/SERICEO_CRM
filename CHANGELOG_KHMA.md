@@ -1,4 +1,4 @@
-﻿# khma 소스 변경 및 VDI 동기화 관리대장
+# khma 소스 변경 및 VDI 동기화 관리대장
 
 본 문서는 로컬 PC에서 개발/수정한 소스 코드를 **VDI 내부망(운영/개발 서버)으로 안전하게 이관(복사-붙여넣기)하기 위한 실무 관리 대장**입니다.  
 `0_MASTER_EXECUTION_PLAN.md`의 **[Step 0 ➡️ Step 1 ➡️ Step 2 ➡️ Step 3]** 작업 순서와 1:1로 정확하게 일치하도록 구성되어 있어, 초급 개발자도 순서대로 따라가며 누락 없이 작업할 수 있습니다.
@@ -162,3 +162,15 @@
   * `WebContent/WEB-INF/Monarch820-servlet.xml` (Spring 4.3 xsd, `ContentNegotiationManager`, `mvc:annotation-driven` 적용)
   * `src/co/kr/kydbm/core/dao/MonArchDaoImpl.java` (Java 1.8 제네릭 `UserInfo` 형변환 보정)
 * **작업 결과**: **VDI 톰캣 9 서버 에러 없이 정상 기동 성공 확인 완료 (2026.10.29)**
+
+### [2026.10.30] Apache POI 4.1.2 업그레이드 및 보안 엑셀 다운로드 (Agile AES 암호화, Step 2-1 ~ Step 2-5)
+* **대상 파일**:
+  * `WebContent/WEB-INF/lib/` (구형 POI 3.8 JAR 7종 `_20261030` 백업, 신규 POI 4.1.2 JAR 7종 배치 완료)
+  * `src/co/kr/kydbm/common/CommonExcelUtil.java` (POI 4.1.2 `CellType` Enum 및 `DateUtil` 문법 보정, 컴파일 에러 0건 완료)
+  * `WebContent/js/jquery.kdb.jobButton.js` (43라인 `DownXlsNew` 권한 분기 추가)
+  * `WebContent/js/jquery.kdb.superContaner.js` (신규 `DownXlsNew` 메서드 추가: 공통코드 `XLS_PURPOSE`/`XLS_TARGET` 동적 로딩, 1단계 사유입력 -> 2단계 파일암호 4자 이상 필수)
+  * `src/co/kr/kydbm/core/filecontrol/UploadController.java` (`downExcel` 내 `excelUsage`, `excelTarget`, `excelReason`, `excelPassword` 파라미터 취득 및 전달)
+  * `src/co/kr/kydbm/core/filecontrol/ExcelDownload.java` (8개 파라미터 오버로딩 `downExcel` 추가, `excelPassword` 전달 시 POI 4.1.2 `SXSSFWorkbook` 스트리밍 및 `POIFSFileSystem` Agile AES 암호화 다운로드 구현)
+* **작업 결과**:
+  * Step 2-1 & 2-2: VDI 이클립스 반영 및 구동 확인 완료 (`[① 로컬: 완료(x) / ② VDI: 완료(x)]`)
+  * Step 2-3 ~ 2-5: 로컬 안티그래비티 작업 및 JDK 11 컴파일 검증 완료 (0 ERRORS, VDI 반영 대기)

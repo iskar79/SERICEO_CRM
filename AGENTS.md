@@ -236,5 +236,14 @@ VDI 내부망 코드를 카메라로 촬영하여 전달받는 경우, 단순 OC
   * `WebContent/js/jquery.kdb.MonArch800.js` 내 `$.Login` 함수에서 아이디 저장 체크박스(`#chk-save`) 활성화 및 쿠키(`SAVE_ID`) 연동 VDI 반영 완료.
 * **[완료] Step 4 (`MonArch800.js`)** (`[① 로컬: 완료(x) / ② VDI: 완료(x)]`):
   * `WebContent/js/jquery.kdb.MonArch800.js` 내 `validatePassword` 비밀번호 복잡도 및 폼 전체 통합 검증 함수 VDI 반영 완료.
-* **[차주 착수 예정] Step 2-1 ~ Step 2-5**:
-  * Apache POI 4.1.2 업그레이드 및 엑셀 다운로드 AES 암호화, 4단 보안 모달, 감사로그 연동.
+* **[?꾨즺] Step 2-1 (POI 4.1.2 ?쇱씠釉뚮윭由?援먯껜)** ([??濡쒖뺄: ?꾨즺(x) / ??VDI: ?꾨즺(x)]):
+  * 援ы삎 POI 3.8 7醫?_20261030 諛깆뾽 諛??좉퇋 POI 4.1.2 7醫?JAR 諛곗튂 ?꾨즺.
+* **[?꾨즺] Step 2-2 (CommonExcelUtil.java)** ([??濡쒖뺄: ?꾨즺(x) / ??VDI: ?꾨즺(x)]):
+  * POI 4.1.2 CellType Enum 諛?DateUtil 臾몃쾿 蹂댁젙, 而댄뙆???먮윭 0嫄??꾨즺.
+* **[吏꾪뻾以? Step 2-3 (jobButton.js, superContaner.js)** ([??濡쒖뺄: ?꾨즺(x) / ??VDI: ?湲? )]):
+  * jobButton.js: DownXlsNew 沅뚰븳 泥댄겕 遺꾧린 ?ы븿.
+  * superContaner.js: DownXlsNew 怨듯넻肄붾뱶(XLS_PURPOSE, XLS_TARGET) ?숈쟻 ?곕룞 諛?2?④퀎 ?앹뾽 (10???댁긽 ?ъ쑀 -> 4???댁긽 ?뷀샇).
+* **[吏꾪뻾以? Step 2-4 (UploadController.java)** ([??濡쒖뺄: ?꾨즺(x) / ??VDI: ?湲? )]):
+  * excelUsage, excelTarget, excelReason, excelPassword ?뚮씪誘명꽣 痍⑤뱷 諛?ExcelDownload ?꾨떖.
+* **[吏꾪뻾以? Step 2-5 (ExcelDownload.java)** ([??濡쒖뺄: ?꾨즺(x) / ??VDI: ?湲? )]):
+  * POI 4.1.2 Agile AES ?뷀샇???뚰겕遺?SXSSFWorkbook ?ㅽ듃由щ컢) 諛?POIFSFileSystem ?뷀샇???ㅼ슫濡쒕뱶 援ы쁽 (JDK 11 javac 寃利?0嫄??꾨즺).

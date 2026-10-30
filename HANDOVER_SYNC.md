@@ -1,4 +1,4 @@
-﻿# 다중 PC 안티그래비티(Antigravity) 실시간 작업 공유 및 인수인계서
+# 다중 PC 안티그래비티(Antigravity) 실시간 작업 공유 및 인수인계서
 
 > **🔄 양방향 PC 동기화 및 VDI 반영 확인 게이트(Gate) 규칙 (필독)**
 > 1. **작업 시작 시 (`PC A` 또는 `PC B`에서 안티그래비티를 열었을 때)**:
@@ -13,7 +13,7 @@
 
 ---
 
-## 1. 현재까지 완료된 작업 요약 (2026.10.30 12:08 기준)
+## 1. 현재까지 완료된 작업 요약 (2026.10.30 15:30 기준)
 
 1. **Step 0: 운영 최신 소스 100% 동기화 및 베이스라인 구동 검증 완료**:
    - 운영 백업본(`sericrm_20261021`) 기준으로 `src/` 및 `WebContent/` 전체 100% 동기화 완료.
@@ -33,26 +33,27 @@
 4. **Step 1-4 & Step 4: 아이디 저장 및 비밀번호 복잡도 통합 검증 완료 및 VDI 반영**:
    - `login.jsp` 및 `MonArch800.js`: `#chk-save` 체크박스 및 `SAVE_ID` 쿠키 연동 완료.
    - `MonArch800.js`: `validatePassword` 다형성 통합 함수(폼객체, 3개인자, 단일문자열) 적용 완료.
-   - **`MonArch800.js` 레거시 주석 전수 정리 완료**: 2020년 이전 과거 주석 및 사장된 주석 블록 225줄 완전 제거, JDK 11 컴파일 파싱 검증 완료 (`SYNTAX VALIDATION: SUCCESSFUL! NO SYNTAX ERRORS!`).
+   - `MonArch800.js` 레거시 주석 전수 정리 완료, JDK 11 컴파일 파싱 검증 완료.
+
+5. **Step 2-1 & Step 2-2: Apache POI 4.1.2 라이브러리 교체 및 CommonExcelUtil 문법 보정 완료**:
+   - `WebContent/WEB-INF/lib/`: 구형 POI 3.8 JAR 7종 `_20261030` 접미사로 백업, POI 4.1.2 JAR 7종 배치 완료 (VDI 확인 완료).
+   - `src/co/kr/kydbm/common/CommonExcelUtil.java`: POI 4.1.2 호환 `CellType` Enum 및 `DateUtil` 적용, 컴파일 에러 0건 (VDI 확인 완료).
+
+6. **Step 2-3: `jobButton.js` 및 `superContaner.js` 신규 `DownXlsNew` 구현 완료 (로컬 수정 완료)**:
+   - `jobButton.js`: 43라인 `DownXlsNew` 권한 체크 포함 완료.
+   - `superContaner.js`: 기존 `DownXls`, `DownXlsOld` 100% 보존하고 신규 `DownXlsNew` 메서드 추가.
+   - 공통코드 그룹 ID(`XLS_PURPOSE`, `XLS_TARGET`) `$.SvcGetCodes` 동적 로딩 + Fallback 기본값 연동.
+   - 2단계 순차 팝업 (1단계: 용도/대상/목적 10자 이상 ➡️ 2단계: 엑셀 열람 암호 4자 이상 필수).
+
+7. **Step 2-4 & Step 2-5: `UploadController.java` 및 `ExcelDownload.java` 보안 엑셀 다운로드 백엔드 구현 완료 (로컬 수정 완료, 컴파일 0건 검증 완료)**:
+   - `UploadController.java`: `excelUsage`, `excelTarget`, `excelReason`, `excelPassword` 파라미터 취득 및 `ExcelDownload.downExcel`에 전달.
+   - `ExcelDownload.java`: 기존 7개 파라미터 `downExcel` 하위호환 유지, 8개 오버로딩 `downExcel` 추가.
+   - `excelPassword` 입력 시 POI 4.1.2 Agile AES 암호화 워크북(`SXSSFWorkbook` 100행 스트리밍) 및 `POIFSFileSystem` 암호화 스트림 방출 구현.
+   - JDK 11 `javac` 컴파일 검증 완료 (0 ERRORS).
 
 ---
 
-## 2. 다른 PC에서 이어서 착수할 작업 (Next Actions)
-
-1. **`MON_COM_사용자정보POPUP_TBL` 구조체 비밀번호 검증 연동**:
-   - **구조체 위치**: 오라클 DB `M_STRUCTURE` 테이블 (`STRUCTURE_NAME = 'MON_COM_사용자정보POPUP_TBL'`)
-   - **연동 방식**:
-     - *옵션 1 (DB)*: `M_STRUCTURE`의 구조체 JSON에 `"beforeSaveCallBack": "validatePassword"` 및 새 비밀번호 필드에 `"type": "passwordcheck"` 설정.
-     - *옵션 2 (프론트엔드)*: `superContaner.js` 108라인 `opticon-config` 클릭 이벤트에서 `beforeSaveCallBack = "validatePassword"` 자동 주입.
-2. **Step 2-1 ~ Step 2-5: Apache POI 4.1.2 업그레이드 및 엑셀 다운로드 보안 적용**:
-   - **Step 2-1**: 구형 POI 3.8 백업 및 `POI 4.1.2 신규 라이브러리/` 7종 배치
-   - **Step 2-2**: `CommonExcelUtil.java` CellType 문법 보정
-   - **Step 2-3**: `superContaner.js` DownXls 4단 보안 모달 연동
-   - **Step 2-4 & 2-5**: `UploadController.java` & `ExcelDownload.java` AES 암호화 워크북 생성 및 스트림 처리
-
----
-
-## 3. 전체 작업 Tasklist 및 2단계 검증 대장 (`로컬 수정` ➡️ `VDI 붙여넣기 확인`)
+## 2. 전체 작업 Tasklist 및 2단계 검증 대장 (`로컬 수정` ➡️ `VDI 붙여넣기 확인`)
 
 | 스텝 | 대상 파일 경로 | 작업 내용 요약 | ① 로컬 수정 | ② VDI 붙여넣기/구동확인 | 현재 상태 |
 | :---: | :--- | :--- | :---: | :---: | :---: |
@@ -65,9 +66,10 @@
 | **Step 1-3** | `WebContent/ui/monform.jsp`, `login.jsp`, `loginProcess.jsp`, `logoutProcess.jsp` | jQuery `1.10.2` ➡️ `1.12.4` 스크립트 경로 변경 (JSP 4개) | `[x]` | `[x]` | **완료** |
 | **Step 1-4** | `WebContent/js/jquery.kdb.MonArch800.js` | 로그인 화면 아이디 저장 체크박스(`#chk-save`) 활성화 및 쿠키(`SAVE_ID`) 연동 | `[x]` | `[x]` | **완료** |
 | **Step 4** | `WebContent/js/jquery.kdb.MonArch800.js` | `validatePassword` 비밀번호 검증 로직 단일 통합 및 레거시 주석 전수 정리 | `[x]` | `[x]` | **완료** |
-| **Step 2-1** | `WebContent/WEB-INF/lib/` | 구형 POI 3.8 `_20261029` 백업 후 `POI 4.1.2 신규 라이브러리/` 7종 배치 | `[ ]` | `[ ]` | 차주 착수 |
-| **Step 2-2** | `src/co/kr/kydbm/common/CommonExcelUtil.java` | POI 4.1.2 호환을 위한 `CellType` Enum 문법 수정 | `[ ]` | `[ ]` | 대기 |
-| **Step 2-3** | `WebContent/js/jquery.kdb.superContaner.js` | `DownXls` 함수 블록 내 4단 보안 모달 팝업 및 감사로그 연동 | `[ ]` | `[ ]` | 대기 |
-| **Step 2-4** | `src/co/kr/kydbm/core/filecontrol/UploadController.java` | 엑셀 비밀번호(`excelPassword`) 파라미터 수신 연동 | `[ ]` | `[ ]` | 대기 |
-| **Step 2-5** | `src/co/kr/kydbm/core/filecontrol/ExcelDownload.java` | POI 4.1.2 Agile AES 암호화 워크북 생성 및 스트림 방출 엔진 | `[ ]` | `[ ]` | 대기 |
+| **Step 2-1** | `WebContent/WEB-INF/lib/` | 구형 POI 3.8 `_20261030` 백업 후 `POI 4.1.2 신규 라이브러리/` 7종 배치 | `[x]` | `[x]` | **완료** |
+| **Step 2-2** | `src/co/kr/kydbm/common/CommonExcelUtil.java` | POI 4.1.2 호환을 위한 `CellType` Enum 및 `DateUtil` 문법 수정 | `[x]` | `[x]` | **완료** |
+| **Step 2-3** | `WebContent/js/jquery.kdb.jobButton.js` | `DownXlsNew` 권한 체크 분기 추가 (Line 43) | `[x]` | `[ ]` | 대기 |
+| **Step 2-3** | `WebContent/js/jquery.kdb.superContaner.js` | `DownXlsNew` 신규 메서드 추가 (공통코드 `XLS_PURPOSE`/`XLS_TARGET` + 2단계 모달) | `[x]` | `[ ]` | 대기 |
+| **Step 2-4** | `src/co/kr/kydbm/core/filecontrol/UploadController.java` | 엑셀 파라미터(`excelUsage`, `excelTarget`, `excelReason`, `excelPassword`) 취득 및 전달 | `[x]` | `[ ]` | 대기 |
+| **Step 2-5** | `src/co/kr/kydbm/core/filecontrol/ExcelDownload.java` | POI 4.1.2 Agile AES 암호화 워크북 생성 및 스트림 방출 구현 | `[x]` | `[ ]` | 대기 |
 | **Step 3** | `MonArchDaoImpl.java`, `FilterGenerator.java`, 프로시저/배치 등 | KSign SecureDB 개인정보 암복호화 공통 모듈 및 프로시저/엑셀업로드 적용 | `[ ]` | `[ ]` | 대기 |
