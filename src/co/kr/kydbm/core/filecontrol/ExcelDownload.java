@@ -55,17 +55,27 @@ import co.kr.kydbm.common.CommonUtil;
 import au.com.bytecode.opencsv.CSVWriter;
 
 /**
- * EXCEL처리를 담당하는 클래스
- * 
- * @author KyoungHo_Ma
- * @version 1.0.0 2012-12-01
- * @since version 1.0.0
+ * 엑셀 다운로드 처리 클래스 (POI 4.1.2 Agile AES 암호화 및 JXL 호환)
+ * version 2.0 2026-10-30
+ * Authors : Ma KyoungHo
+ * Company : KYDBM
  */
 @Controller
 public class ExcelDownload {
 	Logger log = Logger.getLogger(ExcelDownload.class.getName());
 
-	// 20261030 khma : 기존 7개 파라미터 downExcel 하위 호환성 유지 (암호 미설정 기본 호출)
+	/**
+	 * 20261030 khma : 기존 7개 파라미터 downExcel 하위 호환성 유지 (암호 미설정 일반 다운로드)
+	 * @param ds 데이터 리스트
+	 * @param service 서비스/파일명
+	 * @param type 파일 타입(XLS / CSV)
+	 * @param request HttpServletRequest
+	 * @param response HttpServletResponse
+	 * @param arrHeaderInfo 헤더 컬럼 정보
+	 * @param xlsType 엑셀 타입(report / data)
+	 * @return 정상 다운로드 완료 여부
+	 * @throws Exception
+	 */
 	public boolean downExcel(List<Map<String, Object>> ds, String service,
 			String type, HttpServletRequest request,
 			HttpServletResponse response,
@@ -74,7 +84,19 @@ public class ExcelDownload {
 		return downExcel(ds, service, type, request, response, arrHeaderInfo, xlsType, null);
 	}
 
-	// 20261030 khma Start : 보안 엑셀 다운로드 (excelPassword 전달 시 POI 4.1.2 Agile AES 암호화 다운로드)
+	/**
+	 * 20261030 khma Start : 보안 엑셀 다운로드 (excelPassword 전달 시 POI 4.1.2 Agile AES 암호화 다운로드)
+	 * @param ds 데이터 리스트
+	 * @param service 서비스/파일명
+	 * @param type 파일 타입(XLS / CSV)
+	 * @param request HttpServletRequest
+	 * @param response HttpServletResponse
+	 * @param arrHeaderInfo 헤더 컬럼 정보
+	 * @param xlsType 엑셀 타입(report / data)
+	 * @param excelPassword 엑셀 파일 열람 비밀번호 (암호화 적용 여부 결정)
+	 * @return 정상 다운로드 완료 여부
+	 * @throws Exception
+	 */
 	public boolean downExcel(List<Map<String, Object>> ds, String service,
 			String type, HttpServletRequest request,
 			HttpServletResponse response,
