@@ -431,7 +431,8 @@ public class ExcelDownload {
 			fs.writeFilesystem(out);
 			out.flush();
 
-		} catch (Exception e) {
+		// 20261030 khma : NoClassDefFoundError 등 Error 계열 예외 감지를 위해 Throwable 처리
+		} catch (Throwable e) {
 			log.error("보안 엑셀 암호화 다운로드 중 오류 발생: " + e.getMessage(), e);
 			throw new Exception("보안 엑셀 다운로드 처리 중 오류가 발생하였습니다: " + e.getMessage(), e);
 		} finally {
@@ -864,7 +865,10 @@ public class ExcelDownload {
 	}
 
 	private String getBrowser(HttpServletRequest request) {
-		String header = request.getHeader("User-Agent");
+		String header = (request != null) ? request.getHeader("User-Agent") : null;
+		if (header == null) {
+			return "Chrome";
+		}
 		if (header.indexOf("MSIE") > -1 || header.indexOf("rv:11.0") > -1) {
 			return "MSIE";
 		} else if (header.indexOf("Chrome") > -1) {

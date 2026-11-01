@@ -998,13 +998,17 @@ public class UploadController {
 			SvcCRUD svcCRUD = new SvcCRUD();
 			svcCRUD.Log("DATACRUD", sqlCommand, msg, USITE, UID);
 			throw new Exception(CommonConst.COMM_ERROR_MESSAGE);
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			e.printStackTrace();
-			log.error(e.getMessage());
+			log.error(e.getMessage(), e);
 			throw new Exception(CommonConst.COMM_ERROR_MESSAGE);
 		}
 
+		// 20261030 khma : 파일 스트림 직접 출력 완료 후 Spring View 렌더링 생략 (충돌 방지)
+		/*
 		return new ModelAndView("fileDownloadView", "info", null);
+		*/
+		return null;
 	}
 
 	/**

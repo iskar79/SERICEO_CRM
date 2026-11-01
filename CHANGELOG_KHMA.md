@@ -48,11 +48,15 @@
 | **Step 1-3** | `WebContent/ui/monform.jsp`, `login.jsp`, `loginProcess.jsp`, `logoutProcess.jsp` | jQuery 스크립트 경로 상향 (`1.10.2` ➡️ `1.12.4`, 4개 JSP) | `[x]` | `[x]` | **완료** |
 | **Step 1-4** | `WebContent/js/jquery.kdb.MonArch800.js` | 로그인 화면 아이디 저장 체크박스(`#chk-save`) 활성화 및 쿠키(`SAVE_ID`) 연동 | `[x]` | `[x]` | **완료** |
 | **Step 4** | `WebContent/js/jquery.kdb.MonArch800.js` | `validatePassword` 비밀번호 검증 로직 단일 통합 (폼/다중인자/단일복잡도 다형성 지원) | `[x]` | `[x]` | **완료** |
-| **Step 2-1** | `WebContent/WEB-INF/lib/` | 구형 POI 3.8 `_20261029` 백업 후 `POI 4.1.2 신규 라이브러리/` 7종 배치 | `[ ]` | `[ ]` | 차주 착수 |
-| **Step 2-2** | `src/co/kr/kydbm/common/CommonExcelUtil.java` | POI 4.1.2 호환을 위한 `CellType` Enum 문법 수정 | `[ ]` | `[ ]` | 대기 |
-| **Step 2-3** | `WebContent/js/jquery.kdb.superContaner.js` | `DownXls` 함수 블록 내 4단 보안 모달 팝업 및 감사로그 연동 | `[ ]` | `[ ]` | 대기 |
-| **Step 2-4** | `src/co/kr/kydbm/core/filecontrol/UploadController.java` | 엑셀 비밀번호(`excelPassword`) 파라미터 수신 연동 | `[ ]` | `[ ]` | 대기 |
-| **Step 2-5** | `src/co/kr/kydbm/core/filecontrol/ExcelDownload.java` | POI 4.1.2 Agile AES 암호화 워크북 생성 및 스트림 방출 엔진 | `[ ]` | `[ ]` | 대기 |
+| **Step 2-1** | WebContent/WEB-INF/lib/ | 구형 POI 3.8 _20261030 백업 후 POI 4.1.2 신규 라이브러리/ 7종 배치 | [x] | [x] | **완료** |
+| **Step 2-2** | src/co/kr/kydbm/common/CommonExcelUtil.java | POI 4.1.2 호환을 위한 CellType Enum 및 DateUtil 문법 수정 | [x] | [x] | **완료** |
+| **Step 2-3** | WebContent/js/jquery.kdb.jobButton.js | DownXlsNew 권한 체크 분기 추가 및 레거시 주석 정리 (Line 43) | [x] | [x] | **완료** |
+| **Step 2-3** | WebContent/js/jquery.kdb.superContaner.js | DownXlsNew 신규 메서드 추가 (공통코드 XLS_PURPOSE/XLS_TARGET + 2단계 모달) | [x] | [x] | **완료** |
+| **Step 2-6** | src/org/apache/commons/math3/util/ArithmeticUtils.java | POI 4.1.2 POIFSFileSystem 산술 오버플로우 체크 유틸 내장화 | [x] | [ ] | **로컬완료 (VDI 반영 대기)** |
+| **Step 2-6** | src/org/apache/commons/math3/exception/MathArithmeticException.java | 산술 오버플로우 런타임 예외 클래스 내장화 | [x] | [ ] | **로컬완료 (VDI 반영 대기)** |
+| **Step 2-6** | src/com/zaxxer/sparsebits/SparseBitSet.java | POI 4.1.2 AgileEncryptor 암호화 비트셋 유틸 내장화 | [x] | [ ] | **로컬완료 (VDI 반영 대기)** |
+| **Step 2-4** | src/co/kr/kydbm/core/filecontrol/UploadController.java | 엑셀 파라미터 수신, return null; 보정, Throwable 로깅 보강 | [x] | [ ] | **로컬완료 (VDI 반영 대기)** |
+| **Step 2-5** | src/co/kr/kydbm/core/filecontrol/ExcelDownload.java | Agile AES 암호화 워크북 생성, getBrowser NPE 방어, Throwable 처리 | [x] | [ ] | **로컬완료 (VDI 반영 대기)** |
 | **Step 3** | `MonArchDaoImpl.java`, `FilterGenerator.java`, 프로시저/배치 등 | KSign SecureDB 개인정보 암복호화 공통 모듈 및 프로시저/엑셀업로드 적용 | `[ ]` | `[ ]` | 대기 |
 
 ### 📖 Step 0. 사전 환경 정상화 및 아키텍처 숙지 (완료)
