@@ -6170,9 +6170,20 @@ $(document).on("blur", ".t_Money", function (e) {
 
       if (!file) return;
 
+      // 20261102 khma : 기존 파일이 있는 상태에서 새 파일 교체 선택 시 확인 컨펌창 제공
+      var oldVal = _contaner.attr("value");
+      var isReplace = (oldVal && oldVal !== "");
+      if (isReplace) {
+        if (!confirm("기존에 첨부된 파일이 있습니다.\n새 파일 첨부 시 기존 파일은 자동 삭제(교체)됩니다.\n계속 진행하시겠습니까?")) {
+          _contaner.find(".singlefile-input").val("");
+          return;
+        }
+      }
+
       // 최대 파일 크기 20MB 검증
       if (file.size > 20 * 1024 * 1024) {
         alert("파일 용량이 20MB를 초과하여 첨부할 수 없습니다.");
+        _contaner.find(".singlefile-input").val("");
         return;
       }
 
@@ -6180,11 +6191,8 @@ $(document).on("blur", ".t_Money", function (e) {
       _fieldEdit.data("pendingFile", file);
 
       var sizeKb = (file.size / 1024).toFixed(1);
-      var oldVal = _contaner.attr("value");
-      var isReplace = (oldVal && oldVal !== "");
       var tagText = isReplace ? "[교체 대기]" : "[첨부 대기]";
       var warnNotice = isReplace ? "<span style='color: #e11d48; font-size: 11px; margin-right: 8px;'>※ 1개의 파일만 첨부 가능하며, 저장 시 기존 파일은 자동 삭제(교체)됩니다.</span>" : "";
-
       var previewHtm = "<span class='icon i-20 icon-file align-middle' style='margin-right: 4px; color: #0284c7;'></span>"
                      + "<b style='color: #0284c7; margin-right: 6px;'>" + tagText + " " + file.name + " (" + sizeKb + " KB)</b>"
                      + warnNotice
