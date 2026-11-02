@@ -255,7 +255,7 @@ VDI 내부망 코드를 카메라로 촬영하여 전달받는 경우, 단순 OC
   * Mon_LinkCRM_Maven M_USER 및 "CRM"."M_EXCEL_DOWN_LOG" 표준 명명규칙 기반 엑셀 다운로드 보안 감사 및 사유 이력 테이블 DDL 및 모나크 서비스(INSERT_EXCEL_DOWN_LOG) 등록 완료.
 * **[완료] Step 2-7 (superContaner.js)** ([① 로컬: 완료(x) / ② VDI: 완료(x)]):
   * XLS_REASON_POPUP 동적로드, DownXlsNew 타깃 서비스명/메소드명/파일명 정밀 추출 및 실제 다운로드 파일명 타임스탬프 일치화, IP 다중 추출 보정 완료.
-* **[진행중] Step 5-1 (UploadController.java, Resource.js, Monarch820-servlet.xml)** ([① 로컬: 완료(x) / ② VDI: 대기( )]):
+* **[완료] Step 5-1 (UploadController.java, Resource.js, Monarch820-servlet.xml)** ([① 로컬: 완료(x) / ② VDI: 완료(x)]):
   * 차세대 파일시스템 백엔드 독립 엔드포인트 3종(/uploadFileNew, /downloadFileNew, /deleteFileSafe) 및 세션 인터셉터 매핑 완료.
-* **[진행중] Step 5-2 (superContaner.js)** ([① 로컬: 완료(x) / ② VDI: 대기( )]):
-  * singleFileNew HTML5 드래그앤드롭, 지연 업로드(Client Staging), 20MB 검증, 교체 대기 및 취소 복원 기능 구현 완료.
+* **[완료] Step 5-2 (superContaner.js)** ([① 로컬: 완료(x) / ② VDI: 완료(x)]):
+  * singleFileNew, multiFileNew Drag&Drop, 지연 업로드(Client Staging), 20MB 검증, 교체 대기 및 취소 복원 기능 구현 및 VDI 구동 검증 완료.
