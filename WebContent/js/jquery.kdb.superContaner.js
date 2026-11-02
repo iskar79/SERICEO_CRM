@@ -512,6 +512,9 @@ $(document).on("dragleave drop", ".SuperView .fieldContaner[type='singlefilenew'
 $(document).on("drop", ".SuperView .fieldContaner[type='singlefilenew'] .singlefile-dropzone", function (e) {
   var files = e.originalEvent.dataTransfer.files;
   if (files && files.length > 0) {
+    if (files.length > 1) {
+      alert("단일 파일 첨부 항목입니다. 1개의 파일만 첨부 가능하므로 첫 번째 파일만 등록됩니다.");
+    }
     var _contaner = $(this).closest(".fieldContaner");
     _contaner.superContaner("stageSingleFile", files[0]);
   }
@@ -6180,7 +6183,7 @@ $(document).on("blur", ".t_Money", function (e) {
       var oldVal = _contaner.attr("value");
       var isReplace = (oldVal && oldVal !== "");
       var tagText = isReplace ? "[교체 대기]" : "[첨부 대기]";
-      var warnNotice = isReplace ? "<span style='color: #e11d48; font-size: 11px; margin-right: 8px;'>※ 저장 시 기존 파일은 자동 삭제(교체)됩니다.</span>" : "";
+      var warnNotice = isReplace ? "<span style='color: #e11d48; font-size: 11px; margin-right: 8px;'>※ 1개의 파일만 첨부 가능하며, 저장 시 기존 파일은 자동 삭제(교체)됩니다.</span>" : "";
 
       var previewHtm = "<span class='icon i-20 icon-file align-middle' style='margin-right: 4px; color: #0284c7;'></span>"
                      + "<b style='color: #0284c7; margin-right: 6px;'>" + tagText + " " + file.name + " (" + sizeKb + " KB)</b>"
@@ -6207,11 +6210,11 @@ $(document).on("blur", ".t_Money", function (e) {
         var fileHtm = "<span class='icon i-20 icon-file align-middle' style='margin-right: 4px; color: #2563eb;'></span>"
                     + "<a href='" + downUrl + "' class='singlefile-down-link' target='_blank' style='font-weight: bold; color: #1d4ed8; text-decoration: underline; margin-right: 8px;' title='클릭하여 다운로드'>"
                     + dispName + "</a>"
-                    + "<span style='color: #e11d48; font-size: 11px;'>※ 새 파일을 첨부하면 기존 파일은 자동 삭제(교체)됩니다.</span>";
+                    + "<span style='color: #e11d48; font-size: 11px;'>※ 1개의 파일만 첨부 가능하며, 새 파일 첨부 시 기존 파일은 자동 삭제(교체)됩니다.</span>";
         _statusText.html(fileHtm);
       } else {
         var emptyHtm = "<span class='icon i-20 icon-attachment align-middle' style='margin-right: 4px;'></span>"
-                     + "<span class='msg-text' style='color: #64748b;'>파일을 이곳에 드래그하거나 클릭하여 첨부하세요.</span>";
+                     + "<span class='msg-text' style='color: #64748b;'>파일을 이곳에 드래그하거나 클릭하여 첨부하세요. (1개 파일만 첨부 가능, 최대 20MB)</span>";
         _statusText.html(emptyHtm);
       }
       _contaner.removeClass("fldChange");
@@ -11431,7 +11434,7 @@ $(document).on("blur", ".t_Money", function (e) {
           var dropZoneHtm = "<div class='singlefile-dropzone' style='border: 1px dashed #94a3b8; background-color: #f8fafc; border-radius: 4px; padding: 6px 10px; cursor: pointer; transition: all 0.2s ease-in-out; min-height: 32px; display: flex; align-items: center; justify-content: space-between;'>"
                           + "  <span class='singlefile-status-text' style='color: #64748b; font-size: 12px; display: flex; align-items: center;'>"
                           + "    <span class='icon i-20 icon-attachment align-middle' style='margin-right: 4px;'></span>"
-                          + "    <span class='msg-text'>파일을 이곳에 드래그하거나 클릭하여 첨부하세요.</span>"
+                          + "    <span class='msg-text'>파일을 이곳에 드래그하거나 클릭하여 첨부하세요. (1개 파일만 첨부 가능, 최대 20MB)</span>"
                           + "  </span>"
                           + "  <input type='file' class='singlefile-input' style='display: none;' />"
                           + "  <input id='fileSearchKey' type='hidden' value='' />"
@@ -15620,7 +15623,7 @@ $(document).on("blur", ".t_Money", function (e) {
             _Obj.attr("value", "");
 
             var emptyHtm = "<span class='icon i-20 icon-attachment align-middle' style='margin-right: 4px;'></span>"
-                         + "<span class='msg-text' style='color: #64748b;'>파일을 이곳에 드래그하거나 클릭하여 첨부하세요.</span>";
+                         + "<span class='msg-text' style='color: #64748b;'>파일을 이곳에 드래그하거나 클릭하여 첨부하세요. (1개 파일만 첨부 가능, 최대 20MB)</span>";
             _statusText.html(emptyHtm);
             _viewBox.html("<span style='color: #94a3b8;'>파일없음</span>");
           } else {
@@ -15636,7 +15639,7 @@ $(document).on("blur", ".t_Money", function (e) {
             var fileHtm = "<span class='icon i-20 icon-file align-middle' style='margin-right: 4px; color: #2563eb;'></span>"
                         + "<a href='" + downUrl + "' class='singlefile-down-link' target='_blank' style='font-weight: bold; color: #1d4ed8; text-decoration: underline; margin-right: 8px;' title='클릭하여 다운로드'>"
                         + dispName + "</a>"
-                        + "<span style='color: #e11d48; font-size: 11px;'>※ 새 파일을 첨부하면 기존 파일은 자동 삭제(교체)됩니다.</span>";
+                        + "<span style='color: #e11d48; font-size: 11px;'>※ 1개의 파일만 첨부 가능하며, 새 파일 첨부 시 기존 파일은 자동 삭제(교체)됩니다.</span>";
 
             _statusText.html(fileHtm);
             _viewBox.html("<a href='" + downUrl + "' target='_blank' style='font-weight: bold; color: #1d4ed8; text-decoration: underline;'>" + dispName + "</a>");
