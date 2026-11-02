@@ -254,4 +254,4 @@ VDI 내부망 코드를 카메라로 촬영하여 전달받는 경우, 단순 OC
 * **[완료] Step 2-6 (운영쿼리정보/M_EXCEL_DOWN_LOG.sql)** ([① 로컬: 완료(x) / ② VDI: 완료(x)]):
   * Mon_LinkCRM_Maven M_USER 및 "CRM"."M_EXCEL_DOWN_LOG" 표준 명명규칙 기반 엑셀 다운로드 보안 감사 및 사유 이력 테이블 DDL 및 모나크 서비스(INSERT_EXCEL_DOWN_LOG) 등록 완료.
 * **[진행중] Step 2-7 (superContaner.js)** ([① 로컬: 완료(x) / ② VDI: 대기( )]):
-  * XLS_REASON_POPUP 2단계 팝업 및 Create(INSERT_EXCEL_DOWN_LOG) PostJsonData 호출 연동 완료.
+  * XLS_REASON_POPUP 동적로드, DownXlsNew 타깃 서비스명/메소드명/파일명 정밀 추출(Object 타입 방어) 및 IP 다중 추출 보정, 1단계 파라미터 보존 및 M_EXCEL_DOWN_LOG 이력저장 연동 완료.

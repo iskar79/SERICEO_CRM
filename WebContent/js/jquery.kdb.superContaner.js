@@ -6945,7 +6945,7 @@ $(document).on("blur", ".t_Money", function (e) {
             
     },
     // ----------------------------------------------------
-    // 20261102 khma Start : XLS_REASON_POPUP 구조체 기반 엑셀 다운로드 (Create 전용, 사유 10자 이상 및 파라미터 머지)
+    // 20261102 khma Start : XLS_REASON_POPUP 구조체 기반 엑셀 다운로드 (서비스명/메소드명/파일명 정밀 추출 및 Agile 암호화 연동)
     DownXlsNew: function (oCmd) {
       var _Obj = $(this);
       var _RCD_CNT = $('.pgMsg.records', _Obj).text();
@@ -6957,17 +6957,23 @@ $(document).on("blur", ".t_Money", function (e) {
 
       var _json = $(this).data("jsonData");
       var _popup = false;
-      var idx = oCmd.attr("index");
+      var idx = (oCmd && typeof oCmd.attr === "function") ? oCmd.attr("index") : "";
       var _jobInfo;
-      for (var c = 0; c < _json.jobs.length; c++) {
-        if (_json.jobs[c].inComm == "DownXlsNew" && _json.jobs[c].index == idx) {
-          _popup = _json.jobs[c].popup;
-          _jobInfo = _json.jobs[c];
+
+      // 1) 클릭된 버튼(oCmd)의 index와 일치하는 job 탐색
+      if (idx && _json && _json.jobs) {
+        for (var c = 0; c < _json.jobs.length; c++) {
+          if (_json.jobs[c].index == idx) {
+            _popup = _json.jobs[c].popup;
+            _jobInfo = _json.jobs[c];
+            break;
+          }
         }
       }
-      if (_jobInfo == undefined) {
+      // 2) inComm이 DownXlsNew 또는 DownXls인 job 탐색 (fallback)
+      if (_jobInfo == undefined && _json && _json.jobs) {
         for (var c = 0; c < _json.jobs.length; c++) {
-          if (_json.jobs[c].inComm == "DownXlsNew") {
+          if (_json.jobs[c].inComm == "DownXlsNew" || _json.jobs[c].inComm == "DownXls") {
             _popup = _json.jobs[c].popup;
             _jobInfo = _json.jobs[c];
             break;
@@ -6975,10 +6981,64 @@ $(document).on("blur", ".t_Money", function (e) {
         }
       }
 
-      var _svc = _json.method.List;
-      if (_json.method.Excel != "" && _json.method.Excel != undefined) {
-        _svc = _json.method.Excel;
+      // -----------------------------------------------------------------
+      // 20261102 khma : 대상 서비스(SERVICE_NAME) 및 메소드(METHOD_NAME) 정밀 추출
+      // 1순위: jobInfo.xlsOption 설정 (xlsOption.service, xlsOption.method)
+      // 2순위: jobInfo 직접 설정 (service, method)
+      // 3순위: 컨테이너 JSON 설정 (_json.method.Excel, _json.service)
+      // -----------------------------------------------------------------
+      var targetService = "";
+      if (_jobInfo && _jobInfo.xlsOption && _jobInfo.xlsOption.service) {
+        targetService = _jobInfo.xlsOption.service;
+      } else if (_jobInfo && _jobInfo.service) {
+        targetService = _jobInfo.service;
+      } else if (_json && _json.service) {
+        targetService = _json.service;
+      } else {
+        targetService = _Obj.attr("service") || "";
       }
+
+      var targetMethod = "";
+      if (_jobInfo && _jobInfo.xlsOption && _jobInfo.xlsOption.method) {
+        targetMethod = _jobInfo.xlsOption.method;
+      } else if (_jobInfo && _jobInfo.method) {
+        targetMethod = _jobInfo.method;
+      } else if (_json && _json.method && _json.method.Excel) {
+        targetMethod = _json.method.Excel;
+      } else if (_json && _json.method && _json.method.List) {
+        targetMethod = _json.method.List;
+      } else {
+        targetMethod = "EXCEL";
+      }
+
+      // -----------------------------------------------------------------
+      // 20261102 khma : 엑셀 파일명(FILE_NAME) 정밀 추출 (Object 객체 [object Object] 방어)
+      // -----------------------------------------------------------------
+      var excelTitle = "";
+      if (_jobInfo && _jobInfo.xlsOption && typeof _jobInfo.xlsOption.xlsName === "string" && $.trim(_jobInfo.xlsOption.xlsName) !== "") {
+        excelTitle = $.trim(_jobInfo.xlsOption.xlsName);
+      } else if (_jobInfo && typeof _jobInfo.xlsName === "string" && $.trim(_jobInfo.xlsName) !== "") {
+        excelTitle = $.trim(_jobInfo.xlsName);
+      } else if (_jobInfo && typeof _jobInfo.title === "string" && $.trim(_jobInfo.title) !== "") {
+        excelTitle = $.trim(_jobInfo.title);
+      } else if (_json && typeof _json.title === "string" && $.trim(_json.title) !== "") {
+        excelTitle = $.trim(_json.title);
+      } else if (_json && typeof _json.title === "object" && _json.title !== null) {
+        excelTitle = _json.title.name || _json.title.text || _json.title.title || _json.title.label || "";
+      }
+      if (!excelTitle && _json) {
+        if (typeof _json.displayName === "string" && $.trim(_json.displayName) !== "") {
+          excelTitle = $.trim(_json.displayName);
+        } else if (typeof _json.name === "string" && $.trim(_json.name) !== "") {
+          excelTitle = $.trim(_json.name);
+        }
+      }
+      if (!excelTitle) {
+        excelTitle = _Obj.attr("jsonname") || "EXCEL";
+      }
+      excelTitle = $.trim(excelTitle);
+      var excelFileName = (/\.xlsx?$/i.test(excelTitle)) ? excelTitle : (excelTitle + ".xlsx");
+
       var pl = _Obj.superContaner("tableGetFilter");
       pl.add("_order", _Obj.attr("_order"));
       pl.add("_sort", _Obj.attr("_sort"));
@@ -6992,34 +7052,12 @@ $(document).on("blur", ".t_Money", function (e) {
       pl.add("STEPMENU", _M.PrevActGbn.currStepMenu);
       pl.add("ACTIONNAME", _M.PrevActGbn.actionName);
 
-      var serviceName = "";
-      if (_jobInfo != undefined && _jobInfo.xlsOption != undefined) {
-        var xlsOpt = _jobInfo.xlsOption;
-        if (xlsOpt.xlsName != "" && xlsOpt.xlsName != undefined) {
-          pl.add("xlsName", xlsOpt.xlsName);
-        }
-        if (xlsOpt.extClass != "" && xlsOpt.extClass != undefined) {
-          pl.add("extClass", xlsOpt.extClass);
-        }
-        if (xlsOpt.type != "" && xlsOpt.type != undefined) {
-          pl.add("xlsType", xlsOpt.type);
-        } else {
-          pl.add("xlsType", "report");
-        }
-        if (xlsOpt.service != "" && xlsOpt.service != undefined) {
-          serviceName = xlsOpt.service;
-        } else {
-          serviceName = _json.service;
-        }
-        if (xlsOpt.method != "" && xlsOpt.method != undefined) {
-          pl.add("xlsMethod", xlsOpt.method);
-        } else {
-          pl.add("xlsMethod", _svc);
-        }
-      } else {
-        pl.add("xlsType", "report");
-        pl.add("xlsMethod", _svc);
-        serviceName = _json.service;
+      pl.add("xlsType", (_jobInfo && _jobInfo.xlsOption && _jobInfo.xlsOption.type) ? _jobInfo.xlsOption.type : "report");
+      pl.add("xlsMethod", targetMethod);
+      pl.add("xlsService", targetService);
+      pl.add("xlsName", excelTitle);
+      if (_jobInfo && _jobInfo.xlsOption && _jobInfo.xlsOption.extClass) {
+        pl.add("extClass", _jobInfo.xlsOption.extClass);
       }
 
       var dispCols;
@@ -7031,7 +7069,6 @@ $(document).on("blur", ".t_Money", function (e) {
         });
       }
       pl.add("dispCols", dispCols);
-      pl.add("xlsService", serviceName);
       pl.add("structureName", _Obj.attr("jsonname"));
 
       if (
@@ -7105,14 +7142,14 @@ $(document).on("blur", ".t_Money", function (e) {
       // -----------------------------------------------------------------
       $("#excelModalLayer, #excelModalDim, #excelReasonDialog").remove();
 
-      // [1단계 팝업 HTML] superView 구조체 렌더링 컨테이너 (너비 620px 확장 및 [1단계] 태그 제거)
+      // [1단계 팝업 HTML] superView 구조체 렌더링 컨테이너
       var popWidth = (XLS_REASON_POPUP.popupWidth ? XLS_REASON_POPUP.popupWidth : (XLS_REASON_POPUP.popupWith ? XLS_REASON_POPUP.popupWith : 570));
       var step1Html = '<div id="excelModalLayer" style="position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); width:' + popWidth + 'px; background:#fff; border:2px solid #2b579a; padding:20px 24px; z-index:99999; box-shadow:0 0 20px rgba(0,0,0,0.45); border-radius:6px; font-family:\'맑은 고딕\', Malgun Gothic, sans-serif; font-size:12px; color:#333;">';
       step1Html += '<h3 style="margin:0 0 12px 0; font-size:15px; font-weight:bold; color:#2b579a; border-bottom:2px solid #2b579a; padding-bottom:6px;">' + XLS_REASON_POPUP.title + '</h3>';
       step1Html += '<div id="areaXlsReasonSuperView" style="margin-bottom:12px;"></div>';
 
       // -----------------------------------------------------------------
-      // 20261102 khma : 모달 하단 버튼 영역 (개발 버튼 등 제외, 다운로드 전용 [다음], [취소]만 노출)
+      // 20261102 khma : 모달 하단 버튼 영역 (다운로드 전용 [다음], [취소]만 노출)
       // -----------------------------------------------------------------
       step1Html += '<div style="text-align:center; border-top:1px solid #eee; padding-top:12px;" id="areaXlsReasonJobs">';
       step1Html += '<button type="button" id="btnXlsNextStep" style="padding:6px 22px; margin-right:8px; cursor:pointer; background:#2b579a; color:#fff; font-weight:bold; border:none; border-radius:3px; font-size:12px;">다음 (암호 설정) &gt;</button>';
@@ -7170,7 +7207,6 @@ $(document).on("blur", ".t_Money", function (e) {
 
         // -----------------------------------------------------------------
         // 20261102 khma : 1단계 구조체 폼 입력값을 동적으로 전수 추출하여 안전하게 보존
-        // (2단계 전환 시 DOM 삭제로 인한 값 유실 원천 방지 및 구조체 필드 추가/삭제 100% 자동 대응)
         // -----------------------------------------------------------------
         var savedParams = {};
         $(".fieldContaner", $superArea).each(function () {
@@ -7253,7 +7289,9 @@ $(document).on("blur", ".t_Money", function (e) {
           // 파일 열람 암호 추가 (백엔드 POI 암호화 생성용)
           pl.add("excelPassword", encodeURIComponent(pwd1));
 
-          // 다운로드 실행 함수 정의
+          // -----------------------------------------------------------------
+          // 20261102 khma : 다운로드 실행 함수 (targetService 전달 보정)
+          // -----------------------------------------------------------------
           var fnDoDownload = function () {
             if (_jobInfo != undefined && _jobInfo.xlsOption != undefined && _jobInfo.xlsOption.popup) {
               var _col = new Array();
@@ -7270,9 +7308,9 @@ $(document).on("blur", ".t_Money", function (e) {
                     i++;
                   }
                 });
-              $.GetExcelColumn("XLS", _col, _jobInfo.service, pl);
+              $.GetExcelColumn("XLS", _col, targetService, pl);
             } else {
-              $.SvcDownXls(_json.service, pl);
+              $.SvcDownXls(targetService, pl);
             }
           };
 
@@ -7296,10 +7334,14 @@ $(document).on("blur", ".t_Money", function (e) {
             downCnt = "0";
           }
 
-          var currentIp = (typeof _CLIENT_IP !== "undefined" && _CLIENT_IP !== "") ? _CLIENT_IP : "127.0.0.1";
-          var targetService = serviceName || (_json && _json.service) || "";
-          var targetMethod = _svc || (_json && _json.method && _json.method.List) || "List";
-          var excelFileName = (_json && _json.title ? _json.title : "EXCEL") + ".xlsx";
+          var currentIp = "";
+          if (typeof _CLIENT_IP !== "undefined" && _CLIENT_IP !== "") {
+            currentIp = _CLIENT_IP;
+          } else if (_M && _M.UserInfo && _M.UserInfo.ip) {
+            currentIp = _M.UserInfo.ip;
+          } else {
+            currentIp = window.location.hostname || "127.0.0.1";
+          }
 
           plLog.add("service", logSvc);
           plLog.add("method", logMtd);
@@ -7345,7 +7387,7 @@ $(document).on("blur", ".t_Money", function (e) {
         });
       };
     },
-    // 20261102 khma End : XLS_REASON_POPUP 구조체 기반 엑셀 다운로드 (Create 전용, 사유 10자 이상 및 파라미터 머지)
+    // 20261102 khma End : XLS_REASON_POPUP 구조체 기반 엑셀 다운로드 (서비스명/메소드명/파일명 정밀 추출 및 Agile 암호화 연동)
 
     /* ------------------------------------------------------- */
     /* Excel이나 CSV등의 데이터파일을 디비에 저장할때 사용 */
