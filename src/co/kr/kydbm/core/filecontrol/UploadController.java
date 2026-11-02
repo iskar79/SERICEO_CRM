@@ -1238,9 +1238,12 @@ public class UploadController {
 				// 신규 시퀀스 채번
 				Long newFid = null;
 				try {
-					newFid = monArchDao.getJdbcTemplate().queryForObject("SELECT M_IMAGE_GAL_SEQ.NEXTVAL FROM DUAL", Long.class);
+					Map<String, Object> seqMap = monArchDao.queryForMap("SELECT M_IMAGE_GAL_SEQ.NEXTVAL AS NEXTVAL FROM DUAL", new HashMap<String, String>());
+					if (seqMap != null && seqMap.get("NEXTVAL") != null) {
+						newFid = Long.parseLong(seqMap.get("NEXTVAL").toString());
+					}
 				} catch (Exception ex) {
-					log.warn("M_IMAGE_GAL_SEQ 채번 실패, 시퀀스 미지원 또는 기본 방식 대체", ex);
+					log.warn("M_IMAGE_GAL_SEQ 채번 실패, 기본 시퀀스 바인딩 대체", ex);
 				}
 
 				String relativeFilePath = uploadFolder + "/" + realfileName;
