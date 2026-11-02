@@ -7178,63 +7178,24 @@ $(document).on("blur", ".t_Money", function (e) {
 
       // [1단계 -> 2단계] 다음 단계 실행 함수
       var fnGoNextStep = function () {
-        // 구조체 필드값 취득
-        var usage = $.trim($("select[name='XLS_PURPOSE']", $superArea).val());
-        var target = $("input[name='XLS_TARGET']:checked", $superArea).val();
-        var reason = $.trim($("textarea[name='XLS_REASON']", $superArea).val());
-
-        if (usage === "") {
-          alert("다운로드 [용도]를 선택해 주십시오.");
-          $("select[name='XLS_PURPOSE']", $superArea).focus();
+        // 필수값 검증 (모나크 표준 검증)
+        var reqFld = $superArea.superContaner("isRequired");
+        if (reqFld && reqFld.toKeyString() != "") {
+          alert("필수항목중 [" + reqFld.toKeyString() + "] 의 입력이 누락되었습니다.");
           return;
         }
-        if (!target) {
-          target = "ALL";
-        }
-        if (reason.length < 10) {
-          alert("다운로드 [목적]은 최소 10글자 이상 구체적으로 입력해야 합니다. (현재 " + reason.length + "자)");
+
+        // 목적 10자 이상 검증
+        var reasonVal = $.trim($("textarea[name='XLS_REASON']", $superArea).val());
+        if (reasonVal.length < 10) {
+          alert("다운로드 [목적]은 최소 10글자 이상 구체적으로 입력해야 합니다. (현재 " + reasonVal.length + "자)");
           $("textarea[name='XLS_REASON']", $superArea).focus();
           return;
         }
 
-        // 1단계 입력값 임시 보관
-        var savedUsage = usage;
-        var savedTarget = target;
-        var savedReason = reason;
-
-        // -----------------------------------------------------------------
-        // 20261102 khma : 엑셀 다운로드 사유 및 감사 이력 테이블 저장 시도 (Create)
-        // 백엔드 테이블 미배치 상태에서도 다운로드 테스트가 중단되지 않도록 안전 처리
-        // -----------------------------------------------------------------
-        try {
-          var logPl = new JSONClientParameters();
-          logPl.add("service", XLS_REASON_POPUP.service);
-          logPl.add("method", XLS_REASON_POPUP.method.Create);
-          logPl.add("SITE", _M.UserInfo.SID);
-          logPl.add("USEQ", _M.UserInfo.id);
-          logPl.add("LOGINID", _M.UserInfo.lid || _M.UserInfo.id);
-          logPl.add("USER_NAME", _M.UserInfo.name || "");
-          logPl.add("MENU_ID", _M.PrevActGbn.currMenuId || "");
-          logPl.add("MENU_NAME", _M.PrevActGbn.actionName || "");
-          logPl.add("SERVICE_NAME", serviceName);
-          logPl.add("METHOD_NAME", _svc);
-          logPl.add("XLS_PURPOSE", savedUsage);
-          logPl.add("XLS_TARGET", savedTarget);
-          logPl.add("XLS_REASON", savedReason);
-
-          // 이력 테이블 저장 호출 (비동기, 실패하더라도 다운로드 프로세스 계속 진행)
-          $.PostJsonData("/DATACRUD.json", logPl, function (res) {
-            // 이력 저장 성공 콜백
-          }, function (err) {
-            // DB 테이블 미생성 상태 시에도 예외 통과
-          }, true);
-        } catch (e) {
-          // 로깅 예외 무시
-        }
-
         // [2단계 팝업 HTML] 시스템 모달 팝업 형태 파일 열람 암호 설정 (최소 4자 이상)
-        var step2Html = '<div id="excelModalLayer" style="position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); width:380px; background:#fff; border:2px solid #2b579a; padding:22px 24px; z-index:99999; box-shadow:0 0 20px rgba(0,0,0,0.45); border-radius:6px; font-family:\'맑은 고딕\', Malgun Gothic, sans-serif; font-size:12px; color:#333;">';
-        step2Html += '<h3 style="margin:0 0 14px 0; font-size:15px; font-weight:bold; color:#2b579a; border-bottom:2px solid #2b579a; padding-bottom:6px;">[2단계] 엑셀 파일 암호 설정 (필수)</h3>';
+        var step2Html = '<div id="excelModalLayer" style="position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); width:420px; background:#fff; border:2px solid #2b579a; padding:22px 24px; z-index:99999; box-shadow:0 0 20px rgba(0,0,0,0.45); border-radius:6px; font-family:\'맑은 고딕\', Malgun Gothic, sans-serif; font-size:12px; color:#333;">';
+        step2Html += '<h3 style="margin:0 0 14px 0; font-size:15px; font-weight:bold; color:#2b579a; border-bottom:2px solid #2b579a; padding-bottom:6px;">엑셀 파일 암호 설정 (필수)</h3>';
         step2Html += '<p style="color:#666; font-size:11px; margin-bottom:12px; line-height:1.4;">※ 개인정보보호 규정에 따라 엑셀 열람 암호는 <strong>필수(최소 4자 이상)</strong>로 설정해야 합니다.</p>';
 
         step2Html += '<div style="margin-bottom:12px;">';
@@ -7293,31 +7254,21 @@ $(document).on("blur", ".t_Money", function (e) {
           $("#excelModalLayer, #excelModalDim").remove();
 
           // -----------------------------------------------------------------
-          // 20261102 khma : 엑셀 다운로드 동적 쿼리 필터 파라미터(XLS_PURPOSE, XLS_TARGET) 머지
-          // (XLS_REASON은 쿼리 조건이 아니므로 제외, excelPassword는 백엔드 파일 암호화 생성용)
+          // 20261102 khma : 구조체에 정의된 모든 필드/입력값을 동적으로 pl에 머지
+          // (구조체에 필드가 추가/삭제되어도 JS 수정 없이 100% 자동 연동)
           // -----------------------------------------------------------------
-          pl.add("XLS_PURPOSE", encodeURIComponent(savedUsage));
-          pl.add("XLS_TARGET", encodeURIComponent(savedTarget));
+          $(".fieldContaner", $superArea).each(function () {
+            var fldName = $(this).attr("field");
+            if (fldName) {
+              var fldVal = $(this).superContaner("getFieldValue");
+              if (fldVal !== undefined && fldVal !== null) {
+                pl.add(fldName, encodeURIComponent(fldVal));
+              }
+            }
+          });
+
+          // 파일 열람 암호만 단독 추가 (백엔드 POI 암호화 생성용)
           pl.add("excelPassword", encodeURIComponent(pwd1));
-          // -----------------------------------------------------------------
-          // 20261102 khma : 엑셀 다운로드 보안 감사 및 사유 이력 저장 (Create 호출)
-          // -----------------------------------------------------------------
-          var plLog = new JSONClientParameters();
-          plLog.add("service", "MON_COMMON");
-          plLog.add("method", "INSERT_EXCEL_DOWN_LOG");
-          plLog.add("USER_ID", (_M.UserInfo && _M.UserInfo.lid) ? _M.UserInfo.lid : "");
-          plLog.add("USER_NAME", (_M.UserInfo && _M.UserInfo.name) ? _M.UserInfo.name : "");
-          plLog.add("DEPT_NAME", (_M.UserInfo && (_M.UserInfo.departnm || _M.UserInfo.depart)) ? (_M.UserInfo.departnm || _M.UserInfo.depart) : "");
-          plLog.add("MENUID", (typeof _M.MENUID !== "undefined") ? _M.MENUID : "");
-          plLog.add("ACTIONNAME", _json.title ? _json.title : "");
-          plLog.add("SERVICE", _json.service ? _json.service : "");
-          plLog.add("METHOD", (_json.method && _json.method.Read) ? (_json.method.Read + "Down") : "Down");
-          plLog.add("FILE_NAME", (_json.title ? _json.title : "EXCEL") + ".xlsx");
-          plLog.add("XLS_PURPOSE", savedUsage);
-          plLog.add("XLS_TARGET", savedTarget);
-          plLog.add("XLS_REASON", savedReason);
-          plLog.add("TOTAL_RECORD", _RCD_CNT.replace(regex, ""));
-          plLog.add("CLIENT_IP", "");
 
           // 다운로드 실행 함수 정의
           var fnDoDownload = function () {
@@ -7342,23 +7293,19 @@ $(document).on("blur", ".t_Money", function (e) {
             }
           };
 
-          // 이력 저장 AJAX 실행 후 다운로드 진행 (에러 발생 시에도 다운로드 보장)
+          // -----------------------------------------------------------------
+          // 20261102 khma : 모나크 superView 표준 Save(Create) 호출로 이력 저장 후 다운로드
+          // (구조체에 선언된 service와 method.Create를 엔진이 자동 실행)
+          // -----------------------------------------------------------------
           try {
-            PostJsonData(
-              _M.svcUrl[_M.Webtype].crudUrl,
-              plLog,
-              function (_data) {
-                fnDoDownload();
-              },
-              function () {
-                fnDoDownload();
-              }
-            );
-          } catch (eLog) {
+            $superArea.superContaner("Save", function (res) {
+              fnDoDownload();
+            });
+          } catch (eSave) {
             fnDoDownload();
           }
         });
-      });
+      };
     },
     // 20261102 khma End : XLS_REASON_POPUP 구조체 기반 엑셀 다운로드 (Create 전용, 사유 10자 이상 및 파라미터 머지)
 
