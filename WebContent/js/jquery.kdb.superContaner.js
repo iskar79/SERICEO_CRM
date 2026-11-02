@@ -6945,7 +6945,7 @@ $(document).on("blur", ".t_Money", function (e) {
             
     },
     // ----------------------------------------------------
-    // 20261030 khma Start : 보안 엑셀 다운로드 (공통코드 XLS_PURPOSE/XLS_TARGET 동적 연동 및 2단계 순차 팝업)
+    // 20261102 khma Start : XLS_REASON_POPUP 구조체 기반 엑셀 다운로드 (Create 전용, 사유 10자 이상 및 파라미터 머지)
     DownXlsNew: function (oCmd) {
       var _Obj = $(this);
       var _RCD_CNT = $('.pgMsg.records', _Obj).text();
@@ -7043,12 +7043,7 @@ $(document).on("blur", ".t_Money", function (e) {
       }
 
       // -----------------------------------------------------------------
-      // 2단계 순차 모달 팝업 제어 (Step 1: 사유입력 -> Step 2: 필수 암호설정 4자 이상)
-      // -----------------------------------------------------------------
-      $("#excelModalLayer, #excelModalDim").remove();
-
-      // -----------------------------------------------------------------
-      // 공통코드 취득 (사내 표준 _M.Codes 캐시 확인 및 $.SvcGetCodes 동기 조회)
+      // 공통코드 취득 및 캐시 보장 (XLS_PURPOSE, XLS_TARGET)
       // -----------------------------------------------------------------
       if (_M.Codes["XLS_PURPOSE"] == undefined || _M.Codes["XLS_TARGET"] == undefined) {
         $.SvcGetCodes("XLS_PURPOSE,XLS_TARGET", function (data) {
@@ -7076,44 +7071,128 @@ $(document).on("blur", ".t_Money", function (e) {
         }, _M.aSync.sync);
       }
 
-      // 사내 공통코드 객체에서 직접 취득 (하드코딩 완전 제거)
-      var usageCodes = _M.Codes["XLS_PURPOSE"] || [];
-      var targetCodes = _M.Codes["XLS_TARGET"] || [];
-
-      // [1단계 팝업 HTML] 다운로드 사유/대상/목적 입력
-      var step1Html = '<div id="excelModalLayer" style="position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); width:400px; background:#fff; border:2px solid #2b579a; padding:22px 24px; z-index:99999; box-shadow:0 0 20px rgba(0,0,0,0.45); border-radius:6px; font-family:\'맑은 고딕\', Malgun Gothic, sans-serif; font-size:12px; color:#333;">';
-      step1Html += '<h3 style="margin:0 0 14px 0; font-size:15px; font-weight:bold; color:#2b579a; border-bottom:2px solid #2b579a; padding-bottom:6px;">[1단계] 엑셀 다운로드 보안 사유 입력</h3>';
-
-      // 1. 용도 선택 (XLS_PURPOSE)
-      step1Html += '<div style="margin-bottom:12px; display:flex; align-items:center;">';
-      step1Html += '<label style="width:70px; font-weight:bold; color:#222;">용도 <span style="color:#d9534f;">*</span></label>';
-      step1Html += '<select id="selExcelUsage" style="flex:1; height:28px; padding:2px 4px; border:1px solid #aaa; border-radius:3px;">';
-      step1Html += '<option value="">:: 선택하세요 ::</option>';
-      for (var u = 0; u < usageCodes.length; u++) {
-        step1Html += '<option value="' + usageCodes[u].CODE + '">' + usageCodes[u].DECODE + '</option>';
+      // 공통코드가 서버에 아직 등록되지 않은 경우 기본 표준 코드 매핑
+      if (!_M.Codes["XLS_PURPOSE"] || _M.Codes["XLS_PURPOSE"].length === 0) {
+        _M.Codes["XLS_PURPOSE"] = [
+          { CODE: "", DECODE: ":: 선택하세요 ::" },
+          { CODE: "INFO", DECODE: "정보성" },
+          { CODE: "OFF_PROMO", DECODE: "오프라인 홍보용" },
+          { CODE: "ADV_PROMO", DECODE: "광고성 홍보용" },
+          { CODE: "ETC", DECODE: "기타" }
+        ];
       }
-      step1Html += '</select></div>';
-
-      // 2. 대상 선택 (XLS_TARGET)
-      step1Html += '<div style="margin-bottom:12px;">';
-      step1Html += '<div style="font-weight:bold; color:#222; margin-bottom:4px;">대상 <span style="color:#d9534f;">*</span></div>';
-      step1Html += '<div style="display:flex; justify-content:space-between; padding-left:4px;">';
-      for (var t = 0; t < targetCodes.length; t++) {
-        var chk = (t === 0) ? ' checked' : '';
-        step1Html += '<label style="cursor:pointer;"><input type="radio" name="rdoExcelTarget" value="' + targetCodes[t].CODE + '"' + chk + ' style="vertical-align:middle; margin-right:3px;" />' + targetCodes[t].DECODE + '</label>';
+      if (!_M.Codes["XLS_TARGET"] || _M.Codes["XLS_TARGET"].length === 0) {
+        _M.Codes["XLS_TARGET"] = [
+          { CODE: "ALL", DECODE: "전체" },
+          { CODE: "EMAIL", DECODE: "이메일 수신" },
+          { CODE: "SMS", DECODE: "SMS 수신" },
+          { CODE: "TEL", DECODE: "전화 수신" }
+        ];
       }
-      step1Html += '</div></div>';
 
-      // 3. 목적 입력 (10자 이상 필수)
-      step1Html += '<div style="margin-bottom:14px;">';
-      step1Html += '<div style="display:flex; justify-content:space-between; margin-bottom:4px;">';
-      step1Html += '<span style="font-weight:bold; color:#222;">목적 <span style="color:#d9534f;">*</span></span>';
-      step1Html += '<span id="spnReasonLen" style="font-size:11px; color:#d9534f;">(최소 10자 이상 입력 필수)</span>';
-      step1Html += '</div>';
-      step1Html += '<textarea id="txaExcelReason" placeholder="다운로드 사유를 구체적으로 입력하세요 (10자 이상 필수)" style="width:100%; height:60px; padding:6px; box-sizing:border-box; border:1px solid #aaa; border-radius:3px; resize:none; font-size:12px;"></textarea>';
-      step1Html += '</div>';
+      // -----------------------------------------------------------------
+      // 20261102 khma : 엑셀 사유 입력용 superView 구조체 (XLS_REASON_POPUP)
+      // Create 전용 등록 창이므로 Read 메소드는 불필요함
+      // -----------------------------------------------------------------
+      var XLS_REASON_POPUP = {
+        ContanerType: "superView",
+        title: "엑셀 다운로드 사유 및 타겟 선택",
+        popupWidth: 500,
+        isEditMode: true,
+        colgroup: [
+          { index: "Col1", LabelWidth: "25%", DataWidth: "75%" }
+        ],
+        "tr": [
+          // 1. 용도 (Select)
+          {
+            "TD": [
+              {
+                type: "field",
+                label: "용도",
+                colspan: 1,
+                fieldContaner: [
+                  {
+                    field: "XLS_PURPOSE",
+                    type: "select",
+                    width: "100%",
+                    name: "XLS_PURPOSE",
+                    required: true,
+                    codes: "XLS_PURPOSE",
+                    defaultValue: ""
+                  }
+                ]
+              }
+            ]
+          },
+          // 2. 대상 (Radio)
+          {
+            "TD": [
+              {
+                type: "field",
+                label: "대상",
+                colspan: 1,
+                fieldContaner: [
+                  {
+                    field: "XLS_TARGET",
+                    type: "radio",
+                    width: "100%",
+                    name: "XLS_TARGET",
+                    required: true,
+                    defaultValue: "ALL",
+                    codes: "XLS_TARGET"
+                  }
+                ]
+              }
+            ]
+          },
+          // 3. 목적 (10자 이상 Textarea)
+          {
+            "TD": [
+              {
+                type: "field",
+                label: "목적",
+                colspan: 1,
+                fieldContaner: [
+                  {
+                    field: "XLS_REASON",
+                    type: "textarea",
+                    height: "65px",
+                    width: "100%",
+                    name: "XLS_REASON",
+                    required: true,
+                    placeholder: "다운로드 목적을 최소 10글자 이상 구체적으로 입력해 주십시오."
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        jobs: [
+          { name: "다음 (암호 설정)", index: "NextStep", inComm: "NextStep", css: "btn-save" },
+          { name: "취소", index: "Close", inComm: "Close", css: "btn-cancel" }
+        ],
+        // -----------------------------------------------
+        // Svc : Create 전용 신규 등록 화면이므로 Read 메소드는 제외
+        // -----------------------------------------------
+        service: "MON_COMMON",
+        method: { Create: "INSERT_EXCEL_DOWN_LOG" },
+        keyName: "LOG_NO",
+        showMessage: false,
+        whoIs: "2.0"
+      };
 
-      // 버튼 영역 (다음, 취소)
+      // -----------------------------------------------------------------
+      // 기존 잔여 모달 레이어 제거
+      // -----------------------------------------------------------------
+      $("#excelModalLayer, #excelModalDim, #excelReasonDialog").remove();
+
+      // [1단계 팝업 HTML] superView 구조체 렌더링 컨테이너
+      var step1Html = '<div id="excelModalLayer" style="position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); width:520px; background:#fff; border:2px solid #2b579a; padding:20px 24px; z-index:99999; box-shadow:0 0 20px rgba(0,0,0,0.45); border-radius:6px; font-family:\'맑은 고딕\', Malgun Gothic, sans-serif; font-size:12px; color:#333;">';
+      step1Html += '<h3 style="margin:0 0 12px 0; font-size:15px; font-weight:bold; color:#2b579a; border-bottom:2px solid #2b579a; padding-bottom:6px;">[1단계] ' + XLS_REASON_POPUP.title + '</h3>';
+      step1Html += '<div id="areaXlsReasonSuperView" style="margin-bottom:12px;"></div>';
+      step1Html += '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; padding:0 2px;">';
+      step1Html += '<span id="spnReasonLen" style="font-size:11px; color:#d9534f;">※ 목적은 최소 10자 이상 구체적으로 입력해야 합니다.</span>';
+      step1Html += '</div>';
       step1Html += '<div style="text-align:center; border-top:1px solid #eee; padding-top:12px;">';
       step1Html += '<button id="btnStep1Next" style="padding:6px 22px; margin-right:8px; cursor:pointer; background:#2b579a; color:#fff; font-weight:bold; border:none; border-radius:3px; font-size:12px;">다음 (암호 설정) &gt;</button>';
       step1Html += '<button id="btnModalCancel" style="padding:6px 18px; cursor:pointer; background:#e2e2e2; color:#333; border:none; border-radius:3px; font-size:12px;">취소</button>';
@@ -7122,32 +7201,44 @@ $(document).on("blur", ".t_Money", function (e) {
       var dimHtml = '<div id="excelModalDim" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#000; opacity:0.45; z-index:99998;"></div>';
 
       $("body").append(step1Html + dimHtml);
-      $("#selExcelUsage").focus();
 
-      // 목적 글자수 카운팅
-      $("#txaExcelReason").on("keyup change", function () {
+      // superView 구조체 동적 렌더링
+      var $superArea = $("#areaXlsReasonSuperView");
+      $superArea.superContaner("superView", XLS_REASON_POPUP);
+
+      // textarea 글자수 실시간 모니터링 이벤트 바인딩
+      $("textarea[name='XLS_REASON']", $superArea).on("keyup change", function () {
         var len = $.trim($(this).val()).length;
         if (len >= 10) {
-          $("#spnReasonLen").css("color", "#2b579a").text("(" + len + "자 입력됨)");
+          $("#spnReasonLen").css("color", "#2b579a").text("✓ 목적 " + len + "자 입력됨 (조건 만족)");
         } else {
-          $("#spnReasonLen").css("color", "#d9534f").text("(최소 10자 이상 입력 필수 : 현재 " + len + "자)");
+          $("#spnReasonLen").css("color", "#d9534f").text("※ 목적은 최소 10자 이상 필수 (현재 " + len + "자)");
         }
+      });
+
+      // [1단계 취소]
+      $("#btnModalCancel").click(function () {
+        $("#excelModalLayer, #excelModalDim").remove();
       });
 
       // [1단계 -> 2단계] 다음 버튼 이벤트
       $("#btnStep1Next").click(function () {
-        var usage = $.trim($("#selExcelUsage").val());
-        var target = $('input[name="rdoExcelTarget"]:checked').val();
-        var reason = $.trim($("#txaExcelReason").val());
+        // 구조체 필드값 취득
+        var usage = $.trim($("select[name='XLS_PURPOSE']", $superArea).val());
+        var target = $("input[name='XLS_TARGET']:checked", $superArea).val();
+        var reason = $.trim($("textarea[name='XLS_REASON']", $superArea).val());
 
         if (usage === "") {
           alert("다운로드 [용도]를 선택해 주십시오.");
-          $("#selExcelUsage").focus();
+          $("select[name='XLS_PURPOSE']", $superArea).focus();
           return;
+        }
+        if (!target) {
+          target = "ALL";
         }
         if (reason.length < 10) {
           alert("다운로드 [목적]은 최소 10글자 이상 구체적으로 입력해야 합니다. (현재 " + reason.length + "자)");
-          $("#txaExcelReason").focus();
+          $("textarea[name='XLS_REASON']", $superArea).focus();
           return;
         }
 
@@ -7156,7 +7247,37 @@ $(document).on("blur", ".t_Money", function (e) {
         var savedTarget = target;
         var savedReason = reason;
 
-        // [2단계 팝업 HTML] 필수 비밀번호 설정 (최소 4자 이상)
+        // -----------------------------------------------------------------
+        // 20261102 khma : 엑셀 다운로드 사유 및 감사 이력 테이블 저장 시도 (Create)
+        // 백엔드 테이블 미배치 상태에서도 다운로드 테스트가 중단되지 않도록 안전 처리
+        // -----------------------------------------------------------------
+        try {
+          var logPl = new JSONClientParameters();
+          logPl.add("service", XLS_REASON_POPUP.service);
+          logPl.add("method", XLS_REASON_POPUP.method.Create);
+          logPl.add("SITE", _M.UserInfo.SID);
+          logPl.add("USEQ", _M.UserInfo.id);
+          logPl.add("LOGINID", _M.UserInfo.lid || _M.UserInfo.id);
+          logPl.add("USER_NAME", _M.UserInfo.name || "");
+          logPl.add("MENU_ID", _M.PrevActGbn.currMenuId || "");
+          logPl.add("MENU_NAME", _M.PrevActGbn.actionName || "");
+          logPl.add("SERVICE_NAME", serviceName);
+          logPl.add("METHOD_NAME", _svc);
+          logPl.add("XLS_PURPOSE", savedUsage);
+          logPl.add("XLS_TARGET", savedTarget);
+          logPl.add("XLS_REASON", savedReason);
+
+          // 이력 테이블 저장 호출 (비동기, 실패하더라도 다운로드 프로세스 계속 진행)
+          $.PostJsonData("/DATACRUD.json", logPl, function (res) {
+            // 이력 저장 성공 콜백
+          }, function (err) {
+            // DB 테이블 미생성 상태 시에도 예외 통과
+          }, true);
+        } catch (e) {
+          // 로깅 예외 무시
+        }
+
+        // [2단계 팝업 HTML] 시스템 모달 팝업 형태 파일 열람 암호 설정 (최소 4자 이상)
         var step2Html = '<div id="excelModalLayer" style="position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); width:380px; background:#fff; border:2px solid #2b579a; padding:22px 24px; z-index:99999; box-shadow:0 0 20px rgba(0,0,0,0.45); border-radius:6px; font-family:\'맑은 고딕\', Malgun Gothic, sans-serif; font-size:12px; color:#333;">';
         step2Html += '<h3 style="margin:0 0 14px 0; font-size:15px; font-weight:bold; color:#2b579a; border-bottom:2px solid #2b579a; padding-bottom:6px;">[2단계] 엑셀 파일 암호 설정 (필수)</h3>';
         step2Html += '<p style="color:#666; font-size:11px; margin-bottom:12px; line-height:1.4;">※ 개인정보보호 규정에 따라 엑셀 열람 암호는 <strong>필수(최소 4자 이상)</strong>로 설정해야 합니다.</p>';
@@ -7216,11 +7337,19 @@ $(document).on("blur", ".t_Money", function (e) {
           // 검증 완료 -> 모달 닫기
           $("#excelModalLayer, #excelModalDim").remove();
 
-          // 파라미터 패킹 바인딩
+          // -----------------------------------------------------------------
+          // 20261102 khma : 구조체 필드명/값을 기존 그리드 조회조건(pl)에 직접 머지
+          // 백엔드 서비스에서 주석 해제(/* @XLS_TARGET@ ... */) 방식으로 동적 쿼리 처리
+          // -----------------------------------------------------------------
+          pl.add("XLS_PURPOSE", encodeURIComponent(savedUsage));
+          pl.add("XLS_TARGET", encodeURIComponent(savedTarget));
+          pl.add("XLS_REASON", encodeURIComponent(savedReason));
+          pl.add("excelPassword", encodeURIComponent(pwd1));
+
+          // 기존 호환용 파라미터도 함께 유지
           pl.add("excelUsage", encodeURIComponent(savedUsage));
           pl.add("excelTarget", encodeURIComponent(savedTarget));
           pl.add("excelReason", encodeURIComponent(savedReason));
-          pl.add("excelPassword", encodeURIComponent(pwd1));
 
           // 다운로드 실행
           if (_jobInfo != undefined && _jobInfo.xlsOption != undefined && _jobInfo.xlsOption.popup) {
@@ -7244,13 +7373,8 @@ $(document).on("blur", ".t_Money", function (e) {
           }
         });
       });
-
-      // [1단계 취소]
-      $("#btnModalCancel").click(function () {
-        $("#excelModalLayer, #excelModalDim").remove();
-      });
     },
-    // 20261030 khma End : 보안 엑셀 다운로드 (공통코드 XLS_PURPOSE/XLS_TARGET 동적 연동 및 2단계 순차 팝업)
+    // 20261102 khma End : XLS_REASON_POPUP 구조체 기반 엑셀 다운로드 (Create 전용, 사유 10자 이상 및 파라미터 머지)
 
     /* ------------------------------------------------------- */
     /* Excel이나 CSV등의 데이터파일을 디비에 저장할때 사용 */

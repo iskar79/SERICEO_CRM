@@ -68,12 +68,11 @@
 | **Step 1-3** | `WebContent/ui/monform.jsp`, `login.jsp`, `loginProcess.jsp`, `logoutProcess.jsp` | jQuery `1.10.2` ➡️ `1.12.4` 스크립트 경로 변경 (JSP 4개) | `[x]` | `[x]` | **완료** |
 | **Step 1-4** | `WebContent/js/jquery.kdb.MonArch800.js` | 로그인 화면 아이디 저장 체크박스(`#chk-save`) 활성화 및 쿠키(`SAVE_ID`) 연동 | `[x]` | `[x]` | **완료** |
 | **Step 4** | `WebContent/js/jquery.kdb.MonArch800.js` | `validatePassword` 비밀번호 검증 로직 단일 통합 및 레거시 주석 전수 정리 | `[x]` | `[x]` | **완료** |
-| **Step 2-1** | WebContent/WEB-INF/lib/ | POI 4.1.2 7종 + 의존 JAR 3종(commons-math3, SparseBitSet, curvesapi) 배치 | [x] | [ ] | **로컬완료 (VDI 반영 대기)** |
+| **Step 2-1** | `WebContent/WEB-INF/lib/` | POI 4.1.2 7종 + 의존 JAR 3종(commons-math3, SparseBitSet, curvesapi) 배치 | `[x]` | `[x]` | **완료 (VDI 정상구동 확인)** |
 | **Step 2-2** | `src/co/kr/kydbm/common/CommonExcelUtil.java` | POI 4.1.2 호환을 위한 `CellType` Enum 및 `DateUtil` 문법 수정 | `[x]` | `[x]` | **완료** |
 | **Step 2-3** | `WebContent/js/jquery.kdb.jobButton.js` | `DownXlsNew` 권한 체크 분기 추가 및 레거시 주석 정리 (Line 43) | `[x]` | `[x]` | **완료** |
-| **Step 2-4** | src/co/kr/kydbm/core/filecontrol/UploadController.java | 엑셀 파라미터 수신, return null; 보정, Throwable 로깅 보강 | [x] | [ ] | **로컬완료 (VDI 반영 대기)** |
-| **Step 2-5** | src/co/kr/kydbm/core/filecontrol/ExcelDownload.java | Agile AES 암호화 워크북 생성, getBrowser NPE 방어, Throwable 처리 | [x] | [ ] | **로컬완료 (VDI 반영 대기)** |
-| **Step 2-3** | WebContent/js/jquery.kdb.superContaner.js | DownXlsNew 신규 메서드 추가 (공통코드 XLS_PURPOSE/XLS_TARGET + 2단계 모달) | [x] | [x] | **완료** |
-| **Step 2-4** | src/co/kr/kydbm/core/filecontrol/UploadController.java | 엑셀 파라미터 수신, return null; 보정, Throwable 로깅 보강 | [x] | [ ] | **로컬완료 (VDI 반영 대기)** |
-| **Step 2-5** | src/co/kr/kydbm/core/filecontrol/ExcelDownload.java | Agile AES 암호화 워크북 생성, getBrowser NPE 방어, Throwable 처리 | [x] | [ ] | **로컬완료 (VDI 반영 대기)** |
+| **Step 2-4** | `src/co/kr/kydbm/core/filecontrol/UploadController.java` | 엑셀 파라미터 수신, return null; 보정, Throwable 로깅 보강 | `[x]` | `[x]` | **완료 (VDI 정상구동 확인)** |
+| **Step 2-5** | `src/co/kr/kydbm/core/filecontrol/ExcelDownload.java` | Agile AES 암호화 워크북 생성, getBrowser NPE 방어, Throwable 처리 | `[x]` | `[x]` | **완료 (VDI 정상구동 확인)** |
+| **Step 2-6** | `운영쿼리정보/A_EXCEL_DOWN_LOG.sql` | 엑셀 다운로드 보안 감사 및 사유 이력 테이블 DDL (A_USER 및 M_USER 기반) | `[x]` | `[ ]` | **로컬완료 (VDI 반영 대기)** |
+| **Step 2-7** | `WebContent/js/jquery.kdb.superContaner.js` | XLS_REASON_POPUP 구조체(Create 전용) 팝업 및 조건 머지(주석해제용) | `[x]` | `[ ]` | **로컬완료 (VDI 반영 대기)** |
 | **Step 3** | `MonArchDaoImpl.java`, `FilterGenerator.java`, 프로시저/배치 등 | KSign SecureDB 개인정보 암복호화 공통 모듈 및 프로시저/엑셀업로드 적용 | `[ ]` | `[ ]` | 대기 |
