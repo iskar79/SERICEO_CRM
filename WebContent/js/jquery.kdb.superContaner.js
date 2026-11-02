@@ -7092,49 +7092,12 @@ $(document).on("blur", ".t_Money", function (e) {
 
       // -----------------------------------------------------------------
       // 20261102 khma : DB M_STRUCTURE 테이블에서 XLS_REASON_POPUP 구조체 동적 로드
-      // (DB 미등록 시를 위한 Fallback 기본 구조체 내장)
+      // (하드코딩 완전 제거 - DB M_STRUCTURE에서만 100% 로드)
       // -----------------------------------------------------------------
-      var XLS_REASON_POPUP = null;
-      try {
-        XLS_REASON_POPUP = GETJSON("XLS_REASON_POPUP");
-      } catch (eGetJs) {}
-
+      var XLS_REASON_POPUP = GETJSON("XLS_REASON_POPUP");
       if (!XLS_REASON_POPUP) {
-        XLS_REASON_POPUP = {
-          ContanerType: "superView",
-          title: "엑셀 다운로드 사유 및 타겟 선택",
-          popupWidth: 570,
-          isEditMode: true,
-          colgroup: [
-            { index: "Col1", LabelWidth: "15%", DataWidth: "85%" }
-          ],
-          "tr": [
-            {"TD": [
-              { type: "field", label: "용도", colspan: 1, fieldContaner: [
-                { field: "XLS_PURPOSE", type: "select", width: "100%", name: "XLS_PURPOSE", required: true, codes: "XLS_PURPOSE", defaultValue: "" }
-              ]}
-            ]},
-            {"TD": [
-              { type: "field", label: "대상", colspan: 1, fieldContaner: [
-                { field: "XLS_TARGET", type: "radio", width: "100%", name: "XLS_TARGET", required: true, defaultValue: "ALL", codes: "XLS_TARGET" }
-              ]}
-            ]},
-            {"TD": [
-              { type: "field", label: "목적", colspan: 1, fieldContaner: [
-                { field: "XLS_REASON", type: "textarea", height: "65px", width: "100%", name: "XLS_REASON", required: true, placeholder: "다운로드 목적을 최소 10글자 이상 구체적으로 입력해 주십시오." }
-              ]}
-            ]}
-          ],
-          jobs: [
-            { name: "다음 (암호 설정)", index: "NextStep", inComm: "NextStep", css: "btn-save" },
-            { name: "취소", index: "Close", inComm: "Close", css: "btn-cancel" }
-          ],
-          service: "MON_COMMON",
-          method: { Create: "INSERT_EXCEL_DOWN_LOG" },
-          keyName: "LOG_NO",
-          showMessage: false,
-          whoIs: "2.0"
-        };
+        alert("엑셀 다운로드 사유 구조체(XLS_REASON_POPUP)를 DB에서 불러올 수 없습니다.\nM_STRUCTURE 테이블의 등록 상태를 확인해 주십시오.");
+        return;
       }
 
       // -----------------------------------------------------------------
