@@ -1216,11 +1216,9 @@ public class UploadController {
 			String currentTimestamp = sd.format(calendar.getTime());
 
 			String uploadFolder = years + "/" + months;
-			String defaultFilePath = configProperties.getProperty("monarch.fileupload.path");
-			if (StringUtils.isEmpty(defaultFilePath)) {
-				defaultFilePath = configProperties.getProperty("monarch.url.realpath") + "/FileData/signFile/";
-			}
-			String realPath = defaultFilePath + "/" + uploadFolder;
+			// 20261102 khma : D: 드라이브 부재 로컬/VDI 환경 자동 Fallback 지원 기본 업로드 경로 취득
+			String defaultFilePath = getBaseUploadPath(request);
+			String realPath = defaultFilePath + uploadFolder;
 			String originalFileName = Filename.getOriginalFilename();
 			String ext = FilenameUtils.getExtension(originalFileName);
 			String realfileName = currentTimestamp + "_" + originalFileName;
@@ -1319,11 +1317,8 @@ public class UploadController {
 		OutputStream os = null;
 
 		try {
-			ConfigProperties configProperties = ConfigProperties.getInstance();
-			String defaultFilePath = configProperties.getProperty("monarch.fileupload.path");
-			if (StringUtils.isEmpty(defaultFilePath)) {
-				defaultFilePath = configProperties.getProperty("monarch.url.realpath") + "/FileData/signFile/";
-			}
+			// 20261102 khma : D: 드라이브 부재 로컬/VDI 환경 자동 Fallback 지원 기본 업로드 경로 취득
+			String defaultFilePath = getBaseUploadPath(request);
 
 			String targetFilePath = filePath;
 			String downloadFileName = "";
@@ -1349,10 +1344,19 @@ public class UploadController {
 				}
 			}
 
-			String realPath = defaultFilePath + "/" + targetFilePath;
-			// 슬래시 중복 정제
-			realPath = realPath.replace("//", "/").replace("/\\", "/");
+			String realPath = (defaultFilePath + targetFilePath).replace("//", "/").replace("/\\", "/");
 			File file = new File(realPath);
+
+			if (!file.exists() || !file.isFile()) {
+				// WebRoot 하위 보조 탐색
+				String webRoot = request.getSession().getServletContext().getRealPath("/");
+				if (StringUtils.isNotEmpty(webRoot)) {
+					File altFile = new File(webRoot + "/FileData/signFile/" + targetFilePath);
+					if (altFile.exists() && altFile.isFile()) {
+						file = altFile;
+					}
+				}
+			}
 
 			if (!file.exists() || !file.isFile()) {
 				response.setContentType("text/html; charset=UTF-8");
@@ -1414,11 +1418,8 @@ public class UploadController {
 		Map<String, Object> resultMap = new HashMap<String, Object>();
 
 		try {
-			ConfigProperties configProperties = ConfigProperties.getInstance();
-			String defaultFilePath = configProperties.getProperty("monarch.fileupload.path");
-			if (StringUtils.isEmpty(defaultFilePath)) {
-				defaultFilePath = configProperties.getProperty("monarch.url.realpath") + "/FileData/signFile/";
-			}
+			// 20261102 khma : D: 드라이브 부재 로컬/VDI 환경 자동 Fallback 지원 기본 업로드 경로 취득
+			String defaultFilePath = getBaseUploadPath(request);
 
 			String targetFilePath = filePath;
 			MonArchDaoImpl monArchDao = new MonArchDaoImpl();
@@ -1432,8 +1433,18 @@ public class UploadController {
 			}
 
 			if (StringUtils.isNotEmpty(targetFilePath)) {
-				String realPath = (defaultFilePath + "/" + targetFilePath).replace("//", "/");
+				String realPath = (defaultFilePath + targetFilePath).replace("//", "/");
 				File srcFile = new File(realPath);
+				if (!srcFile.exists()) {
+					String webRoot = request.getSession().getServletContext().getRealPath("/");
+					if (StringUtils.isNotEmpty(webRoot)) {
+						File altFile = new File(webRoot + "/FileData/signFile/" + targetFilePath);
+						if (altFile.exists() && altFile.isFile()) {
+							srcFile = altFile;
+							defaultFilePath = webRoot + "/FileData/signFile/";
+						}
+					}
+				}
 
 				if (srcFile.exists() && srcFile.isFile()) {
 					// 휴지통 경로 (/FileData/trash/년/월/) 생성 및 파일 이동
@@ -1467,6 +1478,77 @@ public class UploadController {
 			out.close();
 		}
 	}
+
+	// 20261102 khma Start : 물리 파일 업로드 기본 경로 취득 (D: 드라이브 미존재 로컬/VDI 환경 자동 Fallback 지원)
+	/**
+	 * 물리 파일 업로드 기본 경로를 취득한다.
+	 * monarch.fileupload.path 설정 경로의 루트 드라이브가 존재하지 않는 경우(예: D: 드라이브 없는 VDI 개발환경)
+	 * 서블릿 컨텍스트(ServletContext) 루트 하위 /FileData/signFile/ 로 자동 Fallback하여 물리 파일 저장 실패를 원천 방지한다.
+	 *
+	 * @param request HttpServletRequest
+	 * @return 정제된 물리 디렉토리 기본 경로 (끝에 '/' 포함)
+	 */
+	private String getBaseUploadPath(HttpServletRequest request) {
+		ConfigProperties configProperties = ConfigProperties.getInstance();
+		String defaultFilePath = configProperties.getProperty("monarch.fileupload.path");
+		if (StringUtils.isEmpty(defaultFilePath)) {
+			defaultFilePath = configProperties.getProperty("monarch.url.realpath");
+			if (StringUtils.isNotEmpty(defaultFilePath)) {
+				defaultFilePath += "/FileData/signFile/";
+			}
+		}
+
+		boolean isPathValid = false;
+		if (StringUtils.isNotEmpty(defaultFilePath)) {
+			try {
+				File testFile = new File(defaultFilePath);
+				File[] roots = File.listRoots();
+				boolean rootDriveExists = false;
+				String testPathUpper = testFile.getAbsolutePath().toUpperCase();
+				if (roots != null) {
+					for (File r : roots) {
+						if (testPathUpper.startsWith(r.getAbsolutePath().toUpperCase())) {
+							rootDriveExists = true;
+							break;
+						}
+					}
+				}
+				if (rootDriveExists) {
+					if (!testFile.exists()) {
+						testFile.mkdirs();
+					}
+					if (testFile.exists() && testFile.canWrite()) {
+						isPathValid = true;
+					}
+				}
+			} catch (Exception e) {
+				log.warn("설정된 파일 경로(" + defaultFilePath + ") 유효성 검증 실패: " + e.getMessage());
+			}
+		}
+
+		// D: 드라이브 미존재 등으로 경로가 유효하지 않은 경우 ServletContext 하위로 자동 Fallback
+		if (!isPathValid) {
+			try {
+				String webRoot = request.getSession().getServletContext().getRealPath("/");
+				if (StringUtils.isNotEmpty(webRoot)) {
+					File fallbackDir = new File(webRoot, "FileData/signFile");
+					if (!fallbackDir.exists()) {
+						fallbackDir.mkdirs();
+					}
+					defaultFilePath = fallbackDir.getAbsolutePath().replace("\\", "/");
+					log.info("로컬/VDI 환경 자동 Fallback 파일 저장 경로 적용: " + defaultFilePath);
+				}
+			} catch (Exception e) {
+				log.error("ServletContext getRealPath Fallback 경로 취득 실패", e);
+			}
+		}
+
+		if (StringUtils.isNotEmpty(defaultFilePath) && !defaultFilePath.endsWith("/")) {
+			defaultFilePath += "/";
+		}
+		return defaultFilePath;
+	}
+	// 20261102 khma End : 물리 파일 업로드 기본 경로 취득
 
 	// 20261102 khma End : 차세대 드래그앤드롭 파일 시스템 신규 엔드포인트 (/uploadFileNew, /downloadFileNew, /deleteFileSafe)
 
