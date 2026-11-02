@@ -7283,17 +7283,35 @@ $(document).on("blur", ".t_Money", function (e) {
           var logSvc = XLS_REASON_POPUP.service || "MON_COMMON";
           var logMtd = (XLS_REASON_POPUP.method && XLS_REASON_POPUP.method.Create) ? XLS_REASON_POPUP.method.Create : "INSERT_EXCEL_DOWN_LOG";
 
+          // 건수 정밀 추출 (Records 텍스트 및 tbody tr 행수 다중 판정)
+          var rcdText = $('.records', _Obj).text() || $('.pgMsg.records', _Obj).text() || $('.records').text() || "";
+          var downCnt = rcdText.replace(/[^0-9]/g, "");
+          if (!downCnt || downCnt === "" || downCnt === "0") {
+            var trCount = $(".body tbody tr", _Obj).length;
+            if (trCount > 0) {
+              downCnt = trCount + "";
+            }
+          }
+          if (!downCnt || downCnt === "") {
+            downCnt = "0";
+          }
+
+          var excelFileName = (_json.title ? _json.title : "EXCEL") + ".xlsx";
+
           plLog.add("service", logSvc);
           plLog.add("method", logMtd);
           plLog.add("USITE", (_M.UserInfo && _M.UserInfo.SID) ? _M.UserInfo.SID : "1");
           plLog.add("MENUID", (_M.PrevActGbn && _M.PrevActGbn.currMenuId) ? _M.PrevActGbn.currMenuId : "");
           plLog.add("SERVICE_NAME", serviceName);
           plLog.add("METHOD_NAME", _svc);
-          plLog.add("FILE_NAME", (_json.title ? _json.title : "EXCEL") + ".xlsx");
-          plLog.add("DOWN_CNT", _RCD_CNT.replace(regex, ""));
+          plLog.add("FILE_NAME", excelFileName);
+          plLog.add("fileName", excelFileName);
+          plLog.add("DOWN_CNT", downCnt);
+          plLog.add("totalRecord", downCnt);
+          plLog.add("TOTAL_RECORD", downCnt);
           plLog.add("CLIENT_IP", "");
+          plLog.add("clientIp", "");
           plLog.add("REGUSER", (_M.UserInfo && _M.UserInfo.id) ? _M.UserInfo.id : "");
-
           // 1단계 구조체 필드들(XLS_PURPOSE, XLS_TARGET, XLS_REASON 등) 자동 머지
           $.each(savedParams, function (fldName, fldVal) {
             plLog.add(fldName, fldVal);
