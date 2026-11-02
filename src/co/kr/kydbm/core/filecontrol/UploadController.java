@@ -56,7 +56,7 @@ import co.kr.kydbm.core.utils.QueryGenerator;
 
 /**
  * 파일 업로드 및 엑셀 다운로드 콘트롤러 클래스
- * version 2.0 2026-10-30
+ * version 2.0 2026-11-02
  * Authors : Ma KyoungHo
  * Company : KYDBM
  */
@@ -763,16 +763,16 @@ public class UploadController {
 	}
 
 	/**
-	 * 20261030 khma : 보안 엑셀 다운로드 (XLS_PURPOSE, XLS_TARGET, 사유, 암호화 지원)
+	 * 20261102 khma : 보안 엑셀 다운로드 (동적 쿼리 필터 XLS_PURPOSE, XLS_TARGET 및 POI 4.1.2 Agile AES 암호화)
 	 * 그리드 조회 데이터를 기반으로 일반 엑셀(JXL) 또는 Agile AES 암호화 엑셀(POI 4.1.2 SXSSFWorkbook)을
-	 * 생성하여 다운로드한다.
+	 * 생성하여 클라이언트 스트림으로 직접 출력한다.
 	 * 
 	 * @param XmlParms 엑셀 다운로드 요청 JSON 파라미터 (xlsService, xlsMethod, dispCols,
-	 *                 excelUsage, excelTarget, excelReason, excelPassword 등)
+	 *                 XLS_PURPOSE, XLS_TARGET, excelPassword 등)
 	 * @param request  HttpServletRequest
 	 * @param response HttpServletResponse
-	 * @return ModelAndView 파일 다운로드 뷰
-	 * @throws Exception
+	 * @return ModelAndView 파일 스트림 직접 출력 후 null 반환 (Spring View 충돌 방지)
+	 * @throws Exception 데이터 조회 또는 파일 스트림 출력 중 예외
 	 */
 	@RequestMapping("/exceldown")
 	public ModelAndView downExcel(@RequestParam("XmlParms") String XmlParms, HttpServletRequest request,
@@ -865,24 +865,27 @@ public class UploadController {
 		STEPMENU = obj.get("STEPMENU");
 		ACTIONNAME = obj.get("ACTIONNAME");
 
-		// 20261030 khma Start : 보안 엑셀 다운로드 (용도, 대상, 사유, 암호) 파라미터 취득
+		// 20261102 khma Start : 보안 엑셀 다운로드 (용도 XLS_PURPOSE, 대상 XLS_TARGET, 파일 암호 excelPassword) 파라미터 취득
 		String excelUsage = "";
 		String excelTarget = "";
-		String excelReason = "";
 		String excelPassword = "";
-		if (obj.containsKey("excelUsage") && StringUtils.isNotEmpty(obj.get("excelUsage"))) {
+		// 용도 코드 취득 (동적 쿼리 주석 해제용: XLS_PURPOSE 우선, excelUsage 하위호환)
+		if (obj.containsKey("XLS_PURPOSE") && StringUtils.isNotEmpty(obj.get("XLS_PURPOSE"))) {
+			excelUsage = URLDecoder.decode(obj.get("XLS_PURPOSE"), "UTF-8");
+		} else if (obj.containsKey("excelUsage") && StringUtils.isNotEmpty(obj.get("excelUsage"))) {
 			excelUsage = URLDecoder.decode(obj.get("excelUsage"), "UTF-8");
 		}
-		if (obj.containsKey("excelTarget") && StringUtils.isNotEmpty(obj.get("excelTarget"))) {
+		// 대상 코드 취득 (동적 쿼리 주석 해제용: XLS_TARGET 우선, excelTarget 하위호환)
+		if (obj.containsKey("XLS_TARGET") && StringUtils.isNotEmpty(obj.get("XLS_TARGET"))) {
+			excelTarget = URLDecoder.decode(obj.get("XLS_TARGET"), "UTF-8");
+		} else if (obj.containsKey("excelTarget") && StringUtils.isNotEmpty(obj.get("excelTarget"))) {
 			excelTarget = URLDecoder.decode(obj.get("excelTarget"), "UTF-8");
 		}
-		if (obj.containsKey("excelReason") && StringUtils.isNotEmpty(obj.get("excelReason"))) {
-			excelReason = URLDecoder.decode(obj.get("excelReason"), "UTF-8");
-		}
+		// 파일 암호 취득 (POI 4.1.2 Agile AES 암호화 생성용)
 		if (obj.containsKey("excelPassword") && StringUtils.isNotEmpty(obj.get("excelPassword"))) {
 			excelPassword = URLDecoder.decode(obj.get("excelPassword"), "UTF-8");
 		}
-		// 20261030 khma End : 보안 엑셀 다운로드 (용도, 대상, 사유, 암호) 파라미터 취득
+		// 20261102 khma End : 보안 엑셀 다운로드 파라미터 취득
 
 		// xlsServuce, xlsMethod를 조건으로 쿼리정보를 취득한다.
 		si = monArchDao.ReadQuery(xlsService, xlsMethod, USITE);
@@ -972,11 +975,10 @@ public class UploadController {
 
 			} else {
 				ExcelDownload excelDownload = new ExcelDownload();
-				// 20261030 khma : 보안 엑셀 다운로드 암호 전달 (excelPassword)
+				// 20261102 khma : 보안 엑셀 다운로드 암호 전달 (excelPassword)
 				/*
-				 * excelDownload.downExcel(ds, fileName ,type, request, response, arrHeaderInfo,
-				 * xlsType);
-				 */
+				excelDownload.downExcel(ds, fileName, type, request, response, arrHeaderInfo, xlsType);
+				*/
 				excelDownload.downExcel(ds, fileName, type, request, response, arrHeaderInfo, xlsType, excelPassword);
 			}
 
@@ -1004,7 +1006,7 @@ public class UploadController {
 			throw new Exception(CommonConst.COMM_ERROR_MESSAGE);
 		}
 
-		// 20261030 khma : 파일 스트림 직접 출력 완료 후 Spring View 렌더링 생략 (충돌 방지)
+		// 20261102 khma : 파일 스트림 직접 출력 완료 후 Spring View 렌더링 생략 (응답 스트림 이미 커밋됨에 따른 충돌 방지)
 		/*
 		return new ModelAndView("fileDownloadView", "info", null);
 		*/

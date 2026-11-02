@@ -56,7 +56,7 @@ import au.com.bytecode.opencsv.CSVWriter;
 
 /**
  * 엑셀 다운로드 처리 클래스 (POI 4.1.2 Agile AES 암호화 및 JXL 호환)
- * version 2.0 2026-10-30
+ * version 2.0 2026-11-02
  * Authors : Ma KyoungHo
  * Company : KYDBM
  */
@@ -65,7 +65,8 @@ public class ExcelDownload {
 	Logger log = Logger.getLogger(ExcelDownload.class.getName());
 
 	/**
-	 * 20261030 khma : 기존 7개 파라미터 downExcel 하위 호환성 유지 (암호 미설정 일반 다운로드)
+	 * 20261102 khma : 기존 7개 파라미터 downExcel 하위 호환성 유지 (암호 미설정 일반 다운로드)
+	 * 
 	 * @param ds 데이터 리스트
 	 * @param service 서비스/파일명
 	 * @param type 파일 타입(XLS / CSV)
@@ -85,7 +86,10 @@ public class ExcelDownload {
 	}
 
 	/**
-	 * 20261030 khma Start : 보안 엑셀 다운로드 (excelPassword 전달 시 POI 4.1.2 Agile AES 암호화 다운로드)
+	 * 20261102 khma Start : 보안 엑셀 다운로드 (excelPassword 전달 시 POI 4.1.2 Agile AES 암호화 다운로드)
+	 * 엑셀 파일 열람 암호가 전달된 경우 POI 4.1.2 SXSSFWorkbook 대용량 스트리밍 및
+	 * Agile AES 암호화 컨테이너(POIFSFileSystem)를 거쳐 안전하게 클라이언트로 전송한다.
+	 * 
 	 * @param ds 데이터 리스트
 	 * @param service 서비스/파일명
 	 * @param type 파일 타입(XLS / CSV)
@@ -140,12 +144,7 @@ public class ExcelDownload {
 					response.reset();
 					response.setContentType("application/vnd.msexcel");
 					response.setHeader("content", "text/html; charset=utf-8");
-					// response.setHeader("Content-Disposition",
-					// "attachment; filename=\"" + new
-					// String(fileName.getBytes("UTF-8"), "ISO-8859-1")+".csv" +
-					// "\"");
-					response.setHeader("Content-Disposition", disposition
-							+ ".xls");
+					response.setHeader("Content-Disposition", disposition + ".xls");
 					response.setHeader("Content-Length", "" + ifilesize);
 					response.setHeader("Content-Transfer-Encoding", "binary;");
 					response.setHeader("Pragma", "no-cache;");

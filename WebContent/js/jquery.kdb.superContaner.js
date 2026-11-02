@@ -7338,18 +7338,12 @@ $(document).on("blur", ".t_Money", function (e) {
           $("#excelModalLayer, #excelModalDim").remove();
 
           // -----------------------------------------------------------------
-          // 20261102 khma : 구조체 필드명/값을 기존 그리드 조회조건(pl)에 직접 머지
-          // 백엔드 서비스에서 주석 해제(/* @XLS_TARGET@ ... */) 방식으로 동적 쿼리 처리
+          // 20261102 khma : 엑셀 다운로드 동적 쿼리 필터 파라미터(XLS_PURPOSE, XLS_TARGET) 머지
+          // (XLS_REASON은 쿼리 조건이 아니므로 제외, excelPassword는 백엔드 파일 암호화 생성용)
           // -----------------------------------------------------------------
           pl.add("XLS_PURPOSE", encodeURIComponent(savedUsage));
           pl.add("XLS_TARGET", encodeURIComponent(savedTarget));
-          pl.add("XLS_REASON", encodeURIComponent(savedReason));
           pl.add("excelPassword", encodeURIComponent(pwd1));
-
-          // 기존 호환용 파라미터도 함께 유지
-          pl.add("excelUsage", encodeURIComponent(savedUsage));
-          pl.add("excelTarget", encodeURIComponent(savedTarget));
-          pl.add("excelReason", encodeURIComponent(savedReason));
 
           // 다운로드 실행
           if (_jobInfo != undefined && _jobInfo.xlsOption != undefined && _jobInfo.xlsOption.popup) {
