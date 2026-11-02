@@ -517,10 +517,16 @@ $(document).on("drop", ".SuperView .fieldContaner[type='singlefilenew'] .singlef
   }
 });
 
+// 20261102 khma : input 자체 클릭 시 dropzone 부모 버블링 방지 (무한 재귀 호출 방지)
+$(document).on("click", ".singlefile-input, .multifile-input", function (e) {
+  e.stopPropagation();
+});
+
 $(document).on("click", ".SuperView .fieldContaner[type='singlefilenew'] .singlefile-dropzone", function (e) {
-  if ($(e.target).closest(".singlefile-cancel-btn, .singlefile-down-link").length > 0) return;
+  if ($(e.target).is(".singlefile-input") || $(e.target).closest(".singlefile-cancel-btn, .singlefile-down-link").length > 0) return;
   var _contaner = $(this).closest(".fieldContaner");
-  _contaner.find(".singlefile-input").trigger("click");
+  var _input = _contaner.find(".singlefile-input")[0];
+  if (_input) _input.click();
 });
 
 $(document).on("change", ".SuperView .fieldContaner[type='singlefilenew'] .singlefile-input", function (e) {
@@ -559,9 +565,10 @@ $(document).on("drop", ".SuperView .fieldContaner[type='multifilenew'] .multifil
 });
 
 $(document).on("click", ".SuperView .fieldContaner[type='multifilenew'] .multifile-dropzone", function (e) {
-  if ($(e.target).closest(".multifile-del-btn, .multifile-down-link").length > 0) return;
+  if ($(e.target).is(".multifile-input") || $(e.target).closest(".multifile-del-btn, .multifile-down-link").length > 0) return;
   var _contaner = $(this).closest(".fieldContaner");
-  _contaner.find(".multifile-input").trigger("click");
+  var _input = _contaner.find(".multifile-input")[0];
+  if (_input) _input.click();
 });
 
 $(document).on("change", ".SuperView .fieldContaner[type='multifilenew'] .multifile-input", function (e) {
