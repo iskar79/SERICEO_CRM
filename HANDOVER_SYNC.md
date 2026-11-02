@@ -1,4 +1,4 @@
-﻿# 다중 PC 안티그래비티(Antigravity) 실시간 작업 공유 및 인수인계서
+# 다중 PC 안티그래비티(Antigravity) 실시간 작업 공유 및 인수인계서
 
 > **🔄 양방향 PC 동기화 및 VDI 반영 확인 게이트(Gate) 규칙 (필독)**
 > 1. **작업 시작 시 (`PC A` 또는 `PC B`에서 안티그래비티를 열었을 때)**:
@@ -73,6 +73,6 @@
 | **Step 2-3** | `WebContent/js/jquery.kdb.jobButton.js` | `DownXlsNew` 권한 체크 분기 추가 및 레거시 주석 정리 (Line 43) | `[x]` | `[x]` | **완료** |
 | **Step 2-4** | `src/co/kr/kydbm/core/filecontrol/UploadController.java` | 엑셀 파라미터 수신, return null; 보정, Throwable 로깅 보강 | `[x]` | `[x]` | **완료 (VDI 정상구동 확인)** |
 | **Step 2-5** | `src/co/kr/kydbm/core/filecontrol/ExcelDownload.java` | Agile AES 암호화 워크북 생성, getBrowser NPE 방어, Throwable 처리 | `[x]` | `[x]` | **완료 (VDI 정상구동 확인)** |
-| **Step 2-6** | `운영쿼리정보/M_EXCEL_DOWN_LOG.sql` | 엑셀 다운로드 보안 감사 및 사유 이력 테이블 DDL (CRM.M_EXCEL_DOWN_LOG) | `[x]` | `[ ]` | **로컬완료 (VDI 반영 대기)** |
+| **Step 2-6** | `운영쿼리정보/M_EXCEL_DOWN_LOG.sql` | 엑셀 다운로드 보안 감사 및 사유 이력 테이블 DDL 초경량 13개 컬럼 정비 (CRM.M_EXCEL_DOWN_LOG) | `[x]` | `[x]` | **완료 (VDI 테이블 생성/정비 완료)** |
 | **Step 2-7** | `WebContent/js/jquery.kdb.superContaner.js` | XLS_REASON_POPUP 구조체(Create 전용) 팝업 및 조건 머지(주석해제용) | `[x]` | `[ ]` | **로컬완료 (VDI 반영 대기)** |
 | **Step 3** | `MonArchDaoImpl.java`, `FilterGenerator.java`, 프로시저/배치 등 | KSign SecureDB 개인정보 암복호화 공통 모듈 및 프로시저/엑셀업로드 적용 | `[ ]` | `[ ]` | 대기 |

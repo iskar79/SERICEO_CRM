@@ -1,4 +1,4 @@
-﻿# khma 소스 변경 및 VDI 동기화 관리대장
+# khma 소스 변경 및 VDI 동기화 관리대장
 
 본 문서는 로컬 PC에서 개발/수정한 소스 코드를 **VDI 내부망(운영/개발 서버)으로 안전하게 이관(복사-붙여넣기)하기 위한 실무 관리 대장**입니다.  
 `0_MASTER_EXECUTION_PLAN.md`의 **[Step 0 ➡️ Step 1 ➡️ Step 2 ➡️ Step 3]** 작업 순서와 1:1로 정확하게 일치하도록 구성되어 있어, 초급 개발자도 순서대로 따라가며 누락 없이 작업할 수 있습니다.
@@ -53,7 +53,7 @@
 | **Step 2-3** | `WebContent/js/jquery.kdb.jobButton.js` | `DownXlsNew` 권한 체크 분기 추가 및 레거시 주석 정리 (Line 43) | `[x]` | `[x]` | **완료** |
 | **Step 2-4** | `src/co/kr/kydbm/core/filecontrol/UploadController.java` | 엑셀 파라미터 수신, return null; 보정, Throwable 로깅 보강 | `[x]` | `[x]` | **완료 (VDI 정상구동 확인)** |
 | **Step 2-5** | `src/co/kr/kydbm/core/filecontrol/ExcelDownload.java` | Agile AES 암호화 워크북 생성, getBrowser NPE 방어, Throwable 처리 | `[x]` | `[x]` | **완료 (VDI 정상구동 확인)** |
-| **Step 2-6** | `운영쿼리정보/M_EXCEL_DOWN_LOG.sql` | 엑셀 다운로드 보안 감사 및 사유 이력 테이블 DDL (CRM.M_EXCEL_DOWN_LOG) | `[x]` | `[ ]` | **로컬완료 (VDI 반영 대기)** |
+| **Step 2-6** | `운영쿼리정보/M_EXCEL_DOWN_LOG.sql` | 엑셀 다운로드 보안 감사 및 사유 이력 테이블 DDL 초경량 13개 컬럼 정비 (CRM.M_EXCEL_DOWN_LOG) | `[x]` | `[x]` | **완료 (VDI 테이블 정비 완료)** |
 | **Step 2-7** | `WebContent/js/jquery.kdb.superContaner.js` | XLS_REASON_POPUP 구조체(Create 전용) 팝업 및 조건 머지(주석해제용) | `[x]` | `[ ]` | **로컬완료 (VDI 반영 대기)** |
 | **Step 3** | `MonArchDaoImpl.java`, `FilterGenerator.java`, 프로시저/배치 등 | KSign SecureDB 개인정보 암복호화 공통 모듈 및 프로시저/엑셀업로드 적용 | `[ ]` | `[ ]` | 대기 |
 
@@ -84,6 +84,6 @@
 | **Step 2-3** | `WebContent/js/jquery.kdb.jobButton.js` | `DownXlsNew` 권한 체크 분기 추가 및 레거시 주석 정리 (Line 43) | `[x]` | `[x]` | **완료** |
 | **Step 2-4** | `src/co/kr/kydbm/core/filecontrol/UploadController.java` | 엑셀 파라미터 수신, return null; 보정, Throwable 로깅 보강 | `[x]` | `[x]` | **완료 (VDI 정상구동 확인)** |
 | **Step 2-5** | `src/co/kr/kydbm/core/filecontrol/ExcelDownload.java` | Agile AES 암호화 워크북 생성, getBrowser NPE 방어, Throwable 처리 | `[x]` | `[x]` | **완료 (VDI 정상구동 확인)** |
-| **Step 2-6** | `운영쿼리정보/M_EXCEL_DOWN_LOG.sql` | 엑셀 다운로드 보안 감사 및 사유 이력 테이블 DDL (CRM.M_EXCEL_DOWN_LOG) | `[x]` | `[ ]` | **로컬완료 (VDI 반영 대기)** |
+| **Step 2-6** | `운영쿼리정보/M_EXCEL_DOWN_LOG.sql` | 엑셀 다운로드 보안 감사 및 사유 이력 테이블 DDL 초경량 13개 컬럼 정비 (CRM.M_EXCEL_DOWN_LOG) | `[x]` | `[x]` | **완료 (VDI 테이블 정비 완료)** |
 | **Step 2-7** | `WebContent/js/jquery.kdb.superContaner.js` | XLS_REASON_POPUP 구조체(Create 전용) 팝업 및 조건 머지(주석해제용) | `[x]` | `[ ]` | **로컬완료 (VDI 반영 대기)** |
 
