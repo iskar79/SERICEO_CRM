@@ -7097,10 +7097,10 @@ $(document).on("blur", ".t_Money", function (e) {
       var XLS_REASON_POPUP = {
         ContanerType: "superView",
         title: "엑셀 다운로드 사유 및 타겟 선택",
-        popupWidth: 620,
+        popupWidth: 570,
         isEditMode: true,
         colgroup: [
-          { index: "Col1", LabelWidth: "18%", DataWidth: "82%" }
+          { index: "Col1", LabelWidth: "15%", DataWidth: "85%" }
         ],
         "tr": [
           // 1. 용도 (Select)
@@ -7187,7 +7187,7 @@ $(document).on("blur", ".t_Money", function (e) {
       $("#excelModalLayer, #excelModalDim, #excelReasonDialog").remove();
 
       // [1단계 팝업 HTML] superView 구조체 렌더링 컨테이너 (너비 620px 확장 및 [1단계] 태그 제거)
-      var popWidth = (XLS_REASON_POPUP.popupWidth ? XLS_REASON_POPUP.popupWidth : 620);
+      var popWidth = (XLS_REASON_POPUP.popupWidth ? XLS_REASON_POPUP.popupWidth : (XLS_REASON_POPUP.popupWith ? XLS_REASON_POPUP.popupWith : 570));
       var step1Html = '<div id="excelModalLayer" style="position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); width:' + popWidth + 'px; background:#fff; border:2px solid #2b579a; padding:20px 24px; z-index:99999; box-shadow:0 0 20px rgba(0,0,0,0.45); border-radius:6px; font-family:\'맑은 고딕\', Malgun Gothic, sans-serif; font-size:12px; color:#333;">';
       step1Html += '<h3 style="margin:0 0 12px 0; font-size:15px; font-weight:bold; color:#2b579a; border-bottom:2px solid #2b579a; padding-bottom:6px;">' + XLS_REASON_POPUP.title + '</h3>';
       step1Html += '<div id="areaXlsReasonSuperView" style="margin-bottom:12px;"></div>';
