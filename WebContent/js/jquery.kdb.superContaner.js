@@ -6177,10 +6177,15 @@ $(document).on("blur", ".t_Money", function (e) {
       _fieldEdit.data("pendingFile", file);
 
       var sizeKb = (file.size / 1024).toFixed(1);
-      var previewHtm = "<span class='icon i-20 icon-file align-middle' style='margin-right: 4px; color: #0284c7;'></span>"
-                     + "<b style='color: #0284c7; margin-right: 6px;'>[교체 대기] " + file.name + " (" + sizeKb + " KB)</b>"
-                     + "<span class='singlefile-cancel-btn' style='color: #ef4444; font-weight: bold; cursor: pointer; padding: 2px 6px; border: 1px solid #fca5a5; border-radius: 3px; background: #fff;' title='교체 취소'>✖ 취소</span>";
+      var oldVal = _contaner.attr("value");
+      var isReplace = (oldVal && oldVal !== "");
+      var tagText = isReplace ? "[교체 대기]" : "[첨부 대기]";
+      var warnNotice = isReplace ? "<span style='color: #e11d48; font-size: 11px; margin-right: 8px;'>※ 저장 시 기존 파일은 자동 삭제(교체)됩니다.</span>" : "";
 
+      var previewHtm = "<span class='icon i-20 icon-file align-middle' style='margin-right: 4px; color: #0284c7;'></span>"
+                     + "<b style='color: #0284c7; margin-right: 6px;'>" + tagText + " " + file.name + " (" + sizeKb + " KB)</b>"
+                     + warnNotice
+                     + "<span class='singlefile-cancel-btn' style='color: #ef4444; font-weight: bold; cursor: pointer; padding: 2px 6px; border: 1px solid #fca5a5; border-radius: 3px; background: #fff;' title='교체 취소'>✖ 취소</span>";
       _statusText.html(previewHtm);
       _contaner.addClass("fldChange");
     },
@@ -6202,7 +6207,7 @@ $(document).on("blur", ".t_Money", function (e) {
         var fileHtm = "<span class='icon i-20 icon-file align-middle' style='margin-right: 4px; color: #2563eb;'></span>"
                     + "<a href='" + downUrl + "' class='singlefile-down-link' target='_blank' style='font-weight: bold; color: #1d4ed8; text-decoration: underline; margin-right: 8px;' title='클릭하여 다운로드'>"
                     + dispName + "</a>"
-                    + "<span style='color: #64748b; font-size: 11px;'>(드래그하여 다른 파일로 교체)</span>";
+                    + "<span style='color: #e11d48; font-size: 11px;'>※ 새 파일을 첨부하면 기존 파일은 자동 삭제(교체)됩니다.</span>";
         _statusText.html(fileHtm);
       } else {
         var emptyHtm = "<span class='icon i-20 icon-attachment align-middle' style='margin-right: 4px;'></span>"
@@ -15631,7 +15636,7 @@ $(document).on("blur", ".t_Money", function (e) {
             var fileHtm = "<span class='icon i-20 icon-file align-middle' style='margin-right: 4px; color: #2563eb;'></span>"
                         + "<a href='" + downUrl + "' class='singlefile-down-link' target='_blank' style='font-weight: bold; color: #1d4ed8; text-decoration: underline; margin-right: 8px;' title='클릭하여 다운로드'>"
                         + dispName + "</a>"
-                        + "<span style='color: #64748b; font-size: 11px;'>(드래그하여 다른 파일로 교체)</span>";
+                        + "<span style='color: #e11d48; font-size: 11px;'>※ 새 파일을 첨부하면 기존 파일은 자동 삭제(교체)됩니다.</span>";
 
             _statusText.html(fileHtm);
             _viewBox.html("<a href='" + downUrl + "' target='_blank' style='font-weight: bold; color: #1d4ed8; text-decoration: underline;'>" + dispName + "</a>");
