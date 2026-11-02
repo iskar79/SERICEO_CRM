@@ -3,11 +3,12 @@
 <!-- ========================================================================================== -->
 <!-- [SERICEO CRM (MonArch 8.2.0)] Spring MVC 웹 애플리케이션 컨텍스트 설정 (Monarch820-servlet.xml) -->
 <!-- ========================================================================================== -->
-<!-- 20261029 khma : Spring 4.3.30.RELEASE 업그레이드에 따른 XML 스키마(xsd) 3.0 -> 4.3 상향 -->
-<!--
+<!-- 20261102 khma : VDI 내부망 오프라인 환경(외부 리소스 다운로드 불가) 호환을 위해 이클립스 로컬 XML Catalog에 캐싱된 3.0 xsd 규격 적용 -->
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
-	xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:tx="http://www.springframework.org/schema/tx"
 	xmlns:mvc="http://www.springframework.org/schema/mvc" 
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
@@ -20,24 +21,6 @@
        http://www.springframework.org/schema/context/spring-context-3.0.xsd
        http://www.springframework.org/schema/mvc
        http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
--->
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:aop="http://www.springframework.org/schema/aop"
-	xmlns:p="http://www.springframework.org/schema/p"
-	xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:tx="http://www.springframework.org/schema/tx"
-	xmlns:mvc="http://www.springframework.org/schema/mvc" 
-	xsi:schemaLocation="http://www.springframework.org/schema/beans
-       http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
-       http://www.springframework.org/schema/tx
-       http://www.springframework.org/schema/tx/spring-tx-4.3.xsd
-       http://www.springframework.org/schema/aop
-       http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
-       http://www.springframework.org/schema/context
-       http://www.springframework.org/schema/context/spring-context-4.3.xsd
-       http://www.springframework.org/schema/mvc
-       http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd">
 
 
 	<!-- ========================================================================================== -->
