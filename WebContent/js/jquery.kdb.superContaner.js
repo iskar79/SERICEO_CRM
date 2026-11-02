@@ -7296,22 +7296,32 @@ $(document).on("blur", ".t_Money", function (e) {
             downCnt = "0";
           }
 
-          var excelFileName = (_json.title ? _json.title : "EXCEL") + ".xlsx";
+          var currentIp = (typeof _CLIENT_IP !== "undefined" && _CLIENT_IP !== "") ? _CLIENT_IP : "127.0.0.1";
+          var targetService = serviceName || (_json && _json.service) || "";
+          var targetMethod = _svc || (_json && _json.method && _json.method.List) || "List";
+          var excelFileName = (_json && _json.title ? _json.title : "EXCEL") + ".xlsx";
 
           plLog.add("service", logSvc);
           plLog.add("method", logMtd);
           plLog.add("USITE", (_M.UserInfo && _M.UserInfo.SID) ? _M.UserInfo.SID : "1");
           plLog.add("MENUID", (_M.PrevActGbn && _M.PrevActGbn.currMenuId) ? _M.PrevActGbn.currMenuId : "");
-          plLog.add("SERVICE_NAME", serviceName);
-          plLog.add("METHOD_NAME", _svc);
+          plLog.add("MENU_ID", (_M.PrevActGbn && _M.PrevActGbn.currMenuId) ? _M.PrevActGbn.currMenuId : "");
+          plLog.add("SERVICE_NAME", targetService);
+          plLog.add("service_name", targetService);
+          plLog.add("METHOD_NAME", targetMethod);
+          plLog.add("method_name", targetMethod);
           plLog.add("FILE_NAME", excelFileName);
+          plLog.add("file_name", excelFileName);
           plLog.add("fileName", excelFileName);
           plLog.add("DOWN_CNT", downCnt);
+          plLog.add("down_cnt", downCnt);
           plLog.add("totalRecord", downCnt);
           plLog.add("TOTAL_RECORD", downCnt);
-          plLog.add("CLIENT_IP", "");
-          plLog.add("clientIp", "");
+          plLog.add("CLIENT_IP", currentIp);
+          plLog.add("client_ip", currentIp);
+          plLog.add("clientIp", currentIp);
           plLog.add("REGUSER", (_M.UserInfo && _M.UserInfo.id) ? _M.UserInfo.id : "");
+          plLog.add("reguser", (_M.UserInfo && _M.UserInfo.id) ? _M.UserInfo.id : "");
           // 1단계 구조체 필드들(XLS_PURPOSE, XLS_TARGET, XLS_REASON 등) 자동 머지
           $.each(savedParams, function (fldName, fldVal) {
             plLog.add(fldName, fldVal);

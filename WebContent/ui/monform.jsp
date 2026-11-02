@@ -2,6 +2,17 @@
 
 <%
 request.setCharacterEncoding("UTF-8");
+// 20261102 khma : 엑셀 다운로드 보안 감사 로그용 클라이언트 IP 취득
+String clientIp = request.getHeader("X-Forwarded-For");
+if (clientIp == null || clientIp.length() == 0 || "unknown".equalsIgnoreCase(clientIp)) {
+    clientIp = request.getHeader("Proxy-Client-IP");
+}
+if (clientIp == null || clientIp.length() == 0 || "unknown".equalsIgnoreCase(clientIp)) {
+    clientIp = request.getHeader("WL-Proxy-Client-IP");
+}
+if (clientIp == null || clientIp.length() == 0 || "unknown".equalsIgnoreCase(clientIp)) {
+    clientIp = request.getRemoteAddr();
+}
 %>
 <!DOCTYPE html>
 <html>
@@ -14,6 +25,10 @@ request.setCharacterEncoding("UTF-8");
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <link rel="apple-touch-icon" href="MonArch-blue57x57.ico" />
 <title>::: SERICEO CRM :::</title>
+
+<script type="text/javascript">
+	var _CLIENT_IP = "<%= (clientIp != null) ? clientIp : "" %>";
+</script>
 
 <!-- 테마 및 공통 스타일시트 -->
 <link id="CSSlink" type="text/css" href="css/Theme_CEO.css" rel="stylesheet" />

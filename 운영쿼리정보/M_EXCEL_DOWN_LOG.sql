@@ -51,6 +51,8 @@ CREATE INDEX "CRM"."IDX_M_EXCEL_DOWN_LOG_DATE" ON "CRM"."M_EXCEL_DOWN_LOG" ("REG
 
 -- =====================================================================
 -- 5. 모나크 서비스 메타 SQL 참조 (MON_COMMON / INSERT_EXCEL_DOWN_LOG)
+-- ※ 주의: 모나크는 NamedParameter(:변수명)로 자동 치환하므로
+--         문자열 컬럼이라도 절대 작은따옴표(')를 붙이면 안 됩니다!
 -- =====================================================================
 /*
 INSERT INTO CRM.M_EXCEL_DOWN_LOG (
@@ -69,17 +71,17 @@ INSERT INTO CRM.M_EXCEL_DOWN_LOG (
     REGUSER
 ) VALUES (
     CRM.SEQ_M_EXCEL_DOWN_LOG.NEXTVAL,
-    NVL(TO_NUMBER('@USITE@'), 1),
-    '@MENUID@',
-    '@service@',
-    '@method@',
-    '@fileName@',
-    '@XLS_PURPOSE@',
-    '@XLS_TARGET@',
-    '@XLS_REASON@',
-    NVL(TO_NUMBER('@totalRecord@'), 0),
-    '@clientIp@',
+    NVL(TO_NUMBER(@USITE@), 1),
+    @MENU_ID@,
+    @SERVICE_NAME@,
+    @METHOD_NAME@,
+    @FILE_NAME@,
+    @XLS_PURPOSE@,
+    @XLS_TARGET@,
+    @XLS_REASON@,
+    NVL(TO_NUMBER(@DOWN_CNT@), 0),
+    @CLIENT_IP@,
     SYSTIMESTAMP,
-    '@UID@'
+    @REGUSER@
 )
 */
