@@ -1,4 +1,4 @@
-﻿# VDI 내부망 소스 동기화 및 코드 수정 규칙 (필수 준수 사항)
+# VDI 내부망 소스 동기화 및 코드 수정 규칙 (필수 준수 사항)
 
 이 프로젝트는 VDI 내부망 Git 저장소에서 복사해 온 소스이며, 수정 후 다시 VDI 환경으로 덮어써야 합니다.
 고객사 소스이므로 모든 소스 코드 수정 시 **반드시 아래 규칙을 엄격히 준수**해야 합니다.
@@ -236,14 +236,18 @@ VDI 내부망 코드를 카메라로 촬영하여 전달받는 경우, 단순 OC
   * `WebContent/js/jquery.kdb.MonArch800.js` 내 `$.Login` 함수에서 아이디 저장 체크박스(`#chk-save`) 활성화 및 쿠키(`SAVE_ID`) 연동 VDI 반영 완료.
 * **[완료] Step 4 (`MonArch800.js`)** (`[① 로컬: 완료(x) / ② VDI: 완료(x)]`):
   * `WebContent/js/jquery.kdb.MonArch800.js` 내 `validatePassword` 비밀번호 복잡도 및 폼 전체 통합 검증 함수 VDI 반영 완료.
-* **[?꾨즺] Step 2-1 (POI 4.1.2 ?쇱씠釉뚮윭由?援먯껜)** ([??濡쒖뺄: ?꾨즺(x) / ??VDI: ?꾨즺(x)]):
-  * 援ы삎 POI 3.8 7醫?_20261030 諛깆뾽 諛??좉퇋 POI 4.1.2 7醫?JAR 諛곗튂 ?꾨즺.
-* **[?꾨즺] Step 2-2 (CommonExcelUtil.java)** ([??濡쒖뺄: ?꾨즺(x) / ??VDI: ?꾨즺(x)]):
-  * POI 4.1.2 CellType Enum 諛?DateUtil 臾몃쾿 蹂댁젙, 而댄뙆???먮윭 0嫄??꾨즺.
-* **[吏꾪뻾以? Step 2-3 (jobButton.js, superContaner.js)** ([??濡쒖뺄: ?꾨즺(x) / ??VDI: ?湲? )]):
-  * jobButton.js: DownXlsNew 沅뚰븳 泥댄겕 遺꾧린 ?ы븿.
-  * superContaner.js: DownXlsNew 怨듯넻肄붾뱶(XLS_PURPOSE, XLS_TARGET) ?숈쟻 ?곕룞 諛?2?④퀎 ?앹뾽 (10???댁긽 ?ъ쑀 -> 4???댁긽 ?뷀샇).
-* **[吏꾪뻾以? Step 2-4 (UploadController.java)** ([??濡쒖뺄: ?꾨즺(x) / ??VDI: ?湲? )]):
-  * excelUsage, excelTarget, excelReason, excelPassword ?뚮씪誘명꽣 痍⑤뱷 諛?ExcelDownload ?꾨떖.
-* **[吏꾪뻾以? Step 2-5 (ExcelDownload.java)** ([??濡쒖뺄: ?꾨즺(x) / ??VDI: ?湲? )]):
-  * POI 4.1.2 Agile AES ?뷀샇???뚰겕遺?SXSSFWorkbook ?ㅽ듃由щ컢) 諛?POIFSFileSystem ?뷀샇???ㅼ슫濡쒕뱶 援ы쁽 (JDK 11 javac 寃利?0嫄??꾨즺).
+* **[완료] Step 4 (MonArch800.js)** ([① 로컬: 완료(x) / ② VDI: 완료(x)]):
+  * WebContent/js/jquery.kdb.MonArch800.js 내 alidatePassword 비밀번호 복잡도 및 폼 전체 통합 검증 함수 VDI 반영 완료.
+* **[완료] Step 2-1 (POI 4.1.2 라이브러리 교체)** ([① 로컬: 완료(x) / ② VDI: 완료(x)]):
+  * 구형 POI 3.8 7종 _20261030 백업 및 신규 POI 4.1.2 7종 JAR 배치 완료.
+* **[완료] Step 2-2 (CommonExcelUtil.java)** ([① 로컬: 완료(x) / ② VDI: 완료(x)]):
+  * POI 4.1.2 CellType Enum 및 DateUtil 문법 보정 완료.
+* **[완료] Step 2-3 (jobButton.js, superContaner.js)** ([① 로컬: 완료(x) / ② VDI: 완료(x)]):
+  * jobButton.js: DownXlsNew 권한 체크 분기 추가.
+  * superContaner.js: DownXlsNew 2단계 팝업(사유 10자 이상 ➡️ 암호 4자 이상) 연동 완료.
+* **[진행중] Step 2-1b (POI 암호화 의존 JAR 3종 반입)** ([① 로컬: 완료(x) / ② VDI: 대기( )]):
+  * commons-math3-3.6.1.jar, SparseBitSet-1.2.jar, curvesapi-1.06.jar를 WebContent/WEB-INF/lib/에 배치.
+* **[진행중] Step 2-4 (UploadController.java)** ([① 로컬: 완료(x) / ② VDI: 대기( )]):
+  * 엑셀 파라미터 수신, 파일 스트림 출력 후 eturn null; 보정 및 catch (Throwable e) 처리 완료.
+* **[진행중] Step 2-5 (ExcelDownload.java)** ([① 로컬: 완료(x) / ② VDI: 대기( )]):
+  * POI 4.1.2 Agile AES 암호화 생성, getBrowser NPE 방어 및 스트림 다운로드 완료.
