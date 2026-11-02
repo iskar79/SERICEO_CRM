@@ -7115,28 +7115,11 @@ $(document).on("blur", ".t_Money", function (e) {
       step1Html += '</div>';
 
       // -----------------------------------------------------------------
-      // 20261102 khma : jobs 배열 동적 렌더링 (사용자가 jobs에 추가한 개별 버튼 지원)
+      // 20261102 khma : 모달 하단 버튼 영역 (개발 버튼 등 제외, 다운로드 전용 [다음], [취소]만 노출)
       // -----------------------------------------------------------------
       step1Html += '<div style="text-align:center; border-top:1px solid #eee; padding-top:12px;" id="areaXlsReasonJobs">';
-      if (XLS_REASON_POPUP.jobs && XLS_REASON_POPUP.jobs.length > 0) {
-        for (var j = 0; j < XLS_REASON_POPUP.jobs.length; j++) {
-          var job = XLS_REASON_POPUP.jobs[j];
-          var btnStyle = "padding:6px 20px; margin:0 4px; cursor:pointer; border-radius:3px; font-size:12px; font-weight:bold;";
-          if (job.inComm == "NextStep") {
-            btnStyle += " background:#2b579a; color:#fff; border:none;";
-          } else if (job.inComm == "Close") {
-            btnStyle += " background:#e2e2e2; color:#333; border:none;";
-          } else {
-            btnStyle += " background:#f5f5f5; color:#333; border:1px solid #ccc;";
-          }
-          var btnId = "btnJob_" + (job.index ? job.index : j);
-          var btnCls = "btn-popup-job " + (job.css ? job.css : "");
-          step1Html += '<button type="button" id="' + btnId + '" class="' + btnCls + '" data-incomm="' + job.inComm + '" data-index="' + (job.index ? job.index : "") + '" style="' + btnStyle + '">' + job.name + '</button>';
-        }
-      } else {
-        step1Html += '<button type="button" class="btn-popup-job" data-incomm="NextStep" style="padding:6px 22px; margin-right:8px; cursor:pointer; background:#2b579a; color:#fff; font-weight:bold; border:none; border-radius:3px; font-size:12px;">다음 (암호 설정) &gt;</button>';
-        step1Html += '<button type="button" class="btn-popup-job" data-incomm="Close" style="padding:6px 18px; cursor:pointer; background:#e2e2e2; color:#333; border:none; border-radius:3px; font-size:12px;">취소</button>';
-      }
+      step1Html += '<button type="button" id="btnXlsNextStep" style="padding:6px 22px; margin-right:8px; cursor:pointer; background:#2b579a; color:#fff; font-weight:bold; border:none; border-radius:3px; font-size:12px;">다음 (암호 설정) &gt;</button>';
+      step1Html += '<button type="button" id="btnXlsModalClose" style="padding:6px 18px; cursor:pointer; background:#e2e2e2; color:#333; border:none; border-radius:3px; font-size:12px;">취소</button>';
       step1Html += '</div></div>';
 
       var dimHtml = '<div id="excelModalDim" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#000; opacity:0.45; z-index:99998;"></div>';
@@ -7147,33 +7130,27 @@ $(document).on("blur", ".t_Money", function (e) {
       var $superArea = $("#areaXlsReasonSuperView");
       $superArea.superContaner("superView", XLS_REASON_POPUP);
 
-      // textarea 글자수 실시간 모니터링 이벤트 바인딩
-      $("textarea[name='XLS_REASON']", $superArea).on("keyup change", function () {
-        var len = $.trim($(this).val()).length;
-        if (len >= 10) {
-          $("#spnReasonLen").css("color", "#2b579a").text("✓ 목적 " + len + "자 입력됨 (조건 만족)");
-        } else {
-          $("#spnReasonLen").css("color", "#d9534f").text("※ 목적은 최소 10자 이상 필수 (현재 " + len + "자)");
-        }
-      });
-
       // -----------------------------------------------------------------
-      // 20261102 khma : jobs 버튼 동적 클릭 이벤트 바인딩
+      // 20261102 khma : textarea 실시간 글자수 카운트 (모나크 fieldContaner[field='XLS_REASON'] 정밀 바인딩)
       // -----------------------------------------------------------------
-      $(".btn-popup-job", "#excelModalLayer").click(function () {
-        var inComm = $(this).data("incomm");
-        var jobIndex = $(this).data("index");
-
-        if (inComm == "NextStep") {
-          fnGoNextStep();
-        } else if (inComm == "Close") {
-          $("#excelModalLayer, #excelModalDim").remove();
-        } else {
-          // 사용자가 jobs에 추가한 개별 버튼 처리
-          if (typeof _Obj.superContaner === "function") {
-            _Obj.superContaner("jobClick", $(this));
+      var $txtReason = $(".fieldContaner[field='XLS_REASON'] textarea, textarea[name='XLS_REASON'], textarea", $superArea);
+      if ($txtReason.length > 0) {
+        $txtReason.on("keyup change input", function () {
+          var len = $.trim($(this).val()).length;
+          if (len >= 10) {
+            $("#spnReasonLen").css("color", "#2b579a").html("✓ 목적 <strong>" + len + "자</strong> 입력됨 (10자 이상 충족)");
+          } else {
+            $("#spnReasonLen").css("color", "#d9534f").html("※ 목적은 최소 10자 이상 필수 (현재 <strong>" + len + "자</strong> / 최소 10자)");
           }
-        }
+        });
+      }
+
+      // 모달 하단 버튼 이벤트 바인딩
+      $("#btnXlsNextStep").click(function () {
+        fnGoNextStep();
+      });
+      $("#btnXlsModalClose").click(function () {
+        $("#excelModalLayer, #excelModalDim").remove();
       });
 
       // [1단계 -> 2단계] 다음 단계 실행 함수
@@ -7185,11 +7162,11 @@ $(document).on("blur", ".t_Money", function (e) {
           return;
         }
 
-        // 목적 10자 이상 검증
-        var reasonVal = $.trim($("textarea[name='XLS_REASON']", $superArea).val());
+        // 목적 10자 이상 검증 (정밀 셀렉터 적용)
+        var reasonVal = $.trim($(".fieldContaner[field='XLS_REASON'] textarea, textarea[name='XLS_REASON'], textarea", $superArea).val() || "");
         if (reasonVal.length < 10) {
           alert("다운로드 [목적]은 최소 10글자 이상 구체적으로 입력해야 합니다. (현재 " + reasonVal.length + "자)");
-          $("textarea[name='XLS_REASON']", $superArea).focus();
+          $(".fieldContaner[field='XLS_REASON'] textarea, textarea[name='XLS_REASON'], textarea", $superArea).focus();
           return;
         }
 
