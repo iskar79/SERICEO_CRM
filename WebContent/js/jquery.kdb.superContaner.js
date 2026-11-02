@@ -7097,10 +7097,10 @@ $(document).on("blur", ".t_Money", function (e) {
       var XLS_REASON_POPUP = {
         ContanerType: "superView",
         title: "엑셀 다운로드 사유 및 타겟 선택",
-        popupWidth: 500,
+        popupWidth: 620,
         isEditMode: true,
         colgroup: [
-          { index: "Col1", LabelWidth: "25%", DataWidth: "75%" }
+          { index: "Col1", LabelWidth: "18%", DataWidth: "82%" }
         ],
         "tr": [
           // 1. 용도 (Select)
@@ -7186,16 +7186,38 @@ $(document).on("blur", ".t_Money", function (e) {
       // -----------------------------------------------------------------
       $("#excelModalLayer, #excelModalDim, #excelReasonDialog").remove();
 
-      // [1단계 팝업 HTML] superView 구조체 렌더링 컨테이너
-      var step1Html = '<div id="excelModalLayer" style="position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); width:520px; background:#fff; border:2px solid #2b579a; padding:20px 24px; z-index:99999; box-shadow:0 0 20px rgba(0,0,0,0.45); border-radius:6px; font-family:\'맑은 고딕\', Malgun Gothic, sans-serif; font-size:12px; color:#333;">';
-      step1Html += '<h3 style="margin:0 0 12px 0; font-size:15px; font-weight:bold; color:#2b579a; border-bottom:2px solid #2b579a; padding-bottom:6px;">[1단계] ' + XLS_REASON_POPUP.title + '</h3>';
+      // [1단계 팝업 HTML] superView 구조체 렌더링 컨테이너 (너비 620px 확장 및 [1단계] 태그 제거)
+      var popWidth = (XLS_REASON_POPUP.popupWidth ? XLS_REASON_POPUP.popupWidth : 620);
+      var step1Html = '<div id="excelModalLayer" style="position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); width:' + popWidth + 'px; background:#fff; border:2px solid #2b579a; padding:20px 24px; z-index:99999; box-shadow:0 0 20px rgba(0,0,0,0.45); border-radius:6px; font-family:\'맑은 고딕\', Malgun Gothic, sans-serif; font-size:12px; color:#333;">';
+      step1Html += '<h3 style="margin:0 0 12px 0; font-size:15px; font-weight:bold; color:#2b579a; border-bottom:2px solid #2b579a; padding-bottom:6px;">' + XLS_REASON_POPUP.title + '</h3>';
       step1Html += '<div id="areaXlsReasonSuperView" style="margin-bottom:12px;"></div>';
       step1Html += '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; padding:0 2px;">';
       step1Html += '<span id="spnReasonLen" style="font-size:11px; color:#d9534f;">※ 목적은 최소 10자 이상 구체적으로 입력해야 합니다.</span>';
       step1Html += '</div>';
-      step1Html += '<div style="text-align:center; border-top:1px solid #eee; padding-top:12px;">';
-      step1Html += '<button id="btnStep1Next" style="padding:6px 22px; margin-right:8px; cursor:pointer; background:#2b579a; color:#fff; font-weight:bold; border:none; border-radius:3px; font-size:12px;">다음 (암호 설정) &gt;</button>';
-      step1Html += '<button id="btnModalCancel" style="padding:6px 18px; cursor:pointer; background:#e2e2e2; color:#333; border:none; border-radius:3px; font-size:12px;">취소</button>';
+
+      // -----------------------------------------------------------------
+      // 20261102 khma : jobs 배열 동적 렌더링 (사용자가 jobs에 추가한 개별 버튼 지원)
+      // -----------------------------------------------------------------
+      step1Html += '<div style="text-align:center; border-top:1px solid #eee; padding-top:12px;" id="areaXlsReasonJobs">';
+      if (XLS_REASON_POPUP.jobs && XLS_REASON_POPUP.jobs.length > 0) {
+        for (var j = 0; j < XLS_REASON_POPUP.jobs.length; j++) {
+          var job = XLS_REASON_POPUP.jobs[j];
+          var btnStyle = "padding:6px 20px; margin:0 4px; cursor:pointer; border-radius:3px; font-size:12px; font-weight:bold;";
+          if (job.inComm == "NextStep") {
+            btnStyle += " background:#2b579a; color:#fff; border:none;";
+          } else if (job.inComm == "Close") {
+            btnStyle += " background:#e2e2e2; color:#333; border:none;";
+          } else {
+            btnStyle += " background:#f5f5f5; color:#333; border:1px solid #ccc;";
+          }
+          var btnId = "btnJob_" + (job.index ? job.index : j);
+          var btnCls = "btn-popup-job " + (job.css ? job.css : "");
+          step1Html += '<button type="button" id="' + btnId + '" class="' + btnCls + '" data-incomm="' + job.inComm + '" data-index="' + (job.index ? job.index : "") + '" style="' + btnStyle + '">' + job.name + '</button>';
+        }
+      } else {
+        step1Html += '<button type="button" class="btn-popup-job" data-incomm="NextStep" style="padding:6px 22px; margin-right:8px; cursor:pointer; background:#2b579a; color:#fff; font-weight:bold; border:none; border-radius:3px; font-size:12px;">다음 (암호 설정) &gt;</button>';
+        step1Html += '<button type="button" class="btn-popup-job" data-incomm="Close" style="padding:6px 18px; cursor:pointer; background:#e2e2e2; color:#333; border:none; border-radius:3px; font-size:12px;">취소</button>';
+      }
       step1Html += '</div></div>';
 
       var dimHtml = '<div id="excelModalDim" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#000; opacity:0.45; z-index:99998;"></div>';
@@ -7216,13 +7238,27 @@ $(document).on("blur", ".t_Money", function (e) {
         }
       });
 
-      // [1단계 취소]
-      $("#btnModalCancel").click(function () {
-        $("#excelModalLayer, #excelModalDim").remove();
+      // -----------------------------------------------------------------
+      // 20261102 khma : jobs 버튼 동적 클릭 이벤트 바인딩
+      // -----------------------------------------------------------------
+      $(".btn-popup-job", "#excelModalLayer").click(function () {
+        var inComm = $(this).data("incomm");
+        var jobIndex = $(this).data("index");
+
+        if (inComm == "NextStep") {
+          fnGoNextStep();
+        } else if (inComm == "Close") {
+          $("#excelModalLayer, #excelModalDim").remove();
+        } else {
+          // 사용자가 jobs에 추가한 개별 버튼 처리
+          if (typeof _Obj.superContaner === "function") {
+            _Obj.superContaner("jobClick", $(this));
+          }
+        }
       });
 
-      // [1단계 -> 2단계] 다음 버튼 이벤트
-      $("#btnStep1Next").click(function () {
+      // [1단계 -> 2단계] 다음 단계 실행 함수
+      var fnGoNextStep = function () {
         // 구조체 필드값 취득
         var usage = $.trim($("select[name='XLS_PURPOSE']", $superArea).val());
         var target = $("input[name='XLS_TARGET']:checked", $superArea).val();
