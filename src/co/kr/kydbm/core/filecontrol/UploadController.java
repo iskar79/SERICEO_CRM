@@ -1161,4 +1161,310 @@ public class UploadController {
 		monArchDao.exeCreate(sqlCommand, uselogParam);
 	}
 
+	// 20261102 khma Start : 차세대 드래그앤드롭 파일 시스템 신규 엔드포인트 (/uploadFileNew, /downloadFileNew, /deleteFileSafe)
+
+	/**
+	 * 차세대 드래그앤드롭 파일 업로드 (singleFileNew / multiFileNew 전용)
+	 * 파일을 지정된 물리 경로(monarch.fileupload.path/년/월/)에 저장하고, M_IMAGE_GAL 테이블에 메타데이터를 등록한다.
+	 *
+	 * @param Filename 업로드할 MultipartFile
+	 * @param fileSearchKey 화면에서 전달된 그룹/식별키 (UPPER_INFO 에 매핑)
+	 * @param jobType 업무 분류
+	 * @param ParentKey 부모 업무 PK (UPPER_KEY 에 매핑, 숫자 변환 가능 시)
+	 * @param UID 등록자 ID
+	 * @param USITE 사이트 번호
+	 * @param request HttpServletRequest
+	 * @param response HttpServletResponse
+	 * @throws Exception 파일 저장 및 DB 등록 예외
+	 */
+	@RequestMapping("/uploadFileNew")
+	public void uploadFileNew(
+			@RequestParam("Filename") MultipartFile Filename,
+			@RequestParam(value = "fileSearchKey", required = false, defaultValue = "") String fileSearchKey,
+			@RequestParam(value = "jobType", required = false, defaultValue = "FILE") String jobType,
+			@RequestParam(value = "ParentKey", required = false, defaultValue = "") String ParentKey,
+			@RequestParam(value = "UID", required = false, defaultValue = "1") String UID,
+			@RequestParam(value = "USITE", required = false, defaultValue = "44") String USITE,
+			HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+
+		response.setContentType("application/json; charset=UTF-8");
+		PrintWriter out = response.getWriter();
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+
+		try {
+			if (Filename == null || Filename.isEmpty()) {
+				resultMap.put("result", "FAIL");
+				resultMap.put("message", "업로드할 파일이 없습니다.");
+				out.print(new ObjectMapper().writeValueAsString(resultMap));
+				return;
+			}
+
+			// 업로드 파일 확장자 체크 (화이트리스트)
+			if (!CommonUtil.checkExtender(Filename.getOriginalFilename(), FILE_UPLOAD_WHITE_LIST)) {
+				resultMap.put("result", "FAIL");
+				resultMap.put("message", "업로드 할 수 없는 형식의 파일입니다.");
+				out.print(new ObjectMapper().writeValueAsString(resultMap));
+				return;
+			}
+
+			ConfigProperties configProperties = ConfigProperties.getInstance();
+			Calendar calendar = Calendar.getInstance();
+			String years = String.valueOf(calendar.get(Calendar.YEAR));
+			String months = String.format("%02d", calendar.get(Calendar.MONTH) + 1);
+			SimpleDateFormat sd = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+			String currentTimestamp = sd.format(calendar.getTime());
+
+			String uploadFolder = years + "/" + months;
+			String defaultFilePath = configProperties.getProperty("monarch.fileupload.path");
+			if (StringUtils.isEmpty(defaultFilePath)) {
+				defaultFilePath = configProperties.getProperty("monarch.url.realpath") + "/FileData/signFile/";
+			}
+			String realPath = defaultFilePath + "/" + uploadFolder;
+			String originalFileName = Filename.getOriginalFilename();
+			String ext = FilenameUtils.getExtension(originalFileName);
+			String realfileName = currentTimestamp + "_" + originalFileName;
+			String fileSize = String.valueOf(Filename.getSize());
+
+			// 디렉토리 자동 생성
+			File dir = new File(realPath);
+			if (!dir.isDirectory()) {
+				dir.mkdirs();
+			}
+
+			// 물리 파일 저장
+			if (writeFile(Filename, realPath, realfileName)) {
+				MonArchDaoImpl monArchDao = new MonArchDaoImpl();
+				// 신규 시퀀스 채번
+				Long newFid = null;
+				try {
+					newFid = monArchDao.getJdbcTemplate().queryForObject("SELECT M_IMAGE_GAL_SEQ.NEXTVAL FROM DUAL", Long.class);
+				} catch (Exception ex) {
+					log.warn("M_IMAGE_GAL_SEQ 채번 실패, 시퀀스 미지원 또는 기본 방식 대체", ex);
+				}
+
+				String relativeFilePath = uploadFolder + "/" + realfileName;
+				String upperKeyVal = (StringUtils.isNotEmpty(ParentKey) && StringUtils.isNumeric(ParentKey)) ? ParentKey : null;
+
+				String insertSql = "INSERT INTO M_IMAGE_GAL ("
+						+ (newFid != null ? "M_IMAGE_GAL_NO, " : QueryGenerator.genSequenceCol(DB_TYPE, "M_IMAGE_GAL_NO", true))
+						+ "FILE_NAME, FILE_SIZE, FILE_CONTENT_TYPE, FILE_TYPE_CODE, FILE_DESC, "
+						+ "FILE_PATH, UPPER_INFO, "
+						+ (upperKeyVal != null ? "UPPER_KEY, " : "")
+						+ "REG_DATE, UPD_DATE, REG_USER, UPD_USER, M_USITE_NO) VALUES ("
+						+ (newFid != null ? newFid + ", " : QueryGenerator.genSequenceStmt(DB_TYPE, "M_IMAGE_GAL_SEQ", true))
+						+ "@FILE_NAME@, @FILE_SIZE@, @FILE_CONTENT_TYPE@, @FILE_TYPE_CODE@, @FILE_DESC@, "
+						+ "@FILE_PATH@, @UPPER_INFO@, "
+						+ (upperKeyVal != null ? upperKeyVal + ", " : "")
+						+ QueryGenerator.genSysDate(DB_TYPE, true)
+						+ QueryGenerator.genSysDate(DB_TYPE, true)
+						+ "@REG_USER@, @UPD_USER@, @M_USITE_NO@)";
+
+				Map<String, String> mapParam = new HashMap<String, String>();
+				mapParam.put("FILE_NAME", originalFileName);
+				mapParam.put("FILE_SIZE", fileSize);
+				mapParam.put("FILE_CONTENT_TYPE", ext);
+				mapParam.put("FILE_TYPE_CODE", "파일");
+				mapParam.put("FILE_DESC", jobType);
+				mapParam.put("FILE_PATH", relativeFilePath);
+				mapParam.put("UPPER_INFO", fileSearchKey);
+				mapParam.put("REG_USER", UID);
+				mapParam.put("UPD_USER", UID);
+				mapParam.put("M_USITE_NO", USITE);
+
+				monArchDao.exeUpdate(insertSql, mapParam);
+
+				resultMap.put("result", "OK");
+				resultMap.put("fid", newFid != null ? String.valueOf(newFid) : "");
+				resultMap.put("filePath", relativeFilePath);
+				resultMap.put("fileName", originalFileName);
+				resultMap.put("fileSize", fileSize);
+				resultMap.put("fileSearchKey", fileSearchKey);
+			} else {
+				resultMap.put("result", "FAIL");
+				resultMap.put("message", "물리 파일 저장에 실패하였습니다.");
+			}
+		} catch (Exception e) {
+			log.error("신규 파일 업로드 중 에러 발생", e);
+			resultMap.put("result", "FAIL");
+			resultMap.put("message", "파일 업로드 중 오류가 발생하였습니다: " + e.getMessage());
+		} finally {
+			out.print(new ObjectMapper().writeValueAsString(resultMap));
+			out.flush();
+			out.close();
+		}
+	}
+
+	/**
+	 * 차세대 드래그앤드롭 파일 다운로드 (singleFileNew / multiFileNew 전용)
+	 * M_IMAGE_GAL 의 fid(M_IMAGE_GAL_NO) 또는 상대 filePath 를 기반으로 물리 파일을 안전 스트림 다운로드한다.
+	 *
+	 * @param fid 이미지 갤러리 번호 (M_IMAGE_GAL_NO)
+	 * @param filePath 상대 파일 경로 (fid 부재 시 대체)
+	 * @param request HttpServletRequest
+	 * @param response HttpServletResponse
+	 * @throws Exception 파일 다운로드 예외
+	 */
+	@RequestMapping("/downloadFileNew")
+	public void downloadFileNew(
+			@RequestParam(value = "fid", required = false, defaultValue = "") String fid,
+			@RequestParam(value = "filePath", required = false, defaultValue = "") String filePath,
+			HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+
+		FileInputStream fis = null;
+		OutputStream os = null;
+
+		try {
+			ConfigProperties configProperties = ConfigProperties.getInstance();
+			String defaultFilePath = configProperties.getProperty("monarch.fileupload.path");
+			if (StringUtils.isEmpty(defaultFilePath)) {
+				defaultFilePath = configProperties.getProperty("monarch.url.realpath") + "/FileData/signFile/";
+			}
+
+			String targetFilePath = filePath;
+			String downloadFileName = "";
+
+			if (StringUtils.isNotEmpty(fid)) {
+				String sql = "SELECT * FROM M_IMAGE_GAL WHERE M_IMAGE_GAL_NO = ?";
+				MonArchDaoImpl monArchDao = new MonArchDaoImpl();
+				Map<String, Object> mapFileInfo = monArchDao.downloadFile(sql, fid);
+				if (mapFileInfo != null && !mapFileInfo.isEmpty()) {
+					if (mapFileInfo.get("FILE_PATH") != null) {
+						targetFilePath = mapFileInfo.get("FILE_PATH").toString();
+					}
+					if (mapFileInfo.get("FILE_NAME") != null) {
+						downloadFileName = mapFileInfo.get("FILE_NAME").toString();
+					}
+				}
+			}
+
+			if (StringUtils.isEmpty(downloadFileName) && StringUtils.isNotEmpty(targetFilePath)) {
+				downloadFileName = FilenameUtils.getName(targetFilePath);
+				if (downloadFileName.contains("_")) {
+					downloadFileName = downloadFileName.substring(downloadFileName.indexOf("_") + 1);
+				}
+			}
+
+			String realPath = defaultFilePath + "/" + targetFilePath;
+			// 슬래시 중복 정제
+			realPath = realPath.replace("//", "/").replace("/\\", "/");
+			File file = new File(realPath);
+
+			if (!file.exists() || !file.isFile()) {
+				response.setContentType("text/html; charset=UTF-8");
+				PrintWriter out = response.getWriter();
+				out.write("<script>alert('파일이 존재하지 않거나 삭제되었습니다.'); history.back();</script>");
+				out.flush();
+				out.close();
+				return;
+			}
+
+			int ifilesize = (int) file.length();
+			byte b[] = new byte[8192];
+			fis = new FileInputStream(file);
+			os = response.getOutputStream();
+
+			String disposition = getDisposition(downloadFileName, getBrowser(request));
+			response.reset();
+			response.setContentType("application/octet-stream; charset=UTF-8");
+			response.setHeader("Content-Disposition", disposition);
+			response.setHeader("Content-Length", String.valueOf(ifilesize));
+			response.setHeader("Content-Transfer-Encoding", "binary;");
+			response.setHeader("Pragma", "no-cache;");
+			response.setHeader("Expires", "-1;");
+
+			int read = 0;
+			while ((read = fis.read(b)) != -1) {
+				os.write(b, 0, read);
+			}
+			os.flush();
+		} catch (Exception e) {
+			log.error("신규 파일 다운로드 중 에러 발생", e);
+		} finally {
+			if (os != null) try { os.close(); } catch (Exception e) {}
+			if (fis != null) try { fis.close(); } catch (Exception e) {}
+		}
+	}
+
+	/**
+	 * 차세대 안전 파일 삭제 및 휴지통 이동 (/deleteFileSafe)
+	 * 파일을 영구 파기하지 않고 휴지통 디렉토리(/FileData/trash/년/월/)로 안전 이동하여 롤백 및 감사 보존을 지원한다.
+	 *
+	 * @param fid 대상 M_IMAGE_GAL_NO
+	 * @param filePath 대상 상대 경로 (fid 부재 시)
+	 * @param uid 삭제 요청자 ID
+	 * @param request HttpServletRequest
+	 * @param response HttpServletResponse
+	 * @throws Exception 파일 삭제 및 이동 예외
+	 */
+	@RequestMapping("/deleteFileSafe")
+	public void deleteFileSafe(
+			@RequestParam(value = "fid", required = false, defaultValue = "") String fid,
+			@RequestParam(value = "filePath", required = false, defaultValue = "") String filePath,
+			@RequestParam(value = "uid", required = false, defaultValue = "") String uid,
+			HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+
+		response.setContentType("application/json; charset=UTF-8");
+		PrintWriter out = response.getWriter();
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+
+		try {
+			ConfigProperties configProperties = ConfigProperties.getInstance();
+			String defaultFilePath = configProperties.getProperty("monarch.fileupload.path");
+			if (StringUtils.isEmpty(defaultFilePath)) {
+				defaultFilePath = configProperties.getProperty("monarch.url.realpath") + "/FileData/signFile/";
+			}
+
+			String targetFilePath = filePath;
+			MonArchDaoImpl monArchDao = new MonArchDaoImpl();
+
+			if (StringUtils.isNotEmpty(fid)) {
+				String sql = "SELECT * FROM M_IMAGE_GAL WHERE M_IMAGE_GAL_NO = ?";
+				Map<String, Object> mapFileInfo = monArchDao.downloadFile(sql, fid);
+				if (mapFileInfo != null && mapFileInfo.get("FILE_PATH") != null) {
+					targetFilePath = mapFileInfo.get("FILE_PATH").toString();
+				}
+			}
+
+			if (StringUtils.isNotEmpty(targetFilePath)) {
+				String realPath = (defaultFilePath + "/" + targetFilePath).replace("//", "/");
+				File srcFile = new File(realPath);
+
+				if (srcFile.exists() && srcFile.isFile()) {
+					// 휴지통 경로 (/FileData/trash/년/월/) 생성 및 파일 이동
+					Calendar calendar = Calendar.getInstance();
+					String trashFolder = defaultFilePath + "/trash/" + calendar.get(Calendar.YEAR) + "/" + String.format("%02d", calendar.get(Calendar.MONTH) + 1);
+					File trashDir = new File(trashFolder);
+					if (!trashDir.isDirectory()) {
+						trashDir.mkdirs();
+					}
+					File destFile = new File(trashFolder + "/" + System.currentTimeMillis() + "_" + srcFile.getName());
+					srcFile.renameTo(destFile);
+				}
+
+				// DB 레코드 삭제
+				if (StringUtils.isNotEmpty(fid)) {
+					String delSql = "DELETE FROM M_IMAGE_GAL WHERE M_IMAGE_GAL_NO = @M_IMAGE_GAL_NO@";
+					Map<String, String> delParam = new HashMap<String, String>();
+					delParam.put("M_IMAGE_GAL_NO", fid);
+					monArchDao.exeUpdate(delSql, delParam);
+				}
+			}
+
+			resultMap.put("result", "OK");
+		} catch (Exception e) {
+			log.error("파일 안전 삭제 중 에러 발생", e);
+			resultMap.put("result", "FAIL");
+			resultMap.put("message", e.getMessage());
+		} finally {
+			out.print(new ObjectMapper().writeValueAsString(resultMap));
+			out.flush();
+			out.close();
+		}
+	}
+
+	// 20261102 khma End : 차세대 드래그앤드롭 파일 시스템 신규 엔드포인트 (/uploadFileNew, /downloadFileNew, /deleteFileSafe)
+
 }

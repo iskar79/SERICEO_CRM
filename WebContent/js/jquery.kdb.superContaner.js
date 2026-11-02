@@ -1,4 +1,4 @@
-﻿/// <reference path="jquery.kdb.MonArch800.js" />
+/// <reference path="jquery.kdb.MonArch800.js" />
 /// <reference path="../Resource.js" />
 /// <reference path="MonArchResource.js" />
 
@@ -6060,6 +6060,61 @@ $(document).on("blur", ".t_Money", function (e) {
       _Obj.attr("parentKeyValue", _parentKey);
       $(this).superContaner("List");
     },
+    // 20261102 khma Start : 차세대 singleFileNew 지연 업로드 대기(Staging) 및 취소 메서드
+    stageSingleFile: function (file) {
+      var _contaner = $(this);
+      var _dropZone = $(".singlefile-dropzone", _contaner);
+      var _statusText = $(".singlefile-status-text", _dropZone);
+      var _fieldEdit = $(".fieldEdit", _contaner);
+
+      if (!file) return;
+
+      // 최대 파일 크기 20MB 검증
+      if (file.size > 20 * 1024 * 1024) {
+        alert("파일 용량이 20MB를 초과하여 첨부할 수 없습니다.");
+        return;
+      }
+
+      // 브라우저 메모리에 대기 파일 저장
+      _fieldEdit.data("pendingFile", file);
+
+      var sizeKb = (file.size / 1024).toFixed(1);
+      var previewHtm = "<span class='icon i-20 icon-file align-middle' style='margin-right: 4px; color: #0284c7;'></span>"
+                     + "<b style='color: #0284c7; margin-right: 6px;'>[교체 대기] " + file.name + " (" + sizeKb + " KB)</b>"
+                     + "<span class='singlefile-cancel-btn' style='color: #ef4444; font-weight: bold; cursor: pointer; padding: 2px 6px; border: 1px solid #fca5a5; border-radius: 3px; background: #fff;' title='교체 취소'>✖ 취소</span>";
+
+      _statusText.html(previewHtm);
+      _contaner.addClass("fldChange");
+    },
+
+    cancelSingleFile: function () {
+      var _contaner = $(this);
+      var _dropZone = $(".singlefile-dropzone", _contaner);
+      var _statusText = $(".singlefile-status-text", _dropZone);
+      var _fieldEdit = $(".fieldEdit", _contaner);
+      _fieldEdit.removeData("pendingFile");
+
+      var oldVal = _contaner.attr("value");
+      if (oldVal && oldVal !== "") {
+        var dispName = oldVal;
+        if (dispName.indexOf("/") >= 0) dispName = dispName.substring(dispName.lastIndexOf("/") + 1);
+        if (dispName.indexOf("_") >= 0) dispName = dispName.substring(dispName.indexOf("_") + 1);
+        var downUrl = _M.svcUrl[_M.Webtype].downloadFileNew + "?filePath=" + encodeURIComponent(oldVal);
+
+        var fileHtm = "<span class='icon i-20 icon-file align-middle' style='margin-right: 4px; color: #2563eb;'></span>"
+                    + "<a href='" + downUrl + "' class='singlefile-down-link' target='_blank' style='font-weight: bold; color: #1d4ed8; text-decoration: underline; margin-right: 8px;' title='클릭하여 다운로드'>"
+                    + dispName + "</a>"
+                    + "<span style='color: #64748b; font-size: 11px;'>(드래그하여 다른 파일로 교체)</span>";
+        _statusText.html(fileHtm);
+      } else {
+        var emptyHtm = "<span class='icon i-20 icon-attachment align-middle' style='margin-right: 4px;'></span>"
+                     + "<span class='msg-text' style='color: #64748b;'>파일을 이곳에 드래그하거나 클릭하여 첨부하세요.</span>";
+        _statusText.html(emptyHtm);
+      }
+      _contaner.removeClass("fldChange");
+    },
+    // 20261102 khma End : 차세대 singleFileNew 지연 업로드 대기(Staging) 및 취소 메서드
+
     ListGallery: function () {
       var _Obj = $(this);
       _Obj.attr("_viewpage", 1);
@@ -11183,6 +11238,31 @@ $(document).on("blur", ".t_Money", function (e) {
               after: option.afterLabel ? option.afterLabel : undefined,
             };
             attachLabels(value, _span);
+          }
+          break;
+        case "singlefilenew": // 20261102 khma 차세대 드래그앤드롭 단일파일
+          var jobType = option.jobType != undefined ? option.jobType : "FILE";
+          _fieldEdit.attr("jobType", jobType).css("position", "relative");
+
+          var dropZoneHtm = "<div class='singlefile-dropzone' style='border: 1px dashed #94a3b8; background-color: #f8fafc; border-radius: 4px; padding: 6px 10px; cursor: pointer; transition: all 0.2s ease-in-out; min-height: 32px; display: flex; align-items: center; justify-content: space-between;'>"
+                          + "  <span class='singlefile-status-text' style='color: #64748b; font-size: 12px; display: flex; align-items: center;'>"
+                          + "    <span class='icon i-20 icon-attachment align-middle' style='margin-right: 4px;'></span>"
+                          + "    <span class='msg-text'>파일을 이곳에 드래그하거나 클릭하여 첨부하세요.</span>"
+                          + "  </span>"
+                          + "  <input type='file' class='singlefile-input' style='display: none;' />"
+                          + "  <input id='fileSearchKey' type='hidden' value='' />"
+                          + "  <input id='oldFilePath' type='hidden' value='' />"
+                          + "</div>";
+
+          var _dropZone = $(dropZoneHtm).appendTo(_fieldEdit);
+          var _viewSpan = $("<span class='fldfiledown'></span>").appendTo(_fieldView);
+
+          if (option.beforeLabel != undefined || option.afterLabel != undefined) {
+            var value = {
+              before: option.beforeLabel ? option.beforeLabel : undefined,
+              after: option.afterLabel ? option.afterLabel : undefined,
+            };
+            attachLabels(value, _dropZone);
           }
           break;
         case "signfile": // 20240619

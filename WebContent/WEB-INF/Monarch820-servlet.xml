@@ -144,6 +144,10 @@
 			<mvc:mapping path="/upload.mon" />
 			<mvc:mapping path="/fileupload.mon" />
 			<mvc:mapping path="/filedownload.mon" />
+			<!-- 20261102 khma : 차세대 드래그앤드롭 파일 시스템 세션 검증 매핑 -->
+			<mvc:mapping path="/uploadFileNew.mon" />
+			<mvc:mapping path="/downloadFileNew.mon" />
+			<mvc:mapping path="/deleteFileSafe.mon" />
 			<mvc:mapping path="/exceldown.mon" />
 			<mvc:mapping path="/exceldownOld.mon" />
 			<mvc:mapping path="/doUploadDataFile.mon" />
