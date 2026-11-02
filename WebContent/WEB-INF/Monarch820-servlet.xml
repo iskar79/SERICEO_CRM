@@ -233,39 +233,24 @@
 
 
 	<!-- ========================================================================================== -->
-	<!-- [섹션 5] Quartz 백그라운드 스케줄러 설정 (Spring 4.3 FactoryBean 규격 적용)                -->
+	<!-- [섹션 5] Quartz 백그라운드 스케줄러 설정 (운영 환경 미사용으로 비활성화)                  -->
 	<!-- ========================================================================================== -->
-
-	<!-- 5-1. 개별 다이렉트 메일 발송 Job 정의 -->
-	<!-- 20261029 khma : Spring 4.3 호환을 위해 JobDetailBean -> JobDetailFactoryBean 변경 -->
+	<!-- 20261102 khma : Quartz 1.8.3과 Spring 4.3 간 호환성 이슈 방지 및 운영 미사용 스케줄러 비활성화 처리 -->
 	<!--
-	<bean id="cronSendDirectMailJob" class="org.springframework.scheduling.quartz.JobDetailBean">
-		<property name="jobClass" value="co.kr.kydbm.scheduler.job.SendDirectMailJob" />
-	</bean>
-	-->
 	<bean id="cronSendDirectMailJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
 		<property name="jobClass" value="co.kr.kydbm.scheduler.job.SendDirectMailJob" />
 		<property name="durability" value="true" />
 	</bean>
 	
-	<!-- 5-2. 개별 다이렉트 메일 발송 실행 주기 설정 -->
-	<!-- 20261029 khma : Spring 4.3 호환을 위해 CronTriggerBean -> CronTriggerFactoryBean 변경 -->
-	<!--
-	<bean id="SendDirectMailJobTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
-		<property name="jobDetail" ref="cronSendDirectMailJob" />
-		<property name="cronExpression" value="0/30 * * * * ?"/>
-	</bean>
-	-->
 	<bean id="SendDirectMailJobTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="cronSendDirectMailJob" />
 		<property name="cronExpression" value="0/30 * * * * ?"/>
 	</bean>
 	
-	<!-- 5-3. 스케줄러 팩토리 빈 (운영 설정과 동일하게 트리거는 비활성화 상태 유지) -->
 	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
 		<property name="triggers">
 			<list>
-				<!--<ref bean="SendDirectMailJobTrigger" />-->
+				<ref bean="SendDirectMailJobTrigger" />
 			</list>
 		</property>
 		<property name="quartzProperties">
@@ -278,6 +263,7 @@
 			</props>
 		</property>
 	</bean>
+	-->
 
 
 	<!-- ========================================================================================== -->
