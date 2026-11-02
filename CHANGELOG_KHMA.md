@@ -48,13 +48,10 @@
 | **Step 1-3** | `WebContent/ui/monform.jsp`, `login.jsp`, `loginProcess.jsp`, `logoutProcess.jsp` | jQuery 스크립트 경로 상향 (`1.10.2` ➡️ `1.12.4`, 4개 JSP) | `[x]` | `[x]` | **완료** |
 | **Step 1-4** | `WebContent/js/jquery.kdb.MonArch800.js` | 로그인 화면 아이디 저장 체크박스(`#chk-save`) 활성화 및 쿠키(`SAVE_ID`) 연동 | `[x]` | `[x]` | **완료** |
 | **Step 4** | `WebContent/js/jquery.kdb.MonArch800.js` | `validatePassword` 비밀번호 검증 로직 단일 통합 (폼/다중인자/단일복잡도 다형성 지원) | `[x]` | `[x]` | **완료** |
-| **Step 2-1** | WebContent/WEB-INF/lib/ | 구형 POI 3.8 _20261030 백업 후 POI 4.1.2 신규 라이브러리/ 7종 배치 | [x] | [x] | **완료** |
+| **Step 2-1** | WebContent/WEB-INF/lib/ | POI 4.1.2 7종 + 의존 JAR 3종(commons-math3, SparseBitSet, curvesapi) 배치 | [x] | [ ] | **로컬완료 (VDI 반영 대기)** |
 | **Step 2-2** | src/co/kr/kydbm/common/CommonExcelUtil.java | POI 4.1.2 호환을 위한 CellType Enum 및 DateUtil 문법 수정 | [x] | [x] | **완료** |
 | **Step 2-3** | WebContent/js/jquery.kdb.jobButton.js | DownXlsNew 권한 체크 분기 추가 및 레거시 주석 정리 (Line 43) | [x] | [x] | **완료** |
 | **Step 2-3** | WebContent/js/jquery.kdb.superContaner.js | DownXlsNew 신규 메서드 추가 (공통코드 XLS_PURPOSE/XLS_TARGET + 2단계 모달) | [x] | [x] | **완료** |
-| **Step 2-6** | src/org/apache/commons/math3/util/ArithmeticUtils.java | POI 4.1.2 POIFSFileSystem 산술 오버플로우 체크 유틸 내장화 | [x] | [ ] | **로컬완료 (VDI 반영 대기)** |
-| **Step 2-6** | src/org/apache/commons/math3/exception/MathArithmeticException.java | 산술 오버플로우 런타임 예외 클래스 내장화 | [x] | [ ] | **로컬완료 (VDI 반영 대기)** |
-| **Step 2-6** | src/com/zaxxer/sparsebits/SparseBitSet.java | POI 4.1.2 AgileEncryptor 암호화 비트셋 유틸 내장화 | [x] | [ ] | **로컬완료 (VDI 반영 대기)** |
 | **Step 2-4** | src/co/kr/kydbm/core/filecontrol/UploadController.java | 엑셀 파라미터 수신, return null; 보정, Throwable 로깅 보강 | [x] | [ ] | **로컬완료 (VDI 반영 대기)** |
 | **Step 2-5** | src/co/kr/kydbm/core/filecontrol/ExcelDownload.java | Agile AES 암호화 워크북 생성, getBrowser NPE 방어, Throwable 처리 | [x] | [ ] | **로컬완료 (VDI 반영 대기)** |
 | **Step 3** | `MonArchDaoImpl.java`, `FilterGenerator.java`, 프로시저/배치 등 | KSign SecureDB 개인정보 암복호화 공통 모듈 및 프로시저/엑셀업로드 적용 | `[ ]` | `[ ]` | 대기 |
@@ -81,11 +78,11 @@
 ### 🥈 Step 2. 엑셀 다운로드 보안 적용 (기능 개발)
 > 📘 참조 가이드: `2_TASK_EXCEL_DOWNLOAD_PWD.md`
 * [x] `WebContent/WEB-INF/lib/POI 4.1.2 신규 라이브러리/` ➡️ POI 4.1.2 및 의존성 7종 사전 반입 완료
-* [ ] **[Step 2-1]** `WebContent/WEB-INF/lib/` ➡️ 구형 POI 3.8 백업 후 POI 4.1.2 7종 `lib/` 직하위 배치 (`[① 로컬: 대기 / ② VDI: 대기]`)
+| **Step 2-1** | WebContent/WEB-INF/lib/ | POI 4.1.2 7종 + 의존 JAR 3종(commons-math3, SparseBitSet, curvesapi) 배치 | [x] | [ ] | **로컬완료 (VDI 반영 대기)** |
 * [ ] **[Step 2-2]** `src/co/kr/kydbm/common/CommonExcelUtil.java` ➡️ POI 4.1.2 호환을 위한 `CellType` Enum 문법 수정 (`[① 로컬: 대기 / ② VDI: 대기]`)
 * [ ] **[Step 2-3]** `WebContent/js/jquery.kdb.superContaner.js` ➡️ `DownXls` 함수 블록 내 비밀번호 모달 팝업 추가 (`[① 로컬: 대기 / ② VDI: 대기]`)
-* [ ] **[Step 2-4]** `src/co/kr/kydbm/core/filecontrol/UploadController.java` ➡️ 엑셀 비밀번호(`excelPassword`) 파라미터 수신 연동 (`[① 로컬: 대기 / ② VDI: 대기]`)
-* [ ] **[Step 2-5]** `src/co/kr/kydbm/core/filecontrol/ExcelDownload.java` ➡️ POI 4.1.2 Agile AES 암호화 워크북 생성 및 스트림 방출 엔진 (`[① 로컬: 대기 / ② VDI: 대기]`)
+| **Step 2-4** | src/co/kr/kydbm/core/filecontrol/UploadController.java | 엑셀 파라미터 수신, return null; 보정, Throwable 로깅 보강 | [x] | [ ] | **로컬완료 (VDI 반영 대기)** |
+| **Step 2-5** | src/co/kr/kydbm/core/filecontrol/ExcelDownload.java | Agile AES 암호화 워크북 생성, getBrowser NPE 방어, Throwable 처리 | [x] | [ ] | **로컬완료 (VDI 반영 대기)** |
 
 ### 🥉 Step 3. 개인정보 암호화 (공통 모듈 확장 적용)
 > 📘 참조 가이드: `3_TASK_SECUREDB_API.md` (또는 `3_ALT_SECUREDB_UDF.md`)
@@ -167,7 +164,7 @@
   * `src/co/kr/kydbm/core/dao/MonArchDaoImpl.java` (Java 1.8 제네릭 `UserInfo` 형변환 보정)
 * **작업 결과**: **VDI 톰캣 9 서버 에러 없이 정상 기동 성공 확인 완료 (2026.10.29)**
 
-### [2026.10.30] Apache POI 4.1.2 업그레이드 및 보안 엑셀 다운로드 (Agile AES 암호화, Step 2-1 ~ Step 2-5)
+| **Step 2-1** | WebContent/WEB-INF/lib/ | POI 4.1.2 7종 + 의존 JAR 3종(commons-math3, SparseBitSet, curvesapi) 배치 | [x] | [ ] | **로컬완료 (VDI 반영 대기)** |
 * **대상 파일**:
   * `WebContent/WEB-INF/lib/` (구형 POI 3.8 JAR 7종 `_20261030` 백업, 신규 POI 4.1.2 JAR 7종 배치 완료)
   * `src/co/kr/kydbm/common/CommonExcelUtil.java` (POI 4.1.2 `CellType` Enum 및 `DateUtil` 문법 보정, 컴파일 에러 0건 완료)
@@ -176,7 +173,7 @@
   * `src/co/kr/kydbm/core/filecontrol/UploadController.java` (`downExcel` 내 `excelUsage`, `excelTarget`, `excelReason`, `excelPassword` 파라미터 취득 및 전달)
   * `src/co/kr/kydbm/core/filecontrol/ExcelDownload.java` (8개 파라미터 오버로딩 `downExcel` 추가, `excelPassword` 전달 시 POI 4.1.2 `SXSSFWorkbook` 스트리밍 및 `POIFSFileSystem` Agile AES 암호화 다운로드 구현)
 * **작업 결과**:
-  * Step 2-1 & 2-2: VDI 이클립스 반영 및 구동 확인 완료 (`[① 로컬: 완료(x) / ② VDI: 완료(x)]`)
+| **Step 2-1** | WebContent/WEB-INF/lib/ | POI 4.1.2 7종 + 의존 JAR 3종(commons-math3, SparseBitSet, curvesapi) 배치 | [x] | [ ] | **로컬완료 (VDI 반영 대기)** |
   * Step 2-3 ~ 2-5: 로컬 안티그래비티 작업 및 JDK 11 컴파일 검증 완료 (0 ERRORS, VDI 반영 대기)
 
 ### [2026.10.30] 미사용 레거시 파일 삭제 및 사장된 주석 312줄 전수 정리

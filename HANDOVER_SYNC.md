@@ -35,7 +35,7 @@
    - `MonArch800.js`: `validatePassword` 다형성 통합 함수(폼객체, 3개인자, 단일문자열) 적용 완료.
    - `MonArch800.js` 레거시 주석 전수 정리 완료, JDK 11 컴파일 파싱 검증 완료.
 
-5. **Step 2-1 & Step 2-2: Apache POI 4.1.2 라이브러리 교체 및 CommonExcelUtil 문법 보정 완료 (VDI 확인 완료)**:
+| **Step 2-1** | WebContent/WEB-INF/lib/ | POI 4.1.2 7종 + 의존 JAR 3종(commons-math3, SparseBitSet, curvesapi) 배치 | [x] | [ ] | **로컬완료 (VDI 반영 대기)** |
    - `WebContent/WEB-INF/lib/`: 구형 POI 3.8 JAR 7종 `_20261030` 접미사로 백업, POI 4.1.2 JAR 7종 배치 완료 (VDI 확인 완료).
    - `src/co/kr/kydbm/common/CommonExcelUtil.java`: POI 4.1.2 호환 `CellType` Enum 및 `DateUtil` 적용, 컴파일 에러 0건 (VDI 확인 완료).
 
@@ -45,7 +45,7 @@
 7. **미사용 파일 정리: ExcelDownload2.java 완전 삭제 완료 (VDI 확인 완료)**:
    - `src/co/kr/kydbm/core/filecontrol/ExcelDownload2.java` 및 클래스 파일 전수 삭제 완료.
 
-8. **Step 2-4 & Step 2-5: `UploadController.java` 및 `ExcelDownload.java` 보안 엑셀 다운로드 백엔드 구현 (로컬 완료, JDK 11 컴파일 0건 검증 완료)**:
+| **Step 2-4** | src/co/kr/kydbm/core/filecontrol/UploadController.java | 엑셀 파라미터 수신, return null; 보정, Throwable 로깅 보강 | [x] | [ ] | **로컬완료 (VDI 반영 대기)** |
    - `UploadController.java`: `excelUsage`, `excelTarget`, `excelReason`, `excelPassword` 파라미터 취득 및 `ExcelDownload.downExcel`에 전달. 표준 헤더 주석 적용, 사장된 레거시 주석 전수 정리, 깨진 한글 Javadoc 복원, 상세 설명 보강 완료.
    - `ExcelDownload.java`: 기존 7개 파라미터 `downExcel` 하위호환 유지, 8개 오버로딩 `downExcel` 추가. POI 4.1.2 Agile AES 암호화 워크북(`SXSSFWorkbook` 100행 스트리밍) 및 `POIFSFileSystem` 암호화 스트림 방출 구현. 표준 헤더 및 Javadoc 완비.
 
@@ -68,15 +68,12 @@
 | **Step 1-3** | `WebContent/ui/monform.jsp`, `login.jsp`, `loginProcess.jsp`, `logoutProcess.jsp` | jQuery `1.10.2` ➡️ `1.12.4` 스크립트 경로 변경 (JSP 4개) | `[x]` | `[x]` | **완료** |
 | **Step 1-4** | `WebContent/js/jquery.kdb.MonArch800.js` | 로그인 화면 아이디 저장 체크박스(`#chk-save`) 활성화 및 쿠키(`SAVE_ID`) 연동 | `[x]` | `[x]` | **완료** |
 | **Step 4** | `WebContent/js/jquery.kdb.MonArch800.js` | `validatePassword` 비밀번호 검증 로직 단일 통합 및 레거시 주석 전수 정리 | `[x]` | `[x]` | **완료** |
-| **Step 2-1** | `WebContent/WEB-INF/lib/` | 구형 POI 3.8 `_20261030` 백업 후 `POI 4.1.2 신규 라이브러리/` 7종 배치 | `[x]` | `[x]` | **완료** |
+| **Step 2-1** | WebContent/WEB-INF/lib/ | POI 4.1.2 7종 + 의존 JAR 3종(commons-math3, SparseBitSet, curvesapi) 배치 | [x] | [ ] | **로컬완료 (VDI 반영 대기)** |
 | **Step 2-2** | `src/co/kr/kydbm/common/CommonExcelUtil.java` | POI 4.1.2 호환을 위한 `CellType` Enum 및 `DateUtil` 문법 수정 | `[x]` | `[x]` | **완료** |
 | **Step 2-3** | `WebContent/js/jquery.kdb.jobButton.js` | `DownXlsNew` 권한 체크 분기 추가 및 레거시 주석 정리 (Line 43) | `[x]` | `[x]` | **완료** |
-| **Step 2-4** | `src/co/kr/kydbm/core/filecontrol/UploadController.java` | 엑셀 파라미터 4종 수신/전달, 표준 헤더, Javadoc 상세화, 레거시 주석 정리 | `[x]` | `[x]` | **완료** |
-| **Step 2-5** | `src/co/kr/kydbm/core/filecontrol/ExcelDownload.java` | POI 4.1.2 Agile AES 암호화 워크북 생성/스트림 방출, 표준 헤더, Javadoc 완비 | `[x]` | `[x]` | **완료** |
+| **Step 2-4** | src/co/kr/kydbm/core/filecontrol/UploadController.java | 엑셀 파라미터 수신, return null; 보정, Throwable 로깅 보강 | [x] | [ ] | **로컬완료 (VDI 반영 대기)** |
+| **Step 2-5** | src/co/kr/kydbm/core/filecontrol/ExcelDownload.java | Agile AES 암호화 워크북 생성, getBrowser NPE 방어, Throwable 처리 | [x] | [ ] | **로컬완료 (VDI 반영 대기)** |
 | **Step 2-3** | WebContent/js/jquery.kdb.superContaner.js | DownXlsNew 신규 메서드 추가 (공통코드 XLS_PURPOSE/XLS_TARGET + 2단계 모달) | [x] | [x] | **완료** |
-| **Step 2-6** | src/org/apache/commons/math3/util/ArithmeticUtils.java | POI 4.1.2 POIFSFileSystem 산술 오버플로우 체크 유틸 내장화 | [x] | [ ] | **로컬완료 (VDI 반영 대기)** |
-| **Step 2-6** | src/org/apache/commons/math3/exception/MathArithmeticException.java | 산술 오버플로우 런타임 예외 클래스 내장화 | [x] | [ ] | **로컬완료 (VDI 반영 대기)** |
-| **Step 2-6** | src/com/zaxxer/sparsebits/SparseBitSet.java | POI 4.1.2 AgileEncryptor 암호화 비트셋 유틸 내장화 | [x] | [ ] | **로컬완료 (VDI 반영 대기)** |
 | **Step 2-4** | src/co/kr/kydbm/core/filecontrol/UploadController.java | 엑셀 파라미터 수신, return null; 보정, Throwable 로깅 보강 | [x] | [ ] | **로컬완료 (VDI 반영 대기)** |
 | **Step 2-5** | src/co/kr/kydbm/core/filecontrol/ExcelDownload.java | Agile AES 암호화 워크북 생성, getBrowser NPE 방어, Throwable 처리 | [x] | [ ] | **로컬완료 (VDI 반영 대기)** |
 | **Step 3** | `MonArchDaoImpl.java`, `FilterGenerator.java`, 프로시저/배치 등 | KSign SecureDB 개인정보 암복호화 공통 모듈 및 프로시저/엑셀업로드 적용 | `[ ]` | `[ ]` | 대기 |
