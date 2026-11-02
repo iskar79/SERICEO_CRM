@@ -8224,6 +8224,11 @@ $(document).on("blur", ".t_Money", function (e) {
               _FileClassName = _data == "" ? "fileSelect" : "fileAttch";
               _data = "<span class='" + _FileClassName + "'></span>";
               break;
+            case "singlefilenew":
+            case "multifilenew": // 20261102 khma 그리드 목록 첨부 아이콘 표시
+              _FileClassName = (_data == "" || _data == null || _data == undefined) ? "fileSelect" : "fileAttch";
+              _data = "<span class='" + _FileClassName + "'></span>";
+              break;
 
             case _M.DataType.text:
               if (typeof _data === "string") _data = $.decHTML(_data);
