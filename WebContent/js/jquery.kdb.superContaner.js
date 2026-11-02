@@ -495,6 +495,97 @@ $(document).on(
 );
 
 // ---------------------------------------------------------------------
+// 20261102 khma Start : 차세대 singleFileNew & multiFileNew 드래그앤드롭 및 지연업로드(Client Staging) 이벤트 정의
+// [singleFileNew 드래그앤드롭]
+$(document).on("dragover dragenter", ".SuperView .fieldContaner[type='singlefilenew'] .singlefile-dropzone", function (e) {
+  e.preventDefault();
+  e.stopPropagation();
+  $(this).addClass("is-dragover").css({ "background-color": "#e0f2fe", "border-color": "#0284c7" });
+});
+
+$(document).on("dragleave drop", ".SuperView .fieldContaner[type='singlefilenew'] .singlefile-dropzone", function (e) {
+  e.preventDefault();
+  e.stopPropagation();
+  $(this).removeClass("is-dragover").css({ "background-color": "#f8fafc", "border-color": "#94a3b8" });
+});
+
+$(document).on("drop", ".SuperView .fieldContaner[type='singlefilenew'] .singlefile-dropzone", function (e) {
+  var files = e.originalEvent.dataTransfer.files;
+  if (files && files.length > 0) {
+    var _contaner = $(this).closest(".fieldContaner");
+    _contaner.superContaner("stageSingleFile", files[0]);
+  }
+});
+
+$(document).on("click", ".SuperView .fieldContaner[type='singlefilenew'] .singlefile-dropzone", function (e) {
+  if ($(e.target).closest(".singlefile-cancel-btn, .singlefile-down-link").length > 0) return;
+  var _contaner = $(this).closest(".fieldContaner");
+  _contaner.find(".singlefile-input").trigger("click");
+});
+
+$(document).on("change", ".SuperView .fieldContaner[type='singlefilenew'] .singlefile-input", function (e) {
+  var files = this.files;
+  if (files && files.length > 0) {
+    var _contaner = $(this).closest(".fieldContaner");
+    _contaner.superContaner("stageSingleFile", files[0]);
+  }
+});
+
+$(document).on("click", ".SuperView .fieldContaner[type='singlefilenew'] .singlefile-cancel-btn", function (e) {
+  e.stopPropagation();
+  var _contaner = $(this).closest(".fieldContaner");
+  _contaner.superContaner("cancelSingleFile");
+});
+
+// [multiFileNew 드래그앤드롭]
+$(document).on("dragover dragenter", ".SuperView .fieldContaner[type='multifilenew'] .multifile-dropzone", function (e) {
+  e.preventDefault();
+  e.stopPropagation();
+  $(this).addClass("is-dragover").css({ "background-color": "#e0f2fe", "border-color": "#0284c7" });
+});
+
+$(document).on("dragleave drop", ".SuperView .fieldContaner[type='multifilenew'] .multifile-dropzone", function (e) {
+  e.preventDefault();
+  e.stopPropagation();
+  $(this).removeClass("is-dragover").css({ "background-color": "#f8fafc", "border-color": "#94a3b8" });
+});
+
+$(document).on("drop", ".SuperView .fieldContaner[type='multifilenew'] .multifile-dropzone", function (e) {
+  var files = e.originalEvent.dataTransfer.files;
+  if (files && files.length > 0) {
+    var _contaner = $(this).closest(".fieldContaner");
+    _contaner.superContaner("stageMultiFiles", files);
+  }
+});
+
+$(document).on("click", ".SuperView .fieldContaner[type='multifilenew'] .multifile-dropzone", function (e) {
+  if ($(e.target).closest(".multifile-del-btn, .multifile-down-link").length > 0) return;
+  var _contaner = $(this).closest(".fieldContaner");
+  _contaner.find(".multifile-input").trigger("click");
+});
+
+$(document).on("change", ".SuperView .fieldContaner[type='multifilenew'] .multifile-input", function (e) {
+  var files = this.files;
+  if (files && files.length > 0) {
+    var _contaner = $(this).closest(".fieldContaner");
+    _contaner.superContaner("stageMultiFiles", files);
+  }
+});
+
+$(document).on("click", ".SuperView .fieldContaner[type='multifilenew'] .multifile-remove-pending", function (e) {
+  e.stopPropagation();
+  var _contaner = $(this).closest(".fieldContaner");
+  var idx = $(this).attr("data-index");
+  _contaner.superContaner("cancelMultiPendingFile", idx);
+});
+
+$(document).on("click", ".SuperView .fieldContaner[type='multifilenew'] .multifile-toggle-delete", function (e) {
+  e.stopPropagation();
+  var _contaner = $(this).closest(".fieldContaner");
+  var fid = $(this).attr("data-fid");
+  _contaner.superContaner("toggleMultiDeleteFile", fid, $(this));
+});
+// 20261102 khma End : 차세대 singleFileNew & multiFileNew 드래그앤드롭 및 지연업로드 이벤트 정의
 // SuperOlap live 이벤트 정의
 // ---------------------------------------------------------------------
 /*
@@ -6115,6 +6206,82 @@ $(document).on("blur", ".t_Money", function (e) {
     },
     // 20261102 khma End : 차세대 singleFileNew 지연 업로드 대기(Staging) 및 취소 메서드
 
+    // 20261102 khma Start : 차세대 multiFileNew 지연 업로드 대기(Staging) 및 삭제토글 메서드
+    stageMultiFiles: function (files) {
+      var _contaner = $(this);
+      var _fieldEdit = $(".fieldEdit", _contaner);
+      var pendingList = _fieldEdit.data("pendingAddFiles") || [];
+
+      for (var i = 0; i < files.length; i++) {
+        var f = files[i];
+        if (f.size > 20 * 1024 * 1024) {
+          alert("파일 [" + f.name + "] 은(는) 20MB를 초과하여 제외됩니다.");
+          continue;
+        }
+        pendingList.push(f);
+      }
+      _fieldEdit.data("pendingAddFiles", pendingList);
+      _contaner.superContaner("renderMultiFileList");
+      _contaner.addClass("fldChange");
+    },
+
+    cancelMultiPendingFile: function (index) {
+      var _contaner = $(this);
+      var _fieldEdit = $(".fieldEdit", _contaner);
+      var pendingList = _fieldEdit.data("pendingAddFiles") || [];
+      pendingList.splice(index, 1);
+      _fieldEdit.data("pendingAddFiles", pendingList);
+      _contaner.superContaner("renderMultiFileList");
+      if (pendingList.length === 0) {
+        var delList = _fieldEdit.data("pendingDelFids") || [];
+        if (delList.length === 0) _contaner.removeClass("fldChange");
+      }
+    },
+
+    toggleMultiDeleteFile: function (fid, btn) {
+      var _contaner = $(this);
+      var _fieldEdit = $(".fieldEdit", _contaner);
+      var delList = _fieldEdit.data("pendingDelFids") || [];
+      var row = btn.closest(".multifile-item");
+
+      var idx = delList.indexOf(fid);
+      if (idx >= 0) {
+        delList.splice(idx, 1);
+        row.removeClass("marked-delete").css("opacity", "1");
+        row.find(".file-title").css("text-decoration", "none");
+        btn.text("✖ 삭제").css("color", "#ef4444");
+      } else {
+        delList.push(fid);
+        row.addClass("marked-delete").css("opacity", "0.5");
+        row.find(".file-title").css("text-decoration", "line-through");
+        btn.text("↺ 복원").css("color", "#0284c7");
+      }
+      _fieldEdit.data("pendingDelFids", delList);
+      _contaner.addClass("fldChange");
+    },
+
+    renderMultiFileList: function () {
+      var _contaner = $(this);
+      var _fieldEdit = $(".fieldEdit", _contaner);
+      var _pendingBox = $(".multifile-pending-list", _contaner);
+      var pendingList = _fieldEdit.data("pendingAddFiles") || [];
+      _pendingBox.empty();
+
+      if (pendingList.length > 0) {
+        var htm = "<div style='font-weight: bold; color: #0284c7; margin: 4px 0 2px 0;'>[추가 대기 파일 (" + pendingList.length + "개)]</div><ul style='list-style: none; padding: 0; margin: 0;'>";
+        for (var i = 0; i < pendingList.length; i++) {
+          var f = pendingList[i];
+          var kb = (f.size / 1024).toFixed(1);
+          htm += "<li style='padding: 2px 4px; display: flex; align-items: center; justify-content: space-between; background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 3px; margin-bottom: 2px;'>"
+              + "  <span><span class='icon i-20 icon-file align-middle'></span> " + f.name + " (" + kb + " KB)</span>"
+              + "  <span class='multifile-remove-pending' data-index='" + i + "' style='color: #ef4444; font-weight: bold; cursor: pointer; padding: 0 4px;' title='추가 취소'>✖</span>"
+              + "</li>";
+        }
+        htm += "</ul>";
+        _pendingBox.html(htm);
+      }
+    },
+    // 20261102 khma End : 차세대 multiFileNew 지연 업로드 대기(Staging) 및 삭제토글 메서드
     ListGallery: function () {
       var _Obj = $(this);
       _Obj.attr("_viewpage", 1);
@@ -11265,6 +11432,32 @@ $(document).on("blur", ".t_Money", function (e) {
             attachLabels(value, _dropZone);
           }
           break;
+        case "multifilenew": // 20261102 khma 차세대 드래그앤드롭 멀티파일
+          var jobType = option.jobType != undefined ? option.jobType : "FILE";
+          _fieldEdit.attr("jobType", jobType).css("position", "relative");
+
+          var multiHtm = "<div class='multifilenew-contaner' style='width: 100%;'>"
+                       + "  <div class='multifile-dropzone' style='border: 1px dashed #94a3b8; background-color: #f8fafc; border-radius: 4px; padding: 8px 12px; cursor: pointer; text-align: center; transition: all 0.2s ease-in-out;'>"
+                       + "    <span class='icon i-20 icon-attachment align-middle' style='margin-right: 4px;'></span>"
+                       + "    <span style='color: #64748b; font-size: 12px;'>여러 개의 파일을 이곳에 드래그하거나 클릭하여 추가하세요. (최대 20MB)</span>"
+                       + "    <input type='file' multiple class='multifile-input' style='display: none;' />"
+                       + "    <input id='fileSearchKey' type='hidden' value='' />"
+                       + "  </div>"
+                       + "  <div class='multifile-server-list' style='margin-top: 4px;'></div>"
+                       + "  <div class='multifile-pending-list' style='margin-top: 4px;'></div>"
+                       + "</div>";
+
+          var _dropZone = $(multiHtm).appendTo(_fieldEdit);
+          var _viewSpan = $("<span class='fldfiledown'></span>").appendTo(_fieldView);
+
+          if (option.beforeLabel != undefined || option.afterLabel != undefined) {
+            var value = {
+              before: option.beforeLabel ? option.beforeLabel : undefined,
+              after: option.afterLabel ? option.afterLabel : undefined,
+            };
+            attachLabels(value, _dropZone);
+          }
+          break;
         case "signfile": // 20240619
   
           var jobType = "";
@@ -13708,6 +13901,116 @@ $(document).on("blur", ".t_Money", function (e) {
           _Obj.attr("Value", _retVal);
           if (apl != undefined) apl.add(_Obj.attr("field"), _Obj.attr("Value"));
           break;
+        case "singlefilenew": // 20261102 khma 지연 업로드 확정 처리 (Client Staging -> Server Commit)
+          var _dropZone = $(".singlefile-dropzone", _Obj);
+          var _fieldEdit = $(".fieldEdit", _Obj);
+          var pendingFile = _fieldEdit.data("pendingFile");
+          var _retVal = _Obj.attr("Value");
+
+          if (pendingFile != undefined && pendingFile != null) {
+            var fileSearchKey = $("#fileSearchKey", _dropZone).val();
+            if (!fileSearchKey) {
+              fileSearchKey = _M.UserInfo.id.toString() + "_" + new Date().getTime().toString();
+            }
+            var oldFilePath = $("#oldFilePath", _dropZone).val();
+            var jobType = _fieldEdit.attr("jobType") || "FILE";
+            var parentKey = _Obj.parents(".SuperView").attr("keyvalue") || "";
+
+            var formData = new FormData();
+            formData.append("Filename", pendingFile);
+            formData.append("fileSearchKey", fileSearchKey);
+            formData.append("jobType", jobType);
+            formData.append("ParentKey", parentKey);
+            formData.append("UID", _M.UserInfo.id);
+            formData.append("USITE", _M.UserInfo.SID);
+
+            $.ajax({
+              url: _M.svcUrl[_M.Webtype].uploadFileNew,
+              type: "POST",
+              data: formData,
+              async: false,
+              processData: false,
+              contentType: false,
+              dataType: "json",
+              success: function (res) {
+                if (res && res.result == "OK") {
+                  _retVal = res.filePath;
+                  _Obj.attr("Value", _retVal);
+                  $("#oldFilePath", _dropZone).val(_retVal);
+                  _fieldEdit.removeData("pendingFile");
+
+                  if (oldFilePath && oldFilePath != _retVal) {
+                    $.ajax({
+                      url: _M.svcUrl[_M.Webtype].deleteFileSafe,
+                      type: "POST",
+                      data: { filePath: oldFilePath, uid: _M.UserInfo.id },
+                      async: false
+                    });
+                  }
+                } else {
+                  alert("파일 업로드 처리 중 오류: " + (res.message || "알 수 없는 오류"));
+                }
+              },
+              error: function () {
+                alert("파일 서버 통신 중 오류가 발생하였습니다.");
+              }
+            });
+          }
+
+          _Obj.attr("Value", _retVal);
+          if (apl != undefined) apl.add(_Obj.attr("field"), _Obj.attr("Value"));
+          break;
+
+        case "multifilenew": // 20261102 khma 다중 파일 지연 업로드 및 삭제 일괄 확정 처리
+          var _mCont = $(".multifilenew-contaner", _Obj);
+          var _fieldEdit = $(".fieldEdit", _Obj);
+          var fileSearchKey = $("#fileSearchKey", _mCont).val();
+          if (!fileSearchKey) {
+            fileSearchKey = _M.UserInfo.id.toString() + "_" + new Date().getTime().toString();
+            $("#fileSearchKey", _mCont).val(fileSearchKey);
+          }
+          var jobType = _fieldEdit.attr("jobType") || "FILE";
+          var parentKey = _Obj.parents(".SuperView").attr("keyvalue") || "";
+
+          // 1. 삭제 대기 파일 일괄 휴지통 정리
+          var pendingDel = _fieldEdit.data("pendingDelFids") || [];
+          for (var d = 0; d < pendingDel.length; d++) {
+            $.ajax({
+              url: _M.svcUrl[_M.Webtype].deleteFileSafe,
+              type: "POST",
+              data: { fid: pendingDel[d], uid: _M.UserInfo.id },
+              async: false
+            });
+          }
+          _fieldEdit.removeData("pendingDelFids");
+
+          // 2. 신규 추가 대기 파일 일괄 업로드 전송
+          var pendingAdd = _fieldEdit.data("pendingAddFiles") || [];
+          for (var a = 0; a < pendingAdd.length; a++) {
+            var fData = new FormData();
+            fData.append("Filename", pendingAdd[a]);
+            fData.append("fileSearchKey", fileSearchKey);
+            fData.append("jobType", jobType);
+            fData.append("ParentKey", parentKey);
+            fData.append("UID", _M.UserInfo.id);
+            fData.append("USITE", _M.UserInfo.SID);
+
+            $.ajax({
+              url: _M.svcUrl[_M.Webtype].uploadFileNew,
+              type: "POST",
+              data: fData,
+              async: false,
+              processData: false,
+              contentType: false,
+              dataType: "json"
+            });
+          }
+          _fieldEdit.removeData("pendingAddFiles");
+
+          _retVal = fileSearchKey;
+          _Obj.attr("Value", _retVal);
+          if (apl != undefined) apl.add(_Obj.attr("field"), _Obj.attr("Value"));
+          break;
         case "signfile": //20240619
           // :: get multifile
           if (apl != undefined) apl.add(_Obj.attr("field"), _Obj.attr("Value"));
@@ -15284,6 +15587,97 @@ $(document).on("blur", ".t_Money", function (e) {
                   "?skey=" +
                   _value
               );
+          }
+          break;
+        case "singlefilenew": // 20261102 khma 차세대 드래그앤드롭 단일파일 값 바인딩
+          var _dropZone = $(".singlefile-dropzone", _Obj);
+          var _statusText = $(".singlefile-status-text", _dropZone);
+          var _viewBox = $(".fieldView .fldfiledown", _Obj);
+          var _fieldEdit = $(".fieldEdit", _Obj);
+          _fieldEdit.removeData("pendingFile");
+
+          if (_value == "" || _value == null || _value == undefined) {
+            var newFileKey = _M.UserInfo.id.toString() + "_" + new Date().getTime().toString();
+            $("#fileSearchKey", _dropZone).val(newFileKey);
+            $("#oldFilePath", _dropZone).val("");
+            _Obj.attr("value", "");
+
+            var emptyHtm = "<span class='icon i-20 icon-attachment align-middle' style='margin-right: 4px;'></span>"
+                         + "<span class='msg-text' style='color: #64748b;'>파일을 이곳에 드래그하거나 클릭하여 첨부하세요.</span>";
+            _statusText.html(emptyHtm);
+            _viewBox.html("<span style='color: #94a3b8;'>파일없음</span>");
+          } else {
+            $("#oldFilePath", _dropZone).val(_value);
+            _Obj.attr("value", _value);
+
+            var dispName = _value;
+            if (dispName.indexOf("/") >= 0) dispName = dispName.substring(dispName.lastIndexOf("/") + 1);
+            if (dispName.indexOf("_") >= 0) dispName = dispName.substring(dispName.indexOf("_") + 1);
+
+            var downUrl = _M.svcUrl[_M.Webtype].downloadFileNew + "?filePath=" + encodeURIComponent(_value);
+
+            var fileHtm = "<span class='icon i-20 icon-file align-middle' style='margin-right: 4px; color: #2563eb;'></span>"
+                        + "<a href='" + downUrl + "' class='singlefile-down-link' target='_blank' style='font-weight: bold; color: #1d4ed8; text-decoration: underline; margin-right: 8px;' title='클릭하여 다운로드'>"
+                        + dispName + "</a>"
+                        + "<span style='color: #64748b; font-size: 11px;'>(드래그하여 다른 파일로 교체)</span>";
+
+            _statusText.html(fileHtm);
+            _viewBox.html("<a href='" + downUrl + "' target='_blank' style='font-weight: bold; color: #1d4ed8; text-decoration: underline;'>" + dispName + "</a>");
+          }
+          break;
+
+        case "multifilenew": // 20261102 khma 차세대 드래그앤드롭 멀티파일 값 바인딩 및 목록 조회
+          var _mCont = $(".multifilenew-contaner", _Obj);
+          var _serverList = $(".multifile-server-list", _mCont);
+          var _viewBox = $(".fieldView .fldfiledown", _Obj);
+          var _fieldEdit = $(".fieldEdit", _Obj);
+          _fieldEdit.removeData("pendingAddFiles");
+          _fieldEdit.removeData("pendingDelFids");
+          $(".multifile-pending-list", _mCont).empty();
+
+          var fSearchKey = _value;
+          if (fSearchKey == "" || fSearchKey == null || fSearchKey == undefined) {
+            fSearchKey = _M.UserInfo.id.toString() + "_" + new Date().getTime().toString();
+            $("#fileSearchKey", _mCont).val(fSearchKey);
+            _Obj.attr("value", fSearchKey);
+            _serverList.html("<div style='color: #94a3b8; font-size: 11px; padding: 2px 4px;'>첨부된 파일 없음</div>");
+            _viewBox.html("<span style='color: #94a3b8;'>파일없음</span>");
+          } else {
+            $("#fileSearchKey", _mCont).val(fSearchKey);
+            _Obj.attr("value", fSearchKey);
+
+            // M_IMAGE_GAL 목록 조회 (SIGNFILE_LIST 쿼리 연동)
+            var pl = new JSONClientParameters();
+            pl.add("service", "MON_COMMON");
+            pl.add("method", "SIGNFILE_LIST");
+            pl.add("UPPER_INFO", fSearchKey);
+            pl.add("_viewpage", 1);
+            pl.add("_pagecnt", 999);
+
+            PostJsonData(_M.svcUrl[_M.Webtype].crudUrl, pl, function (_data) {
+              var rst = _data.resultData || [];
+              if (rst.length > 0) {
+                var sHtm = "<ul style='list-style: none; padding: 0; margin: 0;'>";
+                var vHtm = "<ul style='list-style: none; padding: 0; margin: 0;'>";
+                for (var i = 0; i < rst.length; i++) {
+                  var item = rst[i];
+                  var dUrl = _M.svcUrl[_M.Webtype].downloadFileNew + "?fid=" + item.M_IMAGE_GAL_NO;
+                  var kb = (item.FILE_SIZE / 1024).toFixed(1);
+                  sHtm += "<li class='multifile-item' style='padding: 3px 6px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #e2e8f0; font-size: 12px;'>"
+                       + "  <span><span class='icon i-20 icon-file align-middle'></span> <a href='" + dUrl + "' target='_blank' class='file-title' style='color: #1d4ed8; text-decoration: underline; font-weight: bold;'>" + item.FILE_NAME + "</a> <span style='color:#64748b;'>(" + kb + " KB)</span></span>"
+                       + "  <span class='multifile-toggle-delete' data-fid='" + item.M_IMAGE_GAL_NO + "' style='color: #ef4444; font-weight: bold; cursor: pointer; padding: 1px 4px; border: 1px solid #fecaca; border-radius: 3px; background: #fff;' title='삭제 토글'>✖ 삭제</span>"
+                       + "</li>";
+                  vHtm += "<li style='padding: 1px 0;'><a href='" + dUrl + "' target='_blank' style='color: #1d4ed8; text-decoration: underline;'>" + item.FILE_NAME + "</a> (" + kb + " KB)</li>";
+                }
+                sHtm += "</ul>";
+                vHtm += "</ul>";
+                _serverList.html(sHtm);
+                _viewBox.html(vHtm);
+              } else {
+                _serverList.html("<div style='color: #94a3b8; font-size: 11px; padding: 2px 4px;'>첨부된 파일 없음</div>");
+                _viewBox.html("<span style='color: #94a3b8;'>파일없음</span>");
+              }
+            }, function () {}, false);
           }
           break;
         case "signfile": //20240619
