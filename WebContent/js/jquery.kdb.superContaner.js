@@ -7344,26 +7344,63 @@ $(document).on("blur", ".t_Money", function (e) {
           pl.add("XLS_PURPOSE", encodeURIComponent(savedUsage));
           pl.add("XLS_TARGET", encodeURIComponent(savedTarget));
           pl.add("excelPassword", encodeURIComponent(pwd1));
+          // -----------------------------------------------------------------
+          // 20261102 khma : 엑셀 다운로드 보안 감사 및 사유 이력 저장 (Create 호출)
+          // -----------------------------------------------------------------
+          var plLog = new JSONClientParameters();
+          plLog.add("service", "MON_COMMON");
+          plLog.add("method", "INSERT_EXCEL_DOWN_LOG");
+          plLog.add("USER_ID", (_M.UserInfo && _M.UserInfo.lid) ? _M.UserInfo.lid : "");
+          plLog.add("USER_NAME", (_M.UserInfo && _M.UserInfo.name) ? _M.UserInfo.name : "");
+          plLog.add("DEPT_NAME", (_M.UserInfo && (_M.UserInfo.departnm || _M.UserInfo.depart)) ? (_M.UserInfo.departnm || _M.UserInfo.depart) : "");
+          plLog.add("MENUID", (typeof _M.MENUID !== "undefined") ? _M.MENUID : "");
+          plLog.add("ACTIONNAME", _json.title ? _json.title : "");
+          plLog.add("SERVICE", _json.service ? _json.service : "");
+          plLog.add("METHOD", (_json.method && _json.method.Read) ? (_json.method.Read + "Down") : "Down");
+          plLog.add("FILE_NAME", (_json.title ? _json.title : "EXCEL") + ".xlsx");
+          plLog.add("XLS_PURPOSE", savedUsage);
+          plLog.add("XLS_TARGET", savedTarget);
+          plLog.add("XLS_REASON", savedReason);
+          plLog.add("TOTAL_RECORD", _RCD_CNT.replace(regex, ""));
+          plLog.add("CLIENT_IP", "");
 
-          // 다운로드 실행
-          if (_jobInfo != undefined && _jobInfo.xlsOption != undefined && _jobInfo.xlsOption.popup) {
-            var _col = new Array();
-            var i = 0;
-            $(".body thead > tr:first-child > th", _Obj)
-              .not(".resizeBar")
-              .each(function () {
-                if (
-                  $(this).attr("field") != undefined &&
-                  $(this).attr("field") != "" &&
-                  $(this).attr("field") != "ROWNUM"
-                ) {
-                  _col[$(this).attr("field")] = $(this).attr("label");
-                  i++;
-                }
-              });
-            $.GetExcelColumn("XLS", _col, _jobInfo.service, pl);
-          } else {
-            $.SvcDownXls(_json.service, pl);
+          // 다운로드 실행 함수 정의
+          var fnDoDownload = function () {
+            if (_jobInfo != undefined && _jobInfo.xlsOption != undefined && _jobInfo.xlsOption.popup) {
+              var _col = new Array();
+              var i = 0;
+              $(".body thead > tr:first-child > th", _Obj)
+                .not(".resizeBar")
+                .each(function () {
+                  if (
+                    $(this).attr("field") != undefined &&
+                    $(this).attr("field") != "" &&
+                    $(this).attr("field") != "ROWNUM"
+                  ) {
+                    _col[$(this).attr("field")] = $(this).attr("label");
+                    i++;
+                  }
+                });
+              $.GetExcelColumn("XLS", _col, _jobInfo.service, pl);
+            } else {
+              $.SvcDownXls(_json.service, pl);
+            }
+          };
+
+          // 이력 저장 AJAX 실행 후 다운로드 진행 (에러 발생 시에도 다운로드 보장)
+          try {
+            PostJsonData(
+              _M.svcUrl[_M.Webtype].crudUrl,
+              plLog,
+              function (_data) {
+                fnDoDownload();
+              },
+              function () {
+                fnDoDownload();
+              }
+            );
+          } catch (eLog) {
+            fnDoDownload();
           }
         });
       });

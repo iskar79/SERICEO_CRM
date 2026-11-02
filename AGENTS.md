@@ -1,4 +1,4 @@
-# VDI 내부망 소스 동기화 및 코드 수정 규칙 (필수 준수 사항)
+﻿# VDI 내부망 소스 동기화 및 코드 수정 규칙 (필수 준수 사항)
 
 이 프로젝트는 VDI 내부망 Git 저장소에서 복사해 온 소스이며, 수정 후 다시 VDI 환경으로 덮어써야 합니다.
 고객사 소스이므로 모든 소스 코드 수정 시 **반드시 아래 규칙을 엄격히 준수**해야 합니다.
@@ -251,7 +251,7 @@ VDI 내부망 코드를 카메라로 촬영하여 전달받는 경우, 단순 OC
   * 엑셀 파라미터 수신, 파일 스트림 출력 후 return null; 보정 및 catch (Throwable e) 처리 VDI 반영 및 다운로드 구동 확인 완료.
 * **[완료] Step 2-5 (ExcelDownload.java)** ([① 로컬: 완료(x) / ② VDI: 완료(x)]):
   * POI 4.1.2 Agile AES 암호화 생성, getBrowser NPE 방어 및 스트림 다운로드 VDI 반영 및 다운로드 구동 확인 완료.
-* **[진행중] Step 2-6 (운영쿼리정보/M_EXCEL_DOWN_LOG.sql)** ([① 로컬: 완료(x) / ② VDI: 대기( )]):
-  * Mon_LinkCRM_Maven M_USER 및 "CRM"."M_EXCEL_DOWN_LOG" 표준 명명규칙 기반 엑셀 다운로드 보안 감사 및 사유 이력 테이블 DDL 스크립트 작성 완료.
+* **[완료] Step 2-6 (운영쿼리정보/M_EXCEL_DOWN_LOG.sql)** ([① 로컬: 완료(x) / ② VDI: 완료(x)]):
+  * Mon_LinkCRM_Maven M_USER 및 "CRM"."M_EXCEL_DOWN_LOG" 표준 명명규칙 기반 엑셀 다운로드 보안 감사 및 사유 이력 테이블 DDL 및 모나크 서비스(INSERT_EXCEL_DOWN_LOG) 등록 완료.
 * **[진행중] Step 2-7 (superContaner.js)** ([① 로컬: 완료(x) / ② VDI: 대기( )]):
-  * XLS_REASON_POPUP 구조체(Create 전용, Read 불필요) 기반 2단계 팝업 리팩토링 및 조회조건(pl) 파라미터 머지(동적 쿼리 주석해제용) 연동 완료.
+  * XLS_REASON_POPUP 2단계 팝업 및 Create(INSERT_EXCEL_DOWN_LOG) PostJsonData 호출 연동 완료.
