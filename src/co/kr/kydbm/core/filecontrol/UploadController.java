@@ -818,6 +818,10 @@ public class UploadController {
 		Calendar calendar = Calendar.getInstance();
 		SimpleDateFormat sd = new SimpleDateFormat("yyyyMMddHHmmss");
 		String currentTimestamp = sd.format(calendar.getTime());
+		// 20261102 khma : 프론트엔드에서 timeStamp 전달 시 동일하게 사용하여 실제 다운로드 파일명과 감사 로그 파일명 100% 일치
+		if (obj.containsKey("timeStamp") && StringUtils.isNotEmpty(obj.get("timeStamp")) && obj.get("timeStamp").length() >= 14) {
+			currentTimestamp = obj.get("timeStamp");
+		}
 		String fileName = "";
 		UID = obj.get("UID");
 		USITE = obj.get("USITE");

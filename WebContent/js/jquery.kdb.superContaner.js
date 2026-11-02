@@ -6945,7 +6945,7 @@ $(document).on("blur", ".t_Money", function (e) {
             
     },
     // ----------------------------------------------------
-    // 20261102 khma Start : XLS_REASON_POPUP 구조체 기반 엑셀 다운로드 (서비스명/메소드명/파일명 정밀 추출 및 Agile 암호화 연동)
+    // 20261102 khma Start : XLS_REASON_POPUP 구조체 기반 엑셀 다운로드 (서비스명/메소드명/파일명 정밀 추출 및 실제 다운로드 파일명 타임스탬프 일치화)
     DownXlsNew: function (oCmd) {
       var _Obj = $(this);
       var _RCD_CNT = $('.pgMsg.records', _Obj).text();
@@ -7012,7 +7012,7 @@ $(document).on("blur", ".t_Money", function (e) {
       }
 
       // -----------------------------------------------------------------
-      // 20261102 khma : 엑셀 파일명(FILE_NAME) 정밀 추출 (Object 객체 [object Object] 방어)
+      // 20261102 khma : 엑셀 기본 타이틀 정밀 추출 (Object 객체 [object Object] 방어)
       // -----------------------------------------------------------------
       var excelTitle = "";
       if (_jobInfo && _jobInfo.xlsOption && typeof _jobInfo.xlsOption.xlsName === "string" && $.trim(_jobInfo.xlsOption.xlsName) !== "") {
@@ -7037,7 +7037,10 @@ $(document).on("blur", ".t_Money", function (e) {
         excelTitle = _Obj.attr("jsonname") || "EXCEL";
       }
       excelTitle = $.trim(excelTitle);
-      var excelFileName = (/\.xlsx?$/i.test(excelTitle)) ? excelTitle : (excelTitle + ".xlsx");
+      var cleanTitle = excelTitle.replace(/\.xlsx?$/i, "");
+      if (!cleanTitle || cleanTitle === "") {
+        cleanTitle = targetMethod || "EXCEL";
+      }
 
       var pl = _Obj.superContaner("tableGetFilter");
       pl.add("_order", _Obj.attr("_order"));
@@ -7055,7 +7058,7 @@ $(document).on("blur", ".t_Money", function (e) {
       pl.add("xlsType", (_jobInfo && _jobInfo.xlsOption && _jobInfo.xlsOption.type) ? _jobInfo.xlsOption.type : "report");
       pl.add("xlsMethod", targetMethod);
       pl.add("xlsService", targetService);
-      pl.add("xlsName", excelTitle);
+      pl.add("xlsName", cleanTitle);
       if (_jobInfo && _jobInfo.xlsOption && _jobInfo.xlsOption.extClass) {
         pl.add("extClass", _jobInfo.xlsOption.extClass);
       }
@@ -7129,7 +7132,6 @@ $(document).on("blur", ".t_Money", function (e) {
 
       // -----------------------------------------------------------------
       // 20261102 khma : DB M_STRUCTURE 테이블에서 XLS_REASON_POPUP 구조체 동적 로드
-      // (하드코딩 완전 제거 - DB M_STRUCTURE에서만 100% 로드)
       // -----------------------------------------------------------------
       var XLS_REASON_POPUP = GETJSON("XLS_REASON_POPUP");
       if (!XLS_REASON_POPUP) {
@@ -7290,6 +7292,25 @@ $(document).on("blur", ".t_Money", function (e) {
           pl.add("excelPassword", encodeURIComponent(pwd1));
 
           // -----------------------------------------------------------------
+          // 20261102 khma : 실제 다운로드 파일명 형식 [파일명]_[YYYYMMDD]_[HHMISS].xlsx 일치화
+          // (프론트엔드와 백엔드가 동일한 타임스탬프를 공유하여 단 1초의 오차도 없이 100% 일치)
+          // -----------------------------------------------------------------
+          var now = new Date();
+          var yyyy = now.getFullYear();
+          var mm = ("0" + (now.getMonth() + 1)).slice(-2);
+          var dd = ("0" + now.getDate()).slice(-2);
+          var hh = ("0" + now.getHours()).slice(-2);
+          var mi = ("0" + now.getMinutes()).slice(-2);
+          var ss = ("0" + now.getSeconds()).slice(-2);
+          var timeStampDigits = "" + yyyy + mm + dd + hh + mi + ss; // 14자리 YYYYMMDDHHMISS
+          var timeStampFormatted = yyyy + mm + dd + "_" + hh + mi + ss; // YYYYMMDD_HHMISS
+          var actualExcelFileName = cleanTitle + "_" + timeStampFormatted + ".xlsx";
+
+          // 백엔드로 timeStamp 및 xlsName 전송 (백엔드 UploadController 파일명 일치화)
+          pl.add("timeStamp", timeStampDigits);
+          pl.add("xlsName", cleanTitle);
+
+          // -----------------------------------------------------------------
           // 20261102 khma : 다운로드 실행 함수 (targetService 전달 보정)
           // -----------------------------------------------------------------
           var fnDoDownload = function () {
@@ -7352,9 +7373,10 @@ $(document).on("blur", ".t_Money", function (e) {
           plLog.add("service_name", targetService);
           plLog.add("METHOD_NAME", targetMethod);
           plLog.add("method_name", targetMethod);
-          plLog.add("FILE_NAME", excelFileName);
-          plLog.add("file_name", excelFileName);
-          plLog.add("fileName", excelFileName);
+          // 실제 다운로드 파일명과 100% 동일하게 저장 ([파일명]_[YYYYMMDD]_[HHMISS].xlsx)
+          plLog.add("FILE_NAME", actualExcelFileName);
+          plLog.add("file_name", actualExcelFileName);
+          plLog.add("fileName", actualExcelFileName);
           plLog.add("DOWN_CNT", downCnt);
           plLog.add("down_cnt", downCnt);
           plLog.add("totalRecord", downCnt);
@@ -7387,7 +7409,7 @@ $(document).on("blur", ".t_Money", function (e) {
         });
       };
     },
-    // 20261102 khma End : XLS_REASON_POPUP 구조체 기반 엑셀 다운로드 (서비스명/메소드명/파일명 정밀 추출 및 Agile 암호화 연동)
+    // 20261102 khma End : XLS_REASON_POPUP 구조체 기반 엑셀 다운로드 (서비스명/메소드명/파일명 정밀 추출 및 실제 다운로드 파일명 타임스탬프 일치화)
 
     /* ------------------------------------------------------- */
     /* Excel이나 CSV등의 데이터파일을 디비에 저장할때 사용 */
