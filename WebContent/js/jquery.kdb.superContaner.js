@@ -7110,9 +7110,6 @@ $(document).on("blur", ".t_Money", function (e) {
       var step1Html = '<div id="excelModalLayer" style="position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); width:' + popWidth + 'px; background:#fff; border:2px solid #2b579a; padding:20px 24px; z-index:99999; box-shadow:0 0 20px rgba(0,0,0,0.45); border-radius:6px; font-family:\'맑은 고딕\', Malgun Gothic, sans-serif; font-size:12px; color:#333;">';
       step1Html += '<h3 style="margin:0 0 12px 0; font-size:15px; font-weight:bold; color:#2b579a; border-bottom:2px solid #2b579a; padding-bottom:6px;">' + XLS_REASON_POPUP.title + '</h3>';
       step1Html += '<div id="areaXlsReasonSuperView" style="margin-bottom:12px;"></div>';
-      step1Html += '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; padding:0 2px;">';
-      step1Html += '<span id="spnReasonLen" style="font-size:11px; color:#d9534f;">※ 목적은 최소 10자 이상 구체적으로 입력해야 합니다.</span>';
-      step1Html += '</div>';
 
       // -----------------------------------------------------------------
       // 20261102 khma : 모달 하단 버튼 영역 (개발 버튼 등 제외, 다운로드 전용 [다음], [취소]만 노출)
@@ -7145,21 +7142,6 @@ $(document).on("blur", ".t_Money", function (e) {
           }, 50);
         }
       });
-
-      // -----------------------------------------------------------------
-      // 20261102 khma : textarea 실시간 글자수 카운트 (모나크 fieldContaner[field='XLS_REASON'] 정밀 바인딩)
-      // -----------------------------------------------------------------
-      var $txtReason = $(".fieldContaner[field='XLS_REASON'] textarea, textarea[name='XLS_REASON'], textarea", $superArea);
-      if ($txtReason.length > 0) {
-        $txtReason.on("keyup change input", function () {
-          var len = $.trim($(this).val()).length;
-          if (len >= 10) {
-            $("#spnReasonLen").css("color", "#2b579a").html("✓ 목적 <strong>" + len + "자</strong> 입력됨 (10자 이상 충족)");
-          } else {
-            $("#spnReasonLen").css("color", "#d9534f").html("※ 목적은 최소 10자 이상 필수 (현재 <strong>" + len + "자</strong> / 최소 10자)");
-          }
-        });
-      }
 
       // 모달 하단 버튼 이벤트 바인딩
       $("#btnXlsNextStep").click(function () {
