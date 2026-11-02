@@ -4,6 +4,16 @@
 
 ---
 
+## 🚨 최우선 불변 원칙: 기존 파일 시스템 100% 원형 보존 및 하위 호환성 보장
+
+> [!IMPORTANT]
+> **기존 운영 기능 무중단 / 무영향 원칙 (Zero Impact)**
+> 1. **기존 컴포넌트 절대 불변**: 현재 운영 중인 기존 `file`, `singleFile`, `multifile`, `signfile` 관련 프론트엔드(`superContaner.js`, `jobButton.js`) 및 백엔드(`UploadController.java`, `CommonExcelUtil.java` 등) 로직은 **단 한 줄도 수정하거나 기능을 축소하지 않고 100% 동일하게 유지**합니다.
+> 2. **신규 타입 완전 분리**: 신규 드래그앤드롭 및 무결성 보장 기능은 오직 **신규 타입 명칭인 `singleFileNew` 및 `multiFileNew`**로 완벽히 격리된 신규 분기(`case "singlefilenew":`, `case "multifilenew":`)와 신규 엔드포인트(`/uploadFileNew.mon` 등)에서만 독립적으로 구동됩니다.
+> 3. **기존 화면에 영향 제로**: 기존 메타데이터나 기존 화면에서 `singleFile`이나 `multifile`을 사용 중인 모든 프로그램은 기존 방식 그대로 정상 동작함을 철저히 보장합니다.
+
+---
+
 ## 1. 추진 배경 및 기존 파일 시스템의 3대 핵심 문제점
 
 현재 운영 중인 CRM의 파일 처리 방식(`UploadController.java`, `superContaner.js`)을 정밀 전수 분석한 결과, 다음과 같은 심각한 아키텍처 결함이 확인되었습니다.
