@@ -10741,10 +10741,9 @@ $(document).on("blur", ".t_Money", function (e) {
           }
           break;
 
+        // 20261102 khma Start : textarea에 placeholder, minlength 및 실시간 글자수 카운터(showCount) 지원
         case "textarea":
           if (_fieldEdit.parent().parent().hasClass("fldTdLabel") == true) {
-            // 2018.05.22 dmjung :: Textarea 가 dataTD 가 아니라 LabelTD 에 있는
-            // 경우.
             _fieldEdit
               .parent()
               .parent()
@@ -10756,15 +10755,34 @@ $(document).on("blur", ".t_Money", function (e) {
           ).appendTo(_span);
           if (option.height != undefined) {
             _o.css("height", option.height);
-            // 2018.05.27 dmjung :: 텍스트에리어를 갖고 있을 경우, fieldContaner 에
-            // height 값 할당하지 않음.
-            // :::::::::::::::::::: fieldContaner height 때문에 textarea
-            // 하단부 잘리던 부분 수정.
             _o.parents(".fieldContaner").css("height", "auto");
           }
+          if (option.placeholder != undefined) {
+            _o.attr("placeholder", option.placeholder);
+          }
+          if (option.minlength != undefined) {
+            _o.attr("minlength", option.minlength);
+          }
           if (option.maxlength != undefined) {
+            _o.attr("maxlength", option.maxlength);
             _o.keypress(function () {
               checkTextareaLimit($(this), option.maxlength);
+            });
+          }
+          if (option.showCount || option.minlength != undefined) {
+            var $countDiv = $("<div class='textarea-count' style='text-align:right; font-size:11px; margin-top:3px;'></div>").appendTo(_fieldEdit);
+            var minL = option.minlength || 0;
+            var maxL = option.maxlength || 0;
+            var fnUpdateCount = function (len) {
+              if (minL > 0 && len < minL) {
+                $countDiv.html("<span style='color:#d9534f;'>※ 현재 <strong>" + len + "자</strong> / 최소 " + minL + "자 이상 필수</span>" + (maxL > 0 ? " (최대 " + maxL + "자)" : ""));
+              } else {
+                $countDiv.html("<span style='color:#2b579a;'>✓ 현재 <strong>" + len + "자</strong> 입력됨 (충족)</span>" + (maxL > 0 ? " (최대 " + maxL + "자)" : ""));
+              }
+            };
+            fnUpdateCount(0);
+            _o.on("keyup change input", function () {
+              fnUpdateCount($.trim($(this).val()).length);
             });
           }
           if (
@@ -10778,6 +10796,7 @@ $(document).on("blur", ".t_Money", function (e) {
             attachLabels(value, _fieldEdit);
           }
           break;
+        // 20261102 khma End : textarea에 placeholder, minlength 및 실시간 글자수 카운터(showCount) 지원
 
         case "codeEditor":
           if (_fieldEdit.parent().parent().hasClass("fldTdLabel") == true) {
