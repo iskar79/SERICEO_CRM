@@ -7128,7 +7128,23 @@ $(document).on("blur", ".t_Money", function (e) {
 
       // superView 구조체 동적 렌더링
       var $superArea = $("#areaXlsReasonSuperView");
+      $superArea.attr("jsonName", "XLS_REASON_POPUP");
       $superArea.superContaner("superView", XLS_REASON_POPUP);
+
+      // -----------------------------------------------------------------
+      // 20261102 khma : 상단 '개발' 버튼 클릭 시 XLS_REASON_POPUP 구조체 에디터 팝업 호출 및 z-index 보장
+      // -----------------------------------------------------------------
+      $(document).off("click.xlsDevPop").on("click.xlsDevPop", "#areaXlsReasonSuperView .jobArea .cmdspan, #areaXlsReasonSuperView .btn-dev", function (e) {
+        var inComm = $(this).find("input").attr("inComm") || $(this).attr("inComm");
+        if (inComm == "getJson" || $(this).hasClass("btn-dev")) {
+          e.stopPropagation();
+          $.JsonEditPop("XLS_REASON_POPUP");
+          setTimeout(function () {
+            $(".ui-dialog:has(.JsonEditPop)").css("z-index", 100005);
+            $(".ui-widget-overlay").css("z-index", 100004);
+          }, 50);
+        }
+      });
 
       // -----------------------------------------------------------------
       // 20261102 khma : textarea 실시간 글자수 카운트 (모나크 fieldContaner[field='XLS_REASON'] 정밀 바인딩)
@@ -15476,6 +15492,11 @@ $(document).on("blur", ".t_Money", function (e) {
         _nm = $(this).attr("jsonName");
         // _js = $.Json2Str($(this).data("jsonData"));
         $.JsonEditPop(_nm);
+        // 20261102 khma : 모달 팝업 내부 호출 시 다이얼로그 z-index 최상위 상향
+        setTimeout(function () {
+          $(".ui-dialog:has(.JsonEditPop)").css("z-index", 100005);
+          $(".ui-widget-overlay").css("z-index", 100004);
+        }, 50);
       }
     },
     testJson: function (Str) {
