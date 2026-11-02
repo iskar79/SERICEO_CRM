@@ -253,5 +253,5 @@ VDI 내부망 코드를 카메라로 촬영하여 전달받는 경우, 단순 OC
   * POI 4.1.2 Agile AES 암호화 생성, getBrowser NPE 방어 및 스트림 다운로드 VDI 반영 및 다운로드 구동 확인 완료.
 * **[완료] Step 2-6 (운영쿼리정보/M_EXCEL_DOWN_LOG.sql)** ([① 로컬: 완료(x) / ② VDI: 완료(x)]):
   * Mon_LinkCRM_Maven M_USER 및 "CRM"."M_EXCEL_DOWN_LOG" 표준 명명규칙 기반 엑셀 다운로드 보안 감사 및 사유 이력 테이블 DDL 및 모나크 서비스(INSERT_EXCEL_DOWN_LOG) 등록 완료.
-* **[진행중] Step 2-7 (superContaner.js)** ([① 로컬: 완료(x) / ② VDI: 대기( )]):
+* **[완료] Step 2-7 (superContaner.js)** ([① 로컬: 완료(x) / ② VDI: 완료(x)]):
   * XLS_REASON_POPUP 동적로드, DownXlsNew 타깃 서비스명/메소드명/파일명 정밀 추출 및 실제 다운로드 파일명 타임스탬프 일치화, IP 다중 추출 보정 완료.
