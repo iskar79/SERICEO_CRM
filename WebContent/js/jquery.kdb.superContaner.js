@@ -7091,95 +7091,51 @@ $(document).on("blur", ".t_Money", function (e) {
       }
 
       // -----------------------------------------------------------------
-      // 20261102 khma : 엑셀 사유 입력용 superView 구조체 (XLS_REASON_POPUP)
-      // Create 전용 등록 창이므로 Read 메소드는 불필요함
+      // 20261102 khma : DB M_STRUCTURE 테이블에서 XLS_REASON_POPUP 구조체 동적 로드
+      // (DB 미등록 시를 위한 Fallback 기본 구조체 내장)
       // -----------------------------------------------------------------
-      var XLS_REASON_POPUP = {
-        ContanerType: "superView",
-        title: "엑셀 다운로드 사유 및 타겟 선택",
-        popupWidth: 570,
-        isEditMode: true,
-        colgroup: [
-          { index: "Col1", LabelWidth: "15%", DataWidth: "85%" }
-        ],
-        "tr": [
-          // 1. 용도 (Select)
-          {
-            "TD": [
-              {
-                type: "field",
-                label: "용도",
-                colspan: 1,
-                fieldContaner: [
-                  {
-                    field: "XLS_PURPOSE",
-                    type: "select",
-                    width: "100%",
-                    name: "XLS_PURPOSE",
-                    required: true,
-                    codes: "XLS_PURPOSE",
-                    defaultValue: ""
-                  }
-                ]
-              }
-            ]
-          },
-          // 2. 대상 (Radio)
-          {
-            "TD": [
-              {
-                type: "field",
-                label: "대상",
-                colspan: 1,
-                fieldContaner: [
-                  {
-                    field: "XLS_TARGET",
-                    type: "radio",
-                    width: "100%",
-                    name: "XLS_TARGET",
-                    required: true,
-                    defaultValue: "ALL",
-                    codes: "XLS_TARGET"
-                  }
-                ]
-              }
-            ]
-          },
-          // 3. 목적 (10자 이상 Textarea)
-          {
-            "TD": [
-              {
-                type: "field",
-                label: "목적",
-                colspan: 1,
-                fieldContaner: [
-                  {
-                    field: "XLS_REASON",
-                    type: "textarea",
-                    height: "65px",
-                    width: "100%",
-                    name: "XLS_REASON",
-                    required: true,
-                    placeholder: "다운로드 목적을 최소 10글자 이상 구체적으로 입력해 주십시오."
-                  }
-                ]
-              }
-            ]
-          }
-        ],
-        jobs: [
-          { name: "다음 (암호 설정)", index: "NextStep", inComm: "NextStep", css: "btn-save" },
-          { name: "취소", index: "Close", inComm: "Close", css: "btn-cancel" }
-        ],
-        // -----------------------------------------------
-        // Svc : Create 전용 신규 등록 화면이므로 Read 메소드는 제외
-        // -----------------------------------------------
-        service: "MON_COMMON",
-        method: { Create: "INSERT_EXCEL_DOWN_LOG" },
-        keyName: "LOG_NO",
-        showMessage: false,
-        whoIs: "2.0"
-      };
+      var XLS_REASON_POPUP = null;
+      try {
+        XLS_REASON_POPUP = GETJSON("XLS_REASON_POPUP");
+      } catch (eGetJs) {}
+
+      if (!XLS_REASON_POPUP) {
+        XLS_REASON_POPUP = {
+          ContanerType: "superView",
+          title: "엑셀 다운로드 사유 및 타겟 선택",
+          popupWidth: 570,
+          isEditMode: true,
+          colgroup: [
+            { index: "Col1", LabelWidth: "15%", DataWidth: "85%" }
+          ],
+          "tr": [
+            {"TD": [
+              { type: "field", label: "용도", colspan: 1, fieldContaner: [
+                { field: "XLS_PURPOSE", type: "select", width: "100%", name: "XLS_PURPOSE", required: true, codes: "XLS_PURPOSE", defaultValue: "" }
+              ]}
+            ]},
+            {"TD": [
+              { type: "field", label: "대상", colspan: 1, fieldContaner: [
+                { field: "XLS_TARGET", type: "radio", width: "100%", name: "XLS_TARGET", required: true, defaultValue: "ALL", codes: "XLS_TARGET" }
+              ]}
+            ]},
+            {"TD": [
+              { type: "field", label: "목적", colspan: 1, fieldContaner: [
+                { field: "XLS_REASON", type: "textarea", height: "65px", width: "100%", name: "XLS_REASON", required: true, placeholder: "다운로드 목적을 최소 10글자 이상 구체적으로 입력해 주십시오." }
+              ]}
+            ]}
+          ],
+          jobs: [
+            { name: "다음 (암호 설정)", index: "NextStep", inComm: "NextStep", css: "btn-save" },
+            { name: "취소", index: "Close", inComm: "Close", css: "btn-cancel" }
+          ],
+          service: "MON_COMMON",
+          method: { Create: "INSERT_EXCEL_DOWN_LOG" },
+          keyName: "LOG_NO",
+          showMessage: false,
+          whoIs: "2.0"
+        };
+      }
 
       // -----------------------------------------------------------------
       // 기존 잔여 모달 레이어 제거
