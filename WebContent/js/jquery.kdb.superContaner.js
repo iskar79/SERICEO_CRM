@@ -7186,6 +7186,21 @@ $(document).on("blur", ".t_Money", function (e) {
           return;
         }
 
+        // -----------------------------------------------------------------
+        // 20261102 khma : 1단계 구조체 폼 입력값을 동적으로 전수 추출하여 안전하게 보존
+        // (2단계 전환 시 DOM 삭제로 인한 값 유실 원천 방지 및 구조체 필드 추가/삭제 100% 자동 대응)
+        // -----------------------------------------------------------------
+        var savedParams = {};
+        $(".fieldContaner", $superArea).each(function () {
+          var fldName = $(this).attr("field");
+          if (fldName) {
+            var fldVal = $(this).superContaner("getFieldValue");
+            if (fldVal !== undefined && fldVal !== null) {
+              savedParams[fldName] = fldVal;
+            }
+          }
+        });
+
         // [2단계 팝업 HTML] 시스템 모달 팝업 형태 파일 열람 암호 설정 (최소 4자 이상)
         var step2Html = '<div id="excelModalLayer" style="position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); width:420px; background:#fff; border:2px solid #2b579a; padding:22px 24px; z-index:99999; box-shadow:0 0 20px rgba(0,0,0,0.45); border-radius:6px; font-family:\'맑은 고딕\', Malgun Gothic, sans-serif; font-size:12px; color:#333;">';
         step2Html += '<h3 style="margin:0 0 14px 0; font-size:15px; font-weight:bold; color:#2b579a; border-bottom:2px solid #2b579a; padding-bottom:6px;">엑셀 파일 암호 설정 (필수)</h3>';
@@ -7247,20 +7262,13 @@ $(document).on("blur", ".t_Money", function (e) {
           $("#excelModalLayer, #excelModalDim").remove();
 
           // -----------------------------------------------------------------
-          // 20261102 khma : 구조체에 정의된 모든 필드/입력값을 동적으로 pl에 머지
-          // (구조체에 필드가 추가/삭제되어도 JS 수정 없이 100% 자동 연동)
+          // 20261102 khma : 1단계 추출 필드들을 다운로드 파라미터(pl)에 동적 머지
           // -----------------------------------------------------------------
-          $(".fieldContaner", $superArea).each(function () {
-            var fldName = $(this).attr("field");
-            if (fldName) {
-              var fldVal = $(this).superContaner("getFieldValue");
-              if (fldVal !== undefined && fldVal !== null) {
-                pl.add(fldName, encodeURIComponent(fldVal));
-              }
-            }
+          $.each(savedParams, function (fldName, fldVal) {
+            pl.add(fldName, encodeURIComponent(fldVal));
           });
 
-          // 파일 열람 암호만 단독 추가 (백엔드 POI 암호화 생성용)
+          // 파일 열람 암호 추가 (백엔드 POI 암호화 생성용)
           pl.add("excelPassword", encodeURIComponent(pwd1));
 
           // 다운로드 실행 함수 정의
@@ -7287,14 +7295,41 @@ $(document).on("blur", ".t_Money", function (e) {
           };
 
           // -----------------------------------------------------------------
-          // 20261102 khma : 모나크 superView 표준 Save(Create) 호출로 이력 저장 후 다운로드
-          // (구조체에 선언된 service와 method.Create를 엔진이 자동 실행)
+          // 20261102 khma : 구조체(service, method.Create) 기반 보안 감사 이력 저장 실행
           // -----------------------------------------------------------------
+          var plLog = new JSONClientParameters();
+          var logSvc = XLS_REASON_POPUP.service || "MON_COMMON";
+          var logMtd = (XLS_REASON_POPUP.method && XLS_REASON_POPUP.method.Create) ? XLS_REASON_POPUP.method.Create : "INSERT_EXCEL_DOWN_LOG";
+
+          plLog.add("service", logSvc);
+          plLog.add("method", logMtd);
+          plLog.add("USITE", (_M.UserInfo && _M.UserInfo.SID) ? _M.UserInfo.SID : "1");
+          plLog.add("MENUID", (_M.PrevActGbn && _M.PrevActGbn.currMenuId) ? _M.PrevActGbn.currMenuId : "");
+          plLog.add("SERVICE_NAME", serviceName);
+          plLog.add("METHOD_NAME", _svc);
+          plLog.add("FILE_NAME", (_json.title ? _json.title : "EXCEL") + ".xlsx");
+          plLog.add("DOWN_CNT", _RCD_CNT.replace(regex, ""));
+          plLog.add("CLIENT_IP", "");
+          plLog.add("REGUSER", (_M.UserInfo && _M.UserInfo.id) ? _M.UserInfo.id : "");
+
+          // 1단계 구조체 필드들(XLS_PURPOSE, XLS_TARGET, XLS_REASON 등) 자동 머지
+          $.each(savedParams, function (fldName, fldVal) {
+            plLog.add(fldName, fldVal);
+          });
+
+          // 이력 저장 AJAX 실행 후 다운로드 진행
           try {
-            $superArea.superContaner("Save", function (res) {
-              fnDoDownload();
-            });
-          } catch (eSave) {
+            PostJsonData(
+              _M.svcUrl[_M.Webtype].crudUrl,
+              plLog,
+              function (res) {
+                fnDoDownload();
+              },
+              function (err) {
+                fnDoDownload();
+              }
+            );
+          } catch (eLog) {
             fnDoDownload();
           }
         });
