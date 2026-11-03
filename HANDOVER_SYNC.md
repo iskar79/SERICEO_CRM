@@ -1,4 +1,4 @@
-﻿# 다중 PC 안티그래비티(Antigravity) 실시간 작업 공유 및 인수인계서
+# 다중 PC 안티그래비티(Antigravity) 실시간 작업 공유 및 인수인계서
 
 > **🔄 양방향 PC 동기화 및 VDI 반영 확인 게이트(Gate) 규칙 (필독)**
 > 1. **작업 시작 시 (`PC A` 또는 `PC B`에서 안티그래비티를 열었을 때)**:
@@ -79,7 +79,7 @@
 | **Step 2-4** | `src/co/kr/kydbm/core/filecontrol/UploadController.java` | 엑셀 파라미터 수신, return null; 보정, Throwable 로깅 보강 | `[x]` | `[x]` | **완료 (VDI 정상구동 확인)** |
 | **Step 2-5** | `src/co/kr/kydbm/core/filecontrol/ExcelDownload.java` | Agile AES 암호화 워크북 생성, getBrowser NPE 방어, Throwable 처리 | `[x]` | `[x]` | **완료 (VDI 정상구동 확인)** |
 | **Step 2-6** | `운영쿼리정보/M_EXCEL_DOWN_LOG.sql` | 엑셀 다운로드 보안 감사 및 사유 이력 테이블 DDL 초경량 13개 컬럼 정비 (CRM.M_EXCEL_DOWN_LOG) | `[x]` | `[x]` | **완료 (VDI 테이블 생성/정비 완료)** |
-| **Step 2-7** | `WebContent/js/jquery.kdb.superContaner.js` | XLS_REASON_POPUP 동적로드, DownXlsNew 타깃 서비스명/메소드명/파일명 정밀 추출 및 실제 다운로드 파일명 타임스탬프 일치화, IP 다중 추출 보정 | `[x]` | `[ ]` | **로컬완료 (VDI 반영 대기)** |
+| **Step 2-7** | `WebContent/js/jquery.kdb.superContaner.js` | XLS_REASON_POPUP 동적로드, DownXlsNew 타깃 서비스명/메소드명/파일명 정밀 추출 및 실제 다운로드 파일명 타임스탬프 일치화, IP 다중 추출 보정 | `[x]` | `[x]` | **완료 (VDI 정상동작 확인)** |
 | **Step 5-1** | `UploadController.java`, `Resource.js`, `Monarch820-servlet.xml` | 차세대 파일 백엔드 독립 엔드포인트 3종(/uploadFileNew, /downloadFileNew, /deleteFileSafe) 및 세션 인터셉터 매핑 | `[x]` | `[x]` | **완료 (VDI 톰캣 정상 기동 확인)** |
 | **Step 5-2** | `WebContent/js/jquery.kdb.superContaner.js` | singleFileNew, multiFileNew Drag&Drop, 클라이언트 지연 업로드, 20MB 검증, 교체대기/취소복원 | `[x]` | `[x]` | **완료 (VDI 정상동작 확인)** |
 | **Step 3** | `MonArchDaoImpl.java`, `FilterGenerator.java`, 프로시저/배치 등 | KSign SecureDB 개인정보 암복호화 공통 모듈 및 프로시저/엑셀업로드 적용 | `[ ]` | `[ ]` | 대기 |
