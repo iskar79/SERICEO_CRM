@@ -5,11 +5,11 @@ SEQ         NOT NULL NUMBER
 SITE                 VARCHAR2(8)    -- 사이트 식별자 (CEO, CP, EXP, HUB, MS, PRO, SP, SP002~SP018(17개), SST, THR 등)    
 CORP                 NUMBER         
 USEQ                 NUMBER         
-GBN                  VARCHAR2(100)  
-SUBGBN               VARCHAR2(100)  
+GBN                  VARCHAR2(100)  -- 텍스트 직접 저장 (예: '회원가입' 등)
+SUBGBN               VARCHAR2(100)  -- 텍스트 직접 저장 (예: '광고성 정보 전송을 위한 개인정보 수집 이용 동의' 등)
 TITLE                VARCHAR2(300)  
-STATUS               VARCHAR2(18)   
-USEYN                VARCHAR2(1)    
+STATUS               VARCHAR2(18)   -- 동의/상태값 (실데이터: 'Y', 'N', 'C', 'E', 'M', 'PC', 'S', '20140211', null 등 혼재)
+USEYN                VARCHAR2(1)    -- 사용여부 (실데이터: 'Y', 'N', null 혼재)    
 ATTR1                VARCHAR2(2000) 
 ATTR2                VARCHAR2(2000) 
 ATTR3                VARCHAR2(2000) 
