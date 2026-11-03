@@ -7691,6 +7691,14 @@ $(document).on("blur", ".t_Money", function (e) {
           if (savedParams && (savedParams.REQ_DOC || savedParams.req_doc)) {
             reqDocVal = savedParams.REQ_DOC || savedParams.req_doc;
           }
+          // 20261103 khma : savedParams 덮어쓰기 이후에도 엑셀 암호(excelPassword) 평문 노출 원천 방지 마스킹
+          if (reqDocVal && reqDocVal !== "") {
+            reqDocVal = reqDocVal.replace(/("excelPassword"\s*:\s*")[^"]*(")/gi, '$1******$2')
+                                 .replace(/(excelPassword=)[^&]*/gi, '$1******');
+          }
+          if (reqDocVal && reqDocVal.length > 2000) {
+            reqDocVal = reqDocVal.substring(0, 2000);
+          }
           plLog.add("REQ_DOC", reqDocVal);
           plLog.add("req_doc", reqDocVal);
 
@@ -7700,6 +7708,13 @@ $(document).on("blur", ".t_Money", function (e) {
               _M.svcUrl[_M.Webtype].crudUrl,
               plLog,
               function (res) {
+                // 20261103 khma : 업무상 실패 응답(result === 'FAIL' 등) 감지 시 다운로드 차단
+                if (res) {
+                  if (res.result === "FAIL" || res.status === "FAIL" || res.status === "ERROR" || res.status === false || res.isSuccess === false) {
+                    alert("보안 감사 이력 저장 중 업무 오류가 발생하여 엑셀 다운로드가 중단되었습니다.\n" + (res.message || "관리자에게 문의해 주십시오."));
+                    return false;
+                  }
+                }
                 fnDoDownload();
               },
               function (err) {

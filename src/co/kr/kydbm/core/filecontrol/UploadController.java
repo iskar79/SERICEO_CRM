@@ -24,6 +24,11 @@ import org.apache.tools.zip.ZipOutputStream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import co.kr.kydbm.core.bean.UserInfo;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
@@ -904,7 +909,7 @@ public class UploadController {
 		}
 		// 20261103 khma : 감사 로그 내 엑셀 암호(excelPassword) 평문 노출 방지 마스킹
 		if (StringUtils.isNotEmpty(reqDoc)) {
-			reqDoc = reqDoc.replaceAll("(\\"excelPassword\\"\\s*:\\s*\\")[^\\"]*(\\")", "$1******$2")
+			reqDoc = reqDoc.replaceAll("(\"excelPassword\"\\s*:\\s*\")[^\"]*(\")", "$1******$2")
 					.replaceAll("(?i)(excelPassword=)[^&]*", "$1******");
 		}
 		// 20261103 khma End : 요청문서 이력(REQ_DOC) 및 다운로드 사유(XLS_REASON) 파라미터 취득
@@ -936,15 +941,25 @@ public class UploadController {
 		try {
 			String strSql = si.getSql();
 			if (StringUtils.isNotEmpty(obj.get("DOWNCOLS"))) {
-				// 20261103 khma : DOWNCOLS 파라미터 SQL Injection 방어 (영문, 한글, 숫자, 언더스코어, 쉼표, 공백, 따옴표만 허용)
-				if (!obj.get("DOWNCOLS").matches("^[a-zA-Z0-9_\\uAC00-\\uD7A3, \\"'\\t\\n\\r]+$")) {
-					throw new IllegalArgumentException("유효하지 않은 다운로드 컬럼명이 포함되어 있습니다.");
+				// 20261103 khma : DOWNCOLS 화이트리스트 검증 (XLS_SEC_COLS 13대 보안 컬럼 대조)
+				String downColsStr = obj.get("DOWNCOLS").replaceAll("\"", "");
+				String[] cols = downColsStr.split(",");
+				Set<String> allowedCols = new HashSet<String>(Arrays.asList(
+					"회원분류", "아이디", "성명", "이메일", "보안아이디", "휴대폰", "비서이메일",
+					"서비스시작일", "서비스종료일", "법인번호", "이메일_수신", "SMS_수신", "광고성정보_수신"
+				));
+				for (String col : cols) {
+					String trimmedCol = col.trim();
+					if (StringUtils.isNotEmpty(trimmedCol) && !allowedCols.contains(trimmedCol)) {
+						log.warn("보안 정책상 허용되지 않은 다운로드 컬럼 차단: " + trimmedCol);
+						throw new IllegalArgumentException("보안 정책상 허용되지 않은 다운로드 컬럼이 포함되어 있습니다: " + trimmedCol);
+					}
 				}
 				// TODO 서비스 파라메터에 DOWNCOLS의 데이터가 존재할경우
 				// TODO 해당 쿼리를 서브 테이블로 필요한 컬럼만 추출한다.
 				ArrayList<Map<String, Object>> newHeaderInfo = new ArrayList<Map<String, Object>>();
 				String[] lavels = obj.get("DOWNLAVS").replaceAll("\"", "").split(",");
-				String[] cols = obj.get("DOWNCOLS").replaceAll("\"", "").split(",");
+				cols = obj.get("DOWNCOLS").replaceAll("\"", "").split(",");
 				String comsql = "SELECT ";
 				for (int i = 0; i < cols.length; i++) {
 					comsql += (cols[i] + ((i != cols.length - 1) ? ", " : " FROM ( ")); // " AS " + lavels[i] +
@@ -983,7 +998,7 @@ public class UploadController {
 				updateDownCntParam.put("FILE_NAME_EXT", fileName + ".xlsx");
 				updateDownCntParam.put("FILE_NAME_RAW", fileName);
 				updateDownCntParam.put("REGUSER", UID);
-				// 동시 다중 다운로드 요청 시 파일명과 사용자 기준 가장 최근 생성된 LOG_NO 1건만 정밀 갱신
+				// 동시 다중 다운로드 요청 시 파일명, 사용자, 최근 5분 이내 생성된 LOG_NO 중 최신 1건만 정밀 갱신
 				String sqlUpdateDownCnt = "UPDATE M_EXCEL_DOWN_LOG "
 						+ "   SET DOWN_CNT = @DOWN_CNT@ "
 						+ " WHERE LOG_NO = ( "
@@ -991,6 +1006,7 @@ public class UploadController {
 						+ "         FROM M_EXCEL_DOWN_LOG "
 						+ "        WHERE (FILE_NAME = @FILE_NAME_EXT@ OR FILE_NAME = @FILE_NAME_RAW@) "
 						+ "          AND REGUSER = @REGUSER@ "
+						+ "          AND REG_DATE >= SYSDATE - (5 / 1440) "
 						+ " ) ";
 				monArchDao.exeUpdate(sqlUpdateDownCnt, updateDownCntParam);
 			} catch (Exception eLog) {
@@ -1177,10 +1193,9 @@ public class UploadController {
 
 		// 20261103 khma : 감사 로그 내 엑셀 암호(excelPassword) 평문 노출 방지 마스킹
 		if (StringUtils.isNotEmpty(요청문서)) {
-			요청문서 = 요청문서.replaceAll("(\\"excelPassword\\"\\s*:\\s*\\")[^\\"]*(\\")", "$1******$2")
+			요청문서 = 요청문서.replaceAll("(\"excelPassword\"\\s*:\\s*\")[^\"]*(\")", "$1******$2")
 					.replaceAll("(?i)(excelPassword=)[^&]*", "$1******");
 		}
-
 		if (StringUtils.isNotEmpty(요청문서) && 요청문서.length() > 2000)
 			요청문서 = 요청문서.substring(0, 2000);
 		if (StringUtils.isEmpty(사용자))
@@ -1246,14 +1261,28 @@ public class UploadController {
 
 		response.setContentType("application/json; charset=UTF-8");
 		PrintWriter out = response.getWriter();
-		// 20261103 khma : 세션 UserInfo 우선 취득 (요청 파라미터 조작 방어)
-		HttpSession session = request.getSession(false);
-		UserInfo userInfo = (session != null) ? (UserInfo) session.getAttribute("UserInfo") : null;
-		String realUid = (userInfo != null && userInfo.getId() != null) ? userInfo.getId() : UID;
-		String realUsite = (userInfo != null && userInfo.getSite() != null) ? userInfo.getSite() : USITE;
 		Map<String, Object> resultMap = new HashMap<String, Object>();
 
 		try {
+			// 20261103 khma : 세션 userInfo 우선 취득 및 미인증 접근 차단 (요청 파라미터 변조 방어)
+			HttpSession session = request.getSession(false);
+			UserInfo userInfo = null;
+			if (session != null) {
+				if (session.getAttribute("userInfo") != null) {
+					userInfo = (UserInfo) session.getAttribute("userInfo");
+				} else if (session.getAttribute("UserInfo") != null) {
+					userInfo = (UserInfo) session.getAttribute("UserInfo");
+				}
+			}
+			if (userInfo == null) {
+				resultMap.put("result", "FAIL");
+				resultMap.put("message", "로그인 세션이 만료되었거나 존재하지 않습니다.");
+				out.print(new ObjectMapper().writeValueAsString(resultMap));
+				return;
+			}
+			String realUid = StringUtils.isNotEmpty(userInfo.getUserNo()) ? userInfo.getUserNo() : userInfo.getUserCode();
+			String realUsite = StringUtils.isNotEmpty(userInfo.getUsiteNo()) ? userInfo.getUsiteNo() : "44";
+
 			if (Filename == null || Filename.isEmpty()) {
 				resultMap.put("result", "FAIL");
 				resultMap.put("message", "업로드할 파일이 없습니다.");
@@ -1269,7 +1298,6 @@ public class UploadController {
 				out.print(new ObjectMapper().writeValueAsString(resultMap));
 				return;
 			}
-
 			// 업로드 파일 확장자 체크 (화이트리스트)
 			if (!CommonUtil.checkExtender(Filename.getOriginalFilename(), FILE_UPLOAD_WHITE_LIST)) {
 				resultMap.put("result", "FAIL");
@@ -1387,25 +1415,69 @@ public class UploadController {
 		OutputStream os = null;
 
 		try {
+			// 20261103 khma : 세션 userInfo 검증 (미인증 파일 다운로드 차단)
+			HttpSession session = request.getSession(false);
+			UserInfo userInfo = null;
+			if (session != null) {
+				if (session.getAttribute("userInfo") != null) {
+					userInfo = (UserInfo) session.getAttribute("userInfo");
+				} else if (session.getAttribute("UserInfo") != null) {
+					userInfo = (UserInfo) session.getAttribute("UserInfo");
+				}
+			}
+			if (userInfo == null) {
+				response.setContentType("text/html; charset=UTF-8");
+				PrintWriter out = response.getWriter();
+				out.write("<script>alert('로그인 세션이 만료되었습니다. 다시 로그인해 주십시오.'); history.back();</script>");
+				out.flush();
+				out.close();
+				return;
+			}
+			String sessionUsite = StringUtils.isNotEmpty(userInfo.getUsiteNo()) ? userInfo.getUsiteNo() : "";
+
 			// 20261102 khma : D: 드라이브 부재 로컬/VDI 환경 자동 Fallback 지원 기본 업로드 경로 취득
 			String defaultFilePath = getBaseUploadPath(request);
-
-			String targetFilePath = filePath;
+			String targetFilePath = "";
 			String downloadFileName = "";
 
+			// 20261103 khma : 임의 filePath 파라미터 직접 다운로드 차단, 오직 DB(M_IMAGE_GAL)에 등록된 fid로만 다운로드 허용
 			if (StringUtils.isNotEmpty(fid)) {
-				// 20261103 khma : 소프트 삭제(USE_YN='N')된 파일 제외 조회
 				String sql = "SELECT * FROM M_IMAGE_GAL WHERE M_IMAGE_GAL_NO = ? AND (USE_YN IS NULL OR USE_YN <> 'N')";
 				MonArchDaoImpl monArchDao = new MonArchDaoImpl();
 				Map<String, Object> mapFileInfo = monArchDao.downloadFile(sql, fid);
 				if (mapFileInfo != null && !mapFileInfo.isEmpty()) {
+					String fileUsite = (mapFileInfo.get("M_USITE_NO") != null) ? mapFileInfo.get("M_USITE_NO").toString() : "";
+					if (StringUtils.isNotEmpty(sessionUsite) && StringUtils.isNotEmpty(fileUsite) && !sessionUsite.equals(fileUsite)) {
+						log.warn("타 사이트 파일 접근 차단: fid=" + fid + ", sessionUsite=" + sessionUsite + ", fileUsite=" + fileUsite);
+						response.setContentType("text/html; charset=UTF-8");
+						PrintWriter out = response.getWriter();
+						out.write("<script>alert('접근 권한이 없는 파일입니다.'); history.back();</script>");
+						out.flush();
+						out.close();
+						return;
+					}
 					if (mapFileInfo.get("FILE_PATH") != null) {
 						targetFilePath = mapFileInfo.get("FILE_PATH").toString();
 					}
 					if (mapFileInfo.get("FILE_NAME") != null) {
 						downloadFileName = mapFileInfo.get("FILE_NAME").toString();
 					}
+				} else {
+					response.setContentType("text/html; charset=UTF-8");
+					PrintWriter out = response.getWriter();
+					out.write("<script>alert('파일 정보가 존재하지 않거나 삭제된 파일입니다.'); history.back();</script>");
+					out.flush();
+					out.close();
+					return;
 				}
+			} else {
+				log.warn("fid 누락 파일 다운로드 시도 차단");
+				response.setContentType("text/html; charset=UTF-8");
+				PrintWriter out = response.getWriter();
+				out.write("<script>alert('비정상적인 파일 요청입니다. (파일 식별자 누락)'); history.back();</script>");
+				out.flush();
+				out.close();
+				return;
 			}
 
 			if (StringUtils.isEmpty(downloadFileName) && StringUtils.isNotEmpty(targetFilePath)) {
@@ -1415,21 +1487,21 @@ public class UploadController {
 				}
 			}
 
-			// 20261103 khma : Path Traversal(상위 경로 조작) 방어 검증
-			if (StringUtils.isNotEmpty(targetFilePath)) {
-				if (targetFilePath.contains("..") || targetFilePath.contains("./") || targetFilePath.contains(".\\")) {
-					log.warn("비인가 상위 경로 조작 시도 차단 (Path Traversal): " + targetFilePath);
-					response.setContentType("text/html; charset=UTF-8");
-					PrintWriter out = response.getWriter();
-					out.write("<script>alert('비정상적인 파일 경로입니다.'); history.back();</script>");
-					out.flush();
-					out.close();
-					return;
-				}
-			}
 			String realPath = (defaultFilePath + targetFilePath).replace("//", "/").replace("/\\", "/");
 			File file = new File(realPath);
 
+			// 20261103 khma : Canonical Path 기반 기본 업로드 디렉토리 탈출 방어 검증
+			File baseDir = new File(defaultFilePath).getCanonicalFile();
+			File canonicalTarget = file.getCanonicalFile();
+			if (!canonicalTarget.getPath().startsWith(baseDir.getPath())) {
+				log.warn("비인가 상위 디렉토리 이탈 시도 차단 (Canonical Path Traversal): " + canonicalTarget.getPath());
+				response.setContentType("text/html; charset=UTF-8");
+				PrintWriter out = response.getWriter();
+				out.write("<script>alert('비정상적인 파일 경로입니다.'); history.back();</script>");
+				out.flush();
+				out.close();
+				return;
+			}
 			if (!file.exists() || !file.isFile()) {
 				// WebRoot 하위 보조 탐색
 				String webRoot = request.getSession().getServletContext().getRealPath("/");
@@ -1501,43 +1573,70 @@ public class UploadController {
 		Map<String, Object> resultMap = new HashMap<String, Object>();
 
 		try {
-			// 20261102 khma : D: 드라이브 부재 로컬/VDI 환경 자동 Fallback 지원 기본 업로드 경로 취득
-			String defaultFilePath = getBaseUploadPath(request);
-
-			String targetFilePath = filePath;
-			MonArchDaoImpl monArchDao = new MonArchDaoImpl();
-
-			if (StringUtils.isNotEmpty(fid)) {
-				String sql = "SELECT * FROM M_IMAGE_GAL WHERE M_IMAGE_GAL_NO = ?";
-				Map<String, Object> mapFileInfo = monArchDao.downloadFile(sql, fid);
-				if (mapFileInfo != null && mapFileInfo.get("FILE_PATH") != null) {
-					targetFilePath = mapFileInfo.get("FILE_PATH").toString();
+			// 20261103 khma : 세션 userInfo 검증 (미인증 삭제 차단)
+			HttpSession session = request.getSession(false);
+			UserInfo userInfo = null;
+			if (session != null) {
+				if (session.getAttribute("userInfo") != null) {
+					userInfo = (UserInfo) session.getAttribute("userInfo");
+				} else if (session.getAttribute("UserInfo") != null) {
+					userInfo = (UserInfo) session.getAttribute("UserInfo");
 				}
 			}
+			if (userInfo == null) {
+				resultMap.put("result", "FAIL");
+				resultMap.put("message", "로그인 세션이 만료되었거나 존재하지 않습니다.");
+				out.print(new ObjectMapper().writeValueAsString(resultMap));
+				return;
+			}
+			String sessionUid = StringUtils.isNotEmpty(userInfo.getUserNo()) ? userInfo.getUserNo() : userInfo.getUserCode();
+			String sessionUsite = StringUtils.isNotEmpty(userInfo.getUsiteNo()) ? userInfo.getUsiteNo() : "";
 
+			// 20261103 khma : fid 식별자 누락 시 삭제 거부 (임의 경로 직접 삭제 방지)
+			if (StringUtils.isEmpty(fid)) {
+				resultMap.put("result", "FAIL");
+				resultMap.put("message", "삭제 대상 파일 식별자(fid)가 누락되었습니다.");
+				out.print(new ObjectMapper().writeValueAsString(resultMap));
+				return;
+			}
+
+			// 20261102 khma : D: 드라이브 부재 로컬/VDI 환경 자동 Fallback 지원 기본 업로드 경로 취득
+			String defaultFilePath = getBaseUploadPath(request);
+			MonArchDaoImpl monArchDao = new MonArchDaoImpl();
+
+			String sql = "SELECT * FROM M_IMAGE_GAL WHERE M_IMAGE_GAL_NO = ?";
+			Map<String, Object> mapFileInfo = monArchDao.downloadFile(sql, fid);
+			if (mapFileInfo == null || mapFileInfo.isEmpty()) {
+				resultMap.put("result", "FAIL");
+				resultMap.put("message", "삭제 대상 파일 정보가 존재하지 않습니다.");
+				out.print(new ObjectMapper().writeValueAsString(resultMap));
+				return;
+			}
+
+			String fileUsite = (mapFileInfo.get("M_USITE_NO") != null) ? mapFileInfo.get("M_USITE_NO").toString() : "";
+			if (StringUtils.isNotEmpty(sessionUsite) && StringUtils.isNotEmpty(fileUsite) && !sessionUsite.equals(fileUsite)) {
+				resultMap.put("result", "FAIL");
+				resultMap.put("message", "타 사이트 파일에 대한 삭제 권한이 없습니다.");
+				out.print(new ObjectMapper().writeValueAsString(resultMap));
+				return;
+			}
+
+			String targetFilePath = (mapFileInfo.get("FILE_PATH") != null) ? mapFileInfo.get("FILE_PATH").toString() : "";
 			if (StringUtils.isNotEmpty(targetFilePath)) {
-				// 20261103 khma : Path Traversal(상위 경로 조작) 방어 검증
-				if (targetFilePath.contains("..") || targetFilePath.contains("./") || targetFilePath.contains(".\\")) {
+				String realPath = (defaultFilePath + targetFilePath).replace("//", "/");
+				File srcFile = new File(realPath);
+
+				// 20261103 khma : Canonical Path 기반 기본 업로드 디렉토리 탈출 방어 검증
+				File baseDir = new File(defaultFilePath).getCanonicalFile();
+				File canonicalSrc = srcFile.getCanonicalFile();
+				if (!canonicalSrc.getPath().startsWith(baseDir.getPath())) {
 					resultMap.put("result", "FAIL");
-					resultMap.put("message", "비정상적인 파일 경로입니다.");
+					resultMap.put("message", "비정상적인 파일 경로입니다. (디렉토리 이탈)");
 					out.print(new ObjectMapper().writeValueAsString(resultMap));
 					return;
 				}
-				String realPath = (defaultFilePath + targetFilePath).replace("//", "/");
-				File srcFile = new File(realPath);
-				if (!srcFile.exists()) {
-					String webRoot = request.getSession().getServletContext().getRealPath("/");
-					if (StringUtils.isNotEmpty(webRoot)) {
-						File altFile = new File(webRoot + "/FileData/signFile/" + targetFilePath);
-						if (altFile.exists() && altFile.isFile()) {
-							srcFile = altFile;
-							defaultFilePath = webRoot + "/FileData/signFile/";
-						}
-					}
-				}
 
 				if (srcFile.exists() && srcFile.isFile()) {
-					// 휴지통 경로 (/FileData/trash/년/월/) 생성 및 파일 이동
 					Calendar calendar = Calendar.getInstance();
 					String trashFolder = defaultFilePath + "/trash/" + calendar.get(Calendar.YEAR) + "/" + String.format("%02d", calendar.get(Calendar.MONTH) + 1);
 					File trashDir = new File(trashFolder);
@@ -1545,28 +1644,37 @@ public class UploadController {
 						trashDir.mkdirs();
 					}
 					File destFile = new File(trashFolder + "/" + System.currentTimeMillis() + "_" + srcFile.getName());
-					// 20261103 khma : renameTo 성공 여부 확인 및 실패 시 Fallback 로깅
+					// 20261103 khma : renameTo 성공 여부 확인 및 실패 시 FileUtils Fallback
 					boolean isMoved = srcFile.renameTo(destFile);
 					if (!isMoved) {
-						log.warn("물리 파일 휴지통 이동(renameTo) 실패: " + srcFile.getAbsolutePath());
+						try {
+							org.apache.commons.io.FileUtils.moveFile(srcFile, destFile);
+							isMoved = true;
+						} catch (Exception eMove) {
+							log.warn("FileUtils.moveFile 실패: " + eMove.getMessage());
+						}
+					}
+					if (!isMoved) {
+						log.error("물리 파일 휴지통 이동 실패로 DB 삭제 중단: " + srcFile.getAbsolutePath());
+						resultMap.put("result", "FAIL");
+						resultMap.put("message", "물리 파일 이동에 실패하여 삭제 처리를 안전하게 중단하였습니다.");
+						out.print(new ObjectMapper().writeValueAsString(resultMap));
+						return;
 					}
 				}
 
-				// DB 레코드 삭제
-				if (StringUtils.isNotEmpty(fid)) {
-					// 20261103 khma : DB 완전 삭제 대신 소프트 삭제(USE_YN='N', DEL_DATE=SYSDATE) 및 삭제자 기록
-					String delSql = "UPDATE M_IMAGE_GAL "
-							+ "   SET USE_YN = 'N', "
-							+ "       DEL_DATE = SYSDATE, "
-							+ "       DEL_USER = @DEL_USER@, "
-							+ "       UPD_DATE = SYSDATE, "
-							+ "       UPD_USER = @DEL_USER@ "
-							+ " WHERE M_IMAGE_GAL_NO = @M_IMAGE_GAL_NO@";
-					Map<String, String> delParam = new HashMap<String, String>();
-					delParam.put("M_IMAGE_GAL_NO", fid);
-					delParam.put("DEL_USER", uid);
-					monArchDao.exeUpdate(delSql, delParam);
-				}
+				// 20261103 khma : DB 행 완전 삭제 대신 소프트 삭제(USE_YN='N', DEL_DATE=SYSDATE, DEL_USER) 적용
+				String delSql = "UPDATE M_IMAGE_GAL "
+						+ "   SET USE_YN = 'N', "
+						+ "       DEL_DATE = SYSDATE, "
+						+ "       DEL_USER = @DEL_USER@, "
+						+ "       UPD_DATE = SYSDATE, "
+						+ "       UPD_USER = @DEL_USER@ "
+						+ " WHERE M_IMAGE_GAL_NO = @M_IMAGE_GAL_NO@";
+				Map<String, String> delParam = new HashMap<String, String>();
+				delParam.put("M_IMAGE_GAL_NO", fid);
+				delParam.put("DEL_USER", sessionUid);
+				monArchDao.exeUpdate(delSql, delParam);
 			}
 
 			resultMap.put("result", "OK");
