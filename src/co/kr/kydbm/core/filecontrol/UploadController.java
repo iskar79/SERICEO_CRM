@@ -1156,12 +1156,11 @@ public class UploadController {
 		uselogParam.put("M_USER_NO", 사용자);
 		uselogParam.put("SERVICE_NAME", 서비스);
 		uselogParam.put("METHOD_NAME", 메소드);
-		// 20261103 khma : M_USE_LOG SQL 바인딩 템플릿(@REQ_DOC@)과 일치하도록 REQ_DOC 키 추가 (기존 '요청문서' 키 병행 보존)
+		// 20261103 khma : M_USE_LOG SQL 바인딩 템플릿(@REQ_DOC@)과 일치하도록 영문 컬럼명 키(REQ_DOC)로 일치화 및 미사용 키 제거
 		/*
 		uselogParam.put("요청문서", 요청문서);
 		*/
 		uselogParam.put("REQ_DOC", 요청문서);
-		uselogParam.put("요청문서", 요청문서);
 		uselogParam.put("ELAPSED_TIME", String.valueOf(소요시간));
 		uselogParam.put("KEY_VALUE", KEY);
 		uselogParam.put("MENU_MGMT_NO", MENUID);
