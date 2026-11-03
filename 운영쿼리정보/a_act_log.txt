@@ -1,0 +1,24 @@
+"CEO"."A_ACT_LOG"
+이름          널?       유형             
+----------- -------- -------------- 
+SEQ         NOT NULL NUMBER         
+SITE                 VARCHAR2(8)    -- 사이트 식별자 (CEO, CP, EXP, HUB, MS, PRO, SP, SP002~SP018(17개), SST, THR 등)    
+CORP                 NUMBER         
+USEQ                 NUMBER         
+GBN                  VARCHAR2(100)  
+SUBGBN               VARCHAR2(100)  
+TITLE                VARCHAR2(300)  
+STATUS               VARCHAR2(18)   
+USEYN                VARCHAR2(1)    
+ATTR1                VARCHAR2(2000) 
+ATTR2                VARCHAR2(2000) 
+ATTR3                VARCHAR2(2000) 
+REGTIME              DATE           
+CHGTIME              DATE           
+TBL                  VARCHAR2(100)  
+KEY1                 NUMBER         
+KEY2                 NUMBER         
+
+-- 주요 사용 조건 (광고성 정보 전송을 위한 개인정보 수집 이용 동의 이력)
+-- site = '{@GSITE}' AND corp IS NULL AND useyn = 'Y'
+-- AND gbn = '회원가입' AND subgbn = '광고성 정보 전송을 위한 개인정보 수집 이용 동의' AND status = 'Y'

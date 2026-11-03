@@ -1,8 +1,8 @@
-﻿"CEO"."A_USER_DMINFO"
+"CEO"."A_USER_DMINFO"
 이름          널?       유형             비고
 ----------- -------- -------------- ----------------------------------------------------
 SEQ         NOT NULL NUMBER         일련번호 (PK)
-SITE                 VARCHAR2(8)    사이트 식별자 ('CEO', 'PRO', 'HUB' 3종 값만 존재)
+SITE                 VARCHAR2(8)    사이트 식별자 (CEO, CP, EXP, HUB, MS, PRO, SP, SP002~SP018(17개), SST, THR 등)
 CORP                 NUMBER         법인 번호
 USEQ                 NUMBER         회원 번호 (A_USER.USEQ 매핑)
 GBN                  NVARCHAR2(300) 구분 ('CLASS': 오프라인 홍보용 / 'MARKETING': 광고성 홍보용 2종만 존재)
