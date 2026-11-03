@@ -2,7 +2,7 @@
 이름          널?       유형             비고
 ----------- -------- -------------- ----------------------------------------------------
 SEQ         NOT NULL NUMBER         일련번호 (PK)
-SITE                 VARCHAR2(8)    사이트 식별자 (CEO/PRO/MS/SP)
+SITE                 VARCHAR2(8)    사이트 식별자 (CEO, PRO, HUB 등 사이트 구분)
 CORP                 NUMBER         법인 번호
 USEQ                 NUMBER         회원 번호 (A_USER.USEQ 매핑)
 GBN                  NVARCHAR2(300) 구분 ('CLASS': 오프라인 홍보용 / 'MARKETING': 광고성 홍보용 2종만 존재)
