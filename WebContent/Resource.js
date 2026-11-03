@@ -101,7 +101,7 @@ var _M = {
             { "CODE": "CORP",      "DECODE": "법인번호" },
             { "CODE": "EMAILYN",   "DECODE": "이메일 수신" },
             { "CODE": "SMSYN",     "DECODE": "SMS 수신" },
-            { "CODE": "ADVYN",     "DECODE": "광고성정보 수신" }
+            { "CODE": "DMYN",      "DECODE": "광고성정보 수신" }
         ],
         // 20261103 khma : 엑셀 다운로드 용도(XLS_PURPOSE) 및 수신대상(XLS_TARGET) 기본 코드 매핑
         "XLS_PURPOSE": [

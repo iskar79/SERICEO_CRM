@@ -7330,9 +7330,19 @@ $(document).on("blur", ".t_Money", function (e) {
       // -----------------------------------------------------------------
       // 공통코드 취득 및 캐시 보장 (XLS_PURPOSE, XLS_TARGET)
       // -----------------------------------------------------------------
-      // 20261103 khma : 공통코드 취득 및 캐시 보장 (XLS_PURPOSE, XLS_TARGET, XLS_SEC_COLS)
-      if (_M.Codes["XLS_PURPOSE"] == undefined || _M.Codes["XLS_TARGET"] == undefined || _M.Codes["XLS_SEC_COLS"] == undefined) {
-        $.SvcGetCodes("XLS_PURPOSE,XLS_TARGET,XLS_SEC_COLS", function (data) {
+      // 20261103 khma : 보안 추출 공통코드 그룹명 동적 결정 (xlsOption.secCols 우선, 기본값 XLS_SEC_COLS)
+      var targetSecGrp = (_jobInfo && _jobInfo.xlsOption && _jobInfo.xlsOption.secCols)
+                         ? _jobInfo.xlsOption.secCols
+                         : "XLS_SEC_COLS";
+
+      var needFetchCodes = [];
+      if (_M.Codes["XLS_PURPOSE"] == undefined) needFetchCodes.push("XLS_PURPOSE");
+      if (_M.Codes["XLS_TARGET"] == undefined) needFetchCodes.push("XLS_TARGET");
+      if (targetSecGrp !== "NONE" && targetSecGrp !== false && _M.Codes[targetSecGrp] == undefined) {
+        needFetchCodes.push(targetSecGrp);
+      }
+      if (needFetchCodes.length > 0) {
+        $.SvcGetCodes(needFetchCodes.join(","), function (data) {
           if (data && data.resultData) {
             $.each(data.resultData, function (index, value) {
               if (_M.Codes[value.CODE_GRP] == undefined) {
@@ -7561,10 +7571,13 @@ $(document).on("blur", ".t_Money", function (e) {
           // (기타 'ETC'일 경우 DOWNCOLS를 전달하지 않아 원래 화면 그리드의 전체 컬럼 그대로 다운로드)
           // -----------------------------------------------------------------
           var selPurpose = savedParams.XLS_PURPOSE || "";
-          if (selPurpose === "INFO" || selPurpose === "OFF_PROMO" || selPurpose === "ADV_PROMO") {
+          if ((selPurpose === "INFO" || selPurpose === "OFF_PROMO" || selPurpose === "ADV_PROMO") && targetSecGrp !== "NONE" && targetSecGrp !== false) {
             var secCols = [];
             var secLavs = [];
-            var secList = _M.Codes["XLS_SEC_COLS"];
+            var secList = _M.Codes[targetSecGrp];
+            if (!secList || secList.length === 0) {
+              secList = _M.ExcelSecurityCols;
+            }
             if (secList && secList.length > 0) {
               $.each(secList, function (idx, item) {
                 if (item.CODE) {
