@@ -7635,8 +7635,23 @@ $(document).on("blur", ".t_Money", function (e) {
           $.each(savedParams, function (fldName, fldVal) {
             plLog.add(fldName, fldVal);
           });
-          // 20261103 khma : 요청문서 이력(REQ_DOC) 파라미터 기본값 보장 (구조체 미등록 시에도 쿼리 에러 방지)
-          var reqDocVal = savedParams.REQ_DOC || savedParams.req_doc || "";
+          // 20261103 khma : M_USE_LOG.REQ_DOC와 동일하게 엑셀 다운로드 요청 파라미터 전문(pl 직렬화 JSON)을 REQ_DOC에 적재
+          var reqDocVal = "";
+          try {
+            if (pl && typeof pl.toJson === "function") {
+              reqDocVal = pl.toJson();
+            } else if (pl && typeof pl.toXml === "function") {
+              reqDocVal = pl.toXml();
+            }
+          } catch (eParam) {
+            reqDocVal = "";
+          }
+          if (reqDocVal && reqDocVal.length > 2000) {
+            reqDocVal = reqDocVal.substring(0, 2000);
+          }
+          if (savedParams && (savedParams.REQ_DOC || savedParams.req_doc)) {
+            reqDocVal = savedParams.REQ_DOC || savedParams.req_doc;
+          }
           plLog.add("REQ_DOC", reqDocVal);
           plLog.add("req_doc", reqDocVal);
 

@@ -9,7 +9,7 @@
 -- ---------------------------------------------------------------------
 -- 20261103 khma : 요청문서 이력 관리를 위한 REQ_DOC 컬럼 추가
 -- ALTER TABLE "CRM"."M_EXCEL_DOWN_LOG" ADD ("REQ_DOC" NVARCHAR2(2000));
--- COMMENT ON COLUMN "CRM"."M_EXCEL_DOWN_LOG"."REQ_DOC" IS '다운로드 요청문서 이력 (전자결재/품의서 번호, 공문명 등)';
+-- COMMENT ON COLUMN "CRM"."M_EXCEL_DOWN_LOG"."REQ_DOC" IS '엑셀 다운로드 요청 파라미터 전문 (M_USE_LOG.REQ_DOC 동일 규격, 최대 2000자)';
 
 -- ---------------------------------------------------------------------
 -- [옵션 B] 테이블 신규 생성 시 (전체 스크립트 실행)
@@ -34,7 +34,7 @@ CREATE TABLE "CRM"."M_EXCEL_DOWN_LOG" (
     "XLS_PURPOSE"  VARCHAR2(50),                                    -- 용도 코드 (INFO, OFF_PROMO, ADV_PROMO, ETC)
     "XLS_TARGET"   VARCHAR2(50),                                    -- 대상 코드 (ALL, EMAIL, SMS, TEL)
     "XLS_REASON"   VARCHAR2(1000)    NOT NULL,                      -- 다운로드 사유/목적 (최소 10자 이상 필수)
-    "REQ_DOC"      NVARCHAR2(2000),                                 -- 20261103 khma : 다운로드 요청문서 이력 (전자결재/품의서 번호, 문서명 등)
+    "REQ_DOC"      NVARCHAR2(2000),                                 -- 20261103 khma : 엑셀 다운로드 요청 파라미터 전문 (M_USE_LOG.REQ_DOC 동일 규격, 최대 2000자)
     "DOWN_CNT"     NUMBER(10)        DEFAULT 0,                     -- 다운로드 추출 데이터 건수
     "CLIENT_IP"    VARCHAR2(50),                                    -- 요청자 클라이언트 IP 주소
     "REGDATE"      TIMESTAMP(6)      DEFAULT SYSTIMESTAMP NOT NULL, -- 다운로드 일시 (CRM 표준 TIMESTAMP)
@@ -53,7 +53,7 @@ COMMENT ON COLUMN "CRM"."M_EXCEL_DOWN_LOG"."FILE_NAME" IS '생성된 다운로�
 COMMENT ON COLUMN "CRM"."M_EXCEL_DOWN_LOG"."XLS_PURPOSE" IS '다운로드 용도 (INFO, OFF_PROMO, ADV_PROMO, ETC)';
 COMMENT ON COLUMN "CRM"."M_EXCEL_DOWN_LOG"."XLS_TARGET" IS '추출 대상 (ALL, EMAIL, SMS, TEL)';
 COMMENT ON COLUMN "CRM"."M_EXCEL_DOWN_LOG"."XLS_REASON" IS '다운로드 사유/목적 (10자 이상 필수)';
-COMMENT ON COLUMN "CRM"."M_EXCEL_DOWN_LOG"."REQ_DOC" IS '다운로드 요청문서 이력 (전자결재/품의서 번호, 문서명 등)';
+COMMENT ON COLUMN "CRM"."M_EXCEL_DOWN_LOG"."REQ_DOC" IS '엑셀 다운로드 요청 파라미터 전문 (M_USE_LOG.REQ_DOC 동일 규격, 최대 2000자)';
 COMMENT ON COLUMN "CRM"."M_EXCEL_DOWN_LOG"."DOWN_CNT" IS '추출 데이터 건수';
 COMMENT ON COLUMN "CRM"."M_EXCEL_DOWN_LOG"."CLIENT_IP" IS '요청자 클라이언트 IP';
 COMMENT ON COLUMN "CRM"."M_EXCEL_DOWN_LOG"."REGDATE" IS '등록 일시';
