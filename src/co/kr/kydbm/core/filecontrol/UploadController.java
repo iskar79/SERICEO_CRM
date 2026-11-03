@@ -1051,17 +1051,42 @@ public class UploadController {
 			log.error(msg, e);
 			SvcCRUD svcCRUD = new SvcCRUD();
 			svcCRUD.Log("DATACRUD", sqlCommand, msg, USITE, UID);
-			throw new Exception(CommonConst.COMM_ERROR_MESSAGE);
+
+			// 20261103 khma : 하얀 화면 이동 방지, 오류 로그 DB 기록 및 브라우저 alert 안내 후 복귀
+			try {
+				response.reset();
+				response.setContentType("text/html; charset=UTF-8");
+				PrintWriter out = response.getWriter();
+				out.write("<script>alert('엑셀 데이터 조회 중 오류가 발생하였습니다.\\n관리자에게 문의해 주십시오.'); history.back();</script>");
+				out.flush();
+				out.close();
+			} catch (Exception ex) {}
+			return null;
 		} catch (Throwable e) {
 			e.printStackTrace();
 			log.error(e.getMessage(), e);
-			throw new Exception(CommonConst.COMM_ERROR_MESSAGE);
-		}
 
-		// 20261102 khma : 파일 스트림 직접 출력 완료 후 Spring View 렌더링 생략 (응답 스트림 이미 커밋됨에 따른 충돌 방지)
-		/*
-		return new ModelAndView("fileDownloadView", "info", null);
-		*/
+			// 20261103 khma : 시스템 에러 로그(SvcCRUD.Log) DB 적재 및 사용자 alert 안내 출력 (하얀 화면 방어)
+			try {
+				String sqlCommand = (si != null) ? si.getSql() : "";
+				String msg = "MonArch[Excel Down] : " + e.getMessage() + "\r\r ----------------- \r Service = "
+						+ xlsService + "\r Method = " + xlsMethod;
+				SvcCRUD svcCRUD = new SvcCRUD();
+				svcCRUD.Log("EXCELDOWN", sqlCommand, msg, USITE, UID);
+
+				response.reset();
+				response.setContentType("text/html; charset=UTF-8");
+				PrintWriter out = response.getWriter();
+				String alertMsg = "엑셀 다운로드 중 오류가 발생하였습니다.";
+				if (StringUtils.isNotEmpty(e.getMessage()) && !e.getMessage().equals(CommonConst.COMM_ERROR_MESSAGE)) {
+					alertMsg += "\\n(" + e.getMessage().replace("'", "\\'").replace("\r", " ").replace("\n", " ") + ")";
+				}
+				out.write("<script>alert('" + alertMsg + "'); history.back();</script>");
+				out.flush();
+				out.close();
+			} catch (Exception ex) {}
+			return null;
+		}
 		return null;
 	}
 
