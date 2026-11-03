@@ -1,4 +1,4 @@
-# 다중 PC 안티그래비티(Antigravity) 실시간 작업 공유 및 인수인계서
+﻿# 다중 PC 안티그래비티(Antigravity) 실시간 작업 공유 및 인수인계서
 
 > **🔄 양방향 PC 동기화 및 VDI 반영 확인 게이트(Gate) 규칙 (필독)**
 > 1. **작업 시작 시 (`PC A` 또는 `PC B`에서 안티그래비티를 열었을 때)**:
@@ -52,6 +52,11 @@
 9. **Step 2-3 (superContaner.js): `DownXlsNew` 신규 메서드 구현 완료 (로컬 완료)**:
    - 공통코드 그룹 ID(`XLS_PURPOSE`, `XLS_TARGET`) `$.SvcGetCodes` 동적 로딩 + Fallback 기본값 연동.
    - 2단계 순차 팝업 (1단계: 용도/대상/목적 10자 이상 ➡️ 2단계: 엑셀 열람 암호 4자 이상 필수).
+
+10. **Step 5 (차세대 파일 시스템): `singleFileNew`, `multiFileNew` Drag & Drop 및 백엔드 3종 엔드포인트 구축 완료 (VDI 런타임 검증 완료)**:
+   - `UploadController.java`: `/uploadFileNew`, `/downloadFileNew`, `/deleteFileSafe` 3종 엔드포인트 구현 및 D: 드라이브 미존재 VDI 환경 대응 `getBaseUploadPath` 자동 Fallback 구현 완료.
+   - `superContaner.js`: HTML5 Drag & Drop 드롭존, 클라이언트 지연 업로드, 20MB 검증, `singleFileNew` 1개 파일 제한 및 기존 파일 자동 교체 안내 문구/`confirm` 확인창 추가 완료.
+   - `Resource.js`, `Monarch820-servlet.xml`: URL 맵 등록 및 세션 인터셉터 매핑 완료.
 
 ---
 
