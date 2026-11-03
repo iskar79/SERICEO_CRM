@@ -1,4 +1,4 @@
-﻿/// <reference path="jquery.kdb.MonArch800.js" />
+/// <reference path="jquery.kdb.MonArch800.js" />
 /// <reference path="../Resource.js" />
 /// <reference path="MonArchResource.js" />
 
@@ -7330,8 +7330,9 @@ $(document).on("blur", ".t_Money", function (e) {
       // -----------------------------------------------------------------
       // 공통코드 취득 및 캐시 보장 (XLS_PURPOSE, XLS_TARGET)
       // -----------------------------------------------------------------
-      if (_M.Codes["XLS_PURPOSE"] == undefined || _M.Codes["XLS_TARGET"] == undefined) {
-        $.SvcGetCodes("XLS_PURPOSE,XLS_TARGET", function (data) {
+      // 20261103 khma : 공통코드 취득 및 캐시 보장 (XLS_PURPOSE, XLS_TARGET, XLS_SEC_COLS)
+      if (_M.Codes["XLS_PURPOSE"] == undefined || _M.Codes["XLS_TARGET"] == undefined || _M.Codes["XLS_SEC_COLS"] == undefined) {
+        $.SvcGetCodes("XLS_PURPOSE,XLS_TARGET,XLS_SEC_COLS", function (data) {
           if (data && data.resultData) {
             $.each(data.resultData, function (index, value) {
               if (_M.Codes[value.CODE_GRP] == undefined) {
@@ -7554,6 +7555,29 @@ $(document).on("blur", ".t_Money", function (e) {
           // 백엔드로 timeStamp 및 xlsName 전송 (백엔드 UploadController 파일명 일치화)
           pl.add("timeStamp", timeStampDigits);
           pl.add("xlsName", cleanTitle);
+
+          // -----------------------------------------------------------------
+          // 20261103 khma : 정보성/홍보용(INFO, OFF_PROMO, ADV_PROMO)일 경우 공통코드(XLS_SEC_COLS) 기반 13개 컬럼만 정밀 추출
+          // (기타 'ETC'일 경우 DOWNCOLS를 전달하지 않아 원래 화면 그리드의 전체 컬럼 그대로 다운로드)
+          // -----------------------------------------------------------------
+          var selPurpose = savedParams.XLS_PURPOSE || "";
+          if (selPurpose === "INFO" || selPurpose === "OFF_PROMO" || selPurpose === "ADV_PROMO") {
+            var secCols = [];
+            var secLavs = [];
+            var secList = _M.Codes["XLS_SEC_COLS"];
+            if (secList && secList.length > 0) {
+              $.each(secList, function (idx, item) {
+                if (item.CODE) {
+                  secCols.push(item.CODE);
+                  secLavs.push(item.DECODE || item.CODE);
+                }
+              });
+            }
+            if (secCols.length > 0) {
+              pl.add("DOWNCOLS", secCols.join(","));
+              pl.add("DOWNLAVS", secLavs.join(","));
+            }
+          }
 
           // -----------------------------------------------------------------
           // 20261102 khma : 다운로드 실행 함수 (targetService 전달 보정)

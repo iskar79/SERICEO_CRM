@@ -87,6 +87,36 @@ var _M = {
     //IsPageShow: true, // true-전체페이지(빠른속도), false-권한있는페이지 
     //CssName: "silgi",
     Codes: {
+        // 20261103 khma : 정보성/홍보용 엑셀 다운로드 보안 추출 13개 기본 컬럼 정의 (DB XLS_SEC_COLS 공통코드 Fallback)
+        "XLS_SEC_COLS": [
+            { "CODE": "USERGBN",   "DECODE": "회원분류" },
+            { "CODE": "LOGINID",   "DECODE": "아이디" },
+            { "CODE": "NAME",      "DECODE": "이름" },
+            { "CODE": "EMAIL",     "DECODE": "이메일" },
+            { "CODE": "INUM",      "DECODE": "보안아이디" },
+            { "CODE": "MTELNO",    "DECODE": "휴대폰" },
+            { "CODE": "SUBEMAIL",  "DECODE": "비서이메일" },
+            { "CODE": "SERVSTIME", "DECODE": "서비스시작일" },
+            { "CODE": "SERVETIME", "DECODE": "서비스종료일" },
+            { "CODE": "CORP",      "DECODE": "법인번호" },
+            { "CODE": "EMAILYN",   "DECODE": "이메일 수신" },
+            { "CODE": "SMSYN",     "DECODE": "SMS 수신" },
+            { "CODE": "ADVYN",     "DECODE": "광고성정보 수신" }
+        ],
+        // 20261103 khma : 엑셀 다운로드 용도(XLS_PURPOSE) 및 수신대상(XLS_TARGET) 기본 코드 매핑
+        "XLS_PURPOSE": [
+            { "CODE": "",          "DECODE": ":: 선택하세요 ::" },
+            { "CODE": "INFO",      "DECODE": "정보성" },
+            { "CODE": "OFF_PROMO", "DECODE": "오프라인 홍보용" },
+            { "CODE": "ADV_PROMO", "DECODE": "광고성 홍보용" },
+            { "CODE": "ETC",       "DECODE": "기타" }
+        ],
+        "XLS_TARGET": [
+            { "CODE": "ALL",       "DECODE": "전체" },
+            { "CODE": "EMAIL",     "DECODE": "이메일 수신" },
+            { "CODE": "SMS",       "DECODE": "SMS 수신" },
+            { "CODE": "TEL",       "DECODE": "전화 수신" }
+        ],
         "TimeHours": [{ "CODE": "07", "DECODE": "오전 7시" },
                       { "CODE": "08", "DECODE": "오전 8시" },
                       { "CODE": "09", "DECODE": "오전 9시" },
