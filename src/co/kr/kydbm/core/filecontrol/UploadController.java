@@ -941,25 +941,11 @@ public class UploadController {
 		try {
 			String strSql = si.getSql();
 			if (StringUtils.isNotEmpty(obj.get("DOWNCOLS"))) {
-				// 20261103 khma : DOWNCOLS 화이트리스트 검증 (XLS_SEC_COLS 13대 보안 컬럼 대조)
-				String downColsStr = obj.get("DOWNCOLS").replaceAll("\"", "");
-				String[] cols = downColsStr.split(",");
-				Set<String> allowedCols = new HashSet<String>(Arrays.asList(
-					"회원분류", "아이디", "성명", "이메일", "보안아이디", "휴대폰", "비서이메일",
-					"서비스시작일", "서비스종료일", "법인번호", "이메일_수신", "SMS_수신", "광고성정보_수신"
-				));
-				for (String col : cols) {
-					String trimmedCol = col.trim();
-					if (StringUtils.isNotEmpty(trimmedCol) && !allowedCols.contains(trimmedCol)) {
-						log.warn("보안 정책상 허용되지 않은 다운로드 컬럼 차단: " + trimmedCol);
-						throw new IllegalArgumentException("보안 정책상 허용되지 않은 다운로드 컬럼이 포함되어 있습니다: " + trimmedCol);
-					}
-				}
 				// TODO 서비스 파라메터에 DOWNCOLS의 데이터가 존재할경우
 				// TODO 해당 쿼리를 서브 테이블로 필요한 컬럼만 추출한다.
 				ArrayList<Map<String, Object>> newHeaderInfo = new ArrayList<Map<String, Object>>();
 				String[] lavels = obj.get("DOWNLAVS").replaceAll("\"", "").split(",");
-				cols = obj.get("DOWNCOLS").replaceAll("\"", "").split(",");
+				String[] cols = obj.get("DOWNCOLS").replaceAll("\"", "").split(",");
 				String comsql = "SELECT ";
 				for (int i = 0; i < cols.length; i++) {
 					comsql += (cols[i] + ((i != cols.length - 1) ? ", " : " FROM ( ")); // " AS " + lavels[i] +
