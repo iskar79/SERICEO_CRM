@@ -5,8 +5,8 @@
 -- 20261103 khma : EXCEL 메소드 실제 한글 별칭(언더스코어 포함)과 1:1 일치화
 -- =========================================================================
 
--- 기존 등록 건 정리 (재등록 시)
-DELETE FROM M_COMM_CODE WHERE CODE_GRP = 'XLS_SEC_COLS';
+-- 기존 등록 건 정리 (동일 사이트 '44' 기준 재등록 시)
+DELETE FROM M_COMM_CODE WHERE CODE_GRP = 'XLS_SEC_COLS' AND M_USITE_NO = '44';
 
 INSERT INTO M_COMM_CODE (M_COMM_CODE_NO, CODE_GRP, CODE_VAL, CODE_NAME, CODE_DESC, SORT_NO, USE_FLAG, LANG_CODE, M_USITE_NO, REG_DATE, REG_USER)
 VALUES (M_COMM_CODE_SEQ.NEXTVAL, 'XLS_SEC_COLS', '회원분류',        '회원분류',        '정보성/홍보용 엑셀 추출 컬럼', 1,  '1', 'ko', '44', SYSDATE, '1000305');

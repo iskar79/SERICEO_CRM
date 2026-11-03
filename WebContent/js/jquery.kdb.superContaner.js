@@ -7680,6 +7680,11 @@ $(document).on("blur", ".t_Money", function (e) {
           } catch (eParam) {
             reqDocVal = "";
           }
+          // 20261103 khma : 감사 로그 내 엑셀 암호(excelPassword) 평문 노출 방지 마스킹
+          if (reqDocVal && reqDocVal !== "") {
+            reqDocVal = reqDocVal.replace(/("excelPassword"\s*:\s*")[^"]*(")/gi, '$1******$2')
+                                 .replace(/(excelPassword=)[^&]*/gi, '$1******');
+          }
           if (reqDocVal && reqDocVal.length > 2000) {
             reqDocVal = reqDocVal.substring(0, 2000);
           }
@@ -7698,11 +7703,15 @@ $(document).on("blur", ".t_Money", function (e) {
                 fnDoDownload();
               },
               function (err) {
-                fnDoDownload();
+                // 20261103 khma : 보안 감사 이력 저장 실패 시 엑셀 다운로드 차단
+                alert("보안 감사 이력(사유) 저장에 실패하여 엑셀 다운로드가 중단되었습니다.\n관리자에게 문의해 주십시오.");
+                return false;
               }
             );
           } catch (eLog) {
-            fnDoDownload();
+            // 20261103 khma : 예외 발생 시 다운로드 진행 차단
+            alert("보안 감사 이력 처리 중 오류가 발생하여 엑셀 다운로드가 중단되었습니다.");
+            return false;
           }
         });
       };
