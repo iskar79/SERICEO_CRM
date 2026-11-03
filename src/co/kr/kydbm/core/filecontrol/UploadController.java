@@ -1,4 +1,4 @@
-package co.kr.kydbm.core.filecontrol;
+﻿package co.kr.kydbm.core.filecontrol;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -889,6 +889,20 @@ public class UploadController {
 		if (obj.containsKey("excelPassword") && StringUtils.isNotEmpty(obj.get("excelPassword"))) {
 			excelPassword = URLDecoder.decode(obj.get("excelPassword"), "UTF-8");
 		}
+		// 20261103 khma Start : 요청문서 이력(REQ_DOC) 및 다운로드 사유(XLS_REASON) 파라미터 취득
+		String excelReason = "";
+		String reqDoc = "";
+		if (obj.containsKey("XLS_REASON") && StringUtils.isNotEmpty(obj.get("XLS_REASON"))) {
+			excelReason = URLDecoder.decode(obj.get("XLS_REASON"), "UTF-8");
+		} else if (obj.containsKey("excelReason") && StringUtils.isNotEmpty(obj.get("excelReason"))) {
+			excelReason = URLDecoder.decode(obj.get("excelReason"), "UTF-8");
+		}
+		if (obj.containsKey("REQ_DOC") && StringUtils.isNotEmpty(obj.get("REQ_DOC"))) {
+			reqDoc = URLDecoder.decode(obj.get("REQ_DOC"), "UTF-8");
+		} else if (obj.containsKey("reqDoc") && StringUtils.isNotEmpty(obj.get("reqDoc"))) {
+			reqDoc = URLDecoder.decode(obj.get("reqDoc"), "UTF-8");
+		}
+		// 20261103 khma End : 요청문서 이력(REQ_DOC) 및 다운로드 사유(XLS_REASON) 파라미터 취득
 		// 20261102 khma End : 보안 엑셀 다운로드 파라미터 취득
 
 		// xlsServuce, xlsMethod를 조건으로 쿼리정보를 취득한다.

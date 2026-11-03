@@ -1,17 +1,29 @@
--- =====================================================================
--- 20261102 khma : 엑셀 다운로드 보안 감사 및 사유 이력 테이블 생성 스크립트 (초경량 정비)
--- 스키마: CRM / 테이블: M_EXCEL_DOWN_LOG (총 13개 핵심 컬럼)
+﻿-- =====================================================================
+-- 20261103 khma : 엑셀 다운로드 보안 감사 및 사유 이력 테이블 생성 스크립트 (초경량 정비)
+-- 20261103 khma : 다운로드 요청문서(REQ_DOC) 이력 관리 컬럼 추가 반영 (NVARCHAR2(2000))
+-- 스키마: CRM / 테이블: M_EXCEL_DOWN_LOG (총 14개 핵심 컬럼)
 -- =====================================================================
 
--- 1. 시퀀스 생성
-CREATE SEQUENCE "CRM"."SEQ_M_EXCEL_DOWN_LOG"
-    START WITH 1
-    INCREMENT BY 1
-    NOMAXVALUE
-    NOCACHE
-    NOCYCLE;
+-- ---------------------------------------------------------------------
+-- [옵션 A] 이미 M_EXCEL_DOWN_LOG 테이블이 생성되어 있는 경우 (ALTER 문 실행)
+-- ---------------------------------------------------------------------
+-- 20261103 khma : 요청문서 이력 관리를 위한 REQ_DOC 컬럼 추가
+-- ALTER TABLE "CRM"."M_EXCEL_DOWN_LOG" ADD ("REQ_DOC" NVARCHAR2(2000));
+-- COMMENT ON COLUMN "CRM"."M_EXCEL_DOWN_LOG"."REQ_DOC" IS '다운로드 요청문서 이력 (전자결재/품의서 번호, 공문명 등)';
 
--- 2. 테이블 생성 (불필요 마스터/중복 컬럼 제거 완료)
+-- ---------------------------------------------------------------------
+-- [옵션 B] 테이블 신규 생성 시 (전체 스크립트 실행)
+-- ---------------------------------------------------------------------
+
+-- 1. 시퀀스 생성 (기존 미존재 시)
+-- CREATE SEQUENCE "CRM"."SEQ_M_EXCEL_DOWN_LOG"
+--     START WITH 1
+--     INCREMENT BY 1
+--     NOMAXVALUE
+--     NOCACHE
+--     NOCYCLE;
+
+-- 2. 테이블 생성 (총 14개 컬럼)
 CREATE TABLE "CRM"."M_EXCEL_DOWN_LOG" (
     "LOG_NO"       NUMBER(18)        NOT NULL,                      -- 일련번호 (PK, SEQ_M_EXCEL_DOWN_LOG.NEXTVAL)
     "M_USITE_NO"   NUMBER(10)        DEFAULT 1,                     -- 사이트/테넌트 식별자 (USITE, M_USITE_NO)
@@ -22,6 +34,7 @@ CREATE TABLE "CRM"."M_EXCEL_DOWN_LOG" (
     "XLS_PURPOSE"  VARCHAR2(50),                                    -- 용도 코드 (INFO, OFF_PROMO, ADV_PROMO, ETC)
     "XLS_TARGET"   VARCHAR2(50),                                    -- 대상 코드 (ALL, EMAIL, SMS, TEL)
     "XLS_REASON"   VARCHAR2(1000)    NOT NULL,                      -- 다운로드 사유/목적 (최소 10자 이상 필수)
+    "REQ_DOC"      NVARCHAR2(2000),                                 -- 20261103 khma : 다운로드 요청문서 이력 (전자결재/품의서 번호, 문서명 등)
     "DOWN_CNT"     NUMBER(10)        DEFAULT 0,                     -- 다운로드 추출 데이터 건수
     "CLIENT_IP"    VARCHAR2(50),                                    -- 요청자 클라이언트 IP 주소
     "REGDATE"      TIMESTAMP(6)      DEFAULT SYSTIMESTAMP NOT NULL, -- 다운로드 일시 (CRM 표준 TIMESTAMP)
@@ -40,6 +53,7 @@ COMMENT ON COLUMN "CRM"."M_EXCEL_DOWN_LOG"."FILE_NAME" IS '생성된 다운로�
 COMMENT ON COLUMN "CRM"."M_EXCEL_DOWN_LOG"."XLS_PURPOSE" IS '다운로드 용도 (INFO, OFF_PROMO, ADV_PROMO, ETC)';
 COMMENT ON COLUMN "CRM"."M_EXCEL_DOWN_LOG"."XLS_TARGET" IS '추출 대상 (ALL, EMAIL, SMS, TEL)';
 COMMENT ON COLUMN "CRM"."M_EXCEL_DOWN_LOG"."XLS_REASON" IS '다운로드 사유/목적 (10자 이상 필수)';
+COMMENT ON COLUMN "CRM"."M_EXCEL_DOWN_LOG"."REQ_DOC" IS '다운로드 요청문서 이력 (전자결재/품의서 번호, 문서명 등)';
 COMMENT ON COLUMN "CRM"."M_EXCEL_DOWN_LOG"."DOWN_CNT" IS '추출 데이터 건수';
 COMMENT ON COLUMN "CRM"."M_EXCEL_DOWN_LOG"."CLIENT_IP" IS '요청자 클라이언트 IP';
 COMMENT ON COLUMN "CRM"."M_EXCEL_DOWN_LOG"."REGDATE" IS '등록 일시';
@@ -65,6 +79,7 @@ INSERT INTO CRM.M_EXCEL_DOWN_LOG (
     XLS_PURPOSE,
     XLS_TARGET,
     XLS_REASON,
+    REQ_DOC,
     DOWN_CNT,
     CLIENT_IP,
     REGDATE,
@@ -79,6 +94,7 @@ INSERT INTO CRM.M_EXCEL_DOWN_LOG (
     @XLS_PURPOSE@,
     @XLS_TARGET@,
     @XLS_REASON@,
+    @REQ_DOC@,
     NVL(TO_NUMBER(@DOWN_CNT@), 0),
     @CLIENT_IP@,
     SYSTIMESTAMP,

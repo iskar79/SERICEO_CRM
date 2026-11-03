@@ -1,4 +1,4 @@
-/// <reference path="jquery.kdb.MonArch800.js" />
+﻿/// <reference path="jquery.kdb.MonArch800.js" />
 /// <reference path="../Resource.js" />
 /// <reference path="MonArchResource.js" />
 
@@ -7635,6 +7635,10 @@ $(document).on("blur", ".t_Money", function (e) {
           $.each(savedParams, function (fldName, fldVal) {
             plLog.add(fldName, fldVal);
           });
+          // 20261103 khma : 요청문서 이력(REQ_DOC) 파라미터 기본값 보장 (구조체 미등록 시에도 쿼리 에러 방지)
+          var reqDocVal = savedParams.REQ_DOC || savedParams.req_doc || "";
+          plLog.add("REQ_DOC", reqDocVal);
+          plLog.add("req_doc", reqDocVal);
 
           // 이력 저장 AJAX 실행 후 다운로드 진행
           try {
