@@ -259,3 +259,5 @@ VDI 내부망 코드를 카메라로 촬영하여 전달받는 경우, 단순 OC
   * 차세대 파일시스템 백엔드 독립 엔드포인트 3종(/uploadFileNew, /downloadFileNew, /deleteFileSafe) 및 세션 인터셉터 매핑 완료.
 * **[완료] Step 5-2 (superContaner.js)** ([① 로컬: 완료(x) / ② VDI: 완료(x)]):
   * singleFileNew, multiFileNew Drag&Drop, 지연 업로드(Client Staging), 20MB 검증, 교체 대기 및 취소 복원 기능 구현 및 VDI 구동 검증 완료.
+* **[완료] Step 2-8 (M_COMM_CODE_XLS_SEC_COLS.sql, superContaner.js)** ([① 로컬: 완료(x) / ② VDI: 완료(x)]):
+  * 정보성/홍보용 엑셀 추출 보안 컬럼(xlsOption.secCols 동적옵션) DB 공통코드 연동 및 DownXlsNew DOWNCOLS 추출 구현 및 VDI 반영 완료.
