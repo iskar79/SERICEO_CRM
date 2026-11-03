@@ -7575,9 +7575,6 @@ $(document).on("blur", ".t_Money", function (e) {
             var secCols = [];
             var secLavs = [];
             var secList = _M.Codes[targetSecGrp];
-            if (!secList || secList.length === 0) {
-              secList = _M.ExcelSecurityCols;
-            }
             if (secList && secList.length > 0) {
               $.each(secList, function (idx, item) {
                 if (item.CODE) {
