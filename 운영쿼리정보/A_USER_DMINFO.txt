@@ -6,9 +6,9 @@ SITE                 VARCHAR2(8)    사이트 식별자 (CEO/PRO/MS/SP)
 CORP                 NUMBER         법인 번호
 USEQ                 NUMBER         회원 번호 (A_USER.USEQ 매핑)
 GBN                  NVARCHAR2(300) 구분 ('CLASS': 오프라인 홍보용 / 'MARKETING': 광고성 홍보용 2종만 존재)
-EMAILYN              NVARCHAR2(1)   이메일 수신 동의 여부 ('Y'/'N')
-SMSYN                NVARCHAR2(1)   SMS 수신 동의 여부 ('Y'/'N')
-TELLYN               NVARCHAR2(1)   전화 수신 동의 여부 ('Y'/'N', 철자 주의: TELLYN)
+EMAILYN              NVARCHAR2(1)   이메일 수신 동의 여부 ('Y'/'N' 2종 값만 존재)
+SMSYN                NVARCHAR2(1)   SMS 수신 동의 여부 ('Y'/'N' 2종 값만 존재)
+TELLYN               NVARCHAR2(1)   전화 수신 동의 여부 ('Y'/'N' 2종 값만 존재, 철자 주의: TELLYN)
 REGTIME              DATE           등록일시
 REGUSEQ              NUMBER         등록자 식별번호
 CHGTIME              DATE           수정일시
