@@ -15,7 +15,7 @@ INSERT INTO M_COMM_CODE (M_COMM_CODE_NO, CODE_GRP, CODE_VAL, CODE_NAME, CODE_DES
 VALUES (M_COMM_CODE_SEQ.NEXTVAL, 'XLS_SEC_COLS', '아이디',          '아이디',          '정보성/홍보용 엑셀 추출 컬럼', 2,  '1', 'ko', '44', SYSDATE, '1000305');
 
 INSERT INTO M_COMM_CODE (M_COMM_CODE_NO, CODE_GRP, CODE_VAL, CODE_NAME, CODE_DESC, SORT_NO, USE_FLAG, LANG_CODE, M_USITE_NO, REG_DATE, REG_USER)
-VALUES (M_COMM_CODE_SEQ.NEXTVAL, 'XLS_SEC_COLS', '이름',            '이름',            '정보성/홍보용 엑셀 추출 컬럼', 3,  '1', 'ko', '44', SYSDATE, '1000305');
+VALUES (M_COMM_CODE_SEQ.NEXTVAL, 'XLS_SEC_COLS', '성명',            '성명',            '정보성/홍보용 엑셀 추출 컬럼', 3,  '1', 'ko', '44', SYSDATE, '1000305');
 
 INSERT INTO M_COMM_CODE (M_COMM_CODE_NO, CODE_GRP, CODE_VAL, CODE_NAME, CODE_DESC, SORT_NO, USE_FLAG, LANG_CODE, M_USITE_NO, REG_DATE, REG_USER)
 VALUES (M_COMM_CODE_SEQ.NEXTVAL, 'XLS_SEC_COLS', '이메일',          '이메일',          '정보성/홍보용 엑셀 추출 컬럼', 4,  '1', 'ko', '44', SYSDATE, '1000305');
