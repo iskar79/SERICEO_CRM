@@ -56,6 +56,7 @@
 | **Step 2-6** | `운영쿼리정보/M_EXCEL_DOWN_LOG.sql` | 엑셀 다운로드 보안 감사 및 사유 이력 테이블 DDL 초경량 13개 컬럼 정비 (CRM.M_EXCEL_DOWN_LOG) | `[x]` | `[x]` | **완료 (VDI 테이블 정비 완료)** |
 | **Step 2-7** | `WebContent/js/jquery.kdb.superContaner.js` | XLS_REASON_POPUP 동적로드, DownXlsNew 타깃 서비스명/메소드명/파일명 정밀 추출 및 실제 다운로드 파일명 타임스탬프 일치화, IP 다중 추출 보정 | `[x]` | `[x]` | **완료 (VDI 정상동작 확인)** |
 | **Step 2-8** | `운영쿼리정보/M_COMM_CODE_XLS_SEC_COLS.sql`, `superContaner.js` | 정보성/홍보용 엑셀 추출 보안 컬럼(xlsOption.secCols 동적옵션) DB 공통코드 연동 및 DownXlsNew DOWNCOLS 추출 구현 | `[x]` | `[x]` | **완료 (VDI 반영 완료)** |
+| **Step 2-9** | `src/co/kr/kydbm/core/filecontrol/UploadController.java` | 실제 엑셀 조회 데이터 건수(ds.size())로 M_EXCEL_DOWN_LOG.DOWN_CNT 정밀 갱신 로직 구현 | `[x]` | `[ ]` | **로컬 완료 (VDI 복사 대기)** |
 | **Step 5-1** | `UploadController.java`, `Resource.js`, `Monarch820-servlet.xml` | 차세대 파일 백엔드 독립 엔드포인트 3종(/uploadFileNew, /downloadFileNew, /deleteFileSafe) 및 세션 인터셉터 매핑, D: 드라이브 미존재 Fallback 구현 | `[x]` | `[x]` | **완료 (VDI 정상구동 확인)** |
 | **Step 5-2** | `WebContent/js/jquery.kdb.superContaner.js` | singleFileNew, multiFileNew Drag&Drop, 클라이언트 지연 업로드, 20MB 검증, 교체 컨펌(confirm) 및 자동 삭제 안내 UI 구현 | `[x]` | `[x]` | **완료 (VDI 정상동작 확인)** |
 | **Step 3** | `MonArchDaoImpl.java`, `FilterGenerator.java`, 프로시저/배치 등 | KSign SecureDB 개인정보 암복호화 공통 모듈 및 프로시저/엑셀업로드 적용 | `[ ]` | `[ ]` | 대기 |
@@ -90,6 +91,7 @@
 | **Step 2-6** | `운영쿼리정보/M_EXCEL_DOWN_LOG.sql` | 엑셀 다운로드 보안 감사 및 사유 이력 테이블 DDL 초경량 13개 컬럼 정비 (CRM.M_EXCEL_DOWN_LOG) | `[x]` | `[x]` | **완료 (VDI 테이블 정비 완료)** |
 | **Step 2-7** | `WebContent/js/jquery.kdb.superContaner.js` | XLS_REASON_POPUP 동적로드, DownXlsNew 타깃 서비스명/메소드명/파일명 정밀 추출 및 실제 다운로드 파일명 타임스탬프 일치화, IP 다중 추출 보정 | `[x]` | `[x]` | **완료 (VDI 정상동작 확인)** |
 | **Step 2-8** | `운영쿼리정보/M_COMM_CODE_XLS_SEC_COLS.sql`, `superContaner.js` | 정보성/홍보용 엑셀 추출 보안 컬럼(xlsOption.secCols 동적옵션) DB 공통코드 연동 및 DownXlsNew DOWNCOLS 추출 구현 | `[x]` | `[x]` | **완료 (VDI 반영 완료)** |
+| **Step 2-9** | `src/co/kr/kydbm/core/filecontrol/UploadController.java` | 실제 엑셀 조회 데이터 건수(ds.size())로 M_EXCEL_DOWN_LOG.DOWN_CNT 정밀 갱신 로직 구현 | `[x]` | `[ ]` | **로컬 완료 (VDI 복사 대기)** |
 ### 📂 Step 5. 차세대 드래그앤드롭 파일 시스템 구축
 > 📘 참조 가이드: 5_TASK_FILE_SYSTEM_DRAG_DROP.md
 * [x] **[Step 5-1]** UploadController.java, Resource.js, Monarch820-servlet.xml ➡️ 차세대 파일 백엔드 독립 엔드포인트 3종(/uploadFileNew, /downloadFileNew, /deleteFileSafe) 구현, 세션 인터셉터 매핑 및 D: 드라이브 미존재 VDI 환경 자동 Fallback(getBaseUploadPath) 지원 ([① 로컬: 완료(x) / ② VDI: 완료(x)])

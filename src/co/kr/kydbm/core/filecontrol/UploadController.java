@@ -1,4 +1,4 @@
-﻿package co.kr.kydbm.core.filecontrol;
+package co.kr.kydbm.core.filecontrol;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -965,6 +965,23 @@ public class UploadController {
 			// 확장필드 처리 End 20181107 khma
 
 			ds = monArchDao.exeList(strSql, obj, OrderStr, exviewpage, expagecnt, arrExtFilters);
+
+			// 20261103 khma Start : 실제 엑셀 다운로드 조회 건수(ds.size())로 M_EXCEL_DOWN_LOG.DOWN_CNT 정밀 갱신
+			int actualDownCnt = (ds != null) ? ds.size() : 0;
+			try {
+				Map<String, String> updateDownCntParam = new HashMap<String, String>();
+				updateDownCntParam.put("DOWN_CNT", String.valueOf(actualDownCnt));
+				updateDownCntParam.put("FILE_NAME_EXT", fileName + ".xlsx");
+				updateDownCntParam.put("FILE_NAME_RAW", fileName);
+				String sqlUpdateDownCnt = "UPDATE M_EXCEL_DOWN_LOG "
+						+ "   SET DOWN_CNT = @DOWN_CNT@ "
+						+ " WHERE FILE_NAME = @FILE_NAME_EXT@ "
+						+ "    OR FILE_NAME = @FILE_NAME_RAW@ ";
+				monArchDao.exeUpdate(sqlUpdateDownCnt, updateDownCntParam);
+			} catch (Exception eLog) {
+				log.warn("M_EXCEL_DOWN_LOG DOWN_CNT 정밀 갱신 중 예외 발생 (무시): " + eLog.getMessage());
+			}
+			// 20261103 khma End : 실제 엑셀 다운로드 조회 건수로 M_EXCEL_DOWN_LOG.DOWN_CNT 정밀 갱신
 
 			if (obj.containsKey("extClass")
 					&& StringUtils.isNotEmpty(obj.get("extClass"))
