@@ -1,13 +1,13 @@
-﻿/// <reference path="../Resource.js" />
+/// <reference path="../Resource.js" />
 
-/*  
-* version 0.1 2012-02-21
-* Requires jQuery v1.6.2 or later
+/* jQuery grid plugin:
+* version 2.0 2026-11-04
+* Requires jQuery v1.12.4 or later
 * Dual licensed under the MIT and GPL licenses:
 * http://www.opensource.org/licenses/mit-license.php
 * http://www.gnu.org/licenses/gpl.html
-* Authors: Kim Seoung Min
-* Company : Kongyoung DB
+* Authors: Ma KyoungHo
+* Company : KYDBM
 */
 
 // 폼의 최초 관련리소스를 바인딩하기 //
@@ -60,6 +60,7 @@
     document.writeln('<script type="text/javascript" src="/js/jquery.kdb.utils.js"></script>'); //20130814 khma 공통유틸 추가
     document.writeln('<script type="text/javascript" src="/js/MonArchResource.js"></script>');
     document.writeln('<script type="text/javascript" src="/js/jquery.kdb.superContaner.js"></script>');
+    document.writeln('<script type="text/javascript" src="/js/jquery.kdb.superCalendar.js"></script>'); // 20261104 khma 달력 컴포넌트 모듈 분리 로드
     //document.writeln('<script type="text/javascript" src="/js/jquery.kdb.Controls.Menu.js"></script>');
     document.writeln('<script type="text/javascript" src="/js/jquery.kdb.jobButton.js"></script>');
     //document.writeln('<script type="text/javascript" src="/js/jquery.kdb.superContaner.min.js"></script>');

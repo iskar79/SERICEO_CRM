@@ -67,6 +67,7 @@
     document.writeln('<script type="text/javascript" src="/js/jquery.kdb.utils.js"></script>'); //20130814 khma 공통유틸 추가
     document.writeln('<script type="text/javascript" src="/js/MonArchResource.js"></script>');
     document.writeln('<script type="text/javascript" src="/js/jquery.kdb.superContaner.js"></script>');
+    document.writeln('<script type="text/javascript" src="/js/jquery.kdb.superCalendar.js"></script>'); // 20261104 khma 달력 컴포넌트 모듈 분리 로드
     document.writeln('<script type="text/javascript" src="/js/jquery.kdb.Controls.Menu.js"></script>');
     document.writeln('<script type="text/javascript" src="/js/jquery.kdb.jobButton.js"></script>');
     
