@@ -270,6 +270,8 @@ VDI 내부망 코드를 카메라로 촬영하여 전달받는 경우, 단순 OC
 * **[완료] Step 6-4 (UploadController.java)** ([① 로컬: 완료(x) / ② VDI: 완료(x)]):
   * @ExceptionHandler(Exception.class) 표준 ResultInfo 등록, downExcel/downloadFileNew 응답 커밋 검증 및 브라우저 alert 안내, 내부정보 노출 차단, 스트림/Writer null-safe close, printStackTrace 제거 완료.
 * **[완료] Step 6-5 (soap.2.0.js, MonArch800.js)** ([① 로컬: 완료(x) / ② VDI: 완료(x)]):
-  * PostJsonData null/비객체 응답 에러 격리, stale 메뉴 응답 무시 시 $.unblockUI() 안전 해제, MonArch800.js $.Json2Str 최신 직렬화 동기화, GetJsonServer eval 복원 완료.
+  * PostJsonData null/비객체 응답 에러 격리, stale 메뉴 응답 무시, MonArch800.js $.Json2Str 최신 직렬화 동기화, GetJsonServer eval 복원 완료.
+* **[완료] Step 6-6 (MonArchResource.js, soap.2.0.js, superContaner.js)** ([① 로컬: 완료(x) / ② VDI: 완료(x)]):
+  * Java Spring 단일 환경 기준 미사용 .NET ASMX/응답 포장/날짜 분기 정리 완료.
 * **[완료] Step 2-12 (UploadController.java, superContaner.js)** ([① 로컬: 완료(x) / ② VDI: 완료(x)]):
   * M_EXCEL_DOWN_LOG DOWN_CNT 정합성 보강 (REGDATE 오라클 컬럼명 일치, 사용자 Fallback 갱신 및 superContaner _records 연동) 완료.

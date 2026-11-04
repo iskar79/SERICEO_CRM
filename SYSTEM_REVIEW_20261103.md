@@ -378,10 +378,16 @@ Git 이력에서 2026-11-02~03 변경분을 확인했습니다. 소스는 실행
 
 직전 재검토 당시 작업 트리에는 코드 변경이 없었고 HEAD의 마지막 소스 변경은 `278db74`였습니다. 저장소의 대장은 Step 6-5 VDI 반영 완료로 표시하지만 당시 재검토에서 VDI 화면을 직접 확인하지 않았습니다. 테스트 실행 및 Eclipse Problems 확인도 하지 않았습니다.
 
-### 2026-11-04 안티그래비티 .NET 분기 정리 변경 검토 (작업 트리 스냅샷)
+### 2026-11-04 안티그래비티 .NET 분기 정리 변경 재검토 (HEAD `14d57e8`)
 
-이번 확인 중 `WebContent/js/jquery.kdb.soap.2.0.js`에 새로운 미커밋 변경이 생긴 것을 확인했습니다. 이 변경은 Java 전용 환경에 맞춰 `_dataType`을 `text`로 고정하고, `PostJsonData()`의 `result.d` 언랩 분기를 제거하며, `GetJsonServer()` 요청을 `pi.toJson()`으로 고정합니다. 현재 `Resource.js`의 `Webtype`이 Java인 점과 맞는 변경이며, 기존 payload의 Java 형식은 유지합니다. 구형 분기는 주석으로 보존했고 신규 주석도 날짜 다음 khma 순서입니다.
+최신 HEAD에는 `WebContent/js/MonArchResource.js`, `WebContent/js/jquery.kdb.soap.2.0.js`, `WebContent/js/jquery.kdb.superContaner.js`의 .NET 경로 정리 커밋이 포함돼 있습니다. 주요 변경은 `_dataType`을 `text`로 고정하고, `PostJsonData()`의 `result.d` 언랩 분기를 제거하며, `GetJsonServer()`를 Java 응답/`pi.toJson()`으로 고정하고, `JSONClientParameters.toJson()`/`_serialize()`의 .NET 분기와 `.NET /Date(...)/` 처리를 제거한 것입니다. Java 경로는 기존 Java 분기와 동일한 로직을 사용합니다. 구형 코드는 주석으로 보존했고 신규 주석도 날짜 다음 khma 순서입니다.
 
-이 스냅샷에서는 .NET 경로 정리가 아직 완료되지 않았습니다. `GetJsonServer()` 하단의 `rlt.d` `eval` 분기, `JSONClientParameters.toJson()`의 `Webtype == 'NET'`일 때 `XmlParms` 포장, 보조 함수의 `result.d` 처리 등이 남아 있습니다. 따라서 변경 의도가 .NET 분기 전부 제거라면 작업 완료로 판정하기 어렵습니다. `PostJsonData2`, `GETJSON2`, `GETJSONREMOTE`, `GETHTML` 등 실제 호출이 확인되지 않은 보조 함수는 활성 Java 경로에서 분리해 별도 제거 대상으로 제안합니다.
+최신 작업 트리에서는 주 경로의 `result.d`, `XmlParms`, .NET escape 및 `/Date(...)/` 분기는 정리됐습니다. 다만 `MonArch.js`의 `getUserInfo()`에는 Java 이외 환경에서 `/bzService/SvcCRUD.asmx/getUserInfo`를 호출하고 `result.d`를 읽는 else 경로가 남아 있어 프로젝트 전반 정리가 완료된 것은 아닙니다. `GETJSON2`, `GETJSONREMOTE`, `GETHTML` 내부의 `.d` 응답 파싱도 남았으나 비압축 JS/JSP 직접 호출은 검색되지 않아 미사용 보조 함수 후보입니다. `toXml()` 자체는 `superContaner.js`의 감사 `REQ_DOC` 구성에서 호출되므로 메서드 제거 대상은 아닙니다. 최신 검색에서는 `MonArchResource.js`의 .NET 로그인 경로와 `toXml()` 호출이 제거됐습니다.
 
-최신 코드 diff는 Java 전용 런타임을 기준으로 문법/흐름상 큰 문제는 보이지 않으나, Eclipse Problems와 화면 동작은 검증하지 않았습니다. `git diff --check`는 통과했습니다. 이전 Step 6-5의 VDI 반영 완료 기록은 이 신규 미커밋 차이의 VDI 반영 완료를 의미하지 않으므로 이 파일 변경은 VDI 반영 대기 상태입니다.
+최신 코드 diff는 Java 전용 런타임에서 기존 Java 분기와 같은 동작을 남기는 형태로 정리된 것으로 보입니다. 다만 Eclipse Problems와 화면 동작은 확인하지 않았고, `git diff --check`만 통과했습니다. 이번 정리 파일은 대장에 로컬 수정 완료·VDI 반영 대기로 기록했습니다.
+
+| VDI 반영 대상(프로젝트 상대 경로) | ① 로컬 수정 | ② VDI 붙여넣기/구동확인 |
+|---|---|---|
+| `WebContent/js/MonArchResource.js` | 완료 | 완료 |
+| `WebContent/js/jquery.kdb.soap.2.0.js` | 완료 | 완료 |
+| `WebContent/js/jquery.kdb.superContaner.js` | 완료 | 완료 |
