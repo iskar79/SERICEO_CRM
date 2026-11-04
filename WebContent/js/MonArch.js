@@ -1,13 +1,13 @@
-﻿/// <reference path="../Resource.js" />
+/// <reference path="../Resource.js" />
 
-/*  
-* version 0.1 2012-02-21
-* Requires jQuery v1.6.2 or later
+/* jQuery grid plugin:
+* version 2.0 2026-11-04
+* Requires jQuery v1.12.4 or later
 * Dual licensed under the MIT and GPL licenses:
 * http://www.opensource.org/licenses/mit-license.php
 * http://www.gnu.org/licenses/gpl.html
-* Authors: Kim Seoung Min
-* Company : Kongyoung DB
+* Authors: Ma KyoungHo
+* Company : KYDBM
 */
 
 // 폼의 최초 관련리소스를 바인딩하기 //
@@ -208,42 +208,84 @@ function errorInLogin(message) {
 	window.location.href = "http://" + window.location.host + "/"; //해쉬URL정보 클리어
 }
 
+// 20261104 khma : Java Spring 단일 환경 표준화 (미사용 .NET asmx 분기 정리 및 getUserInfo.json 호출 단일화)
 function getUserInfo() {
 	//getUserInfo
 	if ( _M.UserInfo.id == undefined || _M.UserInfo.id == "" ) {
+		$.ajax({
+			type: "POST",
+			url: "getUserInfo.json",
+			data: "",
+			success: function (data) {
+				if ( data.resultInfo.result != "SUCCESS" ) {
+					errorInLogin("error");
+					return;
+				}
+				setUserInfo(data.userInfo); //유저정보셋팅
+
+				settingMenu();
+
+				if(!data.userInfo["logined"]) {
+					//로그인인증후 최초 처리들
+					var pwUpdDate = data.userInfo["pwUpdDate"];
+					if(pwUpdDate == null) {
+						//TODO pwUpdDate가 null이면 최초 등록시 로그인 유저이므로 비밀번호 변경 권유
+						alert('최초 로그인 후 패스워드를 변경하지 않았습니다.\n 패스워드를 변경해 주십시요.');
+						$('.opticon-config').trigger('click');
+					}else {
+						var betweenDays = ((new Date()).getTime() - pwUpdDate)/1000/60/60/24;
+						if( betweenDays > 90 ) {
+							//TODO 비밀번호가 변경된 지 90일이 지났습니다. \n보안을 위해서 새 비밀번호로 변경해 주십시요.
+							alert('비밀번호가 변경된 지 90일이 지났습니다. \n보안을 위해서 새 비밀번호로 변경해 주십시요.');
+							$('.opticon-config').trigger('click');
+						}else {
+							//TODO
+						}
+					}
+				}
+
+			},
+			error: function (data) {
+				var _msg = jQuery.parseJSON(data.responseText);
+				errorInLogin(_msg.resultInfo.message);
+				return;
+			}
+		});
+		/*
+		// 20261104 khma : 미사용 .NET asmx 호출 분기 제외 처리
 		if ( _M.Webtype == "Java" ) {
 			$.ajax({
 				type: "POST",
 				url: "getUserInfo.json",
 				data: "",
 				success: function (data) {
-					if ( data.resultInfo.result != "SUCCESS" ) { 
+					if ( data.resultInfo.result != "SUCCESS" ) {
 						errorInLogin("error");
-						return; 
+						return;
 					}
 					setUserInfo(data.userInfo); //유저정보셋팅
-					
+
 					settingMenu();
-					
-					 if(!data.userInfo["logined"]) {
-					    	//로그인인증후 최초 처리들
-					    	var pwUpdDate = data.userInfo["pwUpdDate"];
-					    	if(pwUpdDate == null) {
-					    		//TODO pwUpdDate가 null이면 최초 등록시 로그인 유저이므로 비밀번호 변경 권유
-					    		alert('최초 로그인 후 패스워드를 변경하지 않았습니다.\n 패스워드를 변경해 주십시요.');
-					    		$('.opticon-config').trigger('click');
-					    	}else {
-					    		var betweenDays = ((new Date()).getTime() - pwUpdDate)/1000/60/60/24;
-					    		if( betweenDays > 90 ) {
-					    			//TODO 비밀번호가 변경된 지 90일이 지났습니다. \n보안을 위해서 새 비밀번호로 변경해 주십시요.
-					    			alert('비밀번호가 변경된 지 90일이 지났습니다. \n보안을 위해서 새 비밀번호로 변경해 주십시요.');
-					    			$('.opticon-config').trigger('click');
-					    		}else {
-					    			//TODO
-					    		}
-					    	}
-					    }
-					
+
+					if(!data.userInfo["logined"]) {
+						//로그인인증후 최초 처리들
+						var pwUpdDate = data.userInfo["pwUpdDate"];
+						if(pwUpdDate == null) {
+							//TODO pwUpdDate가 null이면 최초 등록시 로그인 유저이므로 비밀번호 변경 권유
+							alert('최초 로그인 후 패스워드를 변경하지 않았습니다.\n 패스워드를 변경해 주십시요.');
+							$('.opticon-config').trigger('click');
+						}else {
+							var betweenDays = ((new Date()).getTime() - pwUpdDate)/1000/60/60/24;
+							if( betweenDays > 90 ) {
+								//TODO 비밀번호가 변경된 지 90일이 지났습니다. \n보안을 위해서 새 비밀번호로 변경해 주십시요.
+								alert('비밀번호가 변경된 지 90일이 지났습니다. \n보안을 위해서 새 비밀번호로 변경해 주십시요.');
+								$('.opticon-config').trigger('click');
+							}else {
+								//TODO
+							}
+						}
+					}
+
 				},
 				error: function (data) {
 					var _msg = jQuery.parseJSON(data.responseText);
@@ -251,26 +293,27 @@ function getUserInfo() {
 					return;
 				}
 			});
-        } else {
-            $.ajax({
-                type: "POST",
-                url: "/bzService/SvcCRUD.asmx/getUserInfo",
-                data: {},
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                async: false,
-                success: function (result) {
-                    if (result.d["M_USER_NO"] != undefined && result.d["M_USER_NO"] != null || result.d["M_USER_NO"] == "0") {
-                        setUserInfo(result.d);
-                        settingMenu();
-                    } else {
-                        alert("세션이 종료되었습니다. 다시 로그인 해주세요");
-                        location.href = "/monlogin.htm";
-                    }
+		} else {
+			$.ajax({
+				type: "POST",
+				url: "/bzService/SvcCRUD.asmx/getUserInfo",
+				data: {},
+				contentType: "application/json; charset=utf-8",
+				dataType: "json",
+				async: false,
+				success: function (result) {
+					if (result.d["M_USER_NO"] != undefined && result.d["M_USER_NO"] != null || result.d["M_USER_NO"] == "0") {
+						setUserInfo(result.d);
+						settingMenu();
+					} else {
+						alert("세션이 종료되었습니다. 다시 로그인 해주세요");
+						location.href = "/monlogin.htm";
+					}
 
-                }
-            });
-        }
+				}
+			});
+		}
+		*/
 	}
 }
 

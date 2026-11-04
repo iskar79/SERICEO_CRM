@@ -403,7 +403,10 @@ function GetJsonServer(name, usite, extOpt) {
     */
 
     return rlt;
-};function GETJSON2(name, callBack) {
+};
+
+// 20261104 khma : Java Spring 단일 환경 표준화 (미사용 보조 함수 .NET toXml/rlt.d 분기 정리 및 Java pi.toJson() 연동)
+function GETJSON2(name, callBack) {
     var pi = new JSONClientParameters();
     pi.add("JsName", name);
     pi.add("UID", _M.UserInfo.id);
@@ -413,10 +416,28 @@ function GetJsonServer(name, usite, extOpt) {
     $.ajax({
         type: "POST",
         url: _M.svcUrl[_M.Webtype].GetJs,
-        data: pi.toXml(),
+        data: pi.toJson(),
         contentType: "application/json; charset=utf-8",
         dataType: _dataType,
         async: _M.aSync.async, //_async,
+        success: function (rlt) {
+            var rawData = (typeof rlt === 'string') ? (window.JSON && JSON.parse ? JSON.parse(rlt) : eval('(' + rlt + ')')) : rlt;
+            callBack(rawData);
+        },
+        error: function (msg) {
+            var _msg = (typeof msg.responseText === 'string') ? (window.JSON && JSON.parse ? JSON.parse(msg.responseText) : eval('(' + msg.responseText + ')')) : msg;
+            alert(_msg.Message || _msg.message || "오류가 발생했습니다.");
+        }
+    });
+    /*
+    // 20261104 khma : 기존 .NET toXml/rlt.d 코드 보존
+    $.ajax({
+        type: "POST",
+        url: _M.svcUrl[_M.Webtype].GetJs,
+        data: pi.toXml(),
+        contentType: "application/json; charset=utf-8",
+        dataType: _dataType,
+        async: _M.aSync.async,
         success: function (rlt) {
             //rlt = eval('(' + rlt.d + ')');
             rlt = jQuery.parseJSON(rlt.d);
@@ -428,8 +449,10 @@ function GetJsonServer(name, usite, extOpt) {
             alert(_msg.Message);
         }
     });
+    */
 };
 
+// 20261104 khma : Java Spring 단일 환경 표준화 (미사용 보조 함수 .NET toXml/msg.d 분기 정리 및 Java pi.toJson() 연동)
 function GETJSONREMOTE(name, callBack) {
     if (_M.Jsons[name] != undefined) {
         callBack(_M.Jsons[name]);
@@ -443,10 +466,28 @@ function GETJSONREMOTE(name, callBack) {
     $.ajax({
         type: "POST",
         url: _M.svcUrl[_M.Webtype].GetJs,
-        data: pi.toXml(),
+        data: pi.toJson(),
         contentType: "application/json; charset=utf-8",
         dataType: _dataType,
         async: _M.aSync.async, //_async,
+        success: function (msg) {
+            var _msg = (typeof msg === 'string') ? (window.JSON && JSON.parse ? JSON.parse(msg) : eval('(' + msg + ')')) : msg;
+            _M.Jsons[name] = _msg;
+            callBack(_msg);
+        },
+        error: function (msg) {
+            alert(msg.Message || msg.message || "오류가 발생했습니다.");
+        }
+    });
+    /*
+    // 20261104 khma : 기존 .NET toXml/msg.d 코드 보존
+    $.ajax({
+        type: "POST",
+        url: _M.svcUrl[_M.Webtype].GetJs,
+        data: pi.toXml(),
+        contentType: "application/json; charset=utf-8",
+        dataType: _dataType,
+        async: _M.aSync.async,
         success: function (msg) {
             _msg = eval('(' + msg.d + ')');
             _M.Jsons[name] = _msg;
@@ -456,9 +497,10 @@ function GETJSONREMOTE(name, callBack) {
             alert(msg.Message);
         }
     });
-
+    */
 };
 
+// 20261104 khma : Java Spring 단일 환경 표준화 (미사용 보조 함수 .NET toXml/rlt.d 분기 정리 및 Java pi.toJson() 연동)
 function GETHTML(name) {
     var pi = new JSONClientParameters();
     pi.add("JsName", name);
@@ -469,17 +511,26 @@ function GETHTML(name) {
     var rlt = $.ajax({
         type: "POST",
         url: _M.svcUrl[_M.Webtype].GetJs,
-        data: pi.toXml(),
+        data: pi.toJson(),
         contentType: "application/json; charset=utf-8",
         dataType: _dataType,
         async: _M.aSync.sync //_async,
     }).responseText;
-    //rlt = eval('(' + rlt + ')');
-    rlt = jQuery.parseJSON(rlt);
-    rlt = rlt.d
-    //    rlt = eval('(' + rlt.Table.Rows[0]['구조체내용'] + ')');
-    //    alert(rlt);
     return rlt;
+    /*
+    // 20261104 khma : 기존 .NET toXml/rlt.d 코드 보존
+    var rlt = $.ajax({
+        type: "POST",
+        url: _M.svcUrl[_M.Webtype].GetJs,
+        data: pi.toXml(),
+        contentType: "application/json; charset=utf-8",
+        dataType: _dataType,
+        async: _M.aSync.sync
+    }).responseText;
+    rlt = jQuery.parseJSON(rlt);
+    rlt = rlt.d;
+    return rlt;
+    */
 };
 
 /*

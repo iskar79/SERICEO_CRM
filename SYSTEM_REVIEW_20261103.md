@@ -391,3 +391,41 @@ Git 이력에서 2026-11-02~03 변경분을 확인했습니다. 소스는 실행
 | `WebContent/js/MonArchResource.js` | 완료 | 완료 |
 | `WebContent/js/jquery.kdb.soap.2.0.js` | 완료 | 완료 |
 | `WebContent/js/jquery.kdb.superContaner.js` | 완료 | 완료 |
+
+## 2026-11-04 안티그래비티 팩트 체크 의견 재대조
+
+사용자가 전달한 4개 의견을 현재 저장소 코드와 다시 비교했습니다.
+
+| 의견 | 검토 판정 | 근거 및 한계 |
+|---|---|---|
+| 세 파일의 Java 처리 일치 | 정적 소스상 확인 | `soap.2.0.js`의 Java `PostJsonData` 응답 해석, `GetJsonServer`의 `pi.toJson()` 및 `resultInfo/resultData` 처리, `superContaner.js` 달력 날짜의 Java `new Date(value)`, `MonArchResource.js`의 `/login.mon` 전송이 이전 Java 경로와 일치합니다. 실제 VDI 실행 결과를 독립적으로 재현한 것은 아닙니다. |
+| `MonArch.js` ASMX else 잔존 | 사실 | `getUserInfo()`의 `else`에는 `/bzService/SvcCRUD.asmx/getUserInfo` 및 `result.d` 처리가 남아 있습니다. `Webtype`은 Java로 고정돼 현재 기본 설정에서는 진입하지 않지만, 프로젝트 전체의 .NET 잔재 제거 기준에서는 미정리입니다. |
+| GETJSON2/GETJSONREMOTE/GETHTML 미사용 | 저장소 내 정적 호출 검색 기준 사실 | `WebContent/`에서 함수 정의 외 직접 호출은 검색되지 않았습니다. 저장소 밖 스크립트 또는 런타임 동적 호출 여부는 검색으로 배제할 수 없습니다. 세 함수는 `.d` 응답 형식에 묶여 있으므로 외부 사용 가능성까지 고려해 Java 방식으로 바꾸려면 각 반환 계약을 먼저 확인해야 합니다. |
+| hashchange가 stale 잠금을 정상 정리 | 입증되지 않음 | `monform.jsp`의 hashchange 핸들러는 `historyBackProc()`를 호출하고, `historyBackProc()`는 메뉴/플로우 이동을 수행합니다. 이 경로에서 이전 요청이 획득한 전역 blockUI를 식별하거나 해제하는 공통 처리는 확인되지 않았습니다. stale 응답 콜백을 버리면 호출부 성공 콜백의 `unblockUI()`도 생략될 수 있으므로, 전역 해제 제거가 다른 화면 잠금의 조기 해제는 막아도 이전 요청의 잠금 잔류까지 해결한다고 단정할 수 없습니다. 실제 발생 여부는 blockUI 획득 호출부와 VDI 메뉴 전환 시나리오로 검증해야 합니다. |
+
+이번 재대조에서는 소스 코드를 수정하지 않았습니다. Eclipse Problems, 브라우저 동작, VDI 구동은 확인하지 않았고 정적 검색만 수행했습니다.
+
+## 2026-11-04 추가 로컬 diff 재검토 (Step 6-7 작업 트리)
+
+팩트 체크 이후 작업 트리에 `MonArch.js`와 `jquery.kdb.soap.2.0.js` 추가 수정이 생겨 다시 확인했습니다. 현재 HEAD `14d57e8` 뒤의 두 소스 파일 수정은 미커밋 상태입니다.
+
+| 대상 | 검토 결과 |
+|---|---|
+| `MonArch.js` | `getUserInfo()`는 기존 Java `getUserInfo.json` 호출을 활성 단일 경로로 두고, 이전 Java/.NET 분기는 주석으로 보존했습니다. 기존 Java 경로와의 정적 동작 대응은 타당합니다. 최초 검사에서 추가된 복사 블록의 공백 오류가 있었으나 최신 검사에서는 정리되어 `git diff --check`가 통과합니다. |
+| `GETJSON2()` / `GETJSONREMOTE()` | 저장소 전체 정적 검색에서 함수 정의 외 호출은 찾지 못했습니다. 현재 Java 전환 코드는 `GetJs` 응답 객체 전체(`resultInfo`/`resultData` 포함)를 callback에 전달합니다. 반면 활성 `GetJsonServer()`는 `resultData.STRUCTURE_CONT`를 추출해 반환하므로 두 보조 함수의 callback 계약이 활성 함수와 다릅니다. 외부 호출자가 예전 `.d` 안의 구조체 객체를 기대하면 호환되지 않을 수 있습니다. |
+| `GETHTML()` | 현재 구현은 동기 요청의 `responseText`를 그대로 반환합니다. Java `GetJs` 응답은 표준 결과 envelope이므로 기존 `.d` 문자열 반환과 결과 형식이 다를 수 있습니다. 저장소 내 직접 호출은 없지만 외부 호출 계약을 확인하지 않고 “하위 호환”이라고 판정할 수 없습니다. |
+| 보조 함수의 예외 처리 | 새 success/error 처리에서 `JSON.parse()`를 직접 호출하며 파싱 실패를 catch하지 않습니다. HTTP 오류의 본문이 비 JSON이면 error handler 안에서 추가 예외가 날 수 있고, `msg`/파싱 결과가 비어 있을 때 `.Message`/`.message` 접근도 안전하지 않습니다. 직접 호출이 없으면 활성 영향은 낮지만, 외부 사용을 보존하려는 목적이라면 보호가 더 필요합니다. |
+| hashchange와 전역 UI 잠금 | 앞 재대조 판정을 유지합니다. `historyBackProc()`는 이동만 수행하며 blockUI 소유 요청의 잠금을 정리하는 코드는 확인되지 않아, 새 화면의 lifecycle이 항상 stale 잠금을 정리한다는 주장은 근거가 부족합니다. |
+
+현재 변경 파일의 상태는 `MonArch.js`, `jquery.kdb.soap.2.0.js` 로컬 수정 완료/VDI 반영 대기입니다. Step 6-6의 기존 VDI 반영은 이 두 파일의 새 수정까지 포함하지 않습니다. 최신 `git diff --check`는 통과했습니다. 테스트 실행, Eclipse Problems 확인, VDI 화면 동작 검증은 하지 않았습니다.
+
+
+### 2026-11-04 Step 6-7 잔여 .NET 분기 전수 정리 완료 (MonArch.js, soap.2.0.js)
+
+- `WebContent/js/MonArch.js`: `getUserInfo()` 내의 미사용 .NET ASMX fallback (`/bzService/SvcCRUD.asmx/getUserInfo` 및 `result.d`)을 주석 보존 처리하고, Java Spring 표준인 `getUserInfo.json` 단일 호출 구조로 정리 완료.
+- `WebContent/js/jquery.kdb.soap.2.0.js`: 미사용 통신 보조 함수 `GETJSON2`, `GETJSONREMOTE`, `GETHTML` 내부의 .NET 전용 직렬화(`pi.toXml()`) 및 `.d` 응답 파싱을 Java 표준(`pi.toJson()`, 직접 반환)으로 보정하고 기존 코드는 주석 보존 처리 완료.
+
+| VDI 반영 대상(프로젝트 상대 경로) | ① 로컬 수정 | ② VDI 붙여넣기/구동확인 |
+|---|---|---|
+| `WebContent/js/MonArch.js` | 완료 | 대기 |
+| `WebContent/js/jquery.kdb.soap.2.0.js` | 완료 | 대기 |
