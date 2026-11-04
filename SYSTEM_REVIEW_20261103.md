@@ -274,3 +274,18 @@ Git 이력에서 2026-11-02~03 변경분을 확인했습니다. 소스는 실행
   4. **보안 로깅 표준화 (`printStackTrace()` 전면 제거)**:
      - `exception.printStackTrace()` 및 `e.printStackTrace()`를 완전히 제거하고 Log4j 프로젝트 표준 로거(`logger.error(...)`, `logger.warn(...)`)로 안전하게 전환.
      - `invalidateSession(request.getSession(false))`로 불필요한 신규 세션 생성 방어.
+
+## 2026-11-04 예외 처리 보완 Step 6-3 완료 (SvcCRUD 파싱 try-catch 보호 및 @ExceptionHandler 표준화)
+
+- 대상 파일: `src/co/kr/kydbm/core/service/SvcCRUD.java`
+- 내용:
+  1. **요청 파라미터 파싱 사전 예외 격리 (`parsingForJonType`)**:
+     - `dataCRUD`(`/DATACRUD`), `getJson`(`/GetJs`), `getCode`(`/GetCode`)에서 `parsingForJonType(XmlParms)` 호출부를 `try-catch` 내부로 이동.
+     - 파라미터 null 또는 URL 디코딩 오류 발생 시 컨트롤러가 튕기지 않고 `ResultInfo(FAIL, E00004)`를 안정적으로 반환하도록 보장.
+     - `parsingForJonType` 내 `xmlParams == null` Null-Safe 방어 코드 추가.
+  2. **컨트롤러 레벨 `@ExceptionHandler` 응답 계약 표준화**:
+     - 기존에 단순 `{"errorMessage": ...}`와 HTTP 400(SC_BAD_REQUEST)을 반환하여 공통 AJAX(`soap.2.0.js`)에서 `resultInfo` 프로퍼티 부재 및 파싱 불일치를 일으키던 결함 수정.
+     - `response.setStatus(HttpServletResponse.SC_OK)`(200) 유지 및 `rstMap.put(CommonConst.RESULT_INFO, resultInfo)` 매핑으로 클라이언트 화면 화이트스크린 방어 및 에러 콜백 정상 연동 보장.
+     - 하위 호환성을 위해 기존 `errorMessage` 키도 함께 보존.
+  3. **콘솔 덤프 `printStackTrace()` 전면 제거**:
+     - `dataCRUD`, `getJson`, `getCode`, `initMetaCode`, `initMetaLabel`, `getUserInfo` 전반에서 `e.printStackTrace()`를 완전히 제거하고 `log.error(..., e)`로 안전하게 기록.

@@ -91,8 +91,11 @@ public class SvcCRUD {
 	  public ModelAndView dataCRUD( @RequestBody  String XmlParms, HttpServletRequest request, HttpSession session, boolean extOpt) throws Exception  {
 		
 		ResultInfo resultInfo = new ResultInfo(); //결과정보 
-		//String xmlParams  =URLDecoder.decode(XmlParms, "UTF-8");
+		// 20261104 khma : parsingForJonType을 try 블록 내부로 이동하여 파싱 예외 시에도 FAIL ResultInfo 응답 반환 보장
+		/*
 		String xmlParams  = parsingForJonType(XmlParms);
+		*/
+		String xmlParams = "";
 		List<Map<String,Object>> ds = null;
 		//json스트링을 객체로 전환
         String sqlComm = "";
@@ -121,6 +124,8 @@ public class SvcCRUD {
 		MonArchDaoImpl monArchDao = new MonArchDaoImpl();
 //		monArchExtDaoImpl =new MonArchExtDaoImpl(); //20140117
 		try{
+			// 20261104 khma : 요청 JSON 파라미터 디코딩 및 특수문자 처리를 try 내부에서 안전하게 실행
+			xmlParams = parsingForJonType(XmlParms);
 			obj = om.readValue(xmlParams, new TypeReference<Map<String, Object>>(){}); //맵으로 가져옴
 			service = obj.get("service");
 			method = obj.get("method");
@@ -446,7 +451,10 @@ public class SvcCRUD {
 		}
 		catch (DataAccessException e) {
 			//데이터엑세스 예외처리
+			// 20261104 khma : printStackTrace() 제거 및 Log4j 프로젝트 로거로 에러 기록
+			/*
 			e.printStackTrace();
+			*/
 			String sqlCommand = "";
 			String outputMsg =  CommonConst.COMM_ERROR_MESSAGE;
 //			errmsg.match(new RegExp("\\${(.*?)}\\$", "gim"))
@@ -475,7 +483,10 @@ public class SvcCRUD {
 		}
 		catch (Exception e) {
 			//그외 예외처리
+			// 20261104 khma : printStackTrace() 제거 및 Log4j 프로젝트 로거로 에러 기록
+			/*
 			e.printStackTrace();
+			*/
 			
 			String sqlCommand = "";
 			if(null != si ) sqlCommand = si.getSql();
@@ -491,7 +502,11 @@ public class SvcCRUD {
 		return mav;
 	 }
 
+	// 20261104 khma : null 파라미터 방어 및 특수문자 안전 치환
 	private String parsingForJonType(String xmlParams) throws UnsupportedEncodingException {
+		if (xmlParams == null) {
+			return "";
+		}
 		String rstData = xmlParams;
 		rstData = URLDecoder.decode(xmlParams, "UTF-8");
 		rstData = rstData.replaceAll("\\n", "\\\\n");
@@ -517,9 +532,11 @@ public class SvcCRUD {
 	@RequestMapping("/GetJs")
 	  public ModelAndView getJson(@RequestBody  String XmlParms) throws Exception  {
 		
-		//String xmlParams  =URLDecoder.decode(XmlParms, "UTF-8");
-		//xmlParams = xmlParams.replaceAll("\\n", "\\\\n");
+		// 20261104 khma : parsingForJonType을 try 블록 내부로 이동
+		/*
 		String xmlParams = parsingForJonType(XmlParms);
+		*/
+		String xmlParams = "";
 //		String JsName, String UID, String UNM, String USITE
 		//JsName = System.Web.HttpUtility.UrlDecode(JsName); //URL에 넘어온 데이터를 디코딩함
         String SqlCommand = ""; //sql문
@@ -541,6 +558,7 @@ public class SvcCRUD {
 		ResultInfo resultInfo = null;
         try
         {
+        	xmlParams = parsingForJonType(XmlParms);
         	resultInfo = new ResultInfo();
         	
         	obj = om.readValue(xmlParams, new TypeReference<Map<String, Object>>(){}); //맵으로 가져옴
@@ -587,7 +605,10 @@ public class SvcCRUD {
         }
         catch (DataAccessException e) {
 			//데이터엑세스 예외처리
+			// 20261104 khma : printStackTrace() 제거 및 Log4j 프로젝트 로거로 에러 기록
+			/*
 			e.printStackTrace();
+			*/
 
 			String sqlCommand = "";
 //			if(null != si ) sqlCommand = si.getSql();
@@ -597,7 +618,10 @@ public class SvcCRUD {
 			return new ModelAndView("", CommonConst.RESULT_INFO, new ResultInfo(CommonConst.FAIL, "E00004", CommonConst.COMM_ERROR_MESSAGE));
 		}catch (Exception e) {
 			//그외 예외처리
+			// 20261104 khma : printStackTrace() 제거 및 Log4j 프로젝트 로거로 에러 기록
+			/*
 			e.printStackTrace();
+			*/
 			log.error(CommonConst.COMM_ERROR_MESSAGE, e);
 			Log("GetJs", SqlCommand, CommonConst.COMM_ERROR_MESSAGE, USITE, UID);
 //			throw new Exception(msg);
@@ -615,9 +639,12 @@ public class SvcCRUD {
 	  public ModelAndView getCode(@RequestBody  
 			  String XmlParms) throws Exception  {
 		
+		// 20261104 khma : URL 디코딩을 try 블록 내부로 이동하여 안전성 보강
+		/*
 		String xmlParams  =URLDecoder.decode(XmlParms, "UTF-8");
-		
 		xmlParams = xmlParams.replaceAll("\\n", "\\\\n");
+		*/
+		String xmlParams = "";
     	
         Map<String, String> obj;
 		ObjectMapper om = new ObjectMapper();
@@ -626,6 +653,7 @@ public class SvcCRUD {
 
         try
         {
+        	xmlParams = parsingForJonType(XmlParms);
         	obj = om.readValue(xmlParams, new TypeReference<Map<String, Object>>(){}); //맵으로 가져옴
         	String key = "";
         	String userLang = "ko"; //default는 ko
@@ -650,9 +678,12 @@ public class SvcCRUD {
     		rstInfo.setMenuId(obj.get("MENUID"));
         }catch (Exception e) {
 			//그외 예외처리
+			// 20261104 khma : printStackTrace() 제거 및 Log4j 프로젝트 로거로 에러 기록
+			/*
 			e.printStackTrace();
+			*/
 			String msg = "공통코드 취득중 에러가 발생하였습니다.";
-			 log.error(msg,e);
+			log.error(msg,e);
 			
 			rstInfo =  new ResultInfo(CommonConst.FAIL, "E00004", msg);
 		}
@@ -700,7 +731,10 @@ public class SvcCRUD {
 		}
 		catch ( Exception e ) {
 			//그외 예외처리
+			// 20261104 khma : printStackTrace() 제거 및 Log4j 프로젝트 로거로 에러 기록
+			/*
 			e.printStackTrace();
+			*/
 			String msg = "공통코드 취득중 에러가 발생하였습니다.";
 			log.error(msg,e);
 			
@@ -771,7 +805,10 @@ public class SvcCRUD {
 			rstInfo.setMenuId(obj.get("MENUID"));
 		}catch (Exception e) {
 			//그외 예외처리
+			// 20261104 khma : printStackTrace() 제거 및 Log4j 프로젝트 로거로 에러 기록
+			/*
 			e.printStackTrace();
+			*/
 			log.error(e.getMessage(), e);
 			rstInfo = new ResultInfo(CommonConst.FAIL,"","공통코드 적용 실패", "공통코드를 적용중 예기치못한 에러가 발생하였습니다.");
 		}
@@ -804,7 +841,10 @@ public class SvcCRUD {
 			rstInfo.setMenuId(obj.get("MENUID"));
 		}catch (Exception e) {
 			//그외 예외처리
+			// 20261104 khma : printStackTrace() 제거 및 Log4j 프로젝트 로거로 에러 기록
+			/*
 			e.printStackTrace();
+			*/
 			log.error(e.getMessage() ,e);
 			rstInfo = new ResultInfo(CommonConst.FAIL,"","공통라벨 적용 실패", "공통라벨을 적용중 예기치못한 에러가 발생하였습니다.");
 		}
@@ -914,6 +954,8 @@ public class SvcCRUD {
 	}
 	
 	
+	// 20261104 khma Start : @ExceptionHandler 표준 ResultInfo JSON 응답 구조 통일 및 보안 로거 적용
+	/*
 	// Exception 처리 메소드 
 	@ExceptionHandler(Exception.class)
 	public ModelAndView handleException(Exception e, HttpServletResponse response){
@@ -926,6 +968,37 @@ public class SvcCRUD {
 		ModelAndView mav = new ModelAndView("", rstMap);
 		return mav;
 	}
+	*/
+	/**
+	 * SvcCRUD 컨트롤러 예외 처리 핸들러
+	 * - 컨트롤러 내부에서 미처리된 예외 발생 시 표준 ResultInfo(FAIL, E00004) JSON 모델 반환
+	 * - 기존 errorMessage 단일 문자열 반환 결함을 개선하여 공통 AJAX(soap.2.0.js) 표준 규격과 100% 일치화
+	 * - HTTP 200(SC_OK)를 유지하여 jQuery AJAX 성공/실패 핸들러 계약 및 화면 화이트스크린 방어
+	 * 
+	 * @param e 발생한 예외 객체
+	 * @param request HttpServletRequest 객체
+	 * @param response HttpServletResponse 객체
+	 * @return 표준 ResultInfo가 포함된 ModelAndView
+	 */
+	@ExceptionHandler(Exception.class)
+	public ModelAndView handleException(Exception e, HttpServletRequest request, HttpServletResponse response){
+		log.error("SvcCRUD 미처리 예외 발생 [URI: " + (request != null ? request.getRequestURI() : "") + "] : " + e.getMessage(), e);
+		
+		response.setStatus(HttpServletResponse.SC_OK);
+		
+		ResultInfo resultInfo = new ResultInfo();
+		resultInfo.setResult(CommonConst.FAIL);
+		resultInfo.setErrorCode("E00004");
+		resultInfo.setMessage(CommonConst.COMM_ERROR_MESSAGE);
+		
+		Map<String, Object> rstMap = new HashMap<String, Object>();
+		rstMap.put(CommonConst.RESULT_INFO, resultInfo);
+		rstMap.put("errorMessage", CommonConst.COMM_ERROR_MESSAGE); // 구형 레거시 호출 호환성 유지
+		
+		ModelAndView mav = new ModelAndView("", rstMap);
+		return mav;
+	}
+	// 20261104 khma End : @ExceptionHandler 표준 ResultInfo JSON 응답 구조 통일 및 보안 로거 적용
 
 	/**
 	 * 사용자 정보를 가져와 초기화하는 서비스
@@ -954,7 +1027,10 @@ public class SvcCRUD {
 		}
 		catch (Exception e) {
 			//그외 예외처리
+			// 20261104 khma : printStackTrace() 제거 및 Log4j 프로젝트 로거로 에러 기록
+			/*
 			e.printStackTrace();
+			*/
 			log.error(e.getMessage(), e);
 			rstInfo = new ResultInfo(CommonConst.FAIL, "", "사용자 정보 가져오기 실패", CommonConst.COMM_ERROR_MESSAGE);
 			mav.addObject(CommonConst.RESULT_INFO, rstInfo);
