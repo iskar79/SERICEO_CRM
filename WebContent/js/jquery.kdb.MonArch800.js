@@ -1280,6 +1280,43 @@
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Json2Str
     ///////////////////////////////////////////////////////////////////////////////////////////
+    // 20261104 khma Start : JSON 직렬화 유틸($.Json2Str) JSON.stringify 우선 및 따옴표/개행 이스케이프 보강
+    $.Json2Str = function (obj) {
+        // 최신 브라우저 표준 JSON.stringify 지원 시 우선 사용하여 따옴표/역슬래시/개행 깨짐 방어
+        if (window.JSON && typeof JSON.stringify === "function") {
+            try {
+                return JSON.stringify(obj);
+            } catch (eJson) {
+                // 순환 참조 등으로 실패 시 아래 기존 직렬화 로직으로 Fallback
+            }
+        }
+
+        var t = typeof (obj);
+        if (t != "object" || obj === null) {
+            // simple data type
+            if (t == "string") {
+                obj = '"' + obj.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n').replace(/\r/g, '\\r').replace(/\t/g, '\\t') + '"';
+            }
+            return String(obj);
+        } else {
+            // array or object
+            var json = [], arr = (obj && obj.constructor == Array);
+
+            $.each(obj, function (k, v) {
+                t = typeof (v);
+                if (t == "string") {
+                    v = '"' + v.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n').replace(/\r/g, '\\r').replace(/\t/g, '\\t') + '"';
+                } else if (t == "object" && v !== null) {
+                    v = $.Json2Str(v);
+                }
+                json.push((arr ? "" : '"' + k + '":') + String(v));
+            });
+
+            return (arr ? "[" : "{") + String(json) + (arr ? "]" : "}");
+        }
+    };
+    // 20261104 khma End : JSON 직렬화 유틸($.Json2Str) JSON.stringify 우선 및 따옴표/개행 이스케이프 보강
+    /*
     $.Json2Str = function (obj) {
         var t = typeof (obj);
         if (t != "object" || obj === null) {
@@ -1300,6 +1337,7 @@
             return (arr ? "[" : "{") + String(json) + (arr ? "]" : "}");
         }
     };
+    */
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     // 브라우즈 버전체크

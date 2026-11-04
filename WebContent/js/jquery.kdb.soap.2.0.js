@@ -130,10 +130,30 @@ function PostJsonData(url, pi, ScCallBack, ErCallBack, aSync) {
             }
 
             // -------------------------------------------------------------
-            // 20261104 khma : resultInfo 미포함 일반 객체 응답 호환 처리
-            // SvcCRUD 응답이 아닌 일반 JSON 객체를 반환하는 서비스 호출에 대한 NPE 방어
+            // 20261104 khma : null 또는 비객체 응답 시 에러 콜백으로 안전 격리
+            // 서버에서 빈 응답이 오거나 JSON null 수신 시 성공 콜백 내 필드 참조 예외(TypeError) 방어
             // -------------------------------------------------------------
-            if (!_result || !_result.resultInfo) {
+            if (_result === null || typeof _result !== "object") {
+                alert("서버에서 올바른 응답 데이터를 수신하지 못했습니다.");
+                if (typeof ErCallBack === "function") {
+                    try {
+                        ErCallBack({
+                            resultInfo: {
+                                result: "FAIL",
+                                errorCode: "E9998",
+                                message: "응답 데이터가 비어있거나 올바른 객체가 아닙니다."
+                            }
+                        });
+                    } catch (eCb) {}
+                }
+                return;
+            }
+
+            // -------------------------------------------------------------
+            // 20261104 khma : resultInfo 미포함 일반 유효 JSON 객체 응답 호환 처리
+            // SvcCRUD 응답이 아닌 일반 JSON 객체를 반환하는 서비스 호출에 대한 하위 호환성 유지
+            // -------------------------------------------------------------
+            if (!_result.resultInfo) {
                 if (typeof ScCallBack === "function") {
                     ScCallBack(_result);
                 }
@@ -149,6 +169,11 @@ function PostJsonData(url, pi, ScCallBack, ErCallBack, aSync) {
                 if (_result.resultInfo.menuId == undefined || _result.resultInfo.menuId == "0000" || _result.resultInfo.menuId == _M.PrevActGbn.currMenuId) {
                     if (typeof ScCallBack === "function") {
                         ScCallBack(_result);
+                    }
+                } else {
+                    // 20261104 khma : 현재 메뉴와 불일치하는 stale 응답 무시 시 UI 잠금(blockUI) 해제 완수
+                    if (window.$ && typeof $.unblockUI === "function") {
+                        try { $.unblockUI(); } catch (eUnblock) {}
                     }
                 }
             } else {

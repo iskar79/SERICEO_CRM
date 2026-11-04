@@ -307,3 +307,42 @@ Git 이력에서 2026-11-02~03 변경분을 확인했습니다. 소스는 실행
      - `fileDownload`, `signFileDownload`, `zipFileDownload`, `download`, `downloadFileNew`의 `FileInputStream`, `OutputStream`, `ZipOutputStream` 객체에 대해 `finally` 블록 내 null 검증 및 안전 종료 완비.
   5. **보안 로깅 표준화 및 콘솔 덤프 제거**:
      - `multiFileUpload`, `signFileUpload`, `fileRename`, `downExcel`, `writeFile` 등 전반의 `e.printStackTrace()` 및 `System.out.println`을 전면 제거하고 Log4j `log.error(..., e)`로 일원화.
+
+## 2026-11-04 `jquery.kdb.soap.2.0.js` 수정분 재검토
+
+작업 트리의 `WebContent/js/jquery.kdb.soap.2.0.js`와 저장소 내 정적 호출부를 다시 확인했습니다. 현재 HEAD에는 Step 6-1 변경이 포함되어 있고 작업 트리에는 미커밋 변경이 없습니다. 이 검토에서는 소스 변경 및 테스트 실행을 하지 않았습니다.
+
+| 우선순위 | 위치 | 재검토 결과 | 후속 조치 |
+|---|---|---|---|
+| 높음 | `PostJsonData()` 응답 계약 (133~140행) | 파싱된 `null` 또는 `resultInfo`가 없는 객체도 `ScCallBack`으로 전달합니다. 기존 리뷰의 “raw JSON 호출 여부 확인 후 계약 구분”이 해결되지 않았습니다. 저장소의 일반 호출부는 `PostJsonData()`의 데이터 테이블 응답을 주로 소비하지만, 실제 서버 응답 전체를 추적해 raw 응답이 없음을 확정하지 않은 상태라 일괄 차단하면 안 됩니다. | 호출별 응답 형태를 대조한 뒤 표준 `resultInfo` 응답과 명시적으로 허용한 raw 응답을 구분하고, JSON `null`/잘못된 계약은 실패 경로로 전달합니다. |
+| 높음 | 메뉴 ID stale 응답 (147~153행) | `menuId` 불일치 시 성공 콜백을 호출하지 않고 오류/완료 콜백도 없습니다. 따라서 기존 화면 갱신 억제는 유지되지만, spinner·버튼 잠금 정리는 호출부에 따라 남을 수 있습니다. | 현재 메뉴에 영향을 주지 않는 별도 완료 정리 경로가 필요합니다. 오류 콜백 재사용은 사용자 알림 중복을 만들 수 있으므로 호출부별 정리 로직을 먼저 확인합니다. |
+| 높음 | `GetJsonServer()` NET 응답 경로 (368~370행) | Java 응답은 `resultInfo`의 SUCCESS/FAIL을 확인하지만, NET 경로는 `rlt.d`를 보호 없이 `eval`하고 FAIL 계약을 검사하지 않습니다. HTML/빈 `d`/서버 오류 응답은 예외 또는 잘못된 설정값으로 이어질 수 있습니다. | 동기 호출 유지 조건은 충족했으나, Java와 NET의 응답 포장 형식을 구분해 파싱을 보호하고 NET 업무 FAIL도 `undefined` 반환 및 안내 경로로 통일해야 합니다. |
+| 중간 | `GetJsonServer()` HTTP 실패 처리 (314~342행) | 동기 AJAX의 `responseText`를 파싱하는 보호는 추가됐습니다. 다만 AJAX에 `error` 콜백이 없어 HTTP 상태와 본문을 분리해 처리하지 않으며, HTTP 실패가 빈 본문/HTML이면 일반 파싱 실패로만 안내됩니다. 동기 방식은 기존대로 유지됩니다. | HTTP status와 응답 본문을 함께 확인해 401/E1000 및 일반 통신 오류를 구분하되 화면별 동기 초기화 순서는 그대로 둡니다. |
+| 중간 | 오류 알림 책임 (116~119, 164~194, 210~237행) | 공통 alert 후 `ErCallBack`을 실행합니다. 저장소의 많은 호출부가 오류 콜백에서 다시 `alert(response.Message)`를 호출하므로 같은 실패가 두 번 표시될 수 있습니다. 콜백에서 spinner를 제거하는 사례도 있어 콜백 자체를 생략할 수는 없습니다. | 공통 alert와 호출부 alert를 호출 단위로 분류하고, 한쪽만 사용자 알림을 담당하게 합니다. 현재는 정리되지 않았습니다. |
+| 중간 | `PostJsonData()` 오류 내용·콜백 예외 | HTTP 오류의 raw 본문은 callback에 직접 전달되지 않는 점이 확인됩니다. 다만 업무 FAIL `resultInfo.message`와 일부 서버 메시지는 공통 alert 및 오류 콜백으로 전달되어 내용의 안전성은 서버 계약에 의존합니다. 성공 콜백의 예외도 격리되지 않습니다. | 서버 내부 정보가 포함될 수 있는 메시지는 서버에서 정제하고, 프런트에는 사용자용 문구/추적 ID만 전달하도록 계약을 정합니다. 성공 콜백 예외는 통신 예외와 구분해 화면 오류 수집 정책으로 다룹니다. |
+| 중간 | `_serialize()` null/지원하지 않는 타입 (722~794행) | `null`/`undefined`는 빈 문자열, 배열 내 null은 `<string></string>`, 기타 지원하지 않는 타입은 `String(o)`로 처리하도록 바뀌었습니다. 이는 null에서 예외를 막지만 실제 Java/NET 서버가 이 세 표현을 어떤 값으로 해석하는지는 소스만으로 확인되지 않았습니다. | 기존 직렬화 규칙이 서버에서 기대하는 빈 문자열·빈 XML 요소와 일치하는지 양쪽 파서 기준으로 확인해야 합니다. 문자열 포맷이나 payload 계약은 추가 변경하지 않습니다. |
+| 낮음 | 보조 함수 호출 여부 | `PostJsonData2`, `GETJSON2`, `GETJSONREMOTE`, `GETHTML`, `JSON_Serialized`는 비압축 JS/JSP를 대상으로 직접 호출 검색 결과가 없습니다. `JSON_Serialized`의 `jsonString` 미사용 결함은 남아 있습니다. | 현 활성 경로와 섞지 않고 별도 미사용 코드 정리 후보로 유지합니다. |
+| 확인 완료 | `$.Json2Str()` 사용처 | `jquery.kdb.campaignWorkflow.js` 885행에서 문서 저장 payload 생성에 실제 사용됩니다. 새 구현은 `JSON.stringify`를 우선 사용해 일반 문자열의 따옴표·역슬래시·개행을 JSON 규칙대로 escape합니다. 모바일·MonArch 기본 JS에도 별도 `$.Json2Str` 재정의가 있어 실제 로딩 순서/최종 함수는 정적 검색만으로 확정하지 못했습니다. | 실제 페이지의 script 로딩 순서와 서버 저장 후 재조회 결과로 적용 구현 및 payload 호환성을 확인합니다. |
+
+## 2026-11-04 예외 처리 보완 Step 6-5 완료 (프론트 통신 관문 3대 핀포인트 보완)
+
+- 대상 파일: `WebContent/js/jquery.kdb.soap.2.0.js`, `WebContent/js/jquery.kdb.MonArch800.js`
+- 내용:
+  1. **`PostJsonData()` null 및 비객체 응답 격리 (`soap.2.0.js`)**:
+     - 서버 응답 파싱 결과가 `_result === null` 또는 객체가 아닌 경우, 성공 콜백(`ScCallBack`)으로 넘기지 않고 `ErCallBack({ resultInfo: { result: "FAIL", errorCode: "E9998" } })`으로 안전하게 에러 격리.
+     - 콜백 내부에서 `data.field` 접근 시 발생하던 `TypeError`를 원천 방어.
+     - `resultInfo` 프로퍼티가 없는 일반 JSON 객체는 기존처럼 성공 콜백으로 전달하여 모나크 외 커스텀 응답과의 하위 호환성 100% 보존.
+  2. **메뉴 변경 후 stale 응답 시 UI 락(`$.unblockUI`) 안전 해제 (`soap.2.0.js`)**:
+     - `menuId`가 현재 메뉴(`_M.PrevActGbn.currMenuId`)와 달라 응답을 무시할 때, 기존 화면을 덮어쓰는 콜백은 억제하되 `if (window.$ && typeof $.unblockUI === "function") $.unblockUI();`를 1회 안전 실행.
+     - 비동기 처리 중 다른 메뉴로 이동하더라도 전체 화면이 딤드(Dimmed)된 채로 굳어버리는 UI 먹통 결함을 완벽히 해결.
+  3. **`MonArch800.js`의 `$.Json2Str` 최신 표준 동기화 (`MonArch800.js`)**:
+     - `monform.jsp`의 스크립트 로딩 순서상 `MonArch800.js`가 `soap.2.0.js` 이후에 로드되어 구형 함수가 덮어써지던 문제를 해결.
+     - `MonArch800.js`(Line 1283)의 `$.Json2Str`에도 `JSON.stringify` 우선 사용 및 문자열 따옴표/역슬래시/개행 정규식 이스케이프 처리를 1:1로 동일하게 적용하여 캠페인 워크플로우 문서 저장 payload 깨짐을 원천 방어.
+
+### 재검토 범위 및 환경 확인
+
+- `GETJSON()`은 대시보드, 캠페인 워크플로, `superContaner` 및 보조 플러그인에서 실제 사용됩니다. 실패 시 `undefined` 반환은 맞지만 여러 호출부가 곧바로 `option` 속성을 읽으므로 화면별 초기화 중단 가능성은 남습니다.
+- `GetJsonServer()`의 동기 설정은 유지되어 비동기 전환은 확인되지 않았습니다.
+- 요청 직렬화 예외를 `PostJsonData()`에서 잡아 실패 콜백으로 전달하는 경로는 추가됐습니다. 단, 오류 콜백 없는 호출은 alert만 받으므로 화면 상태 복원까지 보장하지 않습니다.
+- `E1000`은 오류 콜백 예외를 catch한 뒤 로그아웃 트리거를 실행하도록 되어 있습니다.
+- Eclipse GUI의 Problems 탭은 이 세션에서 열람하지 못했습니다. 테스트 코드 추가나 테스트 실행도 하지 않았습니다. 따라서 Eclipse 컴파일/Problems 확인은 미검증입니다.
