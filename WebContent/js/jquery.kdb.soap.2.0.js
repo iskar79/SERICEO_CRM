@@ -368,12 +368,12 @@ function GetJsonServer(name, usite, extOpt) {
     if (_M.Webtype == 'Java') {
         if (rlt && rlt.resultInfo && rlt.resultInfo.result == "SUCCESS") {
             try {
-                // STRUCTURE_CONT 내부 JSON 안전 변환 (JSON.parse 우선 사용)
+                // 20261104 khma : STRUCTURE_CONT 객체 변환 (자바스크립트 함수 및 객체 리터럴을 포함하므로 eval('(' + structCont + ')') 표준 평가)
                 var structCont = rlt.resultData ? rlt.resultData.STRUCTURE_CONT : null;
                 if (typeof structCont === "object" && structCont !== null) {
                     rlt = structCont;
                 } else if (typeof structCont === "string") {
-                    rlt = (window.JSON && JSON.parse) ? JSON.parse(structCont) : eval('(' + structCont + ')');
+                    rlt = eval('(' + structCont + ')'); // 20121204 khma new 원본 평가 방식 유지
                 }
                 _M.Jsons[name] = rlt;
             } catch (eStruct) {
