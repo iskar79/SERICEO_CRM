@@ -92,7 +92,8 @@
 | **Step 6-2** | `src/co/kr/kydbm/core/exception/ExceptionResolver.java` | 전역 예외 처리 표준화 (미처리 예외 표준 ResultInfo 응답 생성, AJAX jsonView 매핑/동기 redirect 분기, ORA-20000 보존 및 SQL 은닉, printStackTrace 제거) | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
 | **Step 6-3** | `src/co/kr/kydbm/core/service/SvcCRUD.java` | parsingForJonType 파싱 try-catch 내부 이동, @ExceptionHandler ResultInfo 표준 JSON 뷰 통일(SC_OK 200 유지), printStackTrace 전면 제거 | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
 | **Step 6-4** | `src/co/kr/kydbm/core/filecontrol/UploadController.java` | @ExceptionHandler(Exception.class) 표준 ResultInfo 등록, downExcel/downloadFileNew 응답 커밋 검증 및 브라우저 alert 안내, 내부정보 노출 차단, 스트림/Writer null-safe close, printStackTrace 제거 | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
-| **Step 6-5** | `soap.2.0.js`, `MonArch800.js` | PostJsonData null/비객체 응답 에러 격리, stale 메뉴 응답 무시 시 $.unblockUI() 안전 해제, MonArch800.js $.Json2Str 최신 직렬화 동기화 | `[x]` | `[ ]` | **로컬수정 완료 (VDI 반영 대기)** |
+| **Step 6-5** | `soap.2.0.js`, `MonArch800.js` | PostJsonData null/비객체 응답 에러 격리, stale 메뉴 응답 무시 시 $.unblockUI() 안전 해제, MonArch800.js $.Json2Str 최신 직렬화 동기화, GetJsonServer eval 복원 | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
+| **Step 2-12**| `UploadController.java`, `superContaner.js` | M_EXCEL_DOWN_LOG DOWN_CNT 정합성 보강 (REGDATE 오라클 컬럼명 일치, 사용자 Fallback 갱신 및 superContaner _records 연동) | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
 | **Step 3** | `MonArchDaoImpl.java`, `FilterGenerator.java`, 프로시저/배치 등 | KSign SecureDB 개인정보 암복호화 공통 모듈 및 프로시저/엑셀업로드 적용 | `[ ]` | `[ ]` | 대기 |
 
 ## 운영 WAR 생성 전 필수 확인 알림
