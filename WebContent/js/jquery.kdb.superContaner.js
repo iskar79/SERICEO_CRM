@@ -7547,6 +7547,12 @@ $(document).on("blur", ".t_Money", function (e) {
           // 파일 열람 암호 추가 (백엔드 POI 암호화 생성용)
           pl.add("excelPassword", encodeURIComponent(pwd1));
 
+          // 20261104 khma : 엑셀 다운로드 폼(xlsForm) 전송 시 파라미터 누락 방지를 위해 UID 및 USITE 명시적 추가
+          var currentUserId = (_M.UserInfo && _M.UserInfo.id) ? _M.UserInfo.id : "";
+          var currentSiteId = (_M.UserInfo && _M.UserInfo.SID) ? _M.UserInfo.SID : "44";
+          pl.add("UID", currentUserId);
+          pl.add("USITE", currentSiteId);
+
           // -----------------------------------------------------------------
           // 20261102 khma : 실제 다운로드 파일명 형식 [파일명]_[YYYYMMDD]_[HHMISS].xlsx 일치화
           // (프론트엔드와 백엔드가 동일한 타임스탬프를 공유하여 단 1초의 오차도 없이 100% 일치)

@@ -830,6 +830,28 @@ public class UploadController {
 		String fileName = "";
 		UID = obj.get("UID");
 		USITE = obj.get("USITE");
+
+		// 20261104 khma Start : 파라미터에 UID/USITE 누락 시 세션(userInfo)에서 안전하게 Fallback 취득
+		if (StringUtils.isEmpty(UID) || StringUtils.isEmpty(USITE)) {
+			HttpSession session = request.getSession(false);
+			if (session != null) {
+				UserInfo sUser = null;
+				if (session.getAttribute("userInfo") != null) {
+					sUser = (UserInfo) session.getAttribute("userInfo");
+				} else if (session.getAttribute("UserInfo") != null) {
+					sUser = (UserInfo) session.getAttribute("UserInfo");
+				}
+				if (sUser != null) {
+					if (StringUtils.isEmpty(UID)) {
+						UID = StringUtils.isNotEmpty(sUser.getUserCode()) ? sUser.getUserCode() : sUser.getUserNo();
+					}
+					if (StringUtils.isEmpty(USITE)) {
+						USITE = StringUtils.isNotEmpty(sUser.getUsiteNo()) ? sUser.getUsiteNo() : "44";
+					}
+				}
+			}
+		}
+		// 20261104 khma End : 파라미터에 UID/USITE 누락 시 세션(userInfo)에서 안전하게 Fallback 취득
 		/* 20140108 khma 추가 액셀 처리방식 개선 XLSTYPE에 따른 처리 추가 start */
 		if (obj.containsKey("xlsType") && StringUtils.isNotEmpty(obj.get("xlsType"))) {
 			xlsType = obj.get("xlsType");
@@ -983,7 +1005,10 @@ public class UploadController {
 				updateDownCntParam.put("DOWN_CNT", String.valueOf(actualDownCnt));
 				updateDownCntParam.put("FILE_NAME_EXT", fileName + ".xlsx");
 				updateDownCntParam.put("FILE_NAME_RAW", fileName);
-				updateDownCntParam.put("REGUSER", UID);
+				// 20261104 khma : UID가 유효할 때만 파라미터에 추가하여 모나크 동적 주석 문법(/* AND REGUSER = @REGUSER@ */)과 연동
+				if (StringUtils.isNotEmpty(UID)) {
+					updateDownCntParam.put("REGUSER", UID);
+				}
 				// 동시 다중 다운로드 요청 시 파일명, 사용자, 최근 5분 이내 생성된 LOG_NO 중 최신 1건만 정밀 갱신
 				String sqlUpdateDownCnt = "UPDATE M_EXCEL_DOWN_LOG "
 						+ "   SET DOWN_CNT = @DOWN_CNT@ "
@@ -991,7 +1016,7 @@ public class UploadController {
 						+ "       SELECT MAX(LOG_NO) "
 						+ "         FROM M_EXCEL_DOWN_LOG "
 						+ "        WHERE (FILE_NAME = @FILE_NAME_EXT@ OR FILE_NAME = @FILE_NAME_RAW@) "
-						+ "          AND REGUSER = @REGUSER@ "
+						+ "        /* AND REGUSER = @REGUSER@ */ "
 						+ "          AND REG_DATE >= SYSDATE - (5 / 1440) "
 						+ " ) ";
 				monArchDao.exeUpdate(sqlUpdateDownCnt, updateDownCntParam);

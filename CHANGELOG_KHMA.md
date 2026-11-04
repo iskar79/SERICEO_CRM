@@ -57,16 +57,7 @@
 | **Step 2-7** | `WebContent/js/jquery.kdb.superContaner.js` | XLS_REASON_POPUP 동적로드, DownXlsNew 타깃 서비스명/메소드명/파일명 정밀 추출 및 실제 다운로드 파일명 타임스탬프 일치화, IP 다중 추출 보정 | `[x]` | `[x]` | **완료 (VDI 정상동작 확인)** |
 | **Step 2-8** | `운영쿼리정보/M_COMM_CODE_XLS_SEC_COLS.sql`, `superContaner.js` | 정보성/홍보용 엑셀 추출 보안 컬럼(xlsOption.secCols 동적옵션) DB 공통코드 연동 및 DownXlsNew DOWNCOLS 추출 구현 | `[x]` | `[x]` | **완료 (VDI 반영 완료)** |
 | **Step 2-9** | src/co/kr/kydbm/core/filecontrol/UploadController.java | 실제 엑셀 조회 데이터 건수(ds.size())로 M_EXCEL_DOWN_LOG.DOWN_CNT 정밀 갱신 로직 구현 | [x] | [x] | **완료 (VDI 반영 확인)** |
-| **Step 2-10**| superContaner.js, UploadController.java, M_COMM_CODE_XLS_SEC_COLS.sql | 엑셀 암호(excelPassword) 평문 마스킹, 감사 실패 시 다운로드 차단, 하얀화면 방어 및 DB오류로깅, 사이트('44') 삭제 조건 보강 | [x] | [x] | **완료 (VDI 반영 확인)** |
-| **Step 5-3** | src/co/kr/kydbm/core/filecontrol/UploadController.java | 파일당 20MB 백엔드 강제 검증, Path Traversal 방어, 세션(userInfo) 식별자 취득, 휴지통 이동 검증 및 DB 소프트 삭제(USE_YN='N', DEL_DATE=SYSDATE) | [x] | [x] | **완료 (VDI 반영 확인)** |
-| **Step 5-1** | `UploadController.java`, `Resource.js`, `Monarch820-servlet.xml` | 차세대 파일 백엔드 독립 엔드포인트 3종(/uploadFileNew, /downloadFileNew, /deleteFileSafe) 및 세션 인터셉터 매핑, D: 드라이브 미존재 Fallback 구현 | `[x]` | `[x]` | **완료 (VDI 정상구동 확인)** |
-| **Step 5-2** | `WebContent/js/jquery.kdb.superContaner.js` | singleFileNew, multiFileNew Drag&Drop, 클라이언트 지연 업로드, 20MB 검증, 교체 컨펌(confirm) 및 자동 삭제 안내 UI 구현 | `[x]` | `[x]` | **완료 (VDI 정상동작 확인)** |
-| **Step 2-10**| `superContaner.js`, `UploadController.java`, `M_COMM_CODE_XLS_SEC_COLS.sql` | 엑셀 암호(excelPassword) 평문 마스킹, 감사 실패 시 다운로드 차단, DOWNCOLS SQLi 방어, DOWN_CNT 동시성 방어, 사이트(
-'44'
-) 삭제 조건 보강 | `[x]` | `[ ]` | **로컬 완료 (VDI 복사 대기)** |
-| **Step 5-3** | `src/co/kr/kydbm/core/filecontrol/UploadController.java` | 파일당 20MB 백엔드 강제 검증, Path Traversal 방어, 세션 식별자 취득, 파일 휴지통 이동 검증 및 DB 소프트 삭제(USE_YN=
-'N'
-, DEL_DATE=SYSDATE) | `[x]` | `[ ]` | **로컬 완료 (VDI 복사 대기)** |
+| **Step 2-11**| `superContaner.js`, `UploadController.java` | 엑셀 다운로드 폼(xlsForm) 전송 시 UID/USITE 명시적 추가, 백엔드 세션 Fallback 및 모나크 동적 주석 문법 연동으로 DOWN_CNT 100% 정합성 보장 | `[x]` | `[ ]` | **로컬 완료 (VDI 복사 대기)** |
 | **Step 3** | `MonArchDaoImpl.java`, `FilterGenerator.java`, 프로시저/배치 등 | KSign SecureDB 개인정보 암복호화 공통 모듈 및 프로시저/엑셀업로드 적용 | `[ ]` | `[ ]` | 대기 |
 
 ### 📖 Step 0. 사전 환경 정상화 및 아키텍처 숙지 (완료)
@@ -100,11 +91,5 @@
 | **Step 2-7** | `WebContent/js/jquery.kdb.superContaner.js` | XLS_REASON_POPUP 동적로드, DownXlsNew 타깃 서비스명/메소드명/파일명 정밀 추출 및 실제 다운로드 파일명 타임스탬프 일치화, IP 다중 추출 보정 | `[x]` | `[x]` | **완료 (VDI 정상동작 확인)** |
 | **Step 2-8** | `운영쿼리정보/M_COMM_CODE_XLS_SEC_COLS.sql`, `superContaner.js` | 정보성/홍보용 엑셀 추출 보안 컬럼(xlsOption.secCols 동적옵션) DB 공통코드 연동 및 DownXlsNew DOWNCOLS 추출 구현 | `[x]` | `[x]` | **완료 (VDI 반영 완료)** |
 | **Step 2-9** | src/co/kr/kydbm/core/filecontrol/UploadController.java | 실제 엑셀 조회 데이터 건수(ds.size())로 M_EXCEL_DOWN_LOG.DOWN_CNT 정밀 갱신 로직 구현 | [x] | [x] | **완료 (VDI 반영 확인)** |
-| **Step 2-10**| superContaner.js, UploadController.java, M_COMM_CODE_XLS_SEC_COLS.sql | 엑셀 암호(excelPassword) 평문 마스킹, 감사 실패 시 다운로드 차단, 하얀화면 방어 및 DB오류로깅, 사이트('44') 삭제 조건 보강 | [x] | [x] | **완료 (VDI 반영 확인)** |
-| **Step 5-3** | src/co/kr/kydbm/core/filecontrol/UploadController.java | 파일당 20MB 백엔드 강제 검증, Path Traversal 방어, 세션(userInfo) 식별자 취득, 휴지통 이동 검증 및 DB 소프트 삭제(USE_YN='N', DEL_DATE=SYSDATE) | [x] | [x] | **완료 (VDI 반영 확인)** |
-### 📂 Step 5. 차세대 드래그앤드롭 파일 시스템 구축
-> 📘 참조 가이드: 5_TASK_FILE_SYSTEM_DRAG_DROP.md
-* [x] **[Step 5-1]** UploadController.java, Resource.js, Monarch820-servlet.xml ➡️ 차세대 파일 백엔드 독립 엔드포인트 3종(/uploadFileNew, /downloadFileNew, /deleteFileSafe) 구현, 세션 인터셉터 매핑 및 D: 드라이브 미존재 VDI 환경 자동 Fallback(getBaseUploadPath) 지원 ([① 로컬: 완료(x) / ② VDI: 완료(x)])
-* [x] **[Step 5-2]** WebContent/js/jquery.kdb.superContaner.js ➡️ singleFileNew, multiFileNew HTML5 Drag & Drop UI, 클라이언트 지연 업로드, 20MB 용량/확장자 검증, 1개 파일 제한 및 기존 파일 자동 교체 confirm 창 추가 ([① 로컬: 완료(x) / ② VDI: 완료(x)])
-* [x] **[Step 2-10]** superContaner.js, UploadController.java, M_COMM_CODE_XLS_SEC_COLS.sql ➡️ 엑셀 열람 암호 평문 마스킹(REQ_DOC), 보안 감사 실패 시 다운로드 진행 차단, 하얀화면 방어 alert 출력 및 SvcCRUD.Log 시스템 오류 로그 적재, XLS_SEC_COLS 사이트('44') 조건 추가 ([① 로컬: 완료(x) / ② VDI: 완료(x)])
-* [x] **[Step 5-3]** UploadController.java ➡️ 백엔드 파일당 20MB 강제 검증, Path Traversal(.. 경로) 차단, 세션(userInfo) 기반 등록자/사이트 식별, 휴지통 이동(renameTo) 성공 여부 확인 및 DB 소프트 삭제(USE_YN='N', DEL_DATE=SYSDATE, DEL_USER) 적용 ([① 로컬: 완료(x) / ② VDI: 완료(x)])
+| **Step 2-11**| `superContaner.js`, `UploadController.java` | 엑셀 다운로드 폼(xlsForm) 전송 시 UID/USITE 명시적 추가, 백엔드 세션 Fallback 및 모나크 동적 주석 문법 연동으로 DOWN_CNT 100% 정합성 보장 | `[x]` | `[ ]` | **로컬 완료 (VDI 복사 대기)** |
+| **Step 2-11**| `superContaner.js`, `UploadController.java` | 엑셀 다운로드 폼(xlsForm) 전송 시 UID/USITE 명시적 추가, 백엔드 세션 Fallback 및 모나크 동적 주석 문법 연동으로 DOWN_CNT 100% 정합성 보장 | `[x]` | `[ ]` | **로컬 완료 (VDI 복사 대기)** |

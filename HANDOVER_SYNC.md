@@ -86,6 +86,7 @@
 | **Step 5-1** | `UploadController.java`, `Resource.js`, `Monarch820-servlet.xml` | 차세대 파일 백엔드 독립 엔드포인트 3종(/uploadFileNew, /downloadFileNew, /deleteFileSafe) 및 세션 인터셉터 매핑 | `[x]` | `[x]` | **완료 (VDI 톰캣 정상 기동 확인)** |
 | **Step 5-2** | `WebContent/js/jquery.kdb.superContaner.js` | singleFileNew, multiFileNew Drag&Drop, 클라이언트 지연 업로드, 20MB 검증, 교체대기/취소복원 | `[x]` | `[x]` | **완료 (VDI 정상동작 확인)** |
 | **Step 5-3** | src/co/kr/kydbm/core/filecontrol/UploadController.java | 파일당 20MB 백엔드 강제 검증, Path Traversal 방어, 세션(userInfo) 식별자 취득, 휴지통 이동 검증 및 DB 소프트 삭제(USE_YN='N', DEL_DATE=SYSDATE) | [x] | [x] | **완료 (VDI 반영 확인)** |
+| **Step 2-11**| `superContaner.js`, `UploadController.java` | 엑셀 다운로드 폼(xlsForm) 전송 시 UID/USITE 명시적 추가, 백엔드 세션 Fallback 및 모나크 동적 주석 문법 연동으로 DOWN_CNT 100% 정합성 보장 | `[x]` | `[ ]` | **로컬 완료 (VDI 복사 대기)** |
 | **Step 3** | `MonArchDaoImpl.java`, `FilterGenerator.java`, 프로시저/배치 등 | KSign SecureDB 개인정보 암복호화 공통 모듈 및 프로시저/엑셀업로드 적용 | `[ ]` | `[ ]` | 대기 |
 
 ## 운영 WAR 생성 전 필수 확인 알림
