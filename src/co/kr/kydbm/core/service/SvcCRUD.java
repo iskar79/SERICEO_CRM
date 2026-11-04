@@ -41,12 +41,21 @@ import co.kr.kydbm.core.utils.ConfigProperties;
 import co.kr.kydbm.core.utils.LanguageExchanger;
 import co.kr.kydbm.core.utils.QueryGenerator;
 /**
- *  모나크 메인 서비스 클래스
- * @author KyoungHo_Ma
- * @version 1.0.0 2012-12-01
- * @since version 1.0.0
+ * SERICEO CRM MonArch 8.2.0 메인 동적 CRUD 트랜잭션 서비스 컨트롤러
+ * 
+ * [시스템 역할 및 요청 라이프사이클]
+ * - 프론트엔드 통신 관문(jquery.kdb.soap.2.0.js)의 AJAX POST 요청(/DATACRUD.json, /GetJs, /GetCode, /extSvc)을 수신
+ * - 수신된 JSON 페이로드 파싱, 세션 인증 유효성 검증(authValue, userInfo) 및 권한 주입
+ * - 서비스 메타데이터(ServiceInfo) 조회 후 FilterGenerator / QueryGenerator를 통한 동적 SQL 및 페이징 구문 생성
+ * - MonArchDaoImpl을 통한 데이터베이스 트랜잭션 실행(LIST, READ, CREATE, UPDATE, DELETE, P_READ)
+ * - 처리 결과를 ResultInfo 및 ResultData 모델에 적재하여 MappingJacksonJsonViewEx를 통해 JSON으로 반환
+ * - Oracle ORA-20000 사용자 정의 비즈니스 예외 파싱(${...}$) 및 시스템 에러 표준화 처리
+ * 
+ * @author Ma KyoungHo
+ * @company KYDBM
+ * @version 2.0 2026-11-04
+ * @since version 1.0.0 2012-12-01
  */
-
 @Controller
 public class SvcCRUD {
 
@@ -67,12 +76,13 @@ public class SvcCRUD {
 
 	
 	/**
-	 * DATACRUD를 외부로 접속하기 위한 메소드(차후 보완예정)
-	 * @param XmlParms
-	 * @return Object
-	 * @throws Exception 
-	 * @throws IOException 
-	 * @throws JsonProcessingException 
+	 * 외부 시스템 연동용 DATACRUD 서비스 진입점 (/extSvc)
+	 * 
+	 * @param XmlParms JSON 포맷의 요청 파라미터 문자열
+	 * @param request HttpServletRequest 요청 객체
+	 * @param session HttpSession 세션 객체
+	 * @return 실행 결과 및 ResultInfo가 포함된 ModelAndView 객체
+	 * @throws Exception 데이터 처리 중 발생 가능한 예외
 	 */
 	 @RequestMapping("/extSvc")
 	 public ModelAndView extSvc( @RequestBody  String XmlParms, HttpServletRequest request, HttpSession session) throws Exception  {
@@ -80,12 +90,22 @@ public class SvcCRUD {
 	 }
 	
 	/**
-	 * DATACRUD
-	 * @param XmlParms
-	 * @return Object
-	 * @throws Exception 
-	 * @throws IOException 
-	 * @throws JsonProcessingException 
+	 * MonArch 공통 데이터 CRUD 핵심 디스패처 메서드 (/DATACRUD)
+	 * 
+	 * [주요 처리 흐름]
+	 * 1. 요청 파라미터 안전 디코딩 (parsingForJonType) 및 Jackson ObjectMapper를 통한 맵 역직렬화
+	 * 2. 세션 인증 토큰(authValue)과 요청 토큰(UKEY) 비교 검증 및 UserInfo 세션 객체 취득
+	 * 3. 서비스명(service), 메소드명(method), 사이트번호(uSite) 기반의 ServiceInfo 메타데이터 취득
+	 * 4. 쿼리 유형(LIST, READ, CREATE, UPDATE, DELETE 등)에 따른 동적 파라미터 바인딩 및 DAO 실행
+	 * 5. DB 예외(DataAccessException) 발생 시 ORA-20000 비즈니스 에러 메시지 추출 및 로깅
+	 * 6. 정상/실패 결과를 MonArch 표준 규격인 ResultInfo(SUCCESS/FAIL) 및 RESULT_DATA로 반환
+	 * 
+	 * @param XmlParms 클라이언트에서 전송된 JSON 형태의 CRUD 요청 파라미터
+	 * @param request HttpServletRequest 요청 객체
+	 * @param session HttpSession 세션 객체
+	 * @param extOpt 외부 서비스 호출 여부 플래그
+	 * @return 결과 데이터셋(ds) 및 ResultInfo가 바인딩된 ModelAndView
+	 * @throws Exception 데이터 처리 중 발생하는 예외
 	 */
 	 @RequestMapping("/DATACRUD")
 	  public ModelAndView dataCRUD( @RequestBody  String XmlParms, HttpServletRequest request, HttpSession session, boolean extOpt) throws Exception  {
@@ -502,6 +522,17 @@ public class SvcCRUD {
 		return mav;
 	 }
 
+	/**
+	 * 클라이언트 전송 JSON 파라미터 디코딩 및 특수문자 이스케이프 보정 메서드
+	 * 
+	 * - null 파라미터 수신 시 안전하게 빈 문자열("") 반환 (NullPointerException 방어)
+	 * - URL UTF-8 디코딩 수행
+	 * - 문자열 내 줄바꿈(\n) 및 탭(\t) 문자를 JSON 파서가 올바르게 인식하도록 이스케이프(\\n, \\t) 처리
+	 * 
+	 * @param xmlParams 원본 인코딩 문자열
+	 * @return 정제된 디코딩 JSON 문자열
+	 * @throws UnsupportedEncodingException 인코딩 미지원 시 발생
+	 */
 	// 20261104 khma : null 파라미터 방어 및 특수문자 안전 치환
 	private String parsingForJonType(String xmlParams) throws UnsupportedEncodingException {
 		if (xmlParams == null) {
@@ -515,9 +546,11 @@ public class SvcCRUD {
 	}
 	
 	/**
-	 * 구조체 취득 메소드(외부)
-	 * @return
-	 * @throws Exception 
+	 * 외부 시스템 연동용 화면 구조체 취득 메서드 (/getExtJs)
+	 * 
+	 * @param XmlParms 구조체 요청 파라미터 JSON 문자열
+	 * @return 구조체 데이터 및 ResultInfo가 바인딩된 ModelAndView
+	 * @throws Exception 구조체 조회 예외
 	 */
 	@RequestMapping("/getExtJs")
 	  public ModelAndView getExtJson(@RequestBody  String XmlParms) throws Exception  {
@@ -525,9 +558,17 @@ public class SvcCRUD {
 	}
 	
 	/**
-	 * 구조체 취득 메소드
-	 * @return
-	 * @throws Exception 
+	 * 모나크 동적 화면 레이아웃 및 그리드 구조체(M_STRUCTURE) 취득 메서드 (/GetJs)
+	 * 
+	 * [주요 처리 흐름]
+	 * 1. 파라미터 안전 디코딩 (parsingForJonType) 및 구조체명(JsName), 사이트번호(USITE) 취득
+	 * 2. M_STRUCTURE 테이블에서 구조체 정의(STRUCTURE_CONT, HTML_CONT) 동적 조회
+	 * 3. HTML 모드(srcType == "html")인 경우 LanguageExchanger를 통한 다국어 라벨 치환
+	 * 4. 조회 실패 시 에러 ResultInfo(FAIL, E00004) 및 SQL 에러 로그 기록
+	 * 
+	 * @param XmlParms 구조체 요청 파라미터 (JsName, UID, USITE, srcType, ULANG 등)
+	 * @return 구조체 데이터 맵(rstMap) 및 ResultInfo가 포함된 ModelAndView
+	 * @throws Exception 구조체 조회 처리 예외
 	 */
 	@RequestMapping("/GetJs")
 	  public ModelAndView getJson(@RequestBody  String XmlParms) throws Exception  {
@@ -635,6 +676,16 @@ public class SvcCRUD {
 	}
 	
 	
+	/**
+	 * 공통코드 그룹(CODE_GRP) 단건 조회 메서드 (/GetCode)
+	 * 
+	 * - 클라이언트에서 요청한 CODE_GRP에 해당하는 공통코드 목록을 MetaCommCode 메모리 캐시에서 조회
+	 * - 사이트별(USITE) 및 사용자 언어별(ULANG) 다국어 코드명 매핑
+	 * 
+	 * @param XmlParms 공통코드 요청 파라미터 JSON 문자열
+	 * @return 공통코드 리스트(ds) 및 ResultInfo가 바인딩된 ModelAndView
+	 * @throws Exception 공통코드 취득 예외
+	 */
 	@RequestMapping("/GetCode")
 	  public ModelAndView getCode(@RequestBody  
 			  String XmlParms) throws Exception  {
@@ -695,16 +746,31 @@ public class SvcCRUD {
         	return mav;
 	}
 	
+	/**
+	 * 복수 공통코드 그룹(CODE_GRP 쉼표 구분) 다건 일괄 조회 메서드 (/GetCodes)
+	 * 
+	 * - 여러 공통코드 그룹(예: "USER_TYPE,STATUS,DEPT")을 쉼표로 분리하여 한 번에 조회
+	 * - 화면 초기 렌더링 시 통신 횟수를 최소화하기 위한 일괄 조회 API
+	 * 
+	 * @param XmlParms 공통코드 그룹 리스트가 포함된 JSON 요청 파라미터
+	 * @return 병합된 공통코드 데이터셋(ds) 및 ResultInfo가 바인딩된 ModelAndView
+	 * @throws Exception 코드 취득 처리 예외
+	 */
 	@RequestMapping("/GetCodes")
 	public ModelAndView GetCodes(@RequestBody String XmlParms) throws Exception  {
+		// 20261104 khma : URL 디코딩을 try 블록 내부로 이동하여 안전성 보강
+		/*
 		String xmlParams  =URLDecoder.decode(XmlParms, "UTF-8");
 		xmlParams = xmlParams.replaceAll("\\n", "\\\\n");
+		*/
+		String xmlParams = "";
 		Map<String, String> obj;
 		ObjectMapper om = new ObjectMapper();
 		List<Map<String,Object>> ds = null;
 		ResultInfo rstInfo = null;
 		
 		try {
+			xmlParams = parsingForJonType(XmlParms);
 			obj = om.readValue(xmlParams, new TypeReference<Map<String, Object>>(){}); //맵으로 가져옴
 			//String key = "";
         	String userLang = "ko"; //default는 ko
@@ -782,20 +848,25 @@ public class SvcCRUD {
 	}
 	
 	/**
-	 * 공통코드 초기화 요청 메소드
-	 * @param XmlParms
-	 * @return
-	 * @throws Exception
+	 * 공통코드(MetaCommCode) 메모리 캐시 강제 재적재/초기화 메서드 (/initMetaCode)
+	 * - 관리자 화면 또는 공통코드 관리에서 변경 사항 발생 시 서버 메모리 캐시를 즉시 갱신
+	 * 
+	 * @param XmlParms 초기화 요청 파라미터 JSON 문자열
+	 * @return 처리 결과 ResultInfo가 포함된 ModelAndView
+	 * @throws Exception 초기화 처리 중 발생하는 예외
 	 */
 	@RequestMapping("/initMetaCode")
 	public ModelAndView initMetaCode(@RequestBody  String XmlParms) throws Exception  {
 		ResultInfo rstInfo= null;
+		// 20261104 khma : URL 디코딩을 try 블록 내부로 이동하여 안전성 보강
+		/*
 		String xmlParams  =URLDecoder.decode(XmlParms, "UTF-8");
+		*/
+		String xmlParams = "";
 		try
 		{
-			xmlParams = xmlParams.replaceAll("\\n", "\\\\n");
-			
-			log.info("[xmlParams] " + xmlParams);
+			xmlParams = parsingForJonType(XmlParms);
+			log.info("[initMetaCode xmlParams] " + xmlParams);
 			Map<String, String> obj;
 			ObjectMapper om = new ObjectMapper();
 			obj = om.readValue(xmlParams, new TypeReference<Map<String, Object>>(){}); //맵으로 가져옴
@@ -818,20 +889,25 @@ public class SvcCRUD {
 	}
 	
 	/**
-	 * 공통라벨 초기화 요청 메소드
-	 * @param XmlParms
-	 * @return
-	 * @throws Exception
+	 * 공통라벨(MetaCommLabel) 메모리 캐시 강제 재적재/초기화 메서드 (/initMetaLabel)
+	 * - 화면 다국어 라벨 정보 변경 시 서버 메모리 캐시를 즉시 갱신
+	 * 
+	 * @param XmlParms 초기화 요청 파라미터 JSON 문자열
+	 * @return 처리 결과 ResultInfo가 포함된 ModelAndView
+	 * @throws Exception 초기화 처리 중 발생하는 예외
 	 */
 	@RequestMapping("/initMetaLabel")
 	public ModelAndView initMetaLabel(@RequestBody  String XmlParms) throws Exception  {
 		ResultInfo rstInfo= null;
+		// 20261104 khma : URL 디코딩을 try 블록 내부로 이동하여 안전성 보강
+		/*
 		String xmlParams  =URLDecoder.decode(XmlParms, "UTF-8");
+		*/
+		String xmlParams = "";
 		try
 		{
-			xmlParams = xmlParams.replaceAll("\\n", "\\\\n");
-			
-			log.info("[xmlParams] " + xmlParams);
+			xmlParams = parsingForJonType(XmlParms);
+			log.info("[initMetaLabel xmlParams] " + xmlParams);
 			Map<String, String> obj;
 			ObjectMapper om = new ObjectMapper();
 			obj = om.readValue(xmlParams, new TypeReference<Map<String, Object>>(){}); //맵으로 가져옴
@@ -1001,10 +1077,11 @@ public class SvcCRUD {
 	// 20261104 khma End : @ExceptionHandler 표준 ResultInfo JSON 응답 구조 통일 및 보안 로거 적용
 
 	/**
-	 * 사용자 정보를 가져와 초기화하는 서비스
-	 * @param XmlParms
-	 * @return
-	 * @throws Exception
+	 * 세션 내 사용자 정보(UserInfo) 취득 및 화면 초기화 메서드 (/getUserInfo)
+	 * 
+	 * @param session HttpSession 세션 객체
+	 * @return UserInfo 및 ResultInfo가 바인딩된 ModelAndView
+	 * @throws Exception 사용자 정보 취득 예외
 	 */
 	@RequestMapping("/getUserInfo")
 	public ModelAndView getUserInfo(HttpSession session) throws Exception  {
