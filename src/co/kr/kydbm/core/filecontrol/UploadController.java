@@ -52,6 +52,7 @@ import co.kr.kydbm.common.CommonConst;
 import co.kr.kydbm.common.CommonConst.XLS_TYPE;
 import co.kr.kydbm.common.CommonExcelUtil;
 import co.kr.kydbm.common.CommonUtil;
+import co.kr.kydbm.core.bean.ResultInfo;
 import co.kr.kydbm.core.bean.ServiceInfo;
 import co.kr.kydbm.core.dao.MonArchDaoImpl;
 import co.kr.kydbm.core.service.SvcCRUD;
@@ -60,10 +61,17 @@ import co.kr.kydbm.core.utils.PropertyUtil;
 import co.kr.kydbm.core.utils.QueryGenerator;
 
 /**
- * 파일 업로드 및 엑셀 다운로드 콘트롤러 클래스
- * version 2.0 2026-11-02
- * Authors : Ma KyoungHo
- * Company : KYDBM
+ * SERICEO CRM MonArch 8.2.0 파일 업로드/다운로드 및 보안 엑셀 다운로드 컨트롤러
+ * 
+ * [시스템 역할 및 기능 명세]
+ * 1. 차세대 파일 제어: HTML5 Drag&Drop 클라이언트 지연 업로드(/uploadFileNew), 안전 다운로드(/downloadFileNew), 휴지통 이동(/deleteFileSafe)
+ * 2. 레거시 파일 제어: 멀티파트 업로드(/multiFileUpload, /upload), 다운로드(/fileDownload, /download), ZIP 압축 다운로드(/zipFileDownload)
+ * 3. 보안 엑셀 다운로드(/downExcel): POI 4.1.2 Agile AES 암호화 엑셀 스트리밍 및 감사 이력(M_EXCEL_DOWN_LOG) 정밀 연동
+ * 4. 예외 및 스트림 안전성: @ExceptionHandler 표준 ResultInfo JSON 응답, HTTP 상태 유지 및 스트림 전송 전/후 에러 격리
+ * 
+ * @author Ma KyoungHo
+ * @company KYDBM
+ * @version 2.0 2026-11-04
  */
 @Controller
 public class UploadController {
@@ -143,9 +151,16 @@ public class UploadController {
 				out = response.getWriter();
 				out.write("<script language='javascript'>alert('업로드 할수 없는 형식의 파일입니다.');</script>");
 			} catch (IOException e) {
+				// 20261104 khma : printStackTrace() 제거 및 로거 기록
+				/*
 				e.printStackTrace();
+				*/
+				log.error("응답 출력 스트림 오류: " + e.getMessage(), e);
 			} finally {
-				out.close();
+				// 20261104 khma : out 객체 null-safe 검증 후 닫기
+				if (out != null) {
+					out.close();
+				}
 			}
 		} else {
 
@@ -156,9 +171,16 @@ public class UploadController {
 					out = response.getWriter();
 					out.write("<script language='javascript'>alert('파일용량이 제한용량보다 큽니다.');</script>");
 				} catch (IOException e) {
+					// 20261104 khma : printStackTrace() 제거 및 로거 기록
+					/*
 					e.printStackTrace();
+					*/
+					log.error("응답 출력 스트림 오류: " + e.getMessage(), e);
 				} finally {
-					out.close();
+					// 20261104 khma : out 객체 null-safe 검증 후 닫기
+					if (out != null) {
+						out.close();
+					}
 				}
 			} else {
 
@@ -221,9 +243,13 @@ public class UploadController {
 		Path newFile = Paths.get(filePath + "/" + fileName);
 		try {
 			Path newFilePath = Files.move(file, newFile);
-			System.out.println(newFilePath);
+			log.info("파일 이름 변경 완료: " + newFilePath);
 		} catch (IOException e) {
+			// 20261104 khma : printStackTrace() 제거 및 로거 기록
+			/*
 			e.printStackTrace();
+			*/
+			log.error("파일 이름 변경 실패: " + e.getMessage(), e);
 		}
 
 		// 파일관리 테이블에 정보 등록
@@ -295,9 +321,16 @@ public class UploadController {
 				out = response.getWriter();
 				out.write("<script language='javascript'>alert('업로드 할수 없는 형식의 파일입니다.');</script>");
 			} catch (IOException e) {
+				// 20261104 khma : printStackTrace() 제거 및 로거 기록
+				/*
 				e.printStackTrace();
+				*/
+				log.error("응답 출력 스트림 오류: " + e.getMessage(), e);
 			} finally {
-				out.close();
+				// 20261104 khma : out 객체 null-safe 검증 후 닫기
+				if (out != null) {
+					out.close();
+				}
 			}
 		} else {
 
@@ -308,9 +341,16 @@ public class UploadController {
 					out = response.getWriter();
 					out.write("<script language='javascript'>alert('파일용량이 제한용량보다 큽니다.');</script>");
 				} catch (IOException e) {
+					// 20261104 khma : printStackTrace() 제거 및 로거 기록
+					/*
 					e.printStackTrace();
+					*/
+					log.error("응답 출력 스트림 오류: " + e.getMessage(), e);
 				} finally {
-					out.close();
+					// 20261104 khma : out 객체 null-safe 검증 후 닫기
+					if (out != null) {
+						out.close();
+					}
 				}
 			} else {
 
@@ -590,8 +630,13 @@ public class UploadController {
 		} catch (Exception e) {
 			log.error("파일다운로드 중 예기치 못한 에러가 발생하였습니다.", e);
 		} finally {
-			os.close();
-			fis.close();
+			// 20261104 khma : null-safe 스트림 닫기
+			if (os != null) {
+				try { os.close(); } catch (Exception e) {}
+			}
+			if (fis != null) {
+				try { fis.close(); } catch (Exception e) {}
+			}
 		}
 	}
 
@@ -646,8 +691,13 @@ public class UploadController {
 		} catch (Exception e) {
 			log.error("파일다운로드 중 예기치 못한 에러가 발생하였습니다.", e);
 		} finally {
-			os.close();
-			fis.close();
+			// 20261104 khma : null-safe 스트림 닫기
+			if (os != null) {
+				try { os.close(); } catch (Exception e) {}
+			}
+			if (fis != null) {
+				try { fis.close(); } catch (Exception e) {}
+			}
 		}
 	}
 
@@ -725,8 +775,13 @@ public class UploadController {
 		} catch (Exception e) {
 			log.error("파일다운로드 중 예기치 못한 에러가 발생하였습니다.", e);
 		} finally {
-			zipOutputStream.close();
-			os.close();
+			// 20261104 khma : null-safe 스트림 닫기
+			if (zipOutputStream != null) {
+				try { zipOutputStream.close(); } catch (Exception e) {}
+			}
+			if (os != null) {
+				try { os.close(); } catch (Exception e) {}
+			}
 		}
 	}
 
@@ -760,10 +815,13 @@ public class UploadController {
 			os = response.getOutputStream();
 			os.write(blob);
 			os.flush();
-			os.close();
 		} catch (IOException ioe) {
 			log.error("파일다운로드 중 예기치 못한 에러가 발생하였습니다.", ioe);
 		} finally {
+			// 20261104 khma : null-safe 스트림 닫기
+			if (os != null) {
+				try { os.close(); } catch (Exception e) {}
+			}
 		}
 	}
 
@@ -1065,7 +1123,10 @@ public class UploadController {
 
 		} catch (DataAccessException e) {
 			// 데이터엑세스 예외처리
+			// 20261104 khma : printStackTrace 제거 및 log.error 일원화
+			/*
 			e.printStackTrace();
+			*/
 
 			String sqlCommand = "";
 			if (null != si)
@@ -1078,20 +1139,27 @@ public class UploadController {
 			svcCRUD.Log("DATACRUD", sqlCommand, msg, USITE, UID);
 
 			// 20261103 khma : 하얀 화면 이동 방지, 오류 로그 DB 기록 및 브라우저 alert 안내 후 복귀
+			// 20261104 khma : response.isCommitted() 체크 추가로 IllegalStateException 방어
 			try {
-				response.reset();
-				response.setContentType("text/html; charset=UTF-8");
-				PrintWriter out = response.getWriter();
-				out.write("<script>alert('엑셀 데이터 조회 중 오류가 발생하였습니다.\\n관리자에게 문의해 주십시오.'); history.back();</script>");
-				out.flush();
-				out.close();
+				if (!response.isCommitted()) {
+					response.reset();
+					response.setContentType("text/html; charset=UTF-8");
+					PrintWriter out = response.getWriter();
+					out.write("<script>alert('엑셀 데이터 조회 중 오류가 발생하였습니다.\\n관리자에게 문의해 주십시오.'); history.back();</script>");
+					out.flush();
+					out.close();
+				}
 			} catch (Exception ex) {}
 			return null;
 		} catch (Throwable e) {
+			// 20261104 khma : printStackTrace 제거 및 표준 로깅
+			/*
 			e.printStackTrace();
+			*/
 			log.error(e.getMessage(), e);
 
 			// 20261103 khma : 시스템 에러 로그(SvcCRUD.Log) DB 적재 및 사용자 alert 안내 출력 (하얀 화면 방어)
+			// 20261104 khma : 내부 시스템 에러 메시지 노출 차단 및 response.isCommitted() 안전 검증
 			try {
 				String sqlCommand = (si != null) ? si.getSql() : "";
 				String msg = "MonArch[Excel Down] : " + e.getMessage() + "\r\r ----------------- \r Service = "
@@ -1099,16 +1167,21 @@ public class UploadController {
 				SvcCRUD svcCRUD = new SvcCRUD();
 				svcCRUD.Log("EXCELDOWN", sqlCommand, msg, USITE, UID);
 
-				response.reset();
-				response.setContentType("text/html; charset=UTF-8");
-				PrintWriter out = response.getWriter();
-				String alertMsg = "엑셀 다운로드 중 오류가 발생하였습니다.";
-				if (StringUtils.isNotEmpty(e.getMessage()) && !e.getMessage().equals(CommonConst.COMM_ERROR_MESSAGE)) {
-					alertMsg += "\\n(" + e.getMessage().replace("'", "\\'").replace("\r", " ").replace("\n", " ") + ")";
+				if (!response.isCommitted()) {
+					response.reset();
+					response.setContentType("text/html; charset=UTF-8");
+					PrintWriter out = response.getWriter();
+					String alertMsg = "엑셀 다운로드 중 오류가 발생하였습니다.\\n관리자에게 문의해 주십시오.";
+					/*
+					String alertMsg = "엑셀 다운로드 중 오류가 발생하였습니다.";
+					if (StringUtils.isNotEmpty(e.getMessage()) && !e.getMessage().equals(CommonConst.COMM_ERROR_MESSAGE)) {
+						alertMsg += "\\n(" + e.getMessage().replace("'", "\\'").replace("\r", " ").replace("\n", " ") + ")";
+					}
+					*/
+					out.write("<script>alert('" + alertMsg + "'); history.back();</script>");
+					out.flush();
+					out.close();
 				}
-				out.write("<script>alert('" + alertMsg + "'); history.back();</script>");
-				out.flush();
-				out.close();
 			} catch (Exception ex) {}
 			return null;
 		}
@@ -1128,13 +1201,31 @@ public class UploadController {
 		return rstData;
 	}
 
+	/**
+	 * 20261104 khma : 파일 업로드 및 다운로드 컨트롤러 전용 공통 예외 처리기 (@ExceptionHandler)
+	 * 컨트롤러 내 처리되지 않은 예외 발생 시 표준 ResultInfo(E00004) JSON 구조를 반환하여
+	 * 클라이언트(jquery.kdb.soap.2.0.js)에서 일관되게 에러를 처리할 수 있도록 보장한다.
+	 *
+	 * @param e 발생한 예외
+	 * @param response HttpServletResponse
+	 * @return JSON 뷰 ModelAndView
+	 */
+	@ExceptionHandler(Exception.class)
 	public ModelAndView handleException(Exception e, HttpServletResponse response) {
 
-		// e 객체에 익셉션에러 들어있음
-		response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+		// 20261104 khma : printStackTrace 대신 log.error 로깅 및 표준 ResultInfo 생성
+		log.error("UploadController 예외 발생: " + e.getMessage(), e);
+		response.setStatus(HttpServletResponse.SC_OK);
 		Map<String, Object> rstMap = new HashMap<String, Object>();
 		rstMap.put("errorMessage", CommonConst.COMM_ERROR_MESSAGE);
-		ModelAndView mav = new ModelAndView("", rstMap);
+
+		ResultInfo resultInfo = new ResultInfo();
+		resultInfo.setResult("FAIL");
+		resultInfo.setErrorCode("E00004");
+		resultInfo.setErrorMessage(CommonConst.COMM_ERROR_MESSAGE);
+		rstMap.put(CommonConst.RESULT_INFO, resultInfo);
+
+		ModelAndView mav = new ModelAndView("mappingJacksonJsonView", rstMap);
 		return mav;
 
 	}
@@ -1159,7 +1250,11 @@ public class UploadController {
 
 		} catch (Exception e) {
 
+			// 20261104 khma : printStackTrace 제거 및 log.error 로깅
+			/*
 			e.printStackTrace();
+			*/
+			log.error("물리 파일 저장 중 오류 발생: path=" + path + ", fileName=" + fileName, e);
 			rstFlag = false;
 		} finally {
 
@@ -1426,11 +1521,20 @@ public class UploadController {
 		} catch (Exception e) {
 			log.error("신규 파일 업로드 중 에러 발생", e);
 			resultMap.put("result", "FAIL");
+			// 20261104 khma : 내부 시스템 에러 메시지(e.getMessage) 노출 차단
+			/*
 			resultMap.put("message", "파일 업로드 중 오류가 발생하였습니다: " + e.getMessage());
+			*/
+			resultMap.put("message", "파일 업로드 처리 중 오류가 발생하였습니다.");
 		} finally {
-			out.print(new ObjectMapper().writeValueAsString(resultMap));
-			out.flush();
-			out.close();
+			// 20261104 khma : out null-safe 출력 및 닫기
+			if (out != null) {
+				try {
+					out.print(new ObjectMapper().writeValueAsString(resultMap));
+					out.flush();
+					out.close();
+				} catch (Exception ex) {}
+			}
 		}
 	}
 
@@ -1591,6 +1695,17 @@ public class UploadController {
 			os.flush();
 		} catch (Exception e) {
 			log.error("신규 파일 다운로드 중 에러 발생", e);
+			// 20261104 khma : 다운로드 예외 발생 시 빈 응답 무한 대기 방지 및 alert 안내 스크립트 출력
+			if (!response.isCommitted()) {
+				try {
+					response.reset();
+					response.setContentType("text/html; charset=UTF-8");
+					PrintWriter out = response.getWriter();
+					out.write("<script>alert('파일 다운로드 처리 중 오류가 발생하였습니다.\\n관리자에게 문의해 주십시오.'); history.back();</script>");
+					out.flush();
+					out.close();
+				} catch (Exception ex) {}
+			}
 		} finally {
 			if (os != null) try { os.close(); } catch (Exception e) {}
 			if (fis != null) try { fis.close(); } catch (Exception e) {}
@@ -1740,11 +1855,20 @@ public class UploadController {
 		} catch (Exception e) {
 			log.error("파일 안전 삭제 중 에러 발생", e);
 			resultMap.put("result", "FAIL");
+			// 20261104 khma : 내부 시스템 에러 메시지(e.getMessage) 노출 차단
+			/*
 			resultMap.put("message", e.getMessage());
+			*/
+			resultMap.put("message", "파일 삭제 처리 중 오류가 발생하였습니다.");
 		} finally {
-			out.print(new ObjectMapper().writeValueAsString(resultMap));
-			out.flush();
-			out.close();
+			// 20261104 khma : out null-safe 출력 및 닫기
+			if (out != null) {
+				try {
+					out.print(new ObjectMapper().writeValueAsString(resultMap));
+					out.flush();
+					out.close();
+				} catch (Exception ex) {}
+			}
 		}
 	}
 

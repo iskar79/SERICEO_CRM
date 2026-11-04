@@ -289,3 +289,21 @@ Git 이력에서 2026-11-02~03 변경분을 확인했습니다. 소스는 실행
      - 하위 호환성을 위해 기존 `errorMessage` 키도 함께 보존.
   3. **콘솔 덤프 `printStackTrace()` 전면 제거**:
      - `dataCRUD`, `getJson`, `getCode`, `initMetaCode`, `initMetaLabel`, `getUserInfo` 전반에서 `e.printStackTrace()`를 완전히 제거하고 `log.error(..., e)`로 안전하게 기록.
+
+## 2026-11-04 예외 처리 보완 Step 6-4 완료 (UploadController 예외 처리 및 스트림 안전성 보강)
+
+- 대상 파일: `src/co/kr/kydbm/core/filecontrol/UploadController.java`
+- 내용:
+  1. **컨트롤러 공통 예외 처리기 `@ExceptionHandler` 어노테이션 누락 복원 및 ResultInfo 표준화**:
+     - `handleException`에 누락되어 있던 `@ExceptionHandler(Exception.class)`를 명시하여 Spring MVC 예외 인터셉트 정상화.
+     - HTTP 상태 코드를 `SC_OK`(200)으로 설정하고 `ResultInfo(result="FAIL", errorCode="E00004", message=COMM_ERROR_MESSAGE)` 및 `mappingJacksonJsonView`를 반환하여 통신 브릿지(`jquery.kdb.soap.2.0.js`)와의 응답 계약 100% 일치.
+  2. **엑셀 및 파일 다운로드 응답 커밋 검증 (`response.isCommitted()`) 및 브라우저 안내**:
+     - `downExcel` 및 `downloadFileNew`에서 예외 발생 시 `if (!response.isCommitted())` 사전 검증을 통해 `response.reset()` 시의 `IllegalStateException`을 원천 방어.
+     - `downloadFileNew` 실패 시 빈 응답으로 브라우저가 무한 대기하는 결함을 수정하고, alert 안내 스크립트 출력 후 `history.back()` 복귀 처리.
+  3. **내부 시스템 및 파일 경로 정보 노출 차단**:
+     - `uploadFileNew`, `deleteFileSafe`, `downExcel`에서 클라이언트로 직접 전달되던 `e.getMessage()`를 사용자 친화적인 안전 문구("파일 업로드/삭제/다운로드 처리 중 오류가 발생하였습니다.")로 은닉화.
+  4. **스트림 및 출력 객체 자원 누수 방지 (Null-Safe `close()`)**:
+     - `multiFileUpload`, `signFileUpload`, `uploadFileNew`, `deleteFileSafe`의 `PrintWriter out`에 대해 `if (out != null) out.close();` null-safe 닫기 적용.
+     - `fileDownload`, `signFileDownload`, `zipFileDownload`, `download`, `downloadFileNew`의 `FileInputStream`, `OutputStream`, `ZipOutputStream` 객체에 대해 `finally` 블록 내 null 검증 및 안전 종료 완비.
+  5. **보안 로깅 표준화 및 콘솔 덤프 제거**:
+     - `multiFileUpload`, `signFileUpload`, `fileRename`, `downExcel`, `writeFile` 등 전반의 `e.printStackTrace()` 및 `System.out.println`을 전면 제거하고 Log4j `log.error(..., e)`로 일원화.

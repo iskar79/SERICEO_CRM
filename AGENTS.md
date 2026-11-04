@@ -261,3 +261,11 @@ VDI 내부망 코드를 카메라로 촬영하여 전달받는 경우, 단순 OC
   * singleFileNew, multiFileNew Drag&Drop, 지연 업로드(Client Staging), 20MB 검증, 교체 대기 및 취소 복원 기능 구현 및 VDI 구동 검증 완료.
 * **[완료] Step 2-8 (M_COMM_CODE_XLS_SEC_COLS.sql, superContaner.js)** ([① 로컬: 완료(x) / ② VDI: 완료(x)]):
   * 정보성/홍보용 엑셀 추출 보안 컬럼(xlsOption.secCols 동적옵션) DB 공통코드 연동 및 DownXlsNew DOWNCOLS 추출 구현 및 VDI 반영 완료.
+* **[완료] Step 6-1 (jquery.kdb.soap.2.0.js)** ([① 로컬: 완료(x) / ② VDI: 완료(x)]):
+  * soap 통신 관문 4대 고도화 (PostJsonData 직렬화 사전격리, GetJsonServer 동기안전파싱, _serialize null방어, Json2Str 문자열이스케이프) VDI 반영 확인 완료.
+* **[완료] Step 6-2 (ExceptionResolver.java)** ([① 로컬: 완료(x) / ② VDI: 완료(x)]):
+  * 전역 예외 처리 표준화 (미처리 예외 표준 ResultInfo 응답 생성, AJAX jsonView/동기 redirect 분기, ORA-20000 보존, printStackTrace 제거) VDI 반영 확인 완료.
+* **[완료] Step 6-3 (SvcCRUD.java)** ([① 로컬: 완료(x) / ② VDI: 완료(x)]):
+  * parsingForJonType 파싱 try-catch 내부 이동, @ExceptionHandler ResultInfo 표준 JSON 뷰 통일(SC_OK 200 유지), printStackTrace 전면 제거 VDI 반영 확인 완료.
+* **[진행중] Step 6-4 (UploadController.java)** ([① 로컬: 완료(x) / ② VDI: 대기( )]):
+  * @ExceptionHandler(Exception.class) 표준 ResultInfo 등록, downExcel/downloadFileNew 응답 커밋 검증 및 브라우저 alert 안내, 내부정보 노출 차단, 스트림/Writer null-safe close, printStackTrace 제거 완료.

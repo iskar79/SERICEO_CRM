@@ -90,7 +90,8 @@
 | **Step 5-4** | `UploadController.java` | M_IMAGE_GAL.FILE_PATH에 원본 파일명 제외하고 순수 타임스탬프(YYYY/MM/타임스탬프)만 저장(기존 CRM 표준 유지) 및 다운로드/삭제 레거시 파일 호환 탐색 | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
 | **Step 6-1** | `WebContent/js/jquery.kdb.soap.2.0.js` | soap 통신 관문 4대 고도화 (PostJsonData 직렬화 사전격리/JSON안전파싱/콜백격리/E1000보장, GetJsonServer 동기안전파싱, _serialize null방어, Json2Str 문자열이스케이프) | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
 | **Step 6-2** | `src/co/kr/kydbm/core/exception/ExceptionResolver.java` | 전역 예외 처리 표준화 (미처리 예외 표준 ResultInfo 응답 생성, AJAX jsonView 매핑/동기 redirect 분기, ORA-20000 보존 및 SQL 은닉, printStackTrace 제거) | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
-| **Step 6-3** | `src/co/kr/kydbm/core/service/SvcCRUD.java` | parsingForJonType 파싱 try-catch 내부 이동, @ExceptionHandler ResultInfo 표준 JSON 뷰 통일(SC_OK 200 유지), printStackTrace 전면 제거 | `[x]` | `[ ]` | **로컬 완료 (VDI 복사 대기)** |
+| **Step 6-3** | `src/co/kr/kydbm/core/service/SvcCRUD.java` | parsingForJonType 파싱 try-catch 내부 이동, @ExceptionHandler ResultInfo 표준 JSON 뷰 통일(SC_OK 200 유지), printStackTrace 전면 제거 | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
+| **Step 6-4** | `src/co/kr/kydbm/core/filecontrol/UploadController.java` | @ExceptionHandler(Exception.class) 표준 ResultInfo 등록, downExcel/downloadFileNew 응답 커밋 검증 및 브라우저 alert 안내, 내부정보 노출 차단, 스트림/Writer null-safe close, printStackTrace 제거 | `[x]` | `[ ]` | **로컬수정 완료 (VDI 반영 대기)** |
 | **Step 3** | `MonArchDaoImpl.java`, `FilterGenerator.java`, 프로시저/배치 등 | KSign SecureDB 개인정보 암복호화 공통 모듈 및 프로시저/엑셀업로드 적용 | `[ ]` | `[ ]` | 대기 |
 
 ## 운영 WAR 생성 전 필수 확인 알림
