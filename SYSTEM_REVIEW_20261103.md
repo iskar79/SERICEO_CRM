@@ -217,12 +217,43 @@ Git 이력에서 2026-11-02~03 변경분을 확인했습니다. 소스는 실행
 
 운영/VDI에서 확인할 사항: 화면에 표시된 전체 오류 문자열과 시간, Tomcat 로그의 ORA-02055 직전 최초 ORA 오류, 실제 M_SERVICE 서비스/메소드와 저장 SQL, SQL이 호출하는 트리거·프로시저의 DB 링크 사용, 동일 세션에서 이어진 ORA-02067 발생 여부를 확보합니다. ORA-02055가 난 동일 세션/트랜잭션에서 추가 DML을 계속하거나 자동 재시도하지 말고 DBA 확인 후 rollback 여부를 결정합니다. 이는 로그/SQL을 확보하기 전까지의 진단 방향이며 원인 확정은 아닙니다.
 
-## 2026-11-04 예외 처리 보완 Step 6-1 완료 (PostJsonData 관문 안전화)
+## 2026-11-04 `jquery.kdb.soap.2.0.js` 통신·예외 처리 검토
 
-- 대상 파일: WebContent/js/jquery.kdb.soap.2.0.js
+현재 파일에는 2026-11-04자 보완이 이미 들어 있어 `PostJsonData()`의 응답 파싱은 try/catch로 보호되고, 선택 오류 콜백은 함수 여부를 검사합니다. 아래는 이 보완을 전제로 한 잔여 검토입니다.
+
+| 우선순위 | 위치 | 확인 내용 | 개선 방향 |
+|---|---|---|---|
+| 높음 | `GETJSON()` / `GetJsonServer()` (254~321행) | `GETJSON()`은 여러 화면에서 사용됩니다. `GetJsonServer()`는 `_M.aSync.sync=false`로 동기 AJAX를 실행하고, `responseText`를 try/catch 없이 `parseJSON()`합니다. 네트워크/401/HTML 응답이나 빈 응답이면 초기 화면 구성 중 동기 예외가 발생할 수 있습니다. | 현재 동기 호출 순서를 깨지 않도록 먼저 오류 응답 파싱과 공통 오류 반환을 안전하게 하고, 화면에서 undefined 설정을 소비하지 않도록 처리합니다. 비동기 전환은 별도 영향 분석 후 진행합니다. |
+| 높음 | `JSONClientParameters._serialize()` 및 `PostJsonData()` 요청 생성 (67~75, 628~720행) | `typeof null === 'object'`인데 `_serialize()`는 `o.constructor`를 읽어 null에서 예외가 납니다. 이 예외는 `pi.toJson()` 평가 시 AJAX 진입 전에 발생하며 `PostJsonData()`의 success/error 콜백으로 전달되지 않습니다. | null·배열 요소 null·지원하지 않는 타입의 호환 직렬화 규칙을 먼저 정하고, 요청 직렬화 실패도 공통 오류 콜백/로그로 전달합니다. 기존 Java/NET 전송 형식은 회귀 확인합니다. |
+| 중간 | `PostJsonData()`의 resultInfo 없는 성공 응답 (111~116행) | 파싱 결과가 null이거나 표준 `resultInfo`가 없어도 성공 콜백으로 전달합니다. 잘못된 JSON은 앞서 걸러지지만 JSON `null` 및 계약이 잘못된 객체는 성공 처리될 수 있습니다. | 표준 MonArch 응답과 의도된 raw JSON 응답을 구분합니다. null/원시값/형식 오류는 프로토콜 실패로 보고하고, 합법적인 raw 객체 호출만 호환하도록 callsite를 확인합니다. |
+| 중간 | 메뉴 ID 불일치 성공 응답 (123~128행) | 현재 메뉴와 응답 메뉴가 다르면 성공·오류 콜백 모두 호출하지 않습니다. 오래된 응답이 화면을 덮는 것은 막지만 호출부의 로딩 표시나 버튼 잠금 해제가 남을 수 있습니다. | stale 응답 억제 동작은 유지하면서 호출 완료/정리 처리가 누락되지 않게 합니다. 오류로 오인해 사용자 알림을 띄우지 않도록 완료 처리와 업무 오류 콜백을 구분합니다. |
+| 중간 | 실패 알림과 콜백 순서 (129~170, 187~194행) | 공통 함수가 먼저 alert하고 오류 콜백도 실행하므로, 콜백에서 다시 alert하는 호출부는 중복 알림이 생길 수 있습니다. E1000에서 오류 콜백이 예외를 던지면 이후 로그아웃 트리거가 실행되지 않을 수 있습니다. | 알림 책임을 공통 함수 또는 호출부 중 한쪽에 명확히 두고, E1000 로그아웃은 콜백 예외와 관계없이 수행되도록 보장합니다. |
+| 중간 | `PostJsonData2()` (229~253행) | `aSync` 선택 결과를 선언하지 않은 전역 `_async`에 대입합니다. 성공/오류 응답도 표준 함수처럼 검증하지 않고 원문을 전달합니다. 현재 1차 코드에서 호출은 검색되지 않았습니다. | 미사용 여부를 확인하고 호출 계약을 기록합니다. 유지할 경우 지역 변수로 바꾸되 사용처를 찾기 전 표준 `PostJsonData()`와 동작을 섞지 않습니다. |
+| 낮음/호출 여부 확인 | `GETJSON2`, `GETJSONREMOTE`, `GETHTML`, `JSON_Serialized` (323~440행) | 직접 응답 파싱이 보호되지 않은 보조 함수들이 있습니다. `JSON_Serialized()`의 문자열 처리 경로는 인자 `jsonString` 대신 설정되지 않은 `_data`를 파싱합니다. 현재 1차 코드 호출은 검색되지 않았습니다. | 사용 여부를 저장소 전체에서 확인한 뒤 호출이 없으면 단계적 폐기 후보, 호출이 있으면 해당 응답 형식별로 별도 보완합니다. |
+| 낮음/호출부 직렬화 | `$.Json2Str()` (442~458행) | 객체를 직접 문자열 결합하므로 따옴표·역슬래시·개행이 포함된 문자열에서 유효 JSON이 되지 않을 수 있습니다. `campaignWorkflow.js`에서 문서 객체 저장 시 사용합니다. | 단순히 JSON.stringify로 교체하지 말고 서버가 기대하는 저장 형식을 확인한 뒤 해당 저장 흐름 회귀 검증과 함께 개선합니다. |
+
+### 안티그래비티 작업 권고 범위
+
+먼저 `GETJSON/GetJsonServer`와 `JSONClientParameters._serialize`를 작은 단위로 조사·수정하고, 이어서 `PostJsonData`의 응답 계약·콜백·E1000 처리 정책을 정리합니다. 호출이 확인되지 않은 보조 함수는 같은 변경에 묶지 않습니다. 각 단계에서 실제 호출부 영향을 정적으로 확인하고 로컬 Eclipse 오류를 점검한 뒤 다음 파일/블록으로 넘어갑니다. 수정 코드는 작성하지 않았으며 VDI 구동 검증도 하지 않았습니다.
+
+## 2026-11-04 예외 처리 보완 Step 6-1 & Step 6-1b 완료 (jquery.kdb.soap.2.0.js 4대 영역 종합 고도화)
+
+- 대상 파일: `WebContent/js/jquery.kdb.soap.2.0.js`
 - 내용:
-  1. PostJsonData 내 	ry-catch 기반 JSON 안전 파싱 적용으로 서버 500/404 HTML 에러 수신 시 SyntaxError 예외 및 화면 먹통 방지.
-  2. 	ypeof ErCallBack === 'function' 검증 적용으로 콜백 미전달 호출 시 런타임 TypeError 원천 차단.
-  3. _result.resultInfo 프로퍼티 부재 시 일반 JSON 응답 호환 처리.
-  4. ORA-20000, E1000, SQL state [20000] 분기에서도 오류 alert 후 ErCallBack을 안전하게 호출하여 호출 화면의 상태(스피너, 버튼 비활성화 등) 복원 보장.
-  5. PostJsonData2에서도 ScCallBack/ErCallBack의 함수 검증 보강.
+  1. **요청 직렬화 사전 예외 격리 (`PostJsonData`)**:
+     - `pi.toJson()` 실행 전 `try-catch`로 사전 격리하여 직렬화 단계에서 예외 발생 시 스크립트 중단을 방어하고 사용자 안내 및 `ErCallBack` 안전 통지.
+  2. **동기 통신 관문 안전화 (`GETJSON` / `GetJsonServer`)**:
+     - 기존 동기 호출 순서(`async: _M.aSync.sync`)를 100% 엄격 유지하면서 `responseText` 파싱에 `try-catch` 안전 JSON 파싱 적용.
+     - HTTP 에러 및 빈 응답 시 화면 먹통 방어, `E1000` 외 일반 `FAIL` 응답 시에도 사용자 alert 안내 후 안전하게 `undefined` 반환.
+     - `STRUCTURE_CONT` 파싱 시 구형 `eval` 대신 표준 `JSON.parse` 우선 적용 및 파싱 실패 방어.
+  3. **직렬화 엔진 예외 원천 차단 (`JSONClientParameters._serialize`)**:
+     - `null`/`undefined` 입력 시 `o.constructor` 접근 TypeError 방어 (`""` 반환).
+     - 배열 원소 순회 시 `null`/`undefined` 요소에 대한 `<string></string>` 안전 직렬화 처리.
+     - 지원하지 않는 타입 수신 시 `throw new Error`로 중단하던 문제를 제거하고 `String(o)` 안전 변환.
+     - `toXml`, `toJson`, `toGetString` 내 `_M.UserInfo` 및 `_M.PrevActGbn` Null-Safe 방어 적용.
+  4. **응답 및 콜백 안정성 강화 (`PostJsonData`)**:
+     - `ErCallBack` 호출 시 `try-catch`로 감싸 콜백 내부 예외가 공통 로직을 중단시키지 않도록 격리.
+     - `E1000` 세션 만료 시 `ErCallBack` 오류 여부와 무관하게 로그아웃(`$(".opticon-logout").trigger("click")`) 완수 보장.
+     - `rawResponse`에 서버 내부 HTML 오류 페이지가 전달되지 않도록 정리.
+  5. **문서 저장 payload 깨짐 방어 (`$.Json2Str`)**:
+     - `campaignWorkflow.js` 등에서 호출하는 `$.Json2Str`에 `JSON.stringify` 표준 우선 사용 및 문자열 따옴표/역슬래시/개행 정규식 이스케이프 보강으로 JSON 깨짐 방어.

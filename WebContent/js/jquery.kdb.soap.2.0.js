@@ -66,10 +66,34 @@ ErCallBack(_msg);
  */
 function PostJsonData(url, pi, ScCallBack, ErCallBack, aSync) {
     // aSync = g_async == e_async.async ? false : aSync;
+
+    // -------------------------------------------------------------
+    // 20261104 khma : 요청 파라미터 직렬화 단계 사전 예외 격리
+    // pi.toJson() 실행 중 예외가 발생하더라도 스크립트 중단을 방어하고 ErCallBack으로 안전 통지
+    // -------------------------------------------------------------
+    var reqData = "";
+    try {
+        reqData = (pi && typeof pi.toJson === "function") ? pi.toJson() : ((pi && typeof pi === "object") ? JSON.stringify(pi) : String(pi));
+    } catch (eReq) {
+        alert("요청 파라미터 처리 중 오류가 발생하였습니다.");
+        if (typeof ErCallBack === "function") {
+            try {
+                ErCallBack({
+                    resultInfo: {
+                        result: "FAIL",
+                        errorCode: "E9998",
+                        message: "요청 데이터 직렬화 실패: " + eReq.message
+                    }
+                });
+            } catch (eCb) {}
+        }
+        return;
+    }
+
     $.ajax({
         type: "POST",
         url: url,
-        data: pi.toJson(), // JSONClientParameters 객체를 JSON 문자열로 직렬화하여 전송
+        data: reqData, // 직렬화 검증 완료된 JSON 문자열 전송
         contentType: "application/json; charset=utf-8",
         dataType: _dataType, // Java 서버 환경일 경우 텍스트로 수신하여 클라이언트에서 정밀 파싱
         async: aSync, // 동기/비동기 제어
@@ -92,14 +116,15 @@ function PostJsonData(url, pi, ScCallBack, ErCallBack, aSync) {
                 // HTML 에러 페이지 등 비정상 문자열 수신 시 안내 후 오류 콜백 호출
                 alert("서버 응답 처리 중 오류가 발생하였습니다.\n(잘못된 응답 형식이 수신되었습니다.)");
                 if (typeof ErCallBack === "function") {
-                    ErCallBack({
-                        resultInfo: {
-                            result: "FAIL",
-                            errorCode: "E9999",
-                            message: "응답 데이터 파싱 실패"
-                        },
-                        rawResponse: result
-                    });
+                    try {
+                        ErCallBack({
+                            resultInfo: {
+                                result: "FAIL",
+                                errorCode: "E9999",
+                                message: "응답 데이터 파싱 실패"
+                            }
+                        });
+                    } catch (eCb) {}
                 }
                 return;
             }
@@ -143,14 +168,14 @@ function PostJsonData(url, pi, ScCallBack, ErCallBack, aSync) {
                     }
                     // 오류 발생 시 호출 화면의 로딩 스피너/버튼 잠금 해제를 위해 ErCallBack 안전 호출
                     if (typeof ErCallBack === "function") {
-                        ErCallBack(_result);
+                        try { ErCallBack(_result); } catch (eCb) {}
                     }
                 } 
-                // ② 세션 만료 오류코드(E1000) 감지: 사용자 알림 및 로그아웃 프로세스 자동 연동
+                // ② 세션 만료 오류코드(E1000) 감지: ErCallBack 예외 여부와 무관하게 로그아웃 완수 보장
                 else if (_result.resultInfo.errorCode == "E1000") {
                     alert(_msg);
                     if (typeof ErCallBack === "function") {
-                        ErCallBack(_result);
+                        try { ErCallBack(_result); } catch (eCb) {}
                     }
                     $(".opticon-logout").trigger("click"); // CRM 공통 로그아웃 트리거 실행
                 } 
@@ -158,14 +183,14 @@ function PostJsonData(url, pi, ScCallBack, ErCallBack, aSync) {
                 else if (_msg.indexOf('SQL state [20000]') > -1) {
                     alert(_msg.substr(_msg.lastIndexOf('Exception:') + 11));
                     if (typeof ErCallBack === "function") {
-                        ErCallBack(_result);
+                        try { ErCallBack(_result); } catch (eCb) {}
                     }
                 } 
                 // ④ 기타 일반 비즈니스 FAIL 예외
                 else {
                     alert(_msg);
                     if (typeof ErCallBack === "function") {
-                        ErCallBack(_result);
+                        try { ErCallBack(_result); } catch (eCb) {}
                     }
                 }
             }
@@ -188,7 +213,7 @@ function PostJsonData(url, pi, ScCallBack, ErCallBack, aSync) {
             if (_msg && _msg.resultInfo && _msg.resultInfo.result == "FAIL" && _msg.resultInfo.errorCode == "E1000") {
                 alert(_msg.resultInfo.message || "세션이 만료되었습니다. 다시 로그인해 주십시오.");
                 if (typeof ErCallBack === "function") {
-                    ErCallBack(_msg);
+                    try { ErCallBack(_msg); } catch (eCb) {}
                 }
                 $(".opticon-logout").trigger("click");
             } else {
@@ -203,29 +228,21 @@ function PostJsonData(url, pi, ScCallBack, ErCallBack, aSync) {
 
                 // 호출 화면 상태 복원을 위한 오류 콜백 안전 실행
                 if (typeof ErCallBack === "function") {
-                    ErCallBack(_msg || {
-                        resultInfo: {
-                            result: "FAIL",
-                            errorCode: "E9999",
-                            message: displayMsg
-                        },
-                        status: result ? result.status : 0
-                    });
+                    try {
+                        ErCallBack(_msg || {
+                            resultInfo: {
+                                result: "FAIL",
+                                errorCode: "E9999",
+                                message: displayMsg
+                            },
+                            status: result ? result.status : 0
+                        });
+                    } catch (eCb) {}
                 }
             }
         }
     });
 }
-
-/**
- * 단순 데이터 전송용 경량 AJAX POST 통신 함수 (PostJsonData2)
- * 
- * @param {string} url - 호출할 백엔드 서비스 URL
- * @param {JSONClientParameters} pi - 전송 파라미터 객체
- * @param {function} ScCallBack - 성공 콜백 함수
- * @param {function} [ErCallBack] - 실패 콜백 함수 (선택 사항)
- * @param {boolean} [aSync] - 비동기 여부
- */
 function PostJsonData2(url, pi, ScCallBack, ErCallBack, aSync) {
     _async = g_async == false ? false : aSync;
     $.ajax({
@@ -265,19 +282,21 @@ function GETJSON(name, usite, extOpt) {
 };
 
 function GetJsonServer(name, usite, extOpt) {
-
     var pi = new JSONClientParameters();
 
     pi.add("JsName", name);
-    pi.add("UID", _M.UserInfo.id);
-    pi.add("UNM", _M.UserInfo.name);
-    if(undefined != usite) {
-    	pi.add("USITE", usite);
-    }else{
-    	pi.add("USITE", _M.UserInfo.SID);
-    }
-    pi.add("ULANG", _M.UserInfo.lang);
-    pi.add("UDEPT", _M.UserInfo.depart);
+    // 20261104 khma : _M.UserInfo Null-Safe 방어 적용
+    var uId = (_M.UserInfo && _M.UserInfo.id) ? _M.UserInfo.id : "";
+    var uNm = (_M.UserInfo && _M.UserInfo.name) ? _M.UserInfo.name : "";
+    var uSite = (undefined != usite) ? usite : ((_M.UserInfo && _M.UserInfo.SID) ? _M.UserInfo.SID : "44");
+    var uLang = (_M.UserInfo && _M.UserInfo.lang) ? _M.UserInfo.lang : "KO";
+    var uDept = (_M.UserInfo && _M.UserInfo.depart) ? _M.UserInfo.depart : "";
+
+    pi.add("UID", uId);
+    pi.add("UNM", uNm);
+    pi.add("USITE", uSite);
+    pi.add("ULANG", uLang);
+    pi.add("UDEPT", uDept);
     
     var _data = pi.toXml();
     if (_M.Webtype == 'Java') {
@@ -285,42 +304,74 @@ function GetJsonServer(name, usite, extOpt) {
     }
     
     var getJsonUrl = _M.svcUrl[_M.Webtype].GetJs;
-    if(undefined != extOpt && extOpt == true){
-    	getJsonUrl = _M.svcUrl[_M.Webtype].getExtJs;
+    if (undefined != extOpt && extOpt == true) {
+        getJsonUrl = _M.svcUrl[_M.Webtype].getExtJs;
     }
     
-    var rlt = $.ajax({
-        type: "POST",
-        url: getJsonUrl,
-        data: _data,
-        contentType: "application/json; charset=utf-8",
-        dataType: _dataType,
-        async: _M.aSync.sync //_async,
-    }).responseText;
+    // -------------------------------------------------------------
+    // 20261104 khma : 동기 통신 순서(async: sync) 유지 + 안전 JSON 파싱 및 예외 방어
+    // -------------------------------------------------------------
+    var rawText = "";
+    try {
+        var xhr = $.ajax({
+            type: "POST",
+            url: getJsonUrl,
+            data: _data,
+            contentType: "application/json; charset=utf-8",
+            dataType: _dataType,
+            async: _M.aSync.sync // 기존 동기 호출 순서 100% 엄격 유지
+        });
+        rawText = (xhr && xhr.responseText) ? xhr.responseText : "";
+    } catch (eAjax) {
+        alert("화면 구조체(" + name + ")를 서버에서 불러오는 중 통신 오류가 발생하였습니다.");
+        return undefined;
+    }
 
-    rlt = jQuery.parseJSON(rlt);
-    if(_M.Webtype == 'Java'){
-        //rlt = eval('(' + rlt + ')');
-		
-		if(rlt.resultInfo.result == "SUCCESS"){
-			rlt = eval('(' +rlt.resultData.STRUCTURE_CONT+ ')'); //20121204 khma new
-			_M.Jsons[name] = rlt;
-		}
-		else {
-			if ( rlt.resultInfo.errorCode == "E1000" ) {
-				alert(rlt.resultInfo.message); // 오류가 발생했음을 알림
-				$(".opticon-logout").trigger("click"); // 로그아웃 코드 발생
-			}
-			return undefined;
-	   }
-    }else{
+    if (!rawText) {
+        alert("화면 구조체(" + name + ") 응답 데이터가 비어 있습니다.");
+        return undefined;
+    }
+
+    var rlt = null;
+    try {
+        rlt = jQuery.parseJSON(rawText);
+    } catch (eParse) {
+        alert("화면 구조체(" + name + ") 수신 데이터 파싱에 실패하였습니다.\n(서버에서 올바른 JSON 응답을 받지 못했습니다.)");
+        return undefined;
+    }
+
+    if (_M.Webtype == 'Java') {
+        if (rlt && rlt.resultInfo && rlt.resultInfo.result == "SUCCESS") {
+            try {
+                // STRUCTURE_CONT 내부 JSON 안전 변환 (JSON.parse 우선 사용)
+                var structCont = rlt.resultData ? rlt.resultData.STRUCTURE_CONT : null;
+                if (typeof structCont === "object" && structCont !== null) {
+                    rlt = structCont;
+                } else if (typeof structCont === "string") {
+                    rlt = (window.JSON && JSON.parse) ? JSON.parse(structCont) : eval('(' + structCont + ')');
+                }
+                _M.Jsons[name] = rlt;
+            } catch (eStruct) {
+                alert("화면 구조체(" + name + ") 설정 데이터 변환에 실패하였습니다.");
+                return undefined;
+            }
+        } else {
+            // E1000 외의 일반 비즈니스 FAIL 응답도 명확히 사용자에게 alert 안내 후 undefined 반환
+            var errMsg = (rlt && rlt.resultInfo && rlt.resultInfo.message) ? rlt.resultInfo.message : "화면 구조체 정보를 불러오지 못했습니다.";
+            if (rlt && rlt.resultInfo && rlt.resultInfo.errorCode == "E1000") {
+                alert(errMsg);
+                $(".opticon-logout").trigger("click");
+            } else {
+                alert("[" + name + "] " + errMsg);
+            }
+            return undefined;
+        }
+    } else {
         rlt = eval('(' + rlt.d + ')');
     }
-    
 
     return rlt;
-};
-function GETJSON2(name, callBack) {
+};function GETJSON2(name, callBack) {
     var pi = new JSONClientParameters();
     pi.add("JsName", name);
     pi.add("UID", _M.UserInfo.id);
@@ -439,24 +490,40 @@ function JSON_Serialized(jsonString, url, jdata) {
     }
 }
 
+// 20261104 khma Start : JSON 직렬화 유틸($.Json2Str) 따옴표/개행 이스케이프 깨짐 방어 보강
 $.Json2Str = function (obj) {
+    // 최신 브라우저 표준 JSON.stringify 지원 시 우선 사용하여 따옴표/역슬래시/개행 깨짐을 완벽 방지
+    if (window.JSON && typeof JSON.stringify === "function") {
+        try {
+            return JSON.stringify(obj);
+        } catch (eJson) {
+            // 순환 참조 등으로 실패 시 아래 기존 직렬화 로직으로 Fallback
+        }
+    }
+
     var t = typeof (obj);
     if (t != "object" || obj === null) {
-        if (t == "string") obj = '"' + obj + '"';
+        if (t == "string") {
+            // 큰따옴표, 역슬래시, 개행문자 정규식 이스케이프 처리
+            obj = '"' + obj.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n').replace(/\r/g, '\\r').replace(/\t/g, '\\t') + '"';
+        }
         return String(obj);
     } else {
         var json = [], arr = (obj && obj.constructor == Array);
         $.each(obj, function (k, v) {
             t = typeof (v);
-            if (t == "string") v = '"' + v + '"';
-            else if (t == "object" & v !== null) v = $.Json2Str(v);
+            if (t == "string") {
+                v = '"' + v.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n').replace(/\r/g, '\\r').replace(/\t/g, '\\t') + '"';
+            } else if (t == "object" && v !== null) {
+                v = $.Json2Str(v);
+            }
             json.push((arr ? "" : '"' + k + '":') + String(v));
         });
 
         return (arr ? "[" : "{") + String(json) + (arr ? "]" : "}");
     }
 };
-
+// 20261104 khma End : JSON 직렬화 유틸($.Json2Str) 따옴표/개행 이스케이프 깨짐 방어 보강
 ///  json parameters 
 function JSONClientParameters() {
     var _pl = new Array();
@@ -468,17 +535,30 @@ function JSONClientParameters() {
         var xml = "{";
         var i = 0;
         
-        xml += 'UID:"' + JSONClientParameters._serialize(_M.UserInfo.id) + '"';
-        xml += ',ULID:"' + JSONClientParameters._serialize(_M.UserInfo.lid) + '"';
-        xml += ',UNM:"' + JSONClientParameters._serialize(_M.UserInfo.name) + '"';
-        xml += ',USITE:"' + JSONClientParameters._serialize(_M.UserInfo.SID) + '"';
-        xml += ',GSITE:"' + JSONClientParameters._serialize(_M.UserInfo.gsite) + '"';
-        xml += ',GCORP:"' + JSONClientParameters._serialize(_M.UserInfo.gcorp) + '"';
-        xml += ',UDEPT:"' + JSONClientParameters._serialize(_M.UserInfo.depart) + '"';
-        xml += ',ULANG:"' + JSONClientParameters._serialize(_M.UserInfo.lang) + '"';
-        xml += ',MENUID:"' + JSONClientParameters._serialize(_M.PrevActGbn.currMenuId) + '"';
-        xml += ',STEPMENU:"' + JSONClientParameters._serialize(_M.PrevActGbn.currStepMenu) + '"';
-        xml += ',ACTIONNAME:"' + JSONClientParameters._serialize(_M.PrevActGbn.actionName) + '"';
+        // 20261104 khma : _M.UserInfo Null-Safe 접근 헬퍼 적용
+        var _uid = (_M.UserInfo && _M.UserInfo.id) ? _M.UserInfo.id : "";
+        var _ulid = (_M.UserInfo && _M.UserInfo.lid) ? _M.UserInfo.lid : "";
+        var _unm = (_M.UserInfo && _M.UserInfo.name) ? _M.UserInfo.name : "";
+        var _usite = (_M.UserInfo && _M.UserInfo.SID) ? _M.UserInfo.SID : "44";
+        var _gsite = (_M.UserInfo && _M.UserInfo.gsite) ? _M.UserInfo.gsite : "";
+        var _gcorp = (_M.UserInfo && _M.UserInfo.gcorp) ? _M.UserInfo.gcorp : "";
+        var _udept = (_M.UserInfo && _M.UserInfo.depart) ? _M.UserInfo.depart : "";
+        var _ulang = (_M.UserInfo && _M.UserInfo.lang) ? _M.UserInfo.lang : "KO";
+        var _menuid = (_M.PrevActGbn && _M.PrevActGbn.currMenuId) ? _M.PrevActGbn.currMenuId : "";
+        var _stepmenu = (_M.PrevActGbn && _M.PrevActGbn.currStepMenu) ? _M.PrevActGbn.currStepMenu : "";
+        var _actnm = (_M.PrevActGbn && _M.PrevActGbn.actionName) ? _M.PrevActGbn.actionName : "";
+
+        xml += 'UID:"' + JSONClientParameters._serialize(_uid) + '"';
+        xml += ',ULID:"' + JSONClientParameters._serialize(_ulid) + '"';
+        xml += ',UNM:"' + JSONClientParameters._serialize(_unm) + '"';
+        xml += ',USITE:"' + JSONClientParameters._serialize(_usite) + '"';
+        xml += ',GSITE:"' + JSONClientParameters._serialize(_gsite) + '"';
+        xml += ',GCORP:"' + JSONClientParameters._serialize(_gcorp) + '"';
+        xml += ',UDEPT:"' + JSONClientParameters._serialize(_udept) + '"';
+        xml += ',ULANG:"' + JSONClientParameters._serialize(_ulang) + '"';
+        xml += ',MENUID:"' + JSONClientParameters._serialize(_menuid) + '"';
+        xml += ',STEPMENU:"' + JSONClientParameters._serialize(_stepmenu) + '"';
+        xml += ',ACTIONNAME:"' + JSONClientParameters._serialize(_actnm) + '"';
         xml += ',UKEY:"' + JSONClientParameters._serialize(sessionStorage.getItem("authValue")) + '"';
         
 		for (var p in _pl) {
@@ -495,17 +575,30 @@ function JSONClientParameters() {
         var xml = "{";
         var i = 0;
   
-        xml += '"UID":"' + JSONClientParameters._serialize(_M.UserInfo.id) + '"';
-        xml += ',"ULID":"' + JSONClientParameters._serialize(_M.UserInfo.lid) + '"';
-        xml += ',"UNM":"' + JSONClientParameters._serialize(_M.UserInfo.name) + '"';
-        xml += ',"USITE":"' + JSONClientParameters._serialize(_M.UserInfo.SID) + '"';
-        xml += ',"GSITE":"' + JSONClientParameters._serialize(_M.UserInfo.gsite) + '"';
-        xml += ',"GCORP":"' + JSONClientParameters._serialize(_M.UserInfo.gcorp) + '"';
-        xml += ',"UDEPT":"' + JSONClientParameters._serialize(_M.UserInfo.depart) + '"';
-        xml += ',"ULANG":"' + JSONClientParameters._serialize(_M.UserInfo.lang) + '"';
-        xml += ',"MENUID":"' + JSONClientParameters._serialize(_M.PrevActGbn.currMenuId) + '"';
-        xml += ',"STEPMENU":"' + JSONClientParameters._serialize(_M.PrevActGbn.currStepMenu) + '"';
-        xml += ',"ACTIONNAME":"' + JSONClientParameters._serialize(_M.PrevActGbn.actionName) + '"';
+        // 20261104 khma : _M.UserInfo Null-Safe 접근 헬퍼 적용
+        var _uid = (_M.UserInfo && _M.UserInfo.id) ? _M.UserInfo.id : "";
+        var _ulid = (_M.UserInfo && _M.UserInfo.lid) ? _M.UserInfo.lid : "";
+        var _unm = (_M.UserInfo && _M.UserInfo.name) ? _M.UserInfo.name : "";
+        var _usite = (_M.UserInfo && _M.UserInfo.SID) ? _M.UserInfo.SID : "44";
+        var _gsite = (_M.UserInfo && _M.UserInfo.gsite) ? _M.UserInfo.gsite : "";
+        var _gcorp = (_M.UserInfo && _M.UserInfo.gcorp) ? _M.UserInfo.gcorp : "";
+        var _udept = (_M.UserInfo && _M.UserInfo.depart) ? _M.UserInfo.depart : "";
+        var _ulang = (_M.UserInfo && _M.UserInfo.lang) ? _M.UserInfo.lang : "KO";
+        var _menuid = (_M.PrevActGbn && _M.PrevActGbn.currMenuId) ? _M.PrevActGbn.currMenuId : "";
+        var _stepmenu = (_M.PrevActGbn && _M.PrevActGbn.currStepMenu) ? _M.PrevActGbn.currStepMenu : "";
+        var _actnm = (_M.PrevActGbn && _M.PrevActGbn.actionName) ? _M.PrevActGbn.actionName : "";
+
+        xml += '"UID":"' + JSONClientParameters._serialize(_uid) + '"';
+        xml += ',"ULID":"' + JSONClientParameters._serialize(_ulid) + '"';
+        xml += ',"UNM":"' + JSONClientParameters._serialize(_unm) + '"';
+        xml += ',"USITE":"' + JSONClientParameters._serialize(_usite) + '"';
+        xml += ',"GSITE":"' + JSONClientParameters._serialize(_gsite) + '"';
+        xml += ',"GCORP":"' + JSONClientParameters._serialize(_gcorp) + '"';
+        xml += ',"UDEPT":"' + JSONClientParameters._serialize(_udept) + '"';
+        xml += ',"ULANG":"' + JSONClientParameters._serialize(_ulang) + '"';
+        xml += ',"MENUID":"' + JSONClientParameters._serialize(_menuid) + '"';
+        xml += ',"STEPMENU":"' + JSONClientParameters._serialize(_stepmenu) + '"';
+        xml += ',"ACTIONNAME":"' + JSONClientParameters._serialize(_actnm) + '"';
         xml += ',"UKEY":"' + JSONClientParameters._serialize(sessionStorage.getItem("authValue")) + '"';
   
       if (_pl != undefined) {
@@ -625,101 +718,83 @@ function JSONClientParamNotSet() {
 }
 
 
+// 20261104 khma Start : 직렬화 엔진(_serialize) null/undefined 및 미지원 타입 예외 방어 보강
 JSONClientParameters._serialize = function (o) {
-
+    if (o === null || o === undefined) {
+        return "";
+    }
     var s = "";
-    if (undefined != o) {
-
-        switch (typeof (o)) {
-            case "string":
-                if(_M.Webtype == 'Java'){
-					s += encodeURIComponent(o.replace(/\\/g, '\\u005C').replace(/"/g, '\\"').replace(/\[/g, '\[').replace(/\]/g, '\]'));
-				}else{
-					s += escape(o.replace(/\\/g, "\\u005C").replace(/"/g, '\\"').replace(/'/g, "\\u0027").replace(/\+/g, "\\u002B"));
-				}
-                //s += o.replace(/"/g, '\\u0022').replace(/'/g, "\\u0027"); ;
-                //s += o.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace("\\", "&#92;").replace(/"/g, '\\u0022').replace(/'/g, "\\u0027"); ;
-                //s = s.replace(/=(.[^&]*)/g, function ($0, $1) { return "=" + escape(decodeURIComponent($1).replace(/\n/g, "\r\n")) });
-                break;
-
-            case "number":
-                s += o; break;
-            case "boolean":
-                s += o.toString(); break;
-            case "object":
-                // Date
-
-                if (o.constructor.toString().indexOf("function Date()") > -1) {
-
-
-                    var year = o.getFullYear().toString();
-                    var month = (o.getMonth() + 1).toString(); month = (month.length == 1) ? "0" + month : month;
-                    var date = o.getDate().toString(); date = (date.length == 1) ? "0" + date : date;
-                    var hours = o.getHours().toString(); hours = (hours.length == 1) ? "0" + hours : hours;
-                    var minutes = o.getMinutes().toString(); minutes = (minutes.length == 1) ? "0" + minutes : minutes;
-                    var seconds = o.getSeconds().toString(); seconds = (seconds.length == 1) ? "0" + seconds : seconds;
-                    var milliseconds = o.getMilliseconds().toString();
-                    var tzminutes = Math.abs(o.getTimezoneOffset());
-                    var tzhours = 0;
-                    while (tzminutes >= 60) {
-                        tzhours++;
-
-                        tzminutes -= 60;
-                    }
-
-                    tzminutes = (tzminutes.toString().length == 1) ? "0" + tzminutes.toString() : tzminutes.toString();
-                    tzhours = (tzhours.toString().length == 1) ? "0" + tzhours.toString() : tzhours.toString();
-                    var timezone = ((o.getTimezoneOffset() < 0) ? "+" : "-") + tzhours + ":" + tzminutes;
-                    s += year + "-" + month + "-" + date + "T" + hours + ":" + minutes + ":" + seconds + "." + milliseconds + timezone;
+    switch (typeof (o)) {
+        case "string":
+            if (_M.Webtype == 'Java') {
+                s += encodeURIComponent(o.replace(/\\/g, '\\u005C').replace(/"/g, '\\"').replace(/\[/g, '\[').replace(/\]/g, '\]'));
+            } else {
+                s += escape(o.replace(/\\/g, "\\u005C").replace(/"/g, '\\"').replace(/'/g, "\\u0027").replace(/\+/g, "\\u002B"));
+            }
+            break;
+        case "number":
+            s += o;
+            break;
+        case "boolean":
+            s += o.toString();
+            break;
+        case "object":
+            if (!o) return "";
+            // Date 객체 판별
+            if (o instanceof Date || (o.constructor && o.constructor.toString().indexOf("function Date()") > -1)) {
+                var year = o.getFullYear().toString();
+                var month = (o.getMonth() + 1).toString(); month = (month.length == 1) ? "0" + month : month;
+                var date = o.getDate().toString(); date = (date.length == 1) ? "0" + date : date;
+                var hours = o.getHours().toString(); hours = (hours.length == 1) ? "0" + hours : hours;
+                var minutes = o.getMinutes().toString(); minutes = (minutes.length == 1) ? "0" + minutes : minutes;
+                var seconds = o.getSeconds().toString(); seconds = (seconds.length == 1) ? "0" + seconds : seconds;
+                var milliseconds = o.getMilliseconds().toString();
+                var tzminutes = Math.abs(o.getTimezoneOffset());
+                var tzhours = 0;
+                while (tzminutes >= 60) {
+                    tzhours++;
+                    tzminutes -= 60;
                 }
-                // Array
-
-
-                else if (o.constructor.toString().indexOf("function Array()") > -1) {
-                    for (var p in o) {
-                        if (!isNaN(p))   // linear array
-                        {
-
-                            (/function\s+(\w*)\s*\(/ig).exec(o[p].constructor.toString());
-                            var type = RegExp.$1;
-                            switch (type) {
-                                case "":
-                                    type = typeof (o[p]);
-                                case "String":
-                                    type = "string"; break;
-                                case "Number":
-                                    type = "int"; break;
-                                case "Boolean":
-                                    type = "bool"; break;
-                                case "Date":
-
-
-                                    type = "DateTime"; break;
-                            }
-
-                            s += "<" + type + ">" + JSONClientParameters._serialize(o[p]) + "</" + type + ">"
+                tzminutes = (tzminutes.toString().length == 1) ? "0" + tzminutes.toString() : tzminutes.toString();
+                tzhours = (tzhours.toString().length == 1) ? "0" + tzhours.toString() : tzhours.toString();
+                var timezone = ((o.getTimezoneOffset() < 0) ? "+" : "-") + tzhours + ":" + tzminutes;
+                s += year + "-" + month + "-" + date + "T" + hours + ":" + minutes + ":" + seconds + "." + milliseconds + timezone;
+            }
+            // Array 객체 판별 (원소 null/undefined 접근 시 constructor TypeError 방어)
+            else if (o instanceof Array || (o.constructor && o.constructor.toString().indexOf("function Array()") > -1)) {
+                for (var p in o) {
+                    if (!isNaN(p)) { // linear array
+                        var elem = o[p];
+                        if (elem === null || elem === undefined) {
+                            s += "<string></string>";
+                            continue;
                         }
-
-                        else    // associative array
-                            s += "<" + p + ">" + JSONClientParameters._serialize(o[p]) + "</" + p + ">"
+                        var type = typeof (elem);
+                        if (type === "string") type = "string";
+                        else if (type === "number") type = "int";
+                        else if (type === "boolean") type = "bool";
+                        else if (elem instanceof Date) type = "DateTime";
+                        s += "<" + type + ">" + JSONClientParameters._serialize(elem) + "</" + type + ">";
+                    } else { // associative array
+                        s += "<" + p + ">" + JSONClientParameters._serialize(o[p]) + "</" + p + ">";
                     }
                 }
-
-
-                // Object or custom function
-                else
-
-                    for (var p in o)
-                        s += "<" + p + ">" + JSONClientParameters._serialize(o[p]) + "</" + p + ">";
-                break;
-
-            default:
-                throw new Error(500, "JSONClientParameters: type '" + typeof (o) + "' is not supported");
-        }
+            }
+            // 일반 Object 객체
+            else {
+                for (var p in o) {
+                    s += "<" + p + ">" + JSONClientParameters._serialize(o[p]) + "</" + p + ">";
+                }
+            }
+            break;
+        default:
+            // 미지원 타입이 들어오더라도 throw new Error로 중단시키지 않고 안전한 문자열 변환 수행
+            s += String(o);
+            break;
     }
     return s;
-}
-
+};
+// 20261104 khma End : 직렬화 엔진(_serialize) null/undefined 및 미지원 타입 예외 방어 보강
 function replaceAll(txt, replace, with_this) {
     return txt.replace(new RegExp(replace, 'g'), with_this);
 }
