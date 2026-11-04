@@ -3290,9 +3290,9 @@ $(document).on("blur", ".t_Money", function (e) {
      * ------------------------------------------------------- Calender
      * --------------------------------------------------------
      */
-    // 20261104 khma Start : 달력 컴포넌트 메서드 21종은 WebContent/js/jquery.kdb.superCalendar.js 로 분리 이전되었습니다. (superContaner.js_20261030 백업 보존)
-    // - 대상 메서드: superCalendar, CalList, CalShow, CalRender, CalSetEventStyle, CalDayClick, CalClick, CalAfterRender,
-    //                CalDragStop, CalReSizeStop, CalAdd, CalShowDetail, CalDrop, CalResize, CalUpdate, CalClear, CalendarListParent 등
+    // 20261104 khma Start : 달력 컴포넌트 메서드 17종은 WebContent/js/jquery.kdb.superCalendar.js 로 분리 이전되었습니다. (작업 트리 내 jquery.kdb.superContaner.js_20261030 백업 보존)
+    // - 대상 메서드 17종: superCalendar, CalList, CalShow, CalRender, CalSetEventStyle, CalDayClick, CalClick, CalAfterRender,
+    //                     CalDragStop, CalReSizeStop, CalAdd, CalShowDetail, CalDrop, CalResize, CalUpdate, CalClear, CalendarListParent
     // 20261104 khma End : 달력 컴포넌트 모듈 분리 완료
 
     /*
