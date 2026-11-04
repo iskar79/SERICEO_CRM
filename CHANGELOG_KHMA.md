@@ -57,8 +57,8 @@
 | **Step 2-7** | `WebContent/js/jquery.kdb.superContaner.js` | XLS_REASON_POPUP 동적로드, DownXlsNew 타깃 서비스명/메소드명/파일명 정밀 추출 및 실제 다운로드 파일명 타임스탬프 일치화, IP 다중 추출 보정 | `[x]` | `[x]` | **완료 (VDI 정상동작 확인)** |
 | **Step 2-8** | `운영쿼리정보/M_COMM_CODE_XLS_SEC_COLS.sql`, `superContaner.js` | 정보성/홍보용 엑셀 추출 보안 컬럼(xlsOption.secCols 동적옵션) DB 공통코드 연동 및 DownXlsNew DOWNCOLS 추출 구현 | `[x]` | `[x]` | **완료 (VDI 반영 완료)** |
 | **Step 2-9** | src/co/kr/kydbm/core/filecontrol/UploadController.java | 실제 엑셀 조회 데이터 건수(ds.size())로 M_EXCEL_DOWN_LOG.DOWN_CNT 정밀 갱신 로직 구현 | [x] | [x] | **완료 (VDI 반영 확인)** |
-| **Step 2-11**| `superContaner.js`, `UploadController.java` | 엑셀 다운로드 폼(xlsForm) 전송 시 UID/USITE 명시적 추가, 백엔드 세션 Fallback 및 모나크 동적 주석 문법 연동으로 DOWN_CNT 100% 정합성 보장 | `[x]` | `[ ]` | **로컬 완료 (VDI 복사 대기)** |
-| **Step 5-4** | `UploadController.java` | M_IMAGE_GAL.FILE_PATH에 원본 파일명 제외하고 순수 타임스탬프(YYYY/MM/타임스탬프)만 저장(기존 CRM 표준 유지) 및 다운로드/삭제 레거시 파일 호환 탐색 | `[x]` | `[ ]` | **로컬 완료 (VDI 복사 대기)** |
+| **Step 2-11**| `superContaner.js`, `UploadController.java` | 엑셀 다운로드 폼(xlsForm) 전송 시 UID/USITE 명시적 추가, 백엔드 세션 Fallback 및 모나크 동적 주석 문법 연동으로 DOWN_CNT 100% 정합성 보장 | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
+| **Step 5-4** | `UploadController.java` | M_IMAGE_GAL.FILE_PATH에 원본 파일명 제외하고 순수 타임스탬프(YYYY/MM/타임스탬프)만 저장(기존 CRM 표준 유지) 및 다운로드/삭제 레거시 파일 호환 탐색 | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
 | **Step 3** | `MonArchDaoImpl.java`, `FilterGenerator.java`, 프로시저/배치 등 | KSign SecureDB 개인정보 암복호화 공통 모듈 및 프로시저/엑셀업로드 적용 | `[ ]` | `[ ]` | 대기 |
 
 ### 📖 Step 0. 사전 환경 정상화 및 아키텍처 숙지 (완료)
@@ -92,7 +92,7 @@
 | **Step 2-7** | `WebContent/js/jquery.kdb.superContaner.js` | XLS_REASON_POPUP 동적로드, DownXlsNew 타깃 서비스명/메소드명/파일명 정밀 추출 및 실제 다운로드 파일명 타임스탬프 일치화, IP 다중 추출 보정 | `[x]` | `[x]` | **완료 (VDI 정상동작 확인)** |
 | **Step 2-8** | `운영쿼리정보/M_COMM_CODE_XLS_SEC_COLS.sql`, `superContaner.js` | 정보성/홍보용 엑셀 추출 보안 컬럼(xlsOption.secCols 동적옵션) DB 공통코드 연동 및 DownXlsNew DOWNCOLS 추출 구현 | `[x]` | `[x]` | **완료 (VDI 반영 완료)** |
 | **Step 2-9** | src/co/kr/kydbm/core/filecontrol/UploadController.java | 실제 엑셀 조회 데이터 건수(ds.size())로 M_EXCEL_DOWN_LOG.DOWN_CNT 정밀 갱신 로직 구현 | [x] | [x] | **완료 (VDI 반영 확인)** |
-| **Step 2-11**| `superContaner.js`, `UploadController.java` | 엑셀 다운로드 폼(xlsForm) 전송 시 UID/USITE 명시적 추가, 백엔드 세션 Fallback 및 모나크 동적 주석 문법 연동으로 DOWN_CNT 100% 정합성 보장 | `[x]` | `[ ]` | **로컬 완료 (VDI 복사 대기)** |
-| **Step 5-4** | `UploadController.java` | M_IMAGE_GAL.FILE_PATH에 원본 파일명 제외하고 순수 타임스탬프(YYYY/MM/타임스탬프)만 저장(기존 CRM 표준 유지) 및 다운로드/삭제 레거시 파일 호환 탐색 | `[x]` | `[ ]` | **로컬 완료 (VDI 복사 대기)** |
-| **Step 2-11**| `superContaner.js`, `UploadController.java` | 엑셀 다운로드 폼(xlsForm) 전송 시 UID/USITE 명시적 추가, 백엔드 세션 Fallback 및 모나크 동적 주석 문법 연동으로 DOWN_CNT 100% 정합성 보장 | `[x]` | `[ ]` | **로컬 완료 (VDI 복사 대기)** |
-| **Step 5-4** | `UploadController.java` | M_IMAGE_GAL.FILE_PATH에 원본 파일명 제외하고 순수 타임스탬프(YYYY/MM/타임스탬프)만 저장(기존 CRM 표준 유지) 및 다운로드/삭제 레거시 파일 호환 탐색 | `[x]` | `[ ]` | **로컬 완료 (VDI 복사 대기)** |
+| **Step 2-11**| `superContaner.js`, `UploadController.java` | 엑셀 다운로드 폼(xlsForm) 전송 시 UID/USITE 명시적 추가, 백엔드 세션 Fallback 및 모나크 동적 주석 문법 연동으로 DOWN_CNT 100% 정합성 보장 | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
+| **Step 5-4** | `UploadController.java` | M_IMAGE_GAL.FILE_PATH에 원본 파일명 제외하고 순수 타임스탬프(YYYY/MM/타임스탬프)만 저장(기존 CRM 표준 유지) 및 다운로드/삭제 레거시 파일 호환 탐색 | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
+| **Step 2-11**| `superContaner.js`, `UploadController.java` | 엑셀 다운로드 폼(xlsForm) 전송 시 UID/USITE 명시적 추가, 백엔드 세션 Fallback 및 모나크 동적 주석 문법 연동으로 DOWN_CNT 100% 정합성 보장 | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
+| **Step 5-4** | `UploadController.java` | M_IMAGE_GAL.FILE_PATH에 원본 파일명 제외하고 순수 타임스탬프(YYYY/MM/타임스탬프)만 저장(기존 CRM 표준 유지) 및 다운로드/삭제 레거시 파일 호환 탐색 | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
