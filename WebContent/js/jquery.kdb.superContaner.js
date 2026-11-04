@@ -7627,13 +7627,29 @@ $(document).on("blur", ".t_Money", function (e) {
           var logSvc = XLS_REASON_POPUP.service || "MON_COMMON";
           var logMtd = (XLS_REASON_POPUP.method && XLS_REASON_POPUP.method.Create) ? XLS_REASON_POPUP.method.Create : "INSERT_EXCEL_DOWN_LOG";
 
-          // 건수 정밀 추출 (Records 텍스트 및 tbody tr 행수 다중 판정)
-          var rcdText = $('.records', _Obj).text() || $('.pgMsg.records', _Obj).text() || $('.records').text() || "";
-          var downCnt = rcdText.replace(/[^0-9]/g, "");
+          // -----------------------------------------------------------------
+          // 20261104 khma : 건수 정밀 추출 (superContaner _records 속성, Records 정규식, tbody 행수 다중 판정)
+          // -----------------------------------------------------------------
+          var downCnt = "";
+          if (_Obj.attr("_records") && !isNaN(_Obj.attr("_records")) && Number(_Obj.attr("_records")) > 0) {
+            downCnt = String(_Obj.attr("_records"));
+          } else {
+            var rcdText = $('.records b', _Obj).text() || $('.pgMsg.records b', _Obj).text() || "";
+            if (!rcdText) {
+              var fullText = $('.records', _Obj).text() || $('.pgMsg.records', _Obj).text() || "";
+              var match = fullText.match(/Records?\s*:\s*([0-9,]+)/i);
+              if (match && match[1]) {
+                rcdText = match[1];
+              } else {
+                rcdText = fullText;
+              }
+            }
+            downCnt = rcdText.replace(/[^0-9]/g, "");
+          }
           if (!downCnt || downCnt === "" || downCnt === "0") {
             var trCount = $(".body tbody tr", _Obj).length;
             if (trCount > 0) {
-              downCnt = trCount + "";
+              downCnt = String(trCount);
             }
           }
           if (!downCnt || downCnt === "") {

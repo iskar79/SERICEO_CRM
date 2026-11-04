@@ -1063,23 +1063,46 @@ public class UploadController {
 				updateDownCntParam.put("DOWN_CNT", String.valueOf(actualDownCnt));
 				updateDownCntParam.put("FILE_NAME_EXT", fileName + ".xlsx");
 				updateDownCntParam.put("FILE_NAME_RAW", fileName);
+				String baseName = (obj.containsKey("xlsName") && StringUtils.isNotEmpty(obj.get("xlsName"))) ? obj.get("xlsName") : xlsMethod;
+				updateDownCntParam.put("BASE_NAME", baseName);
 				// 20261104 khma : UID가 유효할 때만 파라미터에 추가하여 모나크 동적 주석 문법(/* AND REGUSER = @REGUSER@ */)과 연동
 				if (StringUtils.isNotEmpty(UID)) {
 					updateDownCntParam.put("REGUSER", UID);
 				}
-				// 동시 다중 다운로드 요청 시 파일명, 사용자, 최근 5분 이내 생성된 LOG_NO 중 최신 1건만 정밀 갱신
+				// 20261104 khma : 오라클 컬럼명 정합성 보정 (REG_DATE -> REGDATE) 및 파일명/사용자 다중 Fallback 매칭
 				String sqlUpdateDownCnt = "UPDATE M_EXCEL_DOWN_LOG "
 						+ "   SET DOWN_CNT = @DOWN_CNT@ "
 						+ " WHERE LOG_NO = ( "
 						+ "       SELECT MAX(LOG_NO) "
 						+ "         FROM M_EXCEL_DOWN_LOG "
-						+ "        WHERE (FILE_NAME = @FILE_NAME_EXT@ OR FILE_NAME = @FILE_NAME_RAW@) "
-						+ "        /* AND REGUSER = @REGUSER@ */ "
-						+ "          AND REG_DATE >= SYSDATE - (5 / 1440) "
+						+ "        WHERE ( "
+						+ "              FILE_NAME = @FILE_NAME_EXT@ "
+						+ "              OR FILE_NAME = @FILE_NAME_RAW@ "
+						+ "              OR FILE_NAME LIKE '%' || @BASE_NAME@ || '%' "
+						+ "              ) "
+						+ "          /* AND REGUSER = @REGUSER@ */ "
+						+ "          AND REGDATE >= SYSTIMESTAMP - INTERVAL '5' MINUTE "
 						+ " ) ";
-				monArchDao.exeUpdate(sqlUpdateDownCnt, updateDownCntParam);
+				int nUpdateCnt = monArchDao.exeUpdate(sqlUpdateDownCnt, updateDownCntParam);
+				if (nUpdateCnt > 0) {
+					log.info("M_EXCEL_DOWN_LOG DOWN_CNT 정밀 갱신 완료 (" + nUpdateCnt + "건): DOWN_CNT=" + actualDownCnt + ", fileName=" + fileName);
+				} else {
+					// 파일명 매칭 실패 시 동일 사용자 최근 5분 이내 최신 로그 Fallback 갱신
+					if (StringUtils.isNotEmpty(UID)) {
+						String sqlFallback = "UPDATE M_EXCEL_DOWN_LOG "
+								+ "   SET DOWN_CNT = @DOWN_CNT@ "
+								+ " WHERE LOG_NO = ( "
+								+ "       SELECT MAX(LOG_NO) "
+								+ "         FROM M_EXCEL_DOWN_LOG "
+								+ "        WHERE REGUSER = @REGUSER@ "
+								+ "          AND REGDATE >= SYSTIMESTAMP - INTERVAL '5' MINUTE "
+								+ " ) ";
+						int nFb = monArchDao.exeUpdate(sqlFallback, updateDownCntParam);
+						log.info("M_EXCEL_DOWN_LOG Fallback DOWN_CNT 갱신 결과 (" + nFb + "건): DOWN_CNT=" + actualDownCnt + ", UID=" + UID);
+					}
+				}
 			} catch (Exception eLog) {
-				log.warn("M_EXCEL_DOWN_LOG DOWN_CNT 정밀 갱신 중 예외 발생 (무시): " + eLog.getMessage());
+				log.warn("M_EXCEL_DOWN_LOG DOWN_CNT 정밀 갱신 중 예외 발생 (무시): " + eLog.getMessage(), eLog);
 			}
 			// 20261103 khma End : 실제 엑셀 다운로드 조회 건수로 M_EXCEL_DOWN_LOG.DOWN_CNT 정밀 갱신
 
