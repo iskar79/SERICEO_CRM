@@ -1,16 +1,14 @@
 /// <reference path="../Resource.js" />
 /// <reference path="jquery.kdb.MonArch800.js" />
 
-/*!
-* jQuery post get plugin: 
-* 
-* version 0.1 2011-03-01
-* Requires jQuery v1.4.2 or later
+/* jQuery post get plugin: 
+* version 2.0 2026-11-04
+* Requires jQuery v1.12.4 or later
 * Dual licensed under the MIT and GPL licenses:
 * http://www.opensource.org/licenses/mit-license.php
 * http://www.gnu.org/licenses/gpl.html
-* Authors: Kim Seoung Min
-* Company : Kongyoung DB
+* Authors: Ma KyoungHo
+* Company : KYDBM
 */
 
 var e_async = { sync: false, async: true };
@@ -46,26 +44,52 @@ ErCallBack(_msg);
 };*/
 
 // 20261104 khma Start : 프론트엔드 통신 관문(PostJsonData, PostJsonData2) 예외 처리 방어 및 응답 안전 파싱 보강
+
+/**
+ * SERICEO CRM 프론트-백엔드 간 핵심 AJAX POST 통신 관문 함수 (JSONClientParameters 전송 및 응답 수신)
+ * 
+ * [주요 처리 흐름]
+ * 1. 클라이언트 파라미터(pi.toJson())를 JSON 형식으로 서버 URL에 비동기/동기 전송
+ * 2. 서버 응답(result)을 감지하여 HTML 오류 페이지(500, 404 등)가 올 경우 SyntaxError 방어 및 안전 JSON 파싱
+ * 3. resultInfo 메타 응답 계약 검증 (result: 'SUCCESS' / 'FAIL')
+ * 4. 예외 유형별 분기 처리:
+ *    - ORA-20000: 오라클 사용자 정의 비즈니스 예외 메시지 정규식 추출 및 안내
+ *    - E1000: 세션 만료 예외 감지 시 자동 로그아웃 트리거
+ *    - 일반 FAIL: 서버 전달 에러 메시지 알림 및 오류 콜백 실행
+ * 5. 오류 콜백(ErCallBack) 안전 실행: 함수 여부를 검증(typeof === 'function')하여 콜백 미전달 시 런타임 에러 방지
+ * 
+ * @param {string} url - 호출할 백엔드 서비스 엔드포인트 URL (예: /DATACRUD.json)
+ * @param {JSONClientParameters} pi - 직렬화 대상 클라이언트 파라미터 객체
+ * @param {function} ScCallBack - 통신 및 비즈니스 처리 성공 시 실행할 콜백 함수 (매개변수: 서버 응답 객체)
+ * @param {function} [ErCallBack] - 통신 오류 또는 비즈니스 FAIL 발생 시 실행할 오류 콜백 함수 (선택 사항)
+ * @param {boolean} [aSync] - 비동기 통신 여부 (true: 비동기 기본값, false: 동기)
+ */
 function PostJsonData(url, pi, ScCallBack, ErCallBack, aSync) {
     // aSync = g_async == e_async.async ? false : aSync;
     $.ajax({
         type: "POST",
         url: url,
-        data: pi.toJson(),
+        data: pi.toJson(), // JSONClientParameters 객체를 JSON 문자열로 직렬화하여 전송
         contentType: "application/json; charset=utf-8",
-        dataType: _dataType,
-        async: aSync, //_async,
+        dataType: _dataType, // Java 서버 환경일 경우 텍스트로 수신하여 클라이언트에서 정밀 파싱
+        async: aSync, // 동기/비동기 제어
         success: function (result) {
+            // -------------------------------------------------------------
             // 20261104 khma : JSON 안전 파싱 (서버 오류로 HTML 수신 시 SyntaxError 예외 방어)
+            // 서버 500/404 에러나 JSP 포워딩 등으로 HTML 텍스트가 반환되더라도 
+            // jQuery.parseJSON에서 스크립트 실행이 중단되지 않도록 try-catch로 완전 격리
+            // -------------------------------------------------------------
             var _result = null;
             try {
+                // Java 서블릿 환경 및 ASP.NET(result.d) 하위 호환 구조 분기
                 var rawData = (_M.Webtype == 'Java') ? result : (result && result.d ? result.d : result);
                 if (typeof rawData === "object" && rawData !== null) {
-                    _result = rawData;
+                    _result = rawData; // 이미 객체로 파싱된 경우 그대로 사용
                 } else if (typeof rawData === "string") {
-                    _result = jQuery.parseJSON(rawData);
+                    _result = jQuery.parseJSON(rawData); // 문자열일 때만 JSON 파싱 수행
                 }
             } catch (eParse) {
+                // HTML 에러 페이지 등 비정상 문자열 수신 시 안내 후 오류 콜백 호출
                 alert("서버 응답 처리 중 오류가 발생하였습니다.\n(잘못된 응답 형식이 수신되었습니다.)");
                 if (typeof ErCallBack === "function") {
                     ErCallBack({
@@ -80,7 +104,10 @@ function PostJsonData(url, pi, ScCallBack, ErCallBack, aSync) {
                 return;
             }
 
+            // -------------------------------------------------------------
             // 20261104 khma : resultInfo 미포함 일반 객체 응답 호환 처리
+            // SvcCRUD 응답이 아닌 일반 JSON 객체를 반환하는 서비스 호출에 대한 NPE 방어
+            // -------------------------------------------------------------
             if (!_result || !_result.resultInfo) {
                 if (typeof ScCallBack === "function") {
                     ScCallBack(_result);
@@ -88,16 +115,22 @@ function PostJsonData(url, pi, ScCallBack, ErCallBack, aSync) {
                 return;
             }
 
+            // -------------------------------------------------------------
+            // 20261104 khma : 서버 비즈니스 처리 결과 분기 (SUCCESS vs FAIL)
+            // -------------------------------------------------------------
             var rstTf = _result.resultInfo.result;
             if (rstTf == "SUCCESS") {
+                // 메뉴 ID 일치 여부 확인 (이전 메뉴 비동기 응답이 현재 메뉴 화면에 덮어써지는 현상 방어)
                 if (_result.resultInfo.menuId == undefined || _result.resultInfo.menuId == "0000" || _result.resultInfo.menuId == _M.PrevActGbn.currMenuId) {
                     if (typeof ScCallBack === "function") {
                         ScCallBack(_result);
                     }
                 }
             } else {
+                // 비즈니스 처리 실패(FAIL) 응답 분기
                 var _msg = _result.resultInfo.message || "처리 중 오류가 발생하였습니다.";
-                // ORACLE의 사용자정의 EXCEPTION일 때 (ORA-20000)
+
+                // ① ORACLE의 사용자 정의 예외(ORA-20000) 감지: 프로시저/트리거의 ${에러내용}$ 패턴 정밀 추출
                 if (_msg.indexOf('ORA-20000') > -1) {
                     var errmsg = _msg;
                     errmsg = errmsg.substr(errmsg.lastIndexOf('[20000]'), errmsg.length);
@@ -108,25 +141,27 @@ function PostJsonData(url, pi, ScCallBack, ErCallBack, aSync) {
                     } else {
                         alert(_msg);
                     }
+                    // 오류 발생 시 호출 화면의 로딩 스피너/버튼 잠금 해제를 위해 ErCallBack 안전 호출
                     if (typeof ErCallBack === "function") {
                         ErCallBack(_result);
                     }
                 } 
-                // 세션 만료 시 발생하는 오류코드 (E1000)
+                // ② 세션 만료 오류코드(E1000) 감지: 사용자 알림 및 로그아웃 프로세스 자동 연동
                 else if (_result.resultInfo.errorCode == "E1000") {
                     alert(_msg);
                     if (typeof ErCallBack === "function") {
                         ErCallBack(_result);
                     }
-                    $(".opticon-logout").trigger("click");
+                    $(".opticon-logout").trigger("click"); // CRM 공통 로그아웃 트리거 실행
                 } 
-                // MYSQL or MARIADB 사용자정의 EXCEPTION일 때
+                // ③ MySQL/MariaDB 사용자 정의 예외 감지
                 else if (_msg.indexOf('SQL state [20000]') > -1) {
                     alert(_msg.substr(_msg.lastIndexOf('Exception:') + 11));
                     if (typeof ErCallBack === "function") {
                         ErCallBack(_result);
                     }
                 } 
+                // ④ 기타 일반 비즈니스 FAIL 예외
                 else {
                     alert(_msg);
                     if (typeof ErCallBack === "function") {
@@ -136,7 +171,10 @@ function PostJsonData(url, pi, ScCallBack, ErCallBack, aSync) {
             }
         },
         error: function (result) {
-            // 20261104 khma : HTTP 오류 응답 안전 파싱 및 콜백 방어 (HTML 에러 페이지 수신 시 안전 처리)
+            // -------------------------------------------------------------
+            // 20261104 khma : HTTP 통신 레벨 오류(4xx, 5xx) 안전 파싱 및 콜백 방어
+            // 서버 오류로 HTML 에러 페이지가 내려오더라도 JSON 파싱 예외로 중단되지 않도록 보호
+            // -------------------------------------------------------------
             var _msg = null;
             try {
                 if (result && result.responseText) {
@@ -146,7 +184,7 @@ function PostJsonData(url, pi, ScCallBack, ErCallBack, aSync) {
                 _msg = null;
             }
 
-            // 세션 오류(E1000) 여부 확인
+            // HTTP 401 또는 JSON 본문 내 세션 만료(E1000) 감지
             if (_msg && _msg.resultInfo && _msg.resultInfo.result == "FAIL" && _msg.resultInfo.errorCode == "E1000") {
                 alert(_msg.resultInfo.message || "세션이 만료되었습니다. 다시 로그인해 주십시오.");
                 if (typeof ErCallBack === "function") {
@@ -154,6 +192,7 @@ function PostJsonData(url, pi, ScCallBack, ErCallBack, aSync) {
                 }
                 $(".opticon-logout").trigger("click");
             } else {
+                // 사용자에게는 안전하게 정제된 공통 오류 메시지만 안내 (서버 스택트레이스/SQL 은닉)
                 var displayMsg = "예기치 못한 에러가 발생하였습니다.\n관리자에게 문의하시기 바랍니다.";
                 if (_msg && _msg.resultInfo && _msg.resultInfo.message) {
                     displayMsg = _msg.resultInfo.message;
@@ -162,6 +201,7 @@ function PostJsonData(url, pi, ScCallBack, ErCallBack, aSync) {
                 }
                 alert(displayMsg);
 
+                // 호출 화면 상태 복원을 위한 오류 콜백 안전 실행
                 if (typeof ErCallBack === "function") {
                     ErCallBack(_msg || {
                         resultInfo: {
@@ -177,6 +217,15 @@ function PostJsonData(url, pi, ScCallBack, ErCallBack, aSync) {
     });
 }
 
+/**
+ * 단순 데이터 전송용 경량 AJAX POST 통신 함수 (PostJsonData2)
+ * 
+ * @param {string} url - 호출할 백엔드 서비스 URL
+ * @param {JSONClientParameters} pi - 전송 파라미터 객체
+ * @param {function} ScCallBack - 성공 콜백 함수
+ * @param {function} [ErCallBack] - 실패 콜백 함수 (선택 사항)
+ * @param {boolean} [aSync] - 비동기 여부
+ */
 function PostJsonData2(url, pi, ScCallBack, ErCallBack, aSync) {
     _async = g_async == false ? false : aSync;
     $.ajax({
@@ -187,11 +236,13 @@ function PostJsonData2(url, pi, ScCallBack, ErCallBack, aSync) {
         dataType: _dataType,
         async: _async,
         success: function (msg) {
+            // 성공 콜백 함수 유효성 검증 후 안전 호출
             if (typeof ScCallBack === "function") {
                 ScCallBack(msg);
             }
         },
         error: function (msg) {
+            // 에러 응답 문자열 개행 처리 및 콜백 함수 유효성 검증 후 안전 호출
             var _msg = (msg && msg.responseText) ? msg.responseText.replace(/\\r\\n/g, String.fromCharCode(13)).replace(/\\u0027/g, "'") : "";
             if (typeof ErCallBack === "function") {
                 ErCallBack(_msg);
