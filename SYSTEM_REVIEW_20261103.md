@@ -427,5 +427,5 @@ Git 이력에서 2026-11-02~03 변경분을 확인했습니다. 소스는 실행
 
 | VDI 반영 대상(프로젝트 상대 경로) | ① 로컬 수정 | ② VDI 붙여넣기/구동확인 |
 |---|---|---|
-| `WebContent/js/MonArch.js` | 완료 | 대기 |
-| `WebContent/js/jquery.kdb.soap.2.0.js` | 완료 | 대기 |
+| `WebContent/js/MonArch.js` | 완료 | 완료 |
+| `WebContent/js/jquery.kdb.soap.2.0.js` | 완료 | 완료 |

@@ -273,7 +273,7 @@ VDI 내부망 코드를 카메라로 촬영하여 전달받는 경우, 단순 OC
   * PostJsonData null/비객체 응답 에러 격리, stale 메뉴 응답 무시, MonArch800.js $.Json2Str 최신 직렬화 동기화, GetJsonServer eval 복원 완료.
 * **[완료] Step 6-6 (MonArchResource.js, soap.2.0.js, superContaner.js)** ([① 로컬: 완료(x) / ② VDI: 완료(x)]):
   * Java Spring 단일 환경 기준 미사용 .NET ASMX/응답 포장/날짜 분기 정리 완료.
-* **[진행중] Step 6-7 (MonArch.js, soap.2.0.js)** ([① 로컬: 완료(x) / ② VDI: 대기( )]):
+* **[완료] Step 6-7 (MonArch.js, soap.2.0.js)** ([① 로컬: 완료(x) / ② VDI: 완료(x)]):
   * 잔여 .NET 분기 100% 완전 정리 (`MonArch.js` getUserInfo ASMX 제거 및 `getUserInfo.json` 단일화, `soap.2.0.js` GETJSON2/GETJSONREMOTE/GETHTML toXml 및 .d 제거).
 
 
