@@ -267,5 +267,5 @@ VDI 내부망 코드를 카메라로 촬영하여 전달받는 경우, 단순 OC
   * 전역 예외 처리 표준화 (미처리 예외 표준 ResultInfo 응답 생성, AJAX jsonView/동기 redirect 분기, ORA-20000 보존, printStackTrace 제거) VDI 반영 확인 완료.
 * **[완료] Step 6-3 (SvcCRUD.java)** ([① 로컬: 완료(x) / ② VDI: 완료(x)]):
   * parsingForJonType 파싱 try-catch 내부 이동, @ExceptionHandler ResultInfo 표준 JSON 뷰 통일(SC_OK 200 유지), printStackTrace 전면 제거 VDI 반영 확인 완료.
-* **[진행중] Step 6-4 (UploadController.java)** ([① 로컬: 완료(x) / ② VDI: 대기( )]):
+* **[완료] Step 6-4 (UploadController.java)** ([① 로컬: 완료(x) / ② VDI: 완료(x)]):
   * @ExceptionHandler(Exception.class) 표준 ResultInfo 등록, downExcel/downloadFileNew 응답 커밋 검증 및 브라우저 alert 안내, 내부정보 노출 차단, 스트림/Writer null-safe close, printStackTrace 제거 완료.
