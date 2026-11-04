@@ -1245,7 +1245,7 @@ public class UploadController {
 		ResultInfo resultInfo = new ResultInfo();
 		resultInfo.setResult("FAIL");
 		resultInfo.setErrorCode("E00004");
-		resultInfo.setErrorMessage(CommonConst.COMM_ERROR_MESSAGE);
+		resultInfo.setMessage(CommonConst.COMM_ERROR_MESSAGE);
 		rstMap.put(CommonConst.RESULT_INFO, resultInfo);
 
 		ModelAndView mav = new ModelAndView("mappingJacksonJsonView", rstMap);
