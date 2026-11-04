@@ -304,7 +304,13 @@ function GETJSON(name, usite, extOpt) {
     
     var rlt = GetJsonServer(name, usite, extOpt)
 
+    // 20261104 khma : GETJSON 실패(undefined/null) 시 캐시 오염 방어 (성공한 유효 객체만 보관하여 추후 재시도 가능 보장)
+    /*
     _M.Jsons[name] = rlt;
+    */
+    if (rlt !== undefined && rlt !== null) {
+        _M.Jsons[name] = rlt;
+    }
 
     return rlt;
 };
