@@ -11,10 +11,19 @@
 // 20261104 khma : superContaner.js 달력(superCalendar) 컴포넌트 모듈 분리 추출
 (function ($) {
   if (!$.fn.superContaner) {
+    if (window.console && console.error) {
+      console.error(
+        "[ERROR] jquery.kdb.superContaner 플러그인이 로드되지 않았습니다. jquery.kdb.superCalendar.js는 superContaner.js 이후에 로드되어야 합니다."
+      );
+    }
     return;
   }
 
-  $.fn.superContaner.calendarMethods = {
+  if (!$.fn.superContaner.calendarMethods) {
+    $.fn.superContaner.calendarMethods = {};
+  }
+
+  $.extend($.fn.superContaner.calendarMethods, {
     superCalendar: function (option, objKey) {
       var _Obj = $(this);
       var _jsonName = option;
@@ -922,6 +931,6 @@
         );
       }
     },
-  };
+  });
 })(jQuery);
 

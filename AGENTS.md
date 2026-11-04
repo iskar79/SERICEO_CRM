@@ -275,7 +275,7 @@ VDI 내부망 코드를 카메라로 촬영하여 전달받는 경우, 단순 OC
   * Java Spring 단일 환경 기준 미사용 .NET ASMX/응답 포장/날짜 분기 정리 완료.
 * **[완료] Step 6-7 (MonArch.js, soap.2.0.js)** ([① 로컬: 완료(x) / ② VDI: 완료(x)]):
   * 잔여 .NET 분기 100% 완전 정리 (`MonArch.js` getUserInfo ASMX 제거 및 `getUserInfo.json` 단일화, `soap.2.0.js` GETJSON2/GETJSONREMOTE/GETHTML toXml 및 .d 제거).
-* **[진행중] Step 7 (superCalendar.js, superContaner.js, MonArch.js, MonArch_Simple.js)** ([① 로컬: 완료(x) / ② VDI: 대기( )]):
+* **[진행중] Step 7 (superCalendar.js, superContaner.js, MonArch.js)** ([① 로컬: 완료(x) / ② VDI: 대기( )]):
   * 대용량 superContaner.js에서 달력 컴포넌트(21개 메서드, 900줄)를 `jquery.kdb.superCalendar.js`로 독립 분리 및 후로드 디스패처 핀포인트 연동.
 
 
