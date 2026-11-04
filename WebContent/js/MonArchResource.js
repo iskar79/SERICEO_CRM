@@ -1,4 +1,4 @@
-﻿/// <reference path="../Resource.js" />
+/// <reference path="../Resource.js" />
 
 /*!
 * jQuery grid plugin: 
@@ -23,37 +23,17 @@ var _Biz = {
             $("#loginForm").append("<input type='hidden' id='scode' name='scode' value='" + scode + "' />");
             //$("#loginForm").append("<input type='hidden' id='pass' name='pass' value='" + $.md5(pass) + "' />");
 			$("#loginForm").append("<input type='hidden' id='pass' name='pass' value='" + SHA256(pass) + "' />");
-            // action 세팅 후 submit
-			if (_M.Webtype == "Java") {
+            // 20261104 khma : Java Spring 단일 환경 표준화 (action 세팅 후 submit, 미사용 .NET asmx 분기 정리)
+            $("#loginForm").attr("action", "/login.mon");
+            $("#loginForm").submit();
+            /*
+            if (_M.Webtype == "Java") {
                 $("#loginForm").attr("action", "/login.mon");
-				$("#loginForm").submit();
+                $("#loginForm").submit();
+            } else {
+                // .NET ASMX 로그인 프로세스 (미사용)
             }
-			else {
-                var pl = new JSONClientParameters();
-                pl.add("id", id);
-                pl.add("pass", SHA256(pass));
-				//pl.add("pass", $.md5(pass));
-                pl.add("scode", scode);
-                $.ajax({
-                    type: "POST",
-                    url: "/bzService/SvcCRUD.asmx/loginProcess",
-                    data: pl.toXml(),
-                    contentType: "application/json; charset=utf-8",
-                    dataType: "json",
-                    async: false,
-                    success: function (result) {
-                        if (result.d == true) {
-                            location.href = "/monform.htm";
-                        } else {
-                            alert("사용자 정보가 일치하지 않습니다.");
-                            return false;
-                        }
-                    },
-                    error: function (result) {
-                        alert("Failed" + result);
-                    }
-                });
-            }
+            */
 		},
 		/* 이전 버전 로그인 (UKEY 사용)
 		sessionlogin: function (id, pass, scode) {

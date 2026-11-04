@@ -3587,30 +3587,29 @@ $(document).on("blur", ".t_Money", function (e) {
                   $.each(_data.resultData, function (index, row) {
                     var event = new Object(); // khma
 
+                    // 20261104 khma : Java Spring 단일 환경 표준화 (미사용 .NET 날짜 /Date()/ eval 분기 정리)
                     var _from = row.fromdatetime;
                     if (_from != null) {
-                      if (_M.Webtype == "NET") {
-                        _from = eval(
-                          _from.replace(/\/Date\((\d+)\)\//gi, "new Date($1)")
-                        );
-                      } else {
-                        _from = new Date(_from);
-                      }
+                      _from = new Date(_from);
                     } else {
                       _from = eval(_to);
                     }
                     var _to = row.todatetime;
                     if (_to != null) {
-                      if (_M.Webtype == "NET") {
-                        _to = eval(
-                          _to.replace(/\/Date\((\d+)\)\//gi, "new Date($1)")
-                        );
-                      } else {
-                        _to = new Date(_to);
-                      }
+                      _to = new Date(_to);
                     } else {
                       _to = eval(_to);
                     }
+                    /*
+                    var _from = row.fromdatetime;
+                    if (_from != null) {
+                      if (_M.Webtype == "NET") {
+                        _from = eval(_from.replace(/\/Date\((\d+)\)\//gi, "new Date($1)"));
+                      } else {
+                        _from = new Date(_from);
+                      }
+                    }
+                    */
 
                     /*
                      * if

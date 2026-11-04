@@ -15,8 +15,12 @@ var e_async = { sync: false, async: true };
 var g_async = e_async.async;
 
 
+// 20261104 khma : Java 서블릿/Spring MVC 단일 환경 표준 (미사용 .NET json dataType 분기 정리)
+var _dataType = "text";
+/*
 var _dataType = "json";
 if (_M.Webtype == "Java") _dataType = "text";
+*/
 
 
 /*function PostData(url, pi, ScCallBack, ErCallBack, aSync) {
@@ -105,8 +109,11 @@ function PostJsonData(url, pi, ScCallBack, ErCallBack, aSync) {
             // -------------------------------------------------------------
             var _result = null;
             try {
-                // Java 서블릿 환경 및 ASP.NET(result.d) 하위 호환 구조 분기
+                // 20261104 khma : Java Spring 단일 환경 표준화 (미사용 .NET result.d 분기 정리)
+                var rawData = result;
+                /*
                 var rawData = (_M.Webtype == 'Java') ? result : (result && result.d ? result.d : result);
+                */
                 if (typeof rawData === "object" && rawData !== null) {
                     _result = rawData; // 이미 객체로 파싱된 경우 그대로 사용
                 } else if (typeof rawData === "string") {
@@ -319,10 +326,14 @@ function GetJsonServer(name, usite, extOpt) {
     pi.add("ULANG", uLang);
     pi.add("UDEPT", uDept);
     
+    // 20261104 khma : Java Spring 단일 환경 표준화 (pi.toJson() 직렬화 단일 사용)
+    var _data = pi.toJson();
+    /*
     var _data = pi.toXml();
     if (_M.Webtype == 'Java') {
         _data = pi.toJson();
     }
+    */
     
     var getJsonUrl = _M.svcUrl[_M.Webtype].GetJs;
     if (undefined != extOpt && extOpt == true) {
@@ -361,35 +372,35 @@ function GetJsonServer(name, usite, extOpt) {
         return undefined;
     }
 
-    if (_M.Webtype == 'Java') {
-        if (rlt && rlt.resultInfo && rlt.resultInfo.result == "SUCCESS") {
-            try {
-                // 20261104 khma : STRUCTURE_CONT 객체 변환 (자바스크립트 함수 및 객체 리터럴을 포함하므로 eval('(' + structCont + ')') 표준 평가)
-                var structCont = rlt.resultData ? rlt.resultData.STRUCTURE_CONT : null;
-                if (typeof structCont === "object" && structCont !== null) {
-                    rlt = structCont;
-                } else if (typeof structCont === "string") {
-                    rlt = eval('(' + structCont + ')'); // 20121204 khma new 원본 평가 방식 유지
-                }
-                _M.Jsons[name] = rlt;
-            } catch (eStruct) {
-                alert("화면 구조체(" + name + ") 설정 데이터 변환에 실패하였습니다.");
-                return undefined;
+    // 20261104 khma : Java Spring 단일 환경 표준화 (미사용 .NET rlt.d eval 분기 정리)
+    if (rlt && rlt.resultInfo && rlt.resultInfo.result == "SUCCESS") {
+        try {
+            // 20261104 khma : STRUCTURE_CONT 객체 변환 (자바스크립트 함수 및 객체 리터럴을 포함하므로 eval('(' + structCont + ')') 표준 평가)
+            var structCont = rlt.resultData ? rlt.resultData.STRUCTURE_CONT : null;
+            if (typeof structCont === "object" && structCont !== null) {
+                rlt = structCont;
+            } else if (typeof structCont === "string") {
+                rlt = eval('(' + structCont + ')'); // 20121204 khma new 원본 평가 방식 유지
             }
-        } else {
-            // E1000 외의 일반 비즈니스 FAIL 응답도 명확히 사용자에게 alert 안내 후 undefined 반환
-            var errMsg = (rlt && rlt.resultInfo && rlt.resultInfo.message) ? rlt.resultInfo.message : "화면 구조체 정보를 불러오지 못했습니다.";
-            if (rlt && rlt.resultInfo && rlt.resultInfo.errorCode == "E1000") {
-                alert(errMsg);
-                $(".opticon-logout").trigger("click");
-            } else {
-                alert("[" + name + "] " + errMsg);
-            }
+            _M.Jsons[name] = rlt;
+        } catch (eStruct) {
+            alert("화면 구조체(" + name + ") 설정 데이터 변환에 실패하였습니다.");
             return undefined;
         }
     } else {
-        rlt = eval('(' + rlt.d + ')');
+        // E1000 외의 일반 비즈니스 FAIL 응답도 명확히 사용자에게 alert 안내 후 undefined 반환
+        var errMsg = (rlt && rlt.resultInfo && rlt.resultInfo.message) ? rlt.resultInfo.message : "화면 구조체 정보를 불러오지 못했습니다.";
+        if (rlt && rlt.resultInfo && rlt.resultInfo.errorCode == "E1000") {
+            alert(errMsg);
+            $(".opticon-logout").trigger("click");
+        } else {
+            alert("[" + name + "] " + errMsg);
+        }
+        return undefined;
     }
+    /*
+    if (_M.Webtype == 'Java') { ... } else { rlt = eval('(' + rlt.d + ')'); }
+    */
 
     return rlt;
 };function GETJSON2(name, callBack) {
@@ -631,10 +642,13 @@ function JSONClientParameters() {
             }
         }
 		
-  xml += "}";
+        xml += "}";
+        // 20261104 khma : 미사용 .NET XmlParms 감싸기 분기 정리
+        /*
         if (_M.Webtype == 'NET' && opt != 1) {
             xml = "{'XmlParms': '" + xml + "'}"
         }
+        */
         return xml;
     },
     this.toKeyString = function () {
@@ -747,11 +761,15 @@ JSONClientParameters._serialize = function (o) {
     var s = "";
     switch (typeof (o)) {
         case "string":
+            // 20261104 khma : Java Spring 단일 환경 표준화 (encodeURIComponent 단일 적용 및 미사용 .NET escape 분기 정리)
+            s += encodeURIComponent(o.replace(/\\/g, '\\u005C').replace(/"/g, '\\"').replace(/\[/g, '\[').replace(/\]/g, '\]'));
+            /*
             if (_M.Webtype == 'Java') {
                 s += encodeURIComponent(o.replace(/\\/g, '\\u005C').replace(/"/g, '\\"').replace(/\[/g, '\[').replace(/\]/g, '\]'));
             } else {
                 s += escape(o.replace(/\\/g, "\\u005C").replace(/"/g, '\\"').replace(/'/g, "\\u0027").replace(/\+/g, "\\u002B"));
             }
+            */
             break;
         case "number":
             s += o;
