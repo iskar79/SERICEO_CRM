@@ -405,6 +405,21 @@ Git 이력에서 2026-11-02~03 변경분을 확인했습니다. 소스는 실행
 
 이번 재대조에서는 소스 코드를 수정하지 않았습니다. Eclipse Problems, 브라우저 동작, VDI 구동은 확인하지 않았고 정적 검색만 수행했습니다.
 
+## 2026-11-04 최신 완료 상태 재확인 (HEAD `30d1c3f`)
+
+최신 커밋에서 `MonArch.js`의 사용자 정보 조회를 Java `getUserInfo.json` 단일 경로로 만들고, `GETJSON2`/`GETJSONREMOTE`/`GETHTML`의 요청 형식을 Java `pi.toJson()`으로 전환했습니다. Step 6-7의 VDI 반영 완료는 최신 `CHANGELOG_KHMA.md`, `HANDOVER_SYNC.md`, `AGENTS.md` 대장에 기록돼 있습니다. 이는 대장 기준 상태이며, 이번 재검토에서 VDI를 직접 조작하거나 해당 시나리오를 실행하지 않았습니다.
+
+정적 검토상 주 경로의 .NET 실행 분기는 제거됐고, 남은 `.NET` 호출 예시는 수정 규칙에 따라 주석 보존돼 있습니다. 단, `Resource.js`에는 `_M.svcUrl.NET` ASMX 주소 설정이 남아 있으므로 “활성 분기 제거”와 “프로젝트에서 .NET 흔적 완전 삭제”를 구분해야 합니다.
+
+재검토에서 남은 두 가지 주의점은 다음과 같습니다.
+
+1. `GETJSON2`와 `GETJSONREMOTE`는 Java `GetJs` 응답을 callback에 그대로 전달합니다. Java `SvcCRUD.getJson()`은 `resultInfo`와 `resultData` envelope을 반환하고, 현재 `GetJsonServer()`는 `resultData.STRUCTURE_CONT`를 추출합니다. 따라서 외부에서 이 보조 함수를 호출한다면 기존에 기대하던 구조체 응답과 형식이 달라질 수 있습니다. `GETHTML()`도 envelope을 해석하지 않고 JSON 응답 문자열을 반환합니다. 저장소 내 직접 호출은 검색되지 않았으나, 외부 사용이 가능하다고 가정한다면 계약을 맞춘 뒤 사용해야 합니다.
+2. 위 보조 함수들의 새 JSON.parse 경로는 예외 격리가 충분하지 않습니다. 비 JSON/HTML 응답은 success/error callback 안에서 다시 예외를 일으킬 수 있습니다. 현재 저장소 내 호출이 없으므로 활성 화면 영향은 낮지만, 외부 호출 호환을 지원한다면 추가 방어가 필요합니다.
+
+stale 응답의 전역 `unblockUI()` 제거는 타 화면 잠금의 조기 해제를 방지합니다. 그러나 `monform.jsp`의 hashchange와 `historyBackProc()`에는 이전 요청 소유 잠금을 해제하는 공통 처리가 없으므로, 해당 변화만으로 stale 요청이 남긴 잠금까지 정상 정리된다고 단정하지 않습니다. 이 동작의 VDI 검증 기록은 대장에서 확인되지 않았습니다.
+
+최신 로컬 작업 트리에는 `CHANGELOG_KHMA.md`의 Step 6-7 VDI 상태 변경이 남아 있습니다. `git diff --check`는 통과했습니다. 테스트 실행 및 Eclipse Problems 확인은 하지 않았습니다.
+
 ## 2026-11-04 추가 로컬 diff 재검토 (Step 6-7 작업 트리)
 
 팩트 체크 이후 작업 트리에 `MonArch.js`와 `jquery.kdb.soap.2.0.js` 추가 수정이 생겨 다시 확인했습니다. 현재 HEAD `14d57e8` 뒤의 두 소스 파일 수정은 미커밋 상태입니다.
