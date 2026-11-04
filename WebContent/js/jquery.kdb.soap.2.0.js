@@ -1,4 +1,4 @@
-﻿/// <reference path="../Resource.js" />
+/// <reference path="../Resource.js" />
 /// <reference path="jquery.kdb.MonArch800.js" />
 
 /*!
@@ -45,6 +45,7 @@ ErCallBack(_msg);
 });
 };*/
 
+// 20261104 khma Start : 프론트엔드 통신 관문(PostJsonData, PostJsonData2) 예외 처리 방어 및 응답 안전 파싱 보강
 function PostJsonData(url, pi, ScCallBack, ErCallBack, aSync) {
     // aSync = g_async == e_async.async ? false : aSync;
     $.ajax({
@@ -55,102 +56,126 @@ function PostJsonData(url, pi, ScCallBack, ErCallBack, aSync) {
         dataType: _dataType,
         async: aSync, //_async,
         success: function (result) {
-            // _msg = eval('(' + msg.d.replace(/\/Date\((\d+)\)\//gi, "new Date($1)") + ')');
-            var _result = '';
-
-            if (_M.Webtype == 'Java') {
-                _result = jQuery.parseJSON(result);
-            } else {
-                _result = jQuery.parseJSON(result.d);
+            // 20261104 khma : JSON 안전 파싱 (서버 오류로 HTML 수신 시 SyntaxError 예외 방어)
+            var _result = null;
+            try {
+                var rawData = (_M.Webtype == 'Java') ? result : (result && result.d ? result.d : result);
+                if (typeof rawData === "object" && rawData !== null) {
+                    _result = rawData;
+                } else if (typeof rawData === "string") {
+                    _result = jQuery.parseJSON(rawData);
+                }
+            } catch (eParse) {
+                alert("서버 응답 처리 중 오류가 발생하였습니다.\n(잘못된 응답 형식이 수신되었습니다.)");
+                if (typeof ErCallBack === "function") {
+                    ErCallBack({
+                        resultInfo: {
+                            result: "FAIL",
+                            errorCode: "E9999",
+                            message: "응답 데이터 파싱 실패"
+                        },
+                        rawResponse: result
+                    });
+                }
+                return;
             }
-            
 
-            rstTf = _result.resultInfo.result;
-            if (rstTf == "SUCCESS") {
-            	//console.log("[MENUID] " + _result.resultInfo.menuId + ", " + _M.PrevActGbn.currMenuId + ", " + _result.resultInfo.message);
-            	if (_result.resultInfo.menuId == undefined ||  _result.resultInfo.menuId == "0000" || _result.resultInfo.menuId == _M.PrevActGbn.currMenuId ) {
+            // 20261104 khma : resultInfo 미포함 일반 객체 응답 호환 처리
+            if (!_result || !_result.resultInfo) {
+                if (typeof ScCallBack === "function") {
                     ScCallBack(_result);
-				}
+                }
+                return;
+            }
+
+            var rstTf = _result.resultInfo.result;
+            if (rstTf == "SUCCESS") {
+                if (_result.resultInfo.menuId == undefined || _result.resultInfo.menuId == "0000" || _result.resultInfo.menuId == _M.PrevActGbn.currMenuId) {
+                    if (typeof ScCallBack === "function") {
+                        ScCallBack(_result);
+                    }
+                }
             } else {
-                var _msg = _result.resultInfo.message;
-                if (_msg.replace('ORA-20000', '') != _msg) { //ORACLE의 사용자정의EXEPTION일때
+                var _msg = _result.resultInfo.message || "처리 중 오류가 발생하였습니다.";
+                // ORACLE의 사용자정의 EXCEPTION일 때 (ORA-20000)
+                if (_msg.indexOf('ORA-20000') > -1) {
                     var errmsg = _msg;
                     errmsg = errmsg.substr(errmsg.lastIndexOf('[20000]'), errmsg.length);
                     var _aMsg = errmsg.match(new RegExp("\\${(.*?)}\\$", "gim"));
                     if (_aMsg != null) {
-                        xMsg = _aMsg[0].replace('${', '').replace('}$', '');
+                        var xMsg = _aMsg[0].replace('${', '').replace('}$', '');
                         alert(xMsg);
                     } else {
                         alert(_msg);
                     }
+                    if (typeof ErCallBack === "function") {
+                        ErCallBack(_result);
+                    }
                 } 
-                // 2014-03-17 adding Noh Eunhye : 세션이 끊겼을 경우 발생하는 오류와 오류코드
-                else if ( _result.resultInfo.errorCode == "E1000" ) {
-                	alert(_msg); // 오류가 발생했음을 알림
-                	$(".opticon-logout").trigger("click"); // 로그아웃 코드 발생
-                } else if (_msg.replace('SQL state [20000]', '') != _msg) { //MYSQL or MARIADB의 사용자정의EXEPTION일때
-                    alert(_msg.substr(_msg.lastIndexOf('Exception:')+11));
+                // 세션 만료 시 발생하는 오류코드 (E1000)
+                else if (_result.resultInfo.errorCode == "E1000") {
+                    alert(_msg);
+                    if (typeof ErCallBack === "function") {
+                        ErCallBack(_result);
+                    }
+                    $(".opticon-logout").trigger("click");
+                } 
+                // MYSQL or MARIADB 사용자정의 EXCEPTION일 때
+                else if (_msg.indexOf('SQL state [20000]') > -1) {
+                    alert(_msg.substr(_msg.lastIndexOf('Exception:') + 11));
+                    if (typeof ErCallBack === "function") {
+                        ErCallBack(_result);
+                    }
                 } 
                 else {
                     alert(_msg);
-                    ErCallBack(_result);
+                    if (typeof ErCallBack === "function") {
+                        ErCallBack(_result);
+                    }
                 }
-
             }
         },
         error: function (result) {
-            var _msg = jQuery.parseJSON(result.responseText);
-            
-            // 세션 오류인지 확인
-        	if ( _msg.resultInfo.result == "FAIL" && _msg.resultInfo.errorCode == "E1000" ) {
-        		// 오류가 발생했음을 알림
-        		alert(_msg.resultInfo.message);
-        		// 로그아웃 코드 발생
-            	$(".opticon-logout").trigger("click");
-        	}
-        	else {
-	            alert('예기치 못한 에러가 발생하였습니다.\n관리자에게 문의하시기 바랍니다.');
-	
-	            ErCallBack(_msg);
-        	}
+            // 20261104 khma : HTTP 오류 응답 안전 파싱 및 콜백 방어 (HTML 에러 페이지 수신 시 안전 처리)
+            var _msg = null;
+            try {
+                if (result && result.responseText) {
+                    _msg = jQuery.parseJSON(result.responseText);
+                }
+            } catch (eErrParse) {
+                _msg = null;
+            }
 
-            /*
-            if (msg.responseText.indexOf("인증실패") > 0) {
-            // alert("사용자 인증에 실패하였습니다.");
-            // $(".ui-logout").trigger("click");
-            $.cookie('UKEY', '', { path: '/' });
-            location.reload();
-            return;
+            // 세션 오류(E1000) 여부 확인
+            if (_msg && _msg.resultInfo && _msg.resultInfo.result == "FAIL" && _msg.resultInfo.errorCode == "E1000") {
+                alert(_msg.resultInfo.message || "세션이 만료되었습니다. 다시 로그인해 주십시오.");
+                if (typeof ErCallBack === "function") {
+                    ErCallBack(_msg);
+                }
+                $(".opticon-logout").trigger("click");
             } else {
-            var xMsg, xNum;
-            var _aMsg = _msg.Message.match(new RegExp("\\${(.*?)}\\$", "gim"));
-            if (_aMsg != null) {
-            xMsg = _aMsg[0].replace('${', '').replace('}$', '');
-            }
-            var _aNum = _msg.Message.match(new RegExp("\\$\\[(.*?)\\]\\$", "gim"));
-            if (_aNum != null) {
-            xNum = _aNum[0].replace('$[', '').replace(']$', '');
-            }
-            if (xMsg != null || xNum != null) {
-            if (ErCallBack == undefined) {
-            alert('[' + xNum + ']' + xMsg);
-            } else {
-            ErCallBack('[' + xNum + ']' + xMsg);
-            }
-            return;
-            } else {
-            if (ErCallBack == undefined) {
-            alert(_msg.Message);
-            } else {
-            ErCallBack(_msg.Message);
-            }
-            return;
-            }
-            }*/
+                var displayMsg = "예기치 못한 에러가 발생하였습니다.\n관리자에게 문의하시기 바랍니다.";
+                if (_msg && _msg.resultInfo && _msg.resultInfo.message) {
+                    displayMsg = _msg.resultInfo.message;
+                } else if (_msg && _msg.errorMessage) {
+                    displayMsg = _msg.errorMessage;
+                }
+                alert(displayMsg);
 
+                if (typeof ErCallBack === "function") {
+                    ErCallBack(_msg || {
+                        resultInfo: {
+                            result: "FAIL",
+                            errorCode: "E9999",
+                            message: displayMsg
+                        },
+                        status: result ? result.status : 0
+                    });
+                }
+            }
         }
     });
-};
+}
 
 function PostJsonData2(url, pi, ScCallBack, ErCallBack, aSync) {
     _async = g_async == false ? false : aSync;
@@ -162,17 +187,19 @@ function PostJsonData2(url, pi, ScCallBack, ErCallBack, aSync) {
         dataType: _dataType,
         async: _async,
         success: function (msg) {
-            ScCallBack(msg);
+            if (typeof ScCallBack === "function") {
+                ScCallBack(msg);
+            }
         },
         error: function (msg) {
-            _msg = msg.responseText.replace(/\\r\\n/g, String.fromCharCode(13)).replace(/\\u0027/g, "'");
-
-            ErCallBack(_msg);
-
+            var _msg = (msg && msg.responseText) ? msg.responseText.replace(/\\r\\n/g, String.fromCharCode(13)).replace(/\\u0027/g, "'") : "";
+            if (typeof ErCallBack === "function") {
+                ErCallBack(_msg);
+            }
         }
     });
-};
-
+}
+// 20261104 khma End : 프론트엔드 통신 관문(PostJsonData, PostJsonData2) 예외 처리 방어 및 응답 안전 파싱 보강
 function GETJSON(name, usite, extOpt) {
     // 구조체가 local에 보관중이면 읽어오고
     if (_M.Jsons[name] != undefined) {

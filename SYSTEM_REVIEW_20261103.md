@@ -208,3 +208,21 @@ Git 이력에서 2026-11-02~03 변경분을 확인했습니다. 소스는 실행
 6. 우선 DATACRUD JSON 실패, 세션 만료, SQL 오류, 엑셀 감사 INSERT 실패, 파일 업로드/다운로드/삭제 실패를 대상으로 프런트·백엔드 응답 계약 검증을 수행합니다.
 
 이 점검은 소스 코드의 정적 경로 분석이며, 각 오류를 실제 발생시켜 VDI에서 브라우저 동작·HTTP 상태·로그를 검증한 것은 아닙니다.
+
+## 2026-11-04 법인계약 저장 ORA-02055 제보
+
+사용자가 법인계약 메뉴 저장 중 ORA-02055가 발생했다고 알려왔습니다. Oracle 공식 설명은 `distributed update operation failed; rollback required`이며, 분산 갱신 일부가 실패해 사이트 간 데이터가 불일치할 수 있으므로 savepoint 또는 트랜잭션 전체 rollback 후 재시도해야 한다고 안내합니다. 실제 원인 제약조건/원격 DB 장애/트리거 등은 ORA-02055 전후의 전체 Oracle 오류 스택과 실행 SQL을 확인해야 합니다.
+
+현재 저장소에는 법인계약 화면의 M_SERVICE 저장 SQL 원문이 없어 어느 SQL, 트리거, 프로시저 또는 DB 링크가 분산 갱신을 발생시켰는지 특정할 수 없습니다. 저장소의 다른 프로시저에 `@DBL_CEO` DB 링크 참조가 있으나 해당 화면 저장과 연결됐다는 근거는 없습니다. `SvcCRUD`의 `DataAccessException` 경로는 오류를 기록하고 `E00003` 일반 실패 응답을 반환하지만, 이 경로의 명시적 rollback/savepoint 실행은 확인되지 않았습니다. DataSourceTransactionManager 및 TransactionTemplate 정의만 있고, DATACRUD의 저장 호출에서 해당 템플릿을 쓰는 것은 확인되지 않았습니다.
+
+운영/VDI에서 확인할 사항: 화면에 표시된 전체 오류 문자열과 시간, Tomcat 로그의 ORA-02055 직전 최초 ORA 오류, 실제 M_SERVICE 서비스/메소드와 저장 SQL, SQL이 호출하는 트리거·프로시저의 DB 링크 사용, 동일 세션에서 이어진 ORA-02067 발생 여부를 확보합니다. ORA-02055가 난 동일 세션/트랜잭션에서 추가 DML을 계속하거나 자동 재시도하지 말고 DBA 확인 후 rollback 여부를 결정합니다. 이는 로그/SQL을 확보하기 전까지의 진단 방향이며 원인 확정은 아닙니다.
+
+## 2026-11-04 예외 처리 보완 Step 6-1 완료 (PostJsonData 관문 안전화)
+
+- 대상 파일: WebContent/js/jquery.kdb.soap.2.0.js
+- 내용:
+  1. PostJsonData 내 	ry-catch 기반 JSON 안전 파싱 적용으로 서버 500/404 HTML 에러 수신 시 SyntaxError 예외 및 화면 먹통 방지.
+  2. 	ypeof ErCallBack === 'function' 검증 적용으로 콜백 미전달 호출 시 런타임 TypeError 원천 차단.
+  3. _result.resultInfo 프로퍼티 부재 시 일반 JSON 응답 호환 처리.
+  4. ORA-20000, E1000, SQL state [20000] 분기에서도 오류 alert 후 ErCallBack을 안전하게 호출하여 호출 화면의 상태(스피너, 버튼 비활성화 등) 복원 보장.
+  5. PostJsonData2에서도 ScCallBack/ErCallBack의 함수 검증 보강.
