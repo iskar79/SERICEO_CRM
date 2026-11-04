@@ -1355,7 +1355,11 @@ public class UploadController {
 			String realPath = defaultFilePath + uploadFolder;
 			String originalFileName = Filename.getOriginalFilename();
 			String ext = FilenameUtils.getExtension(originalFileName);
+			// 20261104 khma : 물리 파일명 및 DB FILE_PATH에 원본 파일명을 제외하고 순수 타임스탬프(YYYY/MM/타임스탬프)만 저장 (기존 CRM 표준 유지)
+			/*
 			String realfileName = currentTimestamp + "_" + originalFileName;
+			*/
+			String realfileName = currentTimestamp;
 			String fileSize = String.valueOf(Filename.getSize());
 
 			// 디렉토리 자동 생성
@@ -1540,6 +1544,14 @@ public class UploadController {
 			}
 			if (!file.exists() || !file.isFile()) {
 				// WebRoot 하위 보조 탐색
+				// 20261104 khma : 과거 타임스탬프_파일명 형식으로 저장된 레거시 물리 파일 호환 탐색
+				if (StringUtils.isNotEmpty(downloadFileName)) {
+					File legacyFile = new File(realPath + "_" + downloadFileName);
+					if (legacyFile.exists() && legacyFile.isFile()) {
+						file = legacyFile;
+					}
+				}
+
 				String webRoot = request.getSession().getServletContext().getRealPath("/");
 				if (StringUtils.isNotEmpty(webRoot)) {
 					File altFile = new File(webRoot + "/FileData/signFile/" + targetFilePath);
@@ -1670,6 +1682,17 @@ public class UploadController {
 					resultMap.put("message", "비정상적인 파일 경로입니다. (디렉토리 이탈)");
 					out.print(new ObjectMapper().writeValueAsString(resultMap));
 					return;
+				}
+
+				if (!srcFile.exists() || !srcFile.isFile()) {
+					// 20261104 khma : 과거 타임스탬프_파일명 형식으로 저장된 레거시 물리 파일 호환 탐색
+					String legacyName = (mapFileInfo.get("FILE_NAME") != null) ? mapFileInfo.get("FILE_NAME").toString() : "";
+					if (StringUtils.isNotEmpty(legacyName)) {
+						File legacySrc = new File(realPath + "_" + legacyName);
+						if (legacySrc.exists() && legacySrc.isFile()) {
+							srcFile = legacySrc;
+						}
+					}
 				}
 
 				if (srcFile.exists() && srcFile.isFile()) {
