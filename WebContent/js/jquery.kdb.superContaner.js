@@ -1,4 +1,4 @@
-/// <reference path="jquery.kdb.MonArch800.js" />
+﻿/// <reference path="jquery.kdb.MonArch800.js" />
 /// <reference path="../Resource.js" />
 /// <reference path="MonArchResource.js" />
 
@@ -15281,6 +15281,7 @@ $(document).on("blur", ".t_Money", function (e) {
       if (_jsonName == undefined || _jsonName == "") return;
       if (_jsonName == "clear") return;
 
+      var option = null; // 20261105 khma : option을 명시적 지역 변수로 선언하여 상위 스코프 오염 방어
       var jsonNameStr = "";
       if (typeof _jsonName == "string") {
         option = GETJSON(_jsonName);
@@ -15305,39 +15306,69 @@ $(document).on("blur", ".t_Money", function (e) {
       }
       */
       if (!option || typeof option !== "object" || !_ContanerType) {
+        var _failTarget = $(this);
+        _failTarget.empty().removeClass().css({
+          "min-height": "160px",
+          "display": "flex",
+          "align-items": "center",
+          "justify-content": "center"
+        });
+
+        var $box = $("<div></div>").css({
+          "padding": "30px 20px",
+          "text-align": "center",
+          "font-family": "'맑은 고딕', Malgun Gothic, sans-serif",
+          "background": "#fafafa",
+          "border": "1px dashed #ccc",
+          "border-radius": "4px",
+          "width": "80%",
+          "max-width": "480px",
+          "margin": "20px auto"
+        });
+
+        $("<div>⚠️</div>").css({ "font-size": "26px", "color": "#d9534f", "margin-bottom": "8px" }).appendTo($box);
+        $("<div></div>").css({ "font-size": "13px", "font-weight": "bold", "color": "#333", "margin-bottom": "6px" })
+          .text("화면 설정을 불러오지 못했습니다.").appendTo($box);
+
+        var $desc = $("<div></div>").css({ "font-size": "11px", "color": "#777", "margin-bottom": "14px", "word-break": "break-all" });
         if (jsonNameStr !== "") {
-          var _failTarget = $(this);
-          _failTarget.empty().removeClass().css({
-            "min-height": "160px",
-            "display": "flex",
-            "align-items": "center",
-            "justify-content": "center"
-          }).html(
-            '<div style="padding:30px 20px; text-align:center; font-family:\'맑은 고딕\', Malgun Gothic, sans-serif; background:#fafafa; border:1px dashed #ccc; border-radius:4px; width:80%; max-width:480px; margin:20px auto;">' +
-            '  <div style="font-size:26px; color:#d9534f; margin-bottom:8px;">⚠️</div>' +
-            '  <div style="font-size:13px; font-weight:bold; color:#333; margin-bottom:6px;">화면 설정을 불러오지 못했습니다.</div>' +
-            '  <div style="font-size:11px; color:#777; margin-bottom:14px; word-break:break-all;">일시적인 통신 지연이거나 서버 응답 오류일 수 있습니다.<br>(' + jsonNameStr + ')</div>' +
-            '  <button type="button" class="btn-retry-contaner" style="padding:6px 18px; font-size:12px; font-weight:bold; color:#fff; background-color:#2b579a; border:1px solid #1e3f70; border-radius:3px; cursor:pointer;">다시 시도</button>' +
-            '</div>'
-          );
-          _failTarget.find(".btn-retry-contaner").on("click", function (e) {
+          $desc.text("일시적인 통신 지연이거나 서버 응답 오류일 수 있습니다. (" + jsonNameStr + ")");
+        } else {
+          $desc.text("구조체의 ContanerType이 올바르게 정의되지 않았습니다.");
+        }
+        $desc.appendTo($box);
+
+        // 문자열 구조체 호출인 경우에만 서버 재시도 버튼 제공 (인라인 객체 설정 오류는 재시도 제외)
+        if (jsonNameStr !== "") {
+          var $btn = $("<button type='button'></button>")
+            .addClass("btn-retry-contaner")
+            .css({
+              "padding": "6px 18px",
+              "font-size": "12px",
+              "font-weight": "bold",
+              "color": "#fff",
+              "background-color": "#2b579a",
+              "border": "1px solid #1e3f70",
+              "border-radius": "3px",
+              "cursor": "pointer"
+            })
+            .text("다시 시도");
+
+          $btn.on("click", function (e) {
             e.preventDefault();
             if (window._M && _M.Jsons) {
               delete _M.Jsons[jsonNameStr];
             }
             _failTarget.superContaner("SetPageContaner", jsonNameStr);
           });
-          return;
-        } else {
-          alert(
-            "[" +
-              _jsonName +
-              "] 구조체의 ContanerType이 지정되어 있지 않습니다. Type을 지정하세요."
-          );
-          return;
+
+          $btn.appendTo($box);
         }
+
+        $box.appendTo(_failTarget);
+        return;
       }
-      // 20261104 khma End : 화면 설정(GETJSON) 로딩 실패 시 빈 영역 방치 방지 및 [다시 시도] 복구 UI 렌더링
+      // 20261105 khma End : 화면 설정(GETJSON) 로딩 실패 시 빈 영역 방치 방지 및 DOM 기반 안전 [다시 시도] 복구 UI 렌더링
       if (jsonNameStr != "") $(this).attr("jsonName", jsonNameStr);
 
       switch (_ContanerType) {
