@@ -257,3 +257,20 @@ Git 이력에서 2026-11-02~03 변경분을 확인했습니다. 소스는 실행
      - `rawResponse`에 서버 내부 HTML 오류 페이지가 전달되지 않도록 정리.
   5. **문서 저장 payload 깨짐 방어 (`$.Json2Str`)**:
      - `campaignWorkflow.js` 등에서 호출하는 `$.Json2Str`에 `JSON.stringify` 표준 우선 사용 및 문자열 따옴표/역슬래시/개행 정규식 이스케이프 보강으로 JSON 깨짐 방어.
+
+## 2026-11-04 예외 처리 보완 Step 6-2 완료 (ExceptionResolver 전역 리졸버 표준화)
+
+- 대상 파일: `src/co/kr/kydbm/core/exception/ExceptionResolver.java`
+- 내용:
+  1. **전역 예외 응답 형식 표준화 (빈 ModelAndView 반환 결함 해결)**:
+     - `AuthException`/`LoginException` 외의 모든 미처리 예외(DB 오류, 시스템 런타임 예외 등) 발생 시 빈 `ModelAndView`를 반환하던 문제를 전면 개편하여 `ResultInfo(result="FAIL", errorCode, message)` 표준 응답 구조 생성.
+  2. **요청 프로토콜별 자동 분기 (AJAX/JSON vs 동기 브라우저 요청)**:
+     - `isJsonRequest(request)` 판별 로직 추가 (`.json`, `X-Requested-With`, `application/json`).
+     - AJAX/JSON 요청 시 `MappingJacksonJsonViewEx`를 통해 MonArch 표준 규격(HTTP 200 + `resultInfo.result=FAIL`) JSON 응답 반환으로 클라이언트 화면 먹통 및 파싱 실패 원천 방어.
+     - 동기 브라우저 요청 시 `redirect:/error.htm`으로 안전 리다이렉트 처리하여 화이트스크린 방지.
+  3. **내부 시스템 및 DB 상세 정보 은닉화**:
+     - DB 예외(`SQLException`, `DataAccessException`) 시 테이블명/SQL 구문 노출을 방지하고 `"데이터베이스 처리 중 오류가 발생하였습니다."`로 은닉.
+     - 단, Oracle `ORA-20000` / `SQL state [20000]` 사용자 정의 비즈니스 예외는 기존 CRM 프론트 파싱 계약을 그대로 유지하여 화면 안내문구 정상 표출.
+  4. **보안 로깅 표준화 (`printStackTrace()` 전면 제거)**:
+     - `exception.printStackTrace()` 및 `e.printStackTrace()`를 완전히 제거하고 Log4j 프로젝트 표준 로거(`logger.error(...)`, `logger.warn(...)`)로 안전하게 전환.
+     - `invalidateSession(request.getSession(false))`로 불필요한 신규 세션 생성 방어.
