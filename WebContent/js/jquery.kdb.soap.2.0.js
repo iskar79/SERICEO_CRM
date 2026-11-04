@@ -166,14 +166,10 @@ function PostJsonData(url, pi, ScCallBack, ErCallBack, aSync) {
             var rstTf = _result.resultInfo.result;
             if (rstTf == "SUCCESS") {
                 // 메뉴 ID 일치 여부 확인 (이전 메뉴 비동기 응답이 현재 메뉴 화면에 덮어써지는 현상 방어)
+                // 불일치하는 stale 응답은 현재 화면의 UI나 다른 요청의 잠금(blockUI)에 간섭하지 않고 안전하게 무시
                 if (_result.resultInfo.menuId == undefined || _result.resultInfo.menuId == "0000" || _result.resultInfo.menuId == _M.PrevActGbn.currMenuId) {
                     if (typeof ScCallBack === "function") {
                         ScCallBack(_result);
-                    }
-                } else {
-                    // 20261104 khma : 현재 메뉴와 불일치하는 stale 응답 무시 시 UI 잠금(blockUI) 해제 완수
-                    if (window.$ && typeof $.unblockUI === "function") {
-                        try { $.unblockUI(); } catch (eUnblock) {}
                     }
                 }
             } else {
