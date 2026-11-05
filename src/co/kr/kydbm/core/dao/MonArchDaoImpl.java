@@ -595,22 +595,53 @@ public class MonArchDaoImpl   extends DataSourceSupport{
 	}
 
 	// 20261105 khma Start : 대용량 10만건 이상 엑셀/CSV 스트리밍 처리를 위한 exeListStream 및 exeReadStream 구현
+	/**
+	 * 대용량 엑셀/CSV 스트리밍 조회를 위한 List 실행 구현체
+	 * 데이터베이스 종류(DB_TYPE)에 맞는 페이징 쿼리(ROWNUM / LIMIT 등)를 동적으로 생성한 후
+	 * exeReadStream을 호출하여 RowCallbackHandler로 행 단위 스트리밍을 수행한다.
+	 * 
+	 * @param SqlCommand 실행할 기본 쿼리문
+	 * @param parameters 바인딩 조건 파라미터 맵
+	 * @param orderStr 정렬 컬럼 문자열
+	 * @param viewpage 요청 페이지 번호 (1)
+	 * @param pagecnt 페이지당 행 수 (99,999,999)
+	 * @param arrExtFilters 확장 검색 필터 조건 목록
+	 * @param rch 행 단위 스트리밍 처리를 수행할 Spring RowCallbackHandler 콜백 객체
+	 * @throws DataAccessException 데이터베이스 조회 예외
+	 * @throws Exception 쿼리 생성 및 파라미터 파싱 예외
+	 */
 	public void exeListStream(String SqlCommand, Map<String, String> parameters, String orderStr,
 			int viewpage, int pagecnt, ArrayList<Map<String, Object>> arrExtFilters,
 			RowCallbackHandler rch) throws DataAccessException, Exception {
+		// 1단계: DB 유형(Oracle, MariaDB 등)에 맞는 페이징 쿼리 래핑 생성
 		SqlCommand = QueryGenerator.getPagingQry(DB_TYPE, SqlCommand, orderStr, viewpage, pagecnt);
+		// 2단계: 스트리밍 전용 쿼리 실행 메서드 호출
 		exeReadStream(SqlCommand, parameters, arrExtFilters, namedParameterJdbcTemplate, rch);
 	}
 
+	/**
+	 * 대용량 스트리밍 쿼리 실행 및 행 단위 콜백 처리 구현체
+	 * 10만 건 이상의 대용량 엑셀/CSV 다운로드 시 전체 결과를 List<Map> 객체로 메모리에 적재하지 않고,
+	 * DB 커서에서 1행씩 읽어 Spring RowCallbackHandler(processRow)로 즉시 배출한다.
+	 * 
+	 * @param SqlCommand 실행할 페이징 래핑 SQL문
+	 * @param parameters 화면에서 수신한 검색 바인딩 파라미터 맵
+	 * @param arrExtFilters 동적 검색 확장 필터 목록
+	 * @param namedParameterJdbcTemplate 스프링 네임드 파라미터 JDBC 템플릿
+	 * @param rch 1행씩 스트리밍 파일 출력 및 카운트를 수행하는 RowCallbackHandler 콜백
+	 * @throws DataAccessException DB 접근 및 쿼리 실행 예외
+	 * @throws Exception 필수 파라미터 누락 및 정규식 치환 오류
+	 */
 	public void exeReadStream(String SqlCommand, Map<String, String> parameters,
 			ArrayList<Map<String, Object>> arrExtFilters, NamedParameterJdbcTemplate namedParameterJdbcTemplate,
 			RowCallbackHandler rch) throws DataAccessException, Exception {
-		// 다이나믹 쿼리 처리
+		// 1단계: 조건에 따른 다이나믹 쿼리 주석 해제 및 정규식 치환 처리
 		String execSqlCmd = setDynamicQuery(SqlCommand, parameters);
 		Pattern regs = Pattern.compile(REGEX_PARAM, Pattern.MULTILINE);
 		Matcher matchCol = regs.matcher(execSqlCmd);
 		Map<String, String> mapParam = new HashMap<String, String>();
 
+		// 2단계: @파라미터명@ 패턴 파싱 및 바인딩 파라미터 맵(mapParam) 구성
 		while (matchCol.find()) {
 			String para = matchCol.group(0).replace("@", "").trim();
 			try {
@@ -627,27 +658,36 @@ public class MonArchDaoImpl   extends DataSourceSupport{
 			}
 		}
 
-		// 확장 필드가 존재하면 SQL 필터 조건 추가
+		// 3단계: 화면 동적 확장 필터(/* EXTFILTERS */)가 존재하는 경우 SQL WHERE 절에 병합 치환
 		if (arrExtFilters != null && arrExtFilters.size() > 0) {
 			mapParam = FilterGenerator.getExtFilterParams(mapParam, arrExtFilters, parameters);
 			String strExtFilters = FilterGenerator.getFilterQuery(arrExtFilters);
 			execSqlCmd = SqlCommand.replace("/* EXTFILTERS */", strExtFilters);
 		}
 
+		// 4단계: Spring NamedParameter 형식(:파라미터명)으로 SQL 치환
 		execSqlCmd = replaceNameTemplateType(execSqlCmd, mapParam);
 
-		// 대용량 스트리밍 전용 JdbcTemplate 생성 및 FetchSize 설정 (오라클 기준 2,000)
-		// 20261105 khma : NamedParameterJdbcTemplate에는 getJdbcTemplate()이 없으므로 getJdbcOperations()에서 DataSource 추출 (null 방어 datasource 대체)
+		// 5단계: 대용량 스트리밍 전용 JdbcTemplate 인스턴스 생성 및 FetchSize 최적화 설정
+		// 20261105 khma : Spring의 NamedParameterJdbcTemplate에는 getJdbcTemplate() 메서드가 존재하지 않음 (undefined 에러 방지)
+		//                 스프링 내부 JdbcOperations(실제 JdbcTemplate) 인스턴스를 추출하여 getDataSource()를 취득하고,
+		//                 혹시 모를 null 상황에 대비해 상위 DataSourceSupport의 datasource를 fallback으로 사용하는 2중 안전 구조 적용.
 		javax.sql.DataSource currentDs = (namedParameterJdbcTemplate != null && namedParameterJdbcTemplate.getJdbcOperations() instanceof JdbcTemplate)
 				? ((JdbcTemplate) namedParameterJdbcTemplate.getJdbcOperations()).getDataSource()
 				: datasource;
 		JdbcTemplate streamingJdbcTemplate = new JdbcTemplate(currentDs);
+
+		// 6단계: DBMS 드라이버별 대용량 커서 스트리밍 FetchSize 설정
+		// - MySQL/MariaDB: 대용량 스트리밍 시 Integer.MIN_VALUE로 설정해야 드라이버가 전체 결과를 JVM에 버퍼링하지 않고 소켓 단위 스트리밍 수행
+		// - Oracle: 기본 FetchSize(10)를 2,000으로 상향하여 네트워크 RTT(왕복 시간) 지연을 줄이고 DB와 WAS 간 전송 속도를 극대화
 		if ("MYSQL".equalsIgnoreCase(DB_TYPE) || "MARIADB".equalsIgnoreCase(DB_TYPE)) {
 			streamingJdbcTemplate.setFetchSize(Integer.MIN_VALUE);
 		} else {
 			streamingJdbcTemplate.setFetchSize(2000);
 		}
 
+		// 7단계: 스트리밍 전용 NamedParameterJdbcTemplate로 쿼리 실행 및 RowCallbackHandler 콜백 전달
+		// DB 커서에서 1행씩 읽을 때마다 rch.processRow(rs)가 호출되어 파일 스트림으로 즉시 출력되고 메모리에서 GC 대상이 됨
 		NamedParameterJdbcTemplate streamingNamedJdbcTemplate = new NamedParameterJdbcTemplate(streamingJdbcTemplate);
 		streamingNamedJdbcTemplate.query(execSqlCmd, mapParam, rch);
 	}
