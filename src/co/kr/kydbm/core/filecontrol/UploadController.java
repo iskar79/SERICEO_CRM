@@ -1096,8 +1096,17 @@ public class UploadController {
 
 			// 20261103 khma Start : 실제 엑셀 다운로드 조회 건수로 M_EXCEL_DOWN_LOG.DOWN_CNT 정밀 갱신
 			try {
+				// 20261105 khma : REQ_DOC 파라미터 전문 암호 마스킹 및 최대 2000자 규격 정제
+				String reqDocSafe = "";
+				if (StringUtils.isNotEmpty(xmlParams)) {
+					String maskedXmlParams = xmlParams.replaceAll("(?i)(\"excelPassword\"\\s*:\\s*\")[^\"]*(\")", "$1******$2")
+					                                  .replaceAll("(?i)(excelPassword=)[^&]*", "$1******");
+					reqDocSafe = maskedXmlParams.length() > 2000 ? maskedXmlParams.substring(0, 2000) : maskedXmlParams;
+				}
+
 				Map<String, String> updateDownCntParam = new HashMap<String, String>();
 				updateDownCntParam.put("DOWN_CNT", String.valueOf(actualDownCnt));
+				updateDownCntParam.put("REQ_DOC", reqDocSafe);
 				updateDownCntParam.put("FILE_NAME_EXT", fileName + ".xlsx");
 				updateDownCntParam.put("FILE_NAME_RAW", fileName);
 				String baseName = (obj.containsKey("xlsName") && StringUtils.isNotEmpty(obj.get("xlsName"))) ? obj.get("xlsName") : xlsMethod;
@@ -1106,9 +1115,10 @@ public class UploadController {
 				if (StringUtils.isNotEmpty(UID)) {
 					updateDownCntParam.put("REGUSER", UID);
 				}
-				// 20261104 khma : 오라클 컬럼명 정합성 보정 (REG_DATE -> REGDATE) 및 파일명/사용자 다중 Fallback 매칭
+				// 20261105 khma : DOWN_CNT 갱신 시 REQ_DOC가 미입력(NULL) 상태인 경우 백엔드 실제 파라미터 전문으로 보완 갱신
 				String sqlUpdateDownCnt = "UPDATE M_EXCEL_DOWN_LOG "
-						+ "   SET DOWN_CNT = @DOWN_CNT@ "
+						+ "   SET DOWN_CNT = @DOWN_CNT@, "
+						+ "       REQ_DOC = NVL(REQ_DOC, @REQ_DOC@) "
 						+ " WHERE LOG_NO = ( "
 						+ "       SELECT MAX(LOG_NO) "
 						+ "         FROM M_EXCEL_DOWN_LOG "
@@ -1125,10 +1135,11 @@ public class UploadController {
 				if (nUpdateCnt > 0) {
 					log.info("M_EXCEL_DOWN_LOG DOWN_CNT 정밀 갱신 완료 (" + nUpdateCnt + "건): DOWN_CNT=" + actualDownCnt + ", fileName=" + fileName);
 				} else {
-					// 파일명 매칭 실패 시 동일 사용자 최근 5분 이내 최신 로그 Fallback 갱신
+					// 파일명 매칭 실패 시 동일 사용자 최근 5분 이내 최신 로그 Fallback 갱신 (REQ_DOC 누락 보완 포함)
 					if (StringUtils.isNotEmpty(UID)) {
 						String sqlFallback = "UPDATE M_EXCEL_DOWN_LOG "
-								+ "   SET DOWN_CNT = @DOWN_CNT@ "
+								+ "   SET DOWN_CNT = @DOWN_CNT@, "
+								+ "       REQ_DOC = NVL(REQ_DOC, @REQ_DOC@) "
 								+ " WHERE LOG_NO = ( "
 								+ "       SELECT MAX(LOG_NO) "
 								+ "         FROM M_EXCEL_DOWN_LOG "
@@ -1138,17 +1149,17 @@ public class UploadController {
 						nFb = monArchDao.exeUpdate(sqlFallback, updateDownCntParam);
 						log.info("M_EXCEL_DOWN_LOG Fallback DOWN_CNT 갱신 결과 (" + nFb + "건): DOWN_CNT=" + actualDownCnt + ", UID=" + UID);
 					}
-					// 20261105 khma : DownXlsNew 사전 사유 로그가 없는 일반 엑셀 다운로드(DownXls)의 경우 자동 INSERT 적재
+					// 20261105 khma : DownXlsNew 사전 사유 로그가 없는 일반 엑셀 다운로드(DownXls)의 경우 REQ_DOC 포함 자동 INSERT 적재
 					if (nUpdateCnt == 0 && nFb == 0) {
 						String clientIp = request.getRemoteAddr();
 						String sqlAutoInsert = "INSERT INTO M_EXCEL_DOWN_LOG ( "
 								+ "       LOG_NO, M_USITE_NO, MENU_ID, SERVICE_NAME, METHOD_NAME, "
-								+ "       FILE_NAME, XLS_PURPOSE, XLS_TARGET, XLS_REASON, DOWN_CNT, "
+								+ "       FILE_NAME, XLS_PURPOSE, XLS_TARGET, XLS_REASON, REQ_DOC, DOWN_CNT, "
 								+ "       CLIENT_IP, REGDATE, REGUSER "
 								+ " ) VALUES ( "
 								+ "       SEQ_M_EXCEL_DOWN_LOG.NEXTVAL, "
 								+ "       NVL(@USITE@, '44'), @MENU_ID@, @SERVICE_NAME@, @METHOD_NAME@, "
-								+ "       @FILE_NAME@, 'ETC', 'ALL', '일반 엑셀 다운로드', @DOWN_CNT@, "
+								+ "       @FILE_NAME@, 'ETC', 'ALL', '일반 엑셀 다운로드', @REQ_DOC@, @DOWN_CNT@, "
 								+ "       @CLIENT_IP@, SYSTIMESTAMP, NVL(@REGUSER@, 'SYSTEM') "
 								+ " ) ";
 						Map<String, String> insertParam = new HashMap<String, String>();
@@ -1157,6 +1168,7 @@ public class UploadController {
 						insertParam.put("SERVICE_NAME", xlsService);
 						insertParam.put("METHOD_NAME", xlsMethod);
 						insertParam.put("FILE_NAME", fileName + ".xlsx");
+						insertParam.put("REQ_DOC", reqDocSafe);
 						insertParam.put("DOWN_CNT", String.valueOf(actualDownCnt));
 						insertParam.put("CLIENT_IP", clientIp);
 						insertParam.put("REGUSER", StringUtils.isNotEmpty(UID) ? UID : "SYSTEM");
