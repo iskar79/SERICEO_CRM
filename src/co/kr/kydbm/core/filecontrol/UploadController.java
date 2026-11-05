@@ -1159,7 +1159,7 @@ public class UploadController {
 								+ " ) VALUES ( "
 								+ "       SEQ_M_EXCEL_DOWN_LOG.NEXTVAL, "
 								+ "       NVL(@USITE@, '44'), @MENU_ID@, @SERVICE_NAME@, @METHOD_NAME@, "
-								+ "       @FILE_NAME@, 'ETC', 'ALL', '일반 엑셀 다운로드', @REQ_DOC@, @DOWN_CNT@, "
+								+ "       @FILE_NAME@, 'ETC', 'ALL', '일반 엑셀 다운로드 (암호 미적용)', @REQ_DOC@, @DOWN_CNT@, "
 								+ "       @CLIENT_IP@, SYSTIMESTAMP, NVL(@REGUSER@, 'SYSTEM') "
 								+ " ) ";
 						Map<String, String> insertParam = new HashMap<String, String>();
