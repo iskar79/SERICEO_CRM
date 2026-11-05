@@ -1,4 +1,4 @@
-# VDI 내부망 소스 동기화 및 코드 수정 규칙 (필수 준수 사항)
+﻿# VDI 내부망 소스 동기화 및 코드 수정 규칙 (필수 준수 사항)
 
 이 프로젝트는 VDI 내부망 Git 저장소에서 복사해 온 소스이며, 수정 후 다시 VDI 환경으로 덮어써야 합니다.
 고객사 소스이므로 모든 소스 코드 수정 시 **반드시 아래 규칙을 엄격히 준수**해야 합니다.
@@ -277,7 +277,7 @@ VDI 내부망 코드를 카메라로 촬영하여 전달받는 경우, 단순 OC
   * 잔여 .NET 분기 100% 완전 정리 (`MonArch.js` getUserInfo ASMX 제거 및 `getUserInfo.json` 단일화, `soap.2.0.js` GETJSON2/GETJSONREMOTE/GETHTML toXml 및 .d 제거).
 * **[완료] Step 7 (superCalendar.js, superContaner.js, MonArch.js)** ([① 로컬: 완료(x) / ② VDI: 완료(x)]):
   * 대용량 superContaner.js에서 달력 컴포넌트(17개 메서드, 900줄)를 `jquery.kdb.superCalendar.js`로 독립 분리 및 후로드 디스패처 핀포인트 연동 (작업 트리에 superContaner.js_20261030 백업 보존).
-* **[진행중] Step 8 (soap.2.0.js, superContaner.js)** ([① 로컬: 완료(x) / ② VDI: 대기( )]):
+* **[완료] Step 8 (soap.2.0.js, superContaner.js)** ([① 로컬: 완료(x) / ② VDI: 완료(x)]):
   * 화면 설정(GETJSON) 로딩 실패 시 캐시 오염 방어 및 SetPageContaner 실패 안내 + [다시 시도] 복구 UX 구현.
 
 

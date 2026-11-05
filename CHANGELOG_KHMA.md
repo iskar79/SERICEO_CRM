@@ -67,7 +67,7 @@
 | **Step 6-6** | `WebContent/js/MonArchResource.js`, `WebContent/js/jquery.kdb.soap.2.0.js`, `WebContent/js/jquery.kdb.superContaner.js` | Java Spring 단일 환경 기준으로 미사용 .NET ASMX/응답 포장/날짜 직렬화 분기 정리 | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
 | **Step 6-7** | `WebContent/js/MonArch.js`, `WebContent/js/jquery.kdb.soap.2.0.js` | 잔여 .NET 분기 100% 완전 정리 (`MonArch.js` getUserInfo ASMX 제거 및 `getUserInfo.json` 단일화, `soap.2.0.js` GETJSON2/GETJSONREMOTE/GETHTML toXml 및 .d 제거) | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
 | **Step 7** | `WebContent/js/jquery.kdb.superCalendar.js`, `superContaner.js`, `MonArch.js` | 달력 컴포넌트(superCalendar 17개 메서드, 900줄) 모듈 독립 분리 및 후로드 디스패처 핀포인트 연동 (작업 트리에 superContaner.js_20261030 백업 보존) | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
-| **Step 8** | `WebContent/js/jquery.kdb.soap.2.0.js`, `WebContent/js/jquery.kdb.superContaner.js` | 화면 설정(GETJSON) 로딩 실패 시 캐시 오염 방어 및 SetPageContaner 실패 안내 + [다시 시도] 복구 UX 구현 | `[x]` | `[ ]` | **로컬 수정 완료 (VDI 반영 대기)** |
+| **Step 8** | `WebContent/js/jquery.kdb.soap.2.0.js`, `WebContent/js/jquery.kdb.superContaner.js` | 화면 설정(GETJSON) 로딩 실패 시 캐시 오염 방어 및 SetPageContaner 실패 안내 + [다시 시도] 복구 UX 구현 | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
 | **Step 2-12**| `UploadController.java`, `superContaner.js` | M_EXCEL_DOWN_LOG DOWN_CNT 정합성 보강 (REGDATE 오라클 컬럼명 일치, 사용자 Fallback 갱신 및 superContaner _records 연동) | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
 | **Step 3** | `MonArchDaoImpl.java`, `FilterGenerator.java`, 프로시저/배치 등 | KSign SecureDB 개인정보 암복호화 (DB UDF 쿼리 함수 우선 적용 방식) | `[ ]` | `[ ]` | **최종 마지막 단계로 진행 예정 (보류)** |
 
@@ -112,5 +112,5 @@
 | **Step 6-6** | `WebContent/js/MonArchResource.js`, `WebContent/js/jquery.kdb.soap.2.0.js`, `WebContent/js/jquery.kdb.superContaner.js` | Java Spring 단일 환경 기준으로 미사용 .NET ASMX/응답 포장/날짜 직렬화 분기 정리 | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
 | **Step 6-7** | `WebContent/js/MonArch.js`, `WebContent/js/jquery.kdb.soap.2.0.js` | 잔여 .NET 분기 100% 완전 정리 (`MonArch.js` getUserInfo ASMX 제거 및 `getUserInfo.json` 단일화, `soap.2.0.js` GETJSON2/GETJSONREMOTE/GETHTML toXml 및 .d 제거) | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
 | **Step 7** | `WebContent/js/jquery.kdb.superCalendar.js`, `superContaner.js`, `MonArch.js` | 달력 컴포넌트(superCalendar 17개 메서드, 900줄) 모듈 독립 분리 및 후로드 디스패처 핀포인트 연동 (작업 트리에 superContaner.js_20261030 백업 보존) | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
-| **Step 8** | `WebContent/js/jquery.kdb.soap.2.0.js`, `WebContent/js/jquery.kdb.superContaner.js` | 화면 설정(GETJSON) 로딩 실패 시 캐시 오염 방어 및 SetPageContaner 실패 안내 + [다시 시도] 복구 UX 구현 | `[x]` | `[ ]` | **로컬 수정 완료 (VDI 반영 대기)** |
+| **Step 8** | `WebContent/js/jquery.kdb.soap.2.0.js`, `WebContent/js/jquery.kdb.superContaner.js` | 화면 설정(GETJSON) 로딩 실패 시 캐시 오염 방어 및 SetPageContaner 실패 안내 + [다시 시도] 복구 UX 구현 | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
 | **Step 2-12**| `UploadController.java`, `superContaner.js` | M_EXCEL_DOWN_LOG DOWN_CNT 정합성 보강 (REGDATE 오라클 컬럼명 일치, 사용자 Fallback 갱신 및 superContaner _records 연동) | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
