@@ -6241,7 +6241,7 @@ $(document).on("blur", ".t_Money", function (e) {
 				}
 			  });
 			// 서비스, 함수 제대로 들어갔는지 확인하고 pl데이터 들어갔는지 확인
-			$.GetExcelColumn("XLS", _col, _jobInfo.service, pl);
+			$.GetExcelColumn("XLS", _col, _jobInfo.service, pl, oCmd);
 		  } else {
 			// 20261105 khma : oCmd pass for debounce and status ux
 			$.SvcDownXls(_json.service, pl, oCmd);
@@ -6722,7 +6722,7 @@ $(document).on("blur", ".t_Money", function (e) {
                     i++;
                   }
                 });
-              $.GetExcelColumn("XLS", _col, targetService, pl);
+              $.GetExcelColumn("XLS", _col, targetService, pl, oCmd);
             } else {
               // 20261105 khma : oCmd pass for debounce and status ux
               $.SvcDownXls(targetService, pl, oCmd);
@@ -6835,13 +6835,18 @@ $(document).on("blur", ".t_Money", function (e) {
 
           // 이력 저장 AJAX 실행 후 다운로드 진행
           try {
-            PostJsonData(
+            // 20261105 khma : 감사로그 저장 중 버튼 연타 방지를 위해 모달 닫기 및 버튼 잠금 즉시 선행
+          if (typeof $.StartExcelDownloadUX === "function") {
+            $.StartExcelDownloadUX(oCmd);
+          }
+          PostJsonData(
               _M.svcUrl[_M.Webtype].crudUrl,
               plLog,
               function (res) {
                 // 20261103 khma : 업무상 실패 응답(result === 'FAIL' 등) 감지 시 다운로드 차단
                 if (res) {
                   if (res.result === "FAIL" || res.status === "FAIL" || res.status === "ERROR" || res.status === false || res.isSuccess === false) {
+                    if (typeof $.CleanUpExcelDownloadUX === "function") { $.CleanUpExcelDownloadUX(oCmd); }
                     alert("보안 감사 이력 저장 중 업무 오류가 발생하여 엑셀 다운로드가 중단되었습니다.\n" + (res.message || "관리자에게 문의해 주십시오."));
                     return false;
                   }

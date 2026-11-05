@@ -1220,6 +1220,15 @@
     };
 
     // 20261105 khma Start : \uc5d1\uc140 \ub2e4\uc6b4\ub85c\ub4dc \uc5f0\ud0c0 \ubc29\uc9c0 \ubc0f \ube44\uce68\ud574\uc801 \uc778\ub77c\uc778 \uc0c1\ud14c \uc548\ub0b4 \ub9e4\ub2c8\uc800
+    $.CleanUpExcelDownloadUX = function (btn) {
+        var $btn = (btn && $(btn).length > 0) ? $(btn) : $(".jobContaner input[value*='\uc5d1\uc140'], .jobContaner a:contains('\uc5d1\uc140')").first();
+        if ($btn && $btn.length > 0) {
+            $btn.prop("disabled", false).removeClass("disabled");
+            $btn.parent().find(".xls-status-badge").remove();
+        }
+        document.cookie = "fileDownloadToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    };
+
     $.StartExcelDownloadUX = function (btn, token) {
         var $btn = (btn && $(btn).length > 0) ? $(btn) : null;
         if (!$btn || $btn.length === 0) {
@@ -1284,10 +1293,17 @@
                 pollTimer = null;
                 if ($badge && $badge.length > 0) {
                     $badge.css({ color: "#bb5500", background: "#fff5e6", borderColor: "#fedcb0" })
-                          .html("\u26a0\ufe0f \uc751\ub2f5\uc774 \uc544\uc9c1 \ud655\uc778\ub418\uc9c0 \uc54a\uc558\uc2b5\ub2c8\ub2e4. \ub300\uc6a9\ub7c9 \uc791\uc5c5\uc774 \uc11c\ubc84\uc5d0\uc11c \uacc4\uc18d \ucc98\ub9ac \uc911\uc77c \uc218 \uc788\uc2b5\ub2c8\ub2e4. <a href='javascript:void(0);' id='btn_retry_" + badgeId + "' style='color:#cc0000;text-decoration:underline;margin-left:6px;'>[\ub2e4\uc2dc \uc694\uccad]</a>");
+                          .html("\u26a0\ufe0f \uc751\ub2f5\uc774 \uc544\uc9c1 \ud655\uc778\ub418\uc9c0 \uc54a\uc558\uc2b5\ub2c8\ub2e4. \uc694\uccad\uc774 \uc11c\ubc84\uc5d0\uc11c \uacc4\uc18d \ucc98\ub9ac \uc911\uc77c \uc218 \uc788\uc2b5\ub2c8\ub2e4. <a href='javascript:void(0);' id='btn_retry_" + badgeId + "' style='color:#cc0000;text-decoration:underline;margin-left:6px;'>[\uc7a0\uae08 \ud574\uc81c \ud6c4 \ub2e4\uc2dc \uc2dc\ub3c4]</a>");
                     $("#btn_retry_" + badgeId).click(function () {
-                        if (confirm("\uae30\uc874 \uc5d1\uc140 \uc694\uccad\uc774 \uc544\uc9c1 \uc11c\ubc84\uc5d0\uc11c \ucc98\ub9ac \uc911\uc77c \uc218 \uc788\uc5b4 \uc911\ubcf5 \uc2e4\ud589\ub420 \uc218 \uc788\uc2b5\ub2c8\ub2e4.\n\uadf8\ub798\ub3c4 \ub2e4\uc2dc \uc694\uccad\ud558\uc2dc\uaca0\uc2b5\ub2c8\uae4c?")) {
+                        if (confirm("\uae30\uc874 \uc5d1\uc140 \uc694\uccad\uc774 \uc544\uc9c1 \uc11c\ubc84\uc5d0\uc11c \ucc98\ub9ac \uc911\uc77c \uc218 \uc788\uc5b4 \uc911\ubcf5 \uc2e4\ud589\ub420 \uc218 \uc788\uc2b5\ub2c8\ub2e4.\n\uc7a0\uae08\uc744 \ud574\uc81c\ud558\uace0 \ub2e4\uc2dc \uc2dc\ub3c4\ud560 \uc218 \uc788\ub3c4\ub85d \ucd08\uae30\ud654\ud558\uc2dc\uaca0\uc2b5\ub2c8\uae4c?")) {
                             cleanUp();
+                        } else {
+                            // \ucde8\uc18c \uc2dc \ud3f4\ub9c1 \uacc4\uc18d \uc720\uc9c0 (30\ucd08 \uc5f0\uc7a5)
+                            startTime = new Date().getTime() - 90000;
+                            if ($badge && $badge.length > 0) {
+                                $badge.css({ color: "#0055aa", background: "#eef5ff", borderColor: "#b8d4fe" })
+                                      .html("\u23f3 \uc5d1\uc140 \ud30c\uc77c\uc744 \uc900\ube44\ud558\uace0 \uc788\uc2b5\ub2c8\ub2e4. \ub2e4\ub978 \uc5c5\ubb34\ub294 \uacc4\uc18d\ud558\uc2e4 \uc218 \uc788\uc2b5\ub2c8\ub2e4.");
+                            }
                         }
                     });
                 } else if ($btn) {
@@ -1855,7 +1871,7 @@
         });
     };
 
-    $.GetExcelColumn = function (type, cols, service, pl) {
+    $.GetExcelColumn = function (type, cols, service, pl, _btnObj) {
         $(document.body).find('.kcontextMenu').remove();
         $(document.body).append("<div class='kcontextMenu ExcelColumnPopUp' ></div>");
 
@@ -1906,7 +1922,7 @@
                     pl.add("DOWNLAVS", _downlavs);
 
                     if (type == "XLS") {
-                        $.SvcDownXls(service, pl);
+                        $.SvcDownXls(service, pl, _btnObj);
                     } else if (type = "CSV") {
                         $.SvcDownCsv(service, pl);
                     } else {

@@ -1121,6 +1121,7 @@ public class UploadController {
 						+ "          AND REGDATE >= SYSTIMESTAMP - INTERVAL '5' MINUTE "
 						+ " ) ";
 				int nUpdateCnt = monArchDao.exeUpdate(sqlUpdateDownCnt, updateDownCntParam);
+				int nFb = 0;
 				if (nUpdateCnt > 0) {
 					log.info("M_EXCEL_DOWN_LOG DOWN_CNT 정밀 갱신 완료 (" + nUpdateCnt + "건): DOWN_CNT=" + actualDownCnt + ", fileName=" + fileName);
 				} else {
@@ -1134,8 +1135,33 @@ public class UploadController {
 								+ "        WHERE REGUSER = @REGUSER@ "
 								+ "          AND REGDATE >= SYSTIMESTAMP - INTERVAL '5' MINUTE "
 								+ " ) ";
-						int nFb = monArchDao.exeUpdate(sqlFallback, updateDownCntParam);
+						nFb = monArchDao.exeUpdate(sqlFallback, updateDownCntParam);
 						log.info("M_EXCEL_DOWN_LOG Fallback DOWN_CNT 갱신 결과 (" + nFb + "건): DOWN_CNT=" + actualDownCnt + ", UID=" + UID);
+					}
+					// 20261105 khma : DownXlsNew 사전 사유 로그가 없는 일반 엑셀 다운로드(DownXls)의 경우 자동 INSERT 적재
+					if (nUpdateCnt == 0 && nFb == 0) {
+						String clientIp = request.getRemoteAddr();
+						String sqlAutoInsert = "INSERT INTO M_EXCEL_DOWN_LOG ( "
+								+ "       LOG_NO, M_USITE_NO, MENU_ID, SERVICE_NAME, METHOD_NAME, "
+								+ "       FILE_NAME, XLS_PURPOSE, XLS_TARGET, XLS_REASON, DOWN_CNT, "
+								+ "       CLIENT_IP, REGDATE, REGUSER "
+								+ " ) VALUES ( "
+								+ "       SEQ_M_EXCEL_DOWN_LOG.NEXTVAL, "
+								+ "       NVL(@USITE@, '44'), @MENU_ID@, @SERVICE_NAME@, @METHOD_NAME@, "
+								+ "       @FILE_NAME@, 'ETC', 'ALL', '일반 엑셀 다운로드', @DOWN_CNT@, "
+								+ "       @CLIENT_IP@, SYSTIMESTAMP, NVL(@REGUSER@, 'SYSTEM') "
+								+ " ) ";
+						Map<String, String> insertParam = new HashMap<String, String>();
+						insertParam.put("USITE", StringUtils.isNotEmpty(USITE) ? USITE : "44");
+						insertParam.put("MENU_ID", StringUtils.isNotEmpty(MENUID) ? MENUID : "");
+						insertParam.put("SERVICE_NAME", xlsService);
+						insertParam.put("METHOD_NAME", xlsMethod);
+						insertParam.put("FILE_NAME", fileName + ".xlsx");
+						insertParam.put("DOWN_CNT", String.valueOf(actualDownCnt));
+						insertParam.put("CLIENT_IP", clientIp);
+						insertParam.put("REGUSER", StringUtils.isNotEmpty(UID) ? UID : "SYSTEM");
+						int nIns = monArchDao.exeUpdate(sqlAutoInsert, insertParam);
+						log.info("M_EXCEL_DOWN_LOG 일반 엑셀 다운로드 자동 INSERT 완료 (" + nIns + "건): DOWN_CNT=" + actualDownCnt + ", fileName=" + fileName);
 					}
 				}
 			} catch (Exception eLog) {
