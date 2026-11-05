@@ -100,7 +100,7 @@
 | **Step 2-12**| `UploadController.java`, `superContaner.js` | M_EXCEL_DOWN_LOG DOWN_CNT 정합성 보강 (REGDATE 오라클 컬럼명 일치, 사용자 Fallback 갱신 및 superContaner _records 연동) | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
 | **Step 2-13**| `MonArchDao.java`, `MonArchDaoImpl.java`, `ExcelDownload.java`, `UploadController.java` | 대용량 10만건 이상 엑셀/CSV 스트리밍 다운로드 파이프라인 이식 (RowCallbackHandler, SXSSFWorkbook(100) 디스크압축, OpenCSV 스트리밍, 구형 JXL 65,536행 한계 및 WAS 힙 일괄적재 제거) | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
 | **Step 2-14**| `UploadController.java`, `ExcelDownload.java`, `MonArch800.js`, `superContaner.js` | 엑셀 다운로드 연타 방지 및 비침해적 인라인 상태 안내 UX 연동 (클릭 즉시 버튼 잠금 + 안내 배지 노출, response.reset() 직후 fileDownloadToken 쿠키 주입, 응답 시작 시 자동 원복, 120초 타임아웃 재요청) | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
-| **Step 2-15**| `UploadController.java`, `MonArch800.js`, `superContaner.js` | 일반 엑셀 자동 INSERT('일반 엑셀 다운로드 (암호 미적용)') 및 REQ_DOC 적재, DownXlsNew 2단계 선행잠금 재진입(Re-entry) 허용 및 실패 시 CleanUp 복원 보완 | `[x]` | `[ ]` | **로컬 수정 완료 (VDI 반영 대기)** |
+| **Step 2-15**| `UploadController.java`, `MonArch800.js`, `superContaner.js` | 일반 엑셀 자동 INSERT와 보안 엑셀 UPDATE 분기 정밀 격리(기존 로그 덮어쓰기 간섭 원천 차단), DownXlsNew 2단계 선행잠금 재진입(Re-entry) 허용 및 실패 시 CleanUp 복원 보완 | `[x]` | `[ ]` | **로컬 수정 완료 (VDI 반영 대기)** |
 | **Step 3** | `MonArchDaoImpl.java`, `FilterGenerator.java`, 프로시저/배치 등 | KSign SecureDB 개인정보 암복호화 (DB UDF 쿼리 함수 우선 적용 방식) | `[ ]` | `[ ]` | **최종 마지막 단계로 진행 예정 (보류)** |
 
 ## 운영 WAR 생성 전 필수 확인 알림
