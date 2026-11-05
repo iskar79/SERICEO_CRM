@@ -1219,24 +1219,24 @@
 		form.submit();
     };
 
-    // 20261105 khma Start : ?묒? ?ㅼ슫濡쒕뱶 ?고? 諛⑹? 諛?鍮꾩묠?댁쟻 ?몃씪???곹깭 ?덈궡 留ㅻ땲?
+    // 20261105 khma Start : \uc5d1\uc140 \ub2e4\uc6b4\ub85c\ub4dc \uc5f0\ud0c0 \ubc29\uc9c0 \ubc0f \ube44\uce68\ud574\uc801 \uc778\ub77c\uc778 \uc0c1\ud14c \uc548\ub0b4 \ub9e4\ub2c8\uc800
     $.StartExcelDownloadUX = function (btn, token) {
         var $btn = (btn && $(btn).length > 0) ? $(btn) : null;
         if (!$btn || $btn.length === 0) {
-            $btn = $(".jobContaner input[value*='?묒?'], .jobContaner a:contains('?묒?')").first();
+            $btn = $(".jobContaner input[value*='\uc5d1\uc140'], .jobContaner a:contains('\uc5d1\uc140')").first();
         }
         if ($btn && $btn.length > 0 && $btn.prop("disabled")) {
             return false;
         }
 
-        // ?댁쟾 ?붿뿬 荑좏궎 留뚮즺 泥섎━
+        // \uc774\uc804 \uc794\uc5ec \ucfe0\ud0a4 \ub9cc\ub8cc \ucc44\ub9ac
         document.cookie = "fileDownloadToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 
         var badgeId = "xls_badge_" + new Date().getTime();
         var $badge = null;
         if ($btn && $btn.length > 0) {
             $btn.prop("disabled", true).addClass("disabled");
-            $btn.after("<span id='" + badgeId + "' class='xls-status-badge' style='margin-left:8px;font-size:12px;color:#0055aa;font-weight:bold;background:#eef5ff;padding:3px 8px;border-radius:4px;border:1px solid #b8d4fe;'>???묒? ?뚯씪??以鍮꾪븯怨??덉뒿?덈떎. ?ㅻⅨ ?낅Т??怨꾩냽?섏떎 ???덉뒿?덈떎.</span>");
+            $btn.after("<span id='" + badgeId + "' class='xls-status-badge' style='margin-left:8px;font-size:12px;color:#0055aa;font-weight:bold;background:#eef5ff;padding:3px 8px;border-radius:4px;border:1px solid #b8d4fe;'>\u23f3 \uc5d1\uc140 \ud30c\uc77c\uc744 \uc900\ube44\ud558\uace0 \uc788\uc2b5\ub2c8\ub2e4. \ub2e4\ub978 \uc5c5\ubb34\ub294 \uacc4\uc18d\ud558\uc2e4 \uc218 \uc788\uc2b5\ub2c8\ub2e4.</span>");
             $badge = $("#" + badgeId);
         }
 
@@ -1270,7 +1270,7 @@
                         pollTimer = null;
                         if ($badge && $badge.length > 0) {
                             $badge.css({ color: "#007722", background: "#edfaee", borderColor: "#a6e3a6" })
-                                  .html("?뱿 ?ㅼ슫濡쒕뱶 ?묐떟???쒖옉?섏뿀?듬땲?? 釉뚮씪?곗? ?ㅼ슫濡쒕뱶瑜??뺤씤??二쇱꽭??");
+                                  .html("\ud83d\udce5 \ub2e4\uc6b4\ub85c\ub4dc \uc751\ub2f5\uc774 \uc2dc\uc791\ub418\uc5c8\uc2b5\ub2c8\ub2e4. \ube0c\ub77c\uc6b0\uc800 \ub2e4\uc6b4\ub85c\ub4dc\ub97c \ud655\uc778\ud574 \uc8fc\uc138\uc694.");
                         }
                         setTimeout(cleanUp, 2000);
                         return;
@@ -1284,9 +1284,9 @@
                 pollTimer = null;
                 if ($badge && $badge.length > 0) {
                     $badge.css({ color: "#bb5500", background: "#fff5e6", borderColor: "#fedcb0" })
-                          .html("?좑툘 ?묐떟???꾩쭅 ?뺤씤?섏? ?딆븯?듬땲?? ??⑸웾 ?묒뾽???쒕쾭?먯꽌 怨꾩냽 泥섎━ 以묒씪 ???덉뒿?덈떎. <a href='javascript:void(0);' id='btn_retry_" + badgeId + "' style='color:#cc0000;text-decoration:underline;margin-left:6px;'>[?ㅼ떆 ?붿껌]</a>");
+                          .html("\u26a0\ufe0f \uc751\ub2f5\uc774 \uc544\uc9c1 \ud655\uc778\ub418\uc9c0 \uc54a\uc558\uc2b5\ub2c8\ub2e4. \ub300\uc6a9\ub7c9 \uc791\uc5c5\uc774 \uc11c\ubc84\uc5d0\uc11c \uacc4\uc18d \ucc98\ub9ac \uc911\uc77c \uc218 \uc788\uc2b5\ub2c8\ub2e4. <a href='javascript:void(0);' id='btn_retry_" + badgeId + "' style='color:#cc0000;text-decoration:underline;margin-left:6px;'>[\ub2e4\uc2dc \uc694\uccad]</a>");
                     $("#btn_retry_" + badgeId).click(function () {
-                        if (confirm("湲곗〈 ?묒? ?붿껌???꾩쭅 ?쒕쾭?먯꽌 泥섎━ 以묒씪 ???덉뼱 以묐났 ?ㅽ뻾?????덉뒿?덈떎.\n洹몃옒???ㅼ떆 ?붿껌?섏떆寃좎뒿?덇퉴?")) {
+                        if (confirm("\uae30\uc874 \uc5d1\uc140 \uc694\uccad\uc774 \uc544\uc9c1 \uc11c\ubc84\uc5d0\uc11c \ucc98\ub9ac \uc911\uc77c \uc218 \uc788\uc5b4 \uc911\ubcf5 \uc2e4\ud589\ub420 \uc218 \uc788\uc2b5\ub2c8\ub2e4.\n\uadf8\ub798\ub3c4 \ub2e4\uc2dc \uc694\uccad\ud558\uc2dc\uaca0\uc2b5\ub2c8\uae4c?")) {
                             cleanUp();
                         }
                     });
@@ -1298,9 +1298,9 @@
 
         return true;
     };
-    // 20261105 khma End : ?묒? ?ㅼ슫濡쒕뱶 ?고? 諛⑹? 諛?鍮꾩묠?댁쟻 ?몃씪???곹깭 ?덈궡 留ㅻ땲?
+    // 20261105 khma End : \uc5d1\uc140 \ub2e4\uc6b4\ub85c\ub4dc \uc5f0\ud0c0 \ubc29\uc9c0 \ubc0f \ube44\uce68\ud574\uc801 \uc778\ub77c\uc778 \uc0c1\ud14c \uc548\ub0b4 \ub9e4\ub2c8\uc800
 
-    // 20261105 khma : _btnObj ?뚮씪誘명꽣 諛?downloadToken 荑좏궎 ?곕룞 異붽?
+    // 20261105 khma : _btnObj \ud30c\ub77c\ubbf8\ud130 \ubc0f downloadToken \ucfe0\ud0a4 \uc5f0\ub3d9 \ucd94\uac00
     $.SvcDownXls = function (service, _pl, _btnObj) {
         var tokenVal = "token_" + new Date().getTime() + "_" + Math.floor(Math.random() * 1000);
         var canProceed = $.StartExcelDownloadUX(_btnObj, tokenVal);

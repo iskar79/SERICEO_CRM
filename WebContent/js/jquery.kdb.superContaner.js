@@ -6243,7 +6243,7 @@ $(document).on("blur", ".t_Money", function (e) {
 			// 서비스, 함수 제대로 들어갔는지 확인하고 pl데이터 들어갔는지 확인
 			$.GetExcelColumn("XLS", _col, _jobInfo.service, pl);
 		  } else {
-			// 20261105 khma : ?ㅼ슫濡쒕뱶 踰꾪듉(oCmd) ?꾨떖?섏뿬 ?고? 諛⑹? 諛??몃씪???덈궡 ?쒖떆 ?곕룞
+			// 20261105 khma : oCmd pass for debounce and status ux
 			$.SvcDownXls(_json.service, pl, oCmd);
 		  }
 	  }
@@ -6724,7 +6724,7 @@ $(document).on("blur", ".t_Money", function (e) {
                 });
               $.GetExcelColumn("XLS", _col, targetService, pl);
             } else {
-              // 20261105 khma : ?ㅼ슫濡쒕뱶 踰꾪듉(oCmd) ?꾨떖?섏뿬 ?고? 諛⑹? 諛??몃씪???덈궡 ?쒖떆 ?곕룞
+              // 20261105 khma : oCmd pass for debounce and status ux
               $.SvcDownXls(targetService, pl, oCmd);
             }
           };
