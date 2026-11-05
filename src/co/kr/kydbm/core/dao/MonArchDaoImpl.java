@@ -21,7 +21,9 @@ import org.apache.xmlbeans.impl.xb.xsdschema.Public;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementSetter;
+import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.jdbc.support.lob.LobHandler;
@@ -591,6 +593,61 @@ public class MonArchDaoImpl   extends DataSourceSupport{
 		 
 		return ds;
 	}
+
+	// 20261105 khma Start : 대용량 10만건 이상 엑셀/CSV 스트리밍 처리를 위한 exeListStream 및 exeReadStream 구현
+	public void exeListStream(String SqlCommand, Map<String, String> parameters, String orderStr,
+			int viewpage, int pagecnt, ArrayList<Map<String, Object>> arrExtFilters,
+			RowCallbackHandler rch) throws DataAccessException, Exception {
+		SqlCommand = QueryGenerator.getPagingQry(DB_TYPE, SqlCommand, orderStr, viewpage, pagecnt);
+		exeReadStream(SqlCommand, parameters, arrExtFilters, namedParameterJdbcTemplate, rch);
+	}
+
+	public void exeReadStream(String SqlCommand, Map<String, String> parameters,
+			ArrayList<Map<String, Object>> arrExtFilters, NamedParameterJdbcTemplate namedParameterJdbcTemplate,
+			RowCallbackHandler rch) throws DataAccessException, Exception {
+		// 다이나믹 쿼리 처리
+		String execSqlCmd = setDynamicQuery(SqlCommand, parameters);
+		Pattern regs = Pattern.compile(REGEX_PARAM, Pattern.MULTILINE);
+		Matcher matchCol = regs.matcher(execSqlCmd);
+		Map<String, String> mapParam = new HashMap<String, String>();
+
+		while (matchCol.find()) {
+			String para = matchCol.group(0).replace("@", "").trim();
+			try {
+				String _data = parameters.get(para);
+				if (!StringUtils.isEmpty(_data)) {
+					mapParam.put(para, _data);
+				}
+			} catch (Exception e1) {
+				String _msg = "MonArch[CRUD :ReadStream ] READ SQL에서 검색할 키["
+						+ para
+						+ "]값이 검색조건 변수로 전달되지 않았습니다. 구조체의 keyName에 해당변수가 전달되었는지 혹은 공백이 없는지 확인하세요. Sql : "
+						+ execSqlCmd + " / " + e1.getMessage();
+				throw new Exception(_msg);
+			}
+		}
+
+		// 확장 필드가 존재하면 SQL 필터 조건 추가
+		if (arrExtFilters != null && arrExtFilters.size() > 0) {
+			mapParam = FilterGenerator.getExtFilterParams(mapParam, arrExtFilters, parameters);
+			String strExtFilters = FilterGenerator.getFilterQuery(arrExtFilters);
+			execSqlCmd = SqlCommand.replace("/* EXTFILTERS */", strExtFilters);
+		}
+
+		execSqlCmd = replaceNameTemplateType(execSqlCmd, mapParam);
+
+		// 대용량 스트리밍 전용 JdbcTemplate 생성 및 FetchSize 설정 (오라클 기준 2,000)
+		JdbcTemplate streamingJdbcTemplate = new JdbcTemplate(namedParameterJdbcTemplate.getJdbcTemplate().getDataSource());
+		if ("MYSQL".equalsIgnoreCase(DB_TYPE) || "MARIADB".equalsIgnoreCase(DB_TYPE)) {
+			streamingJdbcTemplate.setFetchSize(Integer.MIN_VALUE);
+		} else {
+			streamingJdbcTemplate.setFetchSize(2000);
+		}
+
+		NamedParameterJdbcTemplate streamingNamedJdbcTemplate = new NamedParameterJdbcTemplate(streamingJdbcTemplate);
+		streamingNamedJdbcTemplate.query(execSqlCmd, mapParam, rch);
+	}
+	// 20261105 khma End : 대용량 10만건 이상 엑셀/CSV 스트리밍 처리를 위한 exeListStream 및 exeReadStream 구현
 
 	
 

@@ -98,6 +98,7 @@
 | **Step 7** | `WebContent/js/jquery.kdb.superCalendar.js`, `superContaner.js`, `MonArch.js` | 달력 컴포넌트(superCalendar 17개 메서드, 900줄) 모듈 독립 분리 및 후로드 디스패처 핀포인트 연동 (작업 트리에 superContaner.js_20261030 백업 보존) | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
 | **Step 8** | `WebContent/js/jquery.kdb.soap.2.0.js`, `WebContent/js/jquery.kdb.superContaner.js` | 화면 설정(GETJSON) 로딩 실패 시 캐시 오염 방어 및 SetPageContaner 실패 안내 + [다시 시도] 복구 UX 구현 | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
 | **Step 2-12**| `UploadController.java`, `superContaner.js` | M_EXCEL_DOWN_LOG DOWN_CNT 정합성 보강 (REGDATE 오라클 컬럼명 일치, 사용자 Fallback 갱신 및 superContaner _records 연동) | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
+| **Step 2-13**| `MonArchDao.java`, `MonArchDaoImpl.java`, `ExcelDownload.java`, `UploadController.java` | 대용량 10만건 이상 엑셀/CSV 스트리밍 다운로드 파이프라인 이식 (RowCallbackHandler, SXSSFWorkbook(100) 디스크압축, OpenCSV 스트리밍, 구형 JXL 65,536행 한계 및 WAS 힙 일괄적재 제거) | `[x]` | `[ ]` | **로컬 수정 완료 (VDI 반영 대기)** |
 | **Step 3** | `MonArchDaoImpl.java`, `FilterGenerator.java`, 프로시저/배치 등 | KSign SecureDB 개인정보 암복호화 (DB UDF 쿼리 함수 우선 적용 방식) | `[ ]` | `[ ]` | **최종 마지막 단계로 진행 예정 (보류)** |
 
 ## 운영 WAR 생성 전 필수 확인 알림

@@ -34,6 +34,10 @@ public interface MonArchDao {
 	public int exeUpdate(String SqlCommand, Map<String,String> parameters)  throws DataAccessException;
 	public int exeDelete(String SqlCommand, Map<String,String> parameters)  throws DataAccessException;
 	public List<Map<String,Object>> exeList(String SqlCommand, Map<String,String> parameters, String orderStr, int viewpage, int pagecnt)  throws Exception;
+	// 20261105 khma : 대용량 10만건 이상 엑셀/CSV 스트리밍 처리를 위한 exeListStream 선언
+	public void exeListStream(String SqlCommand, Map<String, String> parameters, String orderStr,
+			int viewpage, int pagecnt, java.util.ArrayList<Map<String, Object>> arrExtFilters,
+			org.springframework.jdbc.core.RowCallbackHandler rch) throws DataAccessException, Exception;
 	public int insertNP(String SqlCommand, Map<String, String> parameters)	throws DataAccessException;
 	public  int insertNP2(String SqlCommand, Map<String, Object> parameters) throws DataAccessException;
 	public int uploadFile(String SqlCommand, Map<String, String> parameters, MultipartFile file)	throws DataAccessException, IOException;

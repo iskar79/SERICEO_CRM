@@ -1,4 +1,4 @@
-package co.kr.kydbm.core.filecontrol;
+﻿package co.kr.kydbm.core.filecontrol;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -1054,10 +1054,38 @@ public class UploadController {
 			}
 			// 확장필드 처리 End 20181107 khma
 
-			ds = monArchDao.exeList(strSql, obj, OrderStr, exviewpage, expagecnt, arrExtFilters);
+			// 20261105 khma Start : 대용량 10만건 이상 엑셀/CSV 스트리밍 다운로드 (WAS 메모리 적재 제거 및 downStream 연동)
+			int actualDownCnt = 0;
 
-			// 20261103 khma Start : 실제 엑셀 다운로드 조회 건수(ds.size())로 M_EXCEL_DOWN_LOG.DOWN_CNT 정밀 갱신
-			int actualDownCnt = (ds != null) ? ds.size() : 0;
+			if (obj.containsKey("extClass")
+					&& StringUtils.isNotEmpty(obj.get("extClass"))
+					&& CommonUtil.checkExtClass(EXCEL_DOWN_CLASS_WHITE_LIST, obj.get("extClass"))) {
+				// extClass(확장클래스)가 지정된 특수 화면의 경우에만 기존 리플렉션 호출 유지
+				ds = monArchDao.exeList(strSql, obj, OrderStr, exviewpage, expagecnt, arrExtFilters);
+				actualDownCnt = (ds != null) ? ds.size() : 0;
+
+				String executeClassName = obj.get("extClass");
+				Class targetClass = Class.forName(executeClassName);
+				Object targetInstance = targetClass.newInstance();
+				Class paramTypes[] = new Class[5];
+				paramTypes[0] = List.class;
+				paramTypes[1] = String.class;
+				paramTypes[2] = String.class;
+				paramTypes[3] = HttpServletRequest.class;
+				paramTypes[4] = HttpServletResponse.class;
+				Method targetMthod = targetClass.getMethod("downExcel", paramTypes);
+				Boolean rst = (Boolean) targetMthod.invoke(targetInstance, ds, fileName, type, request, response);
+			} else {
+				// 일반 엑셀 및 보안 엑셀 모두 DB 커서 기반 Row-by-Row 스트리밍 다운로드 적용 (메모리 100행 유지, 10만건 이상 OOM 원천 방지)
+				if (StringUtils.isNotEmpty(excelPassword)) {
+					request.setAttribute("xlsPassword", excelPassword);
+				}
+				ExcelDownload excelDownload = new ExcelDownload();
+				actualDownCnt = excelDownload.downStream(monArchDao, strSql, obj, OrderStr, arrExtFilters, fileName, type, request, response, arrHeaderInfo, xlsType);
+			}
+			// 20261105 khma End : 대용량 10만건 이상 엑셀/CSV 스트리밍 다운로드 (WAS 메모리 적재 제거 및 downStream 연동)
+
+			// 20261103 khma Start : 실제 엑셀 다운로드 조회 건수로 M_EXCEL_DOWN_LOG.DOWN_CNT 정밀 갱신
 			try {
 				Map<String, String> updateDownCntParam = new HashMap<String, String>();
 				updateDownCntParam.put("DOWN_CNT", String.valueOf(actualDownCnt));
@@ -1105,40 +1133,6 @@ public class UploadController {
 				log.warn("M_EXCEL_DOWN_LOG DOWN_CNT 정밀 갱신 중 예외 발생 (무시): " + eLog.getMessage(), eLog);
 			}
 			// 20261103 khma End : 실제 엑셀 다운로드 조회 건수로 M_EXCEL_DOWN_LOG.DOWN_CNT 정밀 갱신
-
-			if (obj.containsKey("extClass")
-					&& StringUtils.isNotEmpty(obj.get("extClass"))
-					&& CommonUtil.checkExtClass(EXCEL_DOWN_CLASS_WHITE_LIST, obj.get("extClass"))) { // 20150406 외부클래스
-																										// 사용시에는
-																										// whitelist목록으로
-																										// 사용할것(시큐어코딩지침대응)
-				// extClass(확장클래스)가 지정되어있으면 아래의 액셀다운로드 클래스를 사용하지 않고 지정된 클래스를 사용한다.
-
-				String executeClassName = obj.get("extClass");
-				// 1. 리플렉션 대상클래스명을 파라메터로 지정하여 클래스를 취득
-				Class targetClass = Class.forName(executeClassName);
-				// 2. 대상 클래스의 객채를 생성
-				Object targetInstance = targetClass.newInstance();
-				// 3. 대상객체에서 사용할 메소드의 파라메터타입을 맵핑
-				Class paramTypes[] = new Class[5];
-				paramTypes[0] = List.class;
-				paramTypes[1] = String.class;
-				paramTypes[2] = String.class;
-				paramTypes[3] = HttpServletRequest.class;
-				paramTypes[4] = HttpServletResponse.class;
-				// 4. 사용할 메소드명과 파라메터타입을 파라메터로 설정하여 대상객체에서 사용할 메소드를 취득
-				Method targetMthod = targetClass.getMethod("downExcel", paramTypes);
-				// 5. invoke함수를 호출하요 해당 메소드를 실행한다.
-				Boolean rst = (Boolean) targetMthod.invoke(targetInstance, ds, fileName, type, request, response);
-
-			} else {
-				ExcelDownload excelDownload = new ExcelDownload();
-				// 20261102 khma : 보안 엑셀 다운로드 암호 전달 (excelPassword)
-				/*
-				excelDownload.downExcel(ds, fileName, type, request, response, arrHeaderInfo, xlsType);
-				*/
-				excelDownload.downExcel(ds, fileName, type, request, response, arrHeaderInfo, xlsType, excelPassword);
-			}
 
 			long 서비스종료시간 = System.currentTimeMillis();// 서비스종료시간
 			long 서비스소요시간 = 서비스종료시간 - 서비스시작시간;

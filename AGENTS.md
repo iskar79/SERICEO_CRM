@@ -283,5 +283,7 @@ VDI 내부망 코드를 카메라로 촬영하여 전달받는 경우, 단순 OC
 
 * **[완료] Step 2-12 (UploadController.java, superContaner.js)** ([① 로컬: 완료(x) / ② VDI: 완료(x)]):
   * M_EXCEL_DOWN_LOG DOWN_CNT 정합성 보강 (REGDATE 오라클 컬럼명 일치, 사용자 Fallback 갱신 및 superContaner _records 연동) 완료.
+* **[진행중] Step 2-13 (MonArchDao.java, MonArchDaoImpl.java, ExcelDownload.java, UploadController.java)** ([① 로컬: 완료(x) / ② VDI: 대기( )]):
+  * 대용량 10만건 이상 엑셀/CSV 스트리밍 다운로드 파이프라인 이식 (RowCallbackHandler, SXSSFWorkbook(100) 디스크압축, OpenCSV 스트리밍, 구형 JXL 65,536행 한계 및 WAS 힙 일괄적재 제거).
 * **[대기/보류] Step 3 (SecureDB 개인정보 암복호화 - DB UDF 쿼리 함수 우선 방식)**:
   * 시스템 전반(전체 테이블 컬럼, 프로시저, 일배치, 쿼리)에 미치는 영향도가 가장 크므로, 모든 단위 기능 검증 및 시스템 안정화 완료 후 **최종 마지막 순서**로 검토 및 적용 진행 예정.

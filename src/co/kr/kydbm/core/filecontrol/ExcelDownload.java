@@ -1,4 +1,4 @@
-package co.kr.kydbm.core.filecontrol;
+﻿package co.kr.kydbm.core.filecontrol;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -446,6 +446,230 @@ public class ExcelDownload {
 		return true;
 	}
 	// 20261030 khma End : Apache POI 4.1.2 Agile AES 암호화 엑셀 생성 (SXSSFWorkbook 대용량 스트리밍)
+
+	// 20261105 khma Start : 대용량 10만건 이상 엑셀/CSV 스트리밍 다운로드 (RowCallbackHandler + SXSSFWorkbook/OpenCSV)
+	/**
+	 * 대용량 데이터(10만건 이상)를 WAS 메모리에 일괄 적재하지 않고,
+	 * DB 커서에서 1행씩 읽어 즉시 엑셀(SXSSF) 또는 CSV로 전송하는 스트리밍 다운로드 메소드
+	 * @return 실제 다운로드된 데이터 행 수 (M_EXCEL_DOWN_LOG 기록용)
+	 */
+	public int downStream(co.kr.kydbm.core.dao.MonArchDaoImpl dao, String sql, java.util.Map<String, String> obj,
+			String orderStr, java.util.ArrayList<java.util.Map<String, Object>> arrExtFilters, String fileName,
+			String type, HttpServletRequest request, HttpServletResponse response,
+			java.util.ArrayList<java.util.Map<String, Object>> arrHeaderInfo, String xlsType) throws Exception {
+
+		log.debug("downStream (대용량 10만건 스트리밍 다운로드) ==> khma");
+
+		final int[] totalRowCount = { 0 };
+		String typeName = StringUtils.upperCase(type);
+		String ext = "CSV".equals(typeName) ? ".csv" : ".xlsx";
+		String disposition = getDisposition(fileName + "_" + typeName.toLowerCase() + ext, getBrowser(request));
+
+		response.reset();
+		if ("CSV".equals(typeName)) {
+			response.setContentType("text/csv; charset=UTF-8");
+			response.setHeader("Content-Disposition", disposition);
+		} else {
+			response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+			response.setHeader("Content-Disposition", disposition);
+		}
+		response.setHeader("Content-Transfer-Encoding", "binary;");
+		response.setHeader("Pragma", "no-cache;");
+		response.setHeader("Expires", "-1;");
+
+		java.io.OutputStream os = response.getOutputStream();
+
+		if ("CSV".equals(typeName)) {
+			// UTF-8 BOM 삽입 (엑셀에서 CSV 오픈 시 한글 깨짐 방지)
+			byte bom[] = { (byte) 0xEF, (byte) 0xBB, (byte) 0xBF };
+			os.write(bom);
+			java.io.OutputStreamWriter osw = new java.io.OutputStreamWriter(os, "UTF-8");
+			final CSVWriter cw = new CSVWriter(osw, ',');
+
+			final boolean[] headerWritten = { false };
+			org.springframework.jdbc.core.RowCallbackHandler rch = new org.springframework.jdbc.core.RowCallbackHandler() {
+				int colCount = 0;
+				int[] colMapping;
+
+				@Override
+				public void processRow(java.sql.ResultSet rs) throws java.sql.SQLException {
+					if (!headerWritten[0]) {
+						java.sql.ResultSetMetaData rsmd = rs.getMetaData();
+						colCount = rsmd.getColumnCount();
+						java.util.List<String> headers = new java.util.ArrayList<String>();
+						java.util.List<Integer> mapping = new java.util.ArrayList<Integer>();
+						for (int i = 1; i <= colCount; i++) {
+							String colName = rsmd.getColumnLabel(i);
+							if (!"RNUM".equalsIgnoreCase(colName) && !"RCOUNT".equalsIgnoreCase(colName)) {
+								headers.add(colName);
+								mapping.add(i);
+							}
+						}
+						colMapping = new int[mapping.size()];
+						for (int m = 0; m < mapping.size(); m++) {
+							colMapping[m] = mapping.get(m);
+						}
+						cw.writeNext(headers.toArray(new String[0]));
+						headerWritten[0] = true;
+					}
+					String[] rowData = new String[colMapping.length];
+					for (int i = 0; i < colMapping.length; i++) {
+						String val = rs.getString(colMapping[i]);
+						rowData[i] = "\t" + (val == null ? " " : val);
+					}
+					cw.writeNext(rowData);
+					totalRowCount[0]++;
+				}
+			};
+
+			dao.exeListStream(sql, obj, orderStr, 1, 99999999, arrExtFilters, rch);
+
+			if (!headerWritten[0] && arrHeaderInfo != null && arrHeaderInfo.size() > 0) {
+				String[] headers = new String[arrHeaderInfo.size()];
+				for (int i = 0; i < arrHeaderInfo.size(); i++) {
+					headers[i] = String.valueOf(arrHeaderInfo.get(i).values().toArray()[1]);
+				}
+				cw.writeNext(headers);
+			}
+			cw.flush();
+			cw.close();
+		} else {
+			// XLSX 스트리밍 생성 (메모리 100행 유지 + 임시파일 압축 활성화)
+			final SXSSFWorkbook workbook = new SXSSFWorkbook(100);
+			workbook.setCompressTempFiles(true);
+			final Sheet sheet = workbook.createSheet(fileName);
+
+			final CellStyle headerFormat = workbook.createCellStyle();
+			headerFormat.setFillForegroundColor(IndexedColors.LEMON_CHIFFON.getIndex());
+			headerFormat.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+			headerFormat.setBorderTop(BorderStyle.THIN);
+			headerFormat.setBorderBottom(BorderStyle.THIN);
+			headerFormat.setBorderLeft(BorderStyle.THIN);
+			headerFormat.setBorderRight(BorderStyle.THIN);
+			headerFormat.setAlignment(HorizontalAlignment.CENTER);
+
+			final CellStyle dataFormat = workbook.createCellStyle();
+			dataFormat.setBorderTop(BorderStyle.THIN);
+			dataFormat.setBorderBottom(BorderStyle.THIN);
+			dataFormat.setBorderLeft(BorderStyle.THIN);
+			dataFormat.setBorderRight(BorderStyle.THIN);
+
+			final boolean[] headerWritten = { false };
+			org.springframework.jdbc.core.RowCallbackHandler rch = new org.springframework.jdbc.core.RowCallbackHandler() {
+				int colCount = 0;
+				int[] colMapping;
+				int rowIndex = 0;
+
+				@Override
+				public void processRow(java.sql.ResultSet rs) throws java.sql.SQLException {
+					if (!headerWritten[0]) {
+						java.sql.ResultSetMetaData rsmd = rs.getMetaData();
+						colCount = rsmd.getColumnCount();
+						java.util.List<String> headers = new java.util.ArrayList<String>();
+						java.util.List<Integer> mapping = new java.util.ArrayList<Integer>();
+						for (int i = 1; i <= colCount; i++) {
+							String colName = rsmd.getColumnLabel(i);
+							if (!"RNUM".equalsIgnoreCase(colName) && !"RCOUNT".equalsIgnoreCase(colName)) {
+								headers.add(colName);
+								mapping.add(i);
+							}
+						}
+						colMapping = new int[mapping.size()];
+						for (int m = 0; m < mapping.size(); m++) {
+							colMapping[m] = mapping.get(m);
+						}
+
+						Row row = sheet.createRow(rowIndex++);
+						for (int i = 0; i < headers.size(); i++) {
+							Cell cell = row.createCell(i);
+							cell.setCellValue(headers.get(i));
+							cell.setCellStyle(headerFormat);
+							int colSize = headers.get(i).length() * 3 * 256;
+							sheet.setColumnWidth(i, colSize > 255 * 256 ? 255 * 256 : colSize);
+						}
+						headerWritten[0] = true;
+					}
+					Row row = sheet.createRow(rowIndex++);
+					for (int i = 0; i < colMapping.length; i++) {
+						Cell cell = row.createCell(i);
+						cell.setCellStyle(dataFormat);
+						String data = rs.getString(colMapping[i]);
+						if (data == null) {
+							data = " ";
+						}
+						if (NumberUtils.isNumber(data)) {
+							try {
+								// 앞자리가 0인 숫자(예: 010, 사업자번호 등)는 문자열 서식 보존
+								if (data.charAt(0) == '0' && data.length() > 1 && !data.startsWith("0.")) {
+									cell.setCellValue("\t" + data);
+								} else {
+									cell.setCellValue(Double.parseDouble(data));
+								}
+							} catch (NumberFormatException e) {
+								cell.setCellValue(data);
+							}
+						} else {
+							cell.setCellValue(data);
+						}
+					}
+					totalRowCount[0]++;
+				}
+			};
+
+			dao.exeListStream(sql, obj, orderStr, 1, 99999999, arrExtFilters, rch);
+
+			if (!headerWritten[0] && arrHeaderInfo != null && arrHeaderInfo.size() > 0) {
+				setExcelHeaderEmptySheet(sheet, headerFormat, arrHeaderInfo);
+			}
+
+			// 암호화 여부에 따른 전송 분기
+			String xlsPassword = (String) request.getAttribute("xlsPassword");
+			if (StringUtils.isEmpty(xlsPassword)) {
+				xlsPassword = (String) request.getParameter("excelPassword");
+			}
+
+			if (StringUtils.isNotEmpty(xlsPassword)) {
+				POIFSFileSystem fs = new POIFSFileSystem();
+				EncryptionInfo info = new EncryptionInfo(EncryptionMode.agile);
+				Encryptor enc = info.getEncryptor();
+				enc.confirmPassword(xlsPassword);
+
+				try (java.io.OutputStream encOs = enc.getDataStream(fs)) {
+					workbook.write(encOs);
+				}
+				fs.writeFilesystem(os);
+				fs.close();
+			} else {
+				// 일반 다운로드 (암호 없음)
+				workbook.write(os);
+			}
+			workbook.dispose();
+			workbook.close();
+		}
+		os.flush();
+		return totalRowCount[0];
+	}
+
+	/**
+	 * POI SXSSF Sheet용 빈 헤더 설정 메소드 (조회 결과 0건일 때 헤더만 표시)
+	 */
+	private void setExcelHeaderEmptySheet(Sheet sheet, CellStyle cellFormat, List<Map<String, Object>> ds) {
+		String keyName = "";
+		int colSize = 10;
+		Row row = sheet.createRow(0);
+		for (int i = 0; i < ds.size(); i++) {
+			Object[] valArr = ds.get(i).values().toArray();
+			keyName = (valArr.length > 1 && valArr[1] != null) ? valArr[1].toString() : "";
+			Cell cell = row.createCell(i);
+			cell.setCellValue(keyName);
+			cell.setCellStyle(cellFormat);
+			if (!StringUtils.isEmpty(keyName)) {
+				colSize = keyName.length() * 3 * 256;
+			}
+			sheet.setColumnWidth(i, colSize > 255 * 256 ? 255 * 256 : colSize);
+		}
+	}
+	// 20261105 khma End : 대용량 10만건 이상 엑셀/CSV 스트리밍 다운로드 (RowCallbackHandler + SXSSFWorkbook/OpenCSV)
 
 	/**
 	 * 액셀파일을 생성하는 메소드
