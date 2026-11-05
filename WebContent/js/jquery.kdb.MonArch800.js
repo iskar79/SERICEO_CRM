@@ -1234,19 +1234,38 @@
         if (!$btn || $btn.length === 0) {
             $btn = $(".jobContaner input[value*='\uc5d1\uc140'], .jobContaner a:contains('\uc5d1\uc140')").first();
         }
+
+        // 20261105 khma : 이미 잠겨있는 버튼인 경우 연타 방지 및 2단계(감사로그 선행잠금 -> 실제다운로드) 연계 허용
+        var isPreLocked = ($btn && $btn.length > 0 && $btn.prop("disabled") && $btn.parent().find(".xls-status-badge").length > 0);
         if ($btn && $btn.length > 0 && $btn.prop("disabled")) {
-            return false;
+            if (isPreLocked && token) {
+                // 선행 잠금된 버튼에 token이 전달된 실제 다운로드 요청이면 연계 승인 (기존 폴링 타이머 정리 후 재시작)
+                var prevTimer = $btn.data("xls_poll_timer");
+                if (prevTimer) {
+                    clearInterval(prevTimer);
+                }
+            } else {
+                // 단순 중복 클릭(연타) 차단
+                return false;
+            }
         }
 
         // \uc774\uc804 \uc794\uc5ec \ucfe0\ud0a4 \ub9cc\ub8cc \ucc44\ub9ac
         document.cookie = "fileDownloadToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 
         var badgeId = "xls_badge_" + new Date().getTime();
-        var $badge = null;
+        var $badge = ($btn && $btn.length > 0) ? $btn.parent().find(".xls-status-badge") : null;
         if ($btn && $btn.length > 0) {
             $btn.prop("disabled", true).addClass("disabled");
-            $btn.after("<span id='" + badgeId + "' class='xls-status-badge' style='margin-left:8px;font-size:12px;color:#0055aa;font-weight:bold;background:#eef5ff;padding:3px 8px;border-radius:4px;border:1px solid #b8d4fe;'>\u23f3 \uc5d1\uc140 \ud30c\uc77c\uc744 \uc900\ube44\ud558\uace0 \uc788\uc2b5\ub2c8\ub2e4. \ub2e4\ub978 \uc5c5\ubb34\ub294 \uacc4\uc18d\ud558\uc2e4 \uc218 \uc788\uc2b5\ub2c8\ub2e4.</span>");
-            $badge = $("#" + badgeId);
+            if (!$badge || $badge.length === 0) {
+                $btn.after("<span id='" + badgeId + "' class='xls-status-badge' style='margin-left:8px;font-size:12px;color:#0055aa;font-weight:bold;background:#eef5ff;padding:3px 8px;border-radius:4px;border:1px solid #b8d4fe;'>\u23f3 \uc5d1\uc140 \ud30c\uc77c\uc744 \uc900\ube44\ud558\uace0 \uc788\uc2b5\ub2c8\ub2e4. \ub2e4\ub978 \uc5c5\ubb34\ub294 \uacc4\uc18d\ud558\uc2e4 \uc218 \uc788\uc2b5\ub2c8\ub2e4.</span>");
+                $badge = $("#" + badgeId);
+            }
+        }
+
+        // 20261105 khma : token이 없는 단순 선행 잠금 호출 시에는 배지만 표시하고 폴링 없이 반환
+        if (!token) {
+            return true;
         }
 
         var startTime = new Date().getTime();
@@ -1257,6 +1276,9 @@
             if (pollTimer) {
                 clearInterval(pollTimer);
                 pollTimer = null;
+            }
+            if ($btn) {
+                $btn.removeData("xls_poll_timer");
             }
             if ($badge && $badge.length > 0) {
                 $badge.fadeOut(400, function () { $(this).remove(); });

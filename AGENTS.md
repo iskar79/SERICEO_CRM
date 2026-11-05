@@ -287,7 +287,7 @@ VDI 내부망 코드를 카메라로 촬영하여 전달받는 경우, 단순 OC
   * 대용량 10만건 이상 엑셀/CSV 스트리밍 다운로드 파이프라인 이식 (RowCallbackHandler, SXSSFWorkbook(100) 디스크압축, OpenCSV 스트리밍, 구형 JXL 65,536행 한계 및 WAS 힙 일괄적재 제거).
 * **[완료] Step 2-14 (UploadController.java, ExcelDownload.java, MonArch800.js, superContaner.js)** ([① 로컬: 완료(x) / ② VDI: 완료(x)]):
   * 엑셀 다운로드 연타 방지 및 비침해적 인라인 상태 안내 UX 연동 (클릭 즉시 버튼 잠금 + 안내 배지 노출, response.reset() 직후 fileDownloadToken 쿠키 주입, 응답 시작 시 자동 원복, 120초 타임아웃 재요청).
-* **[완료] Step 2-15 (UploadController.java, MonArch800.js, superContaner.js)** ([① 로컬: 완료(x) / ② VDI: 완료(x)]):
-  * 일반 엑셀 다운로드(DownXls) 자동 INSERT('일반 엑셀 다운로드 (암호 미적용)') 및 REQ_DOC 파라미터 전문 적재(암호 마스킹/2000자 규격, DOWN_CNT 갱신 시 Self-Healing 보완), UX 3대 엣지케이스 보완 (GetExcelColumn 원래 버튼 전달, 감사저장 중 즉시 잠금, 120초 취소 시 대기유지 및 버튼명 명확화) 완료.
+* **[진행중] Step 2-15 (UploadController.java, MonArch800.js, superContaner.js)** ([① 로컬: 완료(x) / ② VDI: 대기( )]):
+  * 일반 엑셀 자동 INSERT('일반 엑셀 다운로드 (암호 미적용)') 및 REQ_DOC 적재, DownXlsNew 2단계 선행잠금 재진입(Re-entry) 허용 및 실패 시 CleanUp 복원 보완.
 * **[대기/보류] Step 3 (SecureDB 개인정보 암복호화 - DB UDF 쿼리 함수 우선 방식)**:
   * 시스템 전반(전체 테이블 컬럼, 프로시저, 일배치, 쿼리)에 미치는 영향도가 가장 크므로, 모든 단위 기능 검증 및 시스템 안정화 완료 후 **최종 마지막 순서**로 검토 및 적용 진행 예정.

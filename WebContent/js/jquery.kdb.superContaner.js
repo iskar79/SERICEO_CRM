@@ -6854,13 +6854,15 @@ $(document).on("blur", ".t_Money", function (e) {
                 fnDoDownload();
               },
               function (err) {
-                // 20261103 khma : 보안 감사 이력 저장 실패 시 엑셀 다운로드 차단
+                // 20261103 khma : 보안 감사 이력 저장 실패 시 엑셀 다운로드 차단 및 버튼 잠금 해제
+                if (typeof $.CleanUpExcelDownloadUX === "function") { $.CleanUpExcelDownloadUX(oCmd); }
                 alert("보안 감사 이력(사유) 저장에 실패하여 엑셀 다운로드가 중단되었습니다.\n관리자에게 문의해 주십시오.");
                 return false;
               }
             );
           } catch (eLog) {
-            // 20261103 khma : 예외 발생 시 다운로드 진행 차단
+            // 20261103 khma : 예외 발생 시 다운로드 진행 차단 및 버튼 잠금 해제
+            if (typeof $.CleanUpExcelDownloadUX === "function") { $.CleanUpExcelDownloadUX(oCmd); }
             alert("보안 감사 이력 처리 중 오류가 발생하여 엑셀 다운로드가 중단되었습니다.");
             return false;
           }
