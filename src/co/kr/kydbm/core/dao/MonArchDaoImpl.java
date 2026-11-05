@@ -637,7 +637,11 @@ public class MonArchDaoImpl   extends DataSourceSupport{
 		execSqlCmd = replaceNameTemplateType(execSqlCmd, mapParam);
 
 		// 대용량 스트리밍 전용 JdbcTemplate 생성 및 FetchSize 설정 (오라클 기준 2,000)
-		JdbcTemplate streamingJdbcTemplate = new JdbcTemplate(namedParameterJdbcTemplate.getJdbcTemplate().getDataSource());
+		// 20261105 khma : NamedParameterJdbcTemplate에는 getJdbcTemplate()이 없으므로 getJdbcOperations()에서 DataSource 추출 (null 방어 datasource 대체)
+		javax.sql.DataSource currentDs = (namedParameterJdbcTemplate != null && namedParameterJdbcTemplate.getJdbcOperations() instanceof JdbcTemplate)
+				? ((JdbcTemplate) namedParameterJdbcTemplate.getJdbcOperations()).getDataSource()
+				: datasource;
+		JdbcTemplate streamingJdbcTemplate = new JdbcTemplate(currentDs);
 		if ("MYSQL".equalsIgnoreCase(DB_TYPE) || "MARIADB".equalsIgnoreCase(DB_TYPE)) {
 			streamingJdbcTemplate.setFetchSize(Integer.MIN_VALUE);
 		} else {
