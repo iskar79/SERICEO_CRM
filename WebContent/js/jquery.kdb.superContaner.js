@@ -1,4 +1,4 @@
-﻿/// <reference path="jquery.kdb.MonArch800.js" />
+/// <reference path="jquery.kdb.MonArch800.js" />
 /// <reference path="../Resource.js" />
 /// <reference path="MonArchResource.js" />
 
@@ -6243,7 +6243,8 @@ $(document).on("blur", ".t_Money", function (e) {
 			// 서비스, 함수 제대로 들어갔는지 확인하고 pl데이터 들어갔는지 확인
 			$.GetExcelColumn("XLS", _col, _jobInfo.service, pl);
 		  } else {
-			$.SvcDownXls(_json.service, pl);
+			// 20261105 khma : ?ㅼ슫濡쒕뱶 踰꾪듉(oCmd) ?꾨떖?섏뿬 ?고? 諛⑹? 諛??몃씪???덈궡 ?쒖떆 ?곕룞
+			$.SvcDownXls(_json.service, pl, oCmd);
 		  }
 	  }
     },
@@ -6723,7 +6724,8 @@ $(document).on("blur", ".t_Money", function (e) {
                 });
               $.GetExcelColumn("XLS", _col, targetService, pl);
             } else {
-              $.SvcDownXls(targetService, pl);
+              // 20261105 khma : ?ㅼ슫濡쒕뱶 踰꾪듉(oCmd) ?꾨떖?섏뿬 ?고? 諛⑹? 諛??몃씪???덈궡 ?쒖떆 ?곕룞
+              $.SvcDownXls(targetService, pl, oCmd);
             }
           };
 

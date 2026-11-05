@@ -1219,13 +1219,102 @@
 		form.submit();
     };
 
-    $.SvcDownXls = function (service, _pl) {
+    // 20261105 khma Start : ?묒? ?ㅼ슫濡쒕뱶 ?고? 諛⑹? 諛?鍮꾩묠?댁쟻 ?몃씪???곹깭 ?덈궡 留ㅻ땲?
+    $.StartExcelDownloadUX = function (btn, token) {
+        var $btn = (btn && $(btn).length > 0) ? $(btn) : null;
+        if (!$btn || $btn.length === 0) {
+            $btn = $(".jobContaner input[value*='?묒?'], .jobContaner a:contains('?묒?')").first();
+        }
+        if ($btn && $btn.length > 0 && $btn.prop("disabled")) {
+            return false;
+        }
+
+        // ?댁쟾 ?붿뿬 荑좏궎 留뚮즺 泥섎━
+        document.cookie = "fileDownloadToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
+        var badgeId = "xls_badge_" + new Date().getTime();
+        var $badge = null;
+        if ($btn && $btn.length > 0) {
+            $btn.prop("disabled", true).addClass("disabled");
+            $btn.after("<span id='" + badgeId + "' class='xls-status-badge' style='margin-left:8px;font-size:12px;color:#0055aa;font-weight:bold;background:#eef5ff;padding:3px 8px;border-radius:4px;border:1px solid #b8d4fe;'>???묒? ?뚯씪??以鍮꾪븯怨??덉뒿?덈떎. ?ㅻⅨ ?낅Т??怨꾩냽?섏떎 ???덉뒿?덈떎.</span>");
+            $badge = $("#" + badgeId);
+        }
+
+        var startTime = new Date().getTime();
+        var pollTimer = null;
+        var isStarted = false;
+
+        var cleanUp = function () {
+            if (pollTimer) {
+                clearInterval(pollTimer);
+                pollTimer = null;
+            }
+            if ($badge && $badge.length > 0) {
+                $badge.fadeOut(400, function () { $(this).remove(); });
+            }
+            if ($btn && $btn.length > 0) {
+                $btn.prop("disabled", false).removeClass("disabled");
+            }
+            document.cookie = "fileDownloadToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        };
+
+        pollTimer = setInterval(function () {
+            var cookies = document.cookie ? document.cookie.split(";") : [];
+            for (var i = 0; i < cookies.length; i++) {
+                var c = $.trim(cookies[i]);
+                if (c.indexOf("fileDownloadToken=") === 0) {
+                    var val = c.substring("fileDownloadToken=".length);
+                    if (val === token) {
+                        isStarted = true;
+                        clearInterval(pollTimer);
+                        pollTimer = null;
+                        if ($badge && $badge.length > 0) {
+                            $badge.css({ color: "#007722", background: "#edfaee", borderColor: "#a6e3a6" })
+                                  .html("?뱿 ?ㅼ슫濡쒕뱶 ?묐떟???쒖옉?섏뿀?듬땲?? 釉뚮씪?곗? ?ㅼ슫濡쒕뱶瑜??뺤씤??二쇱꽭??");
+                        }
+                        setTimeout(cleanUp, 2000);
+                        return;
+                    }
+                }
+            }
+
+            var elapsed = new Date().getTime() - startTime;
+            if (!isStarted && elapsed > 120000) {
+                clearInterval(pollTimer);
+                pollTimer = null;
+                if ($badge && $badge.length > 0) {
+                    $badge.css({ color: "#bb5500", background: "#fff5e6", borderColor: "#fedcb0" })
+                          .html("?좑툘 ?묐떟???꾩쭅 ?뺤씤?섏? ?딆븯?듬땲?? ??⑸웾 ?묒뾽???쒕쾭?먯꽌 怨꾩냽 泥섎━ 以묒씪 ???덉뒿?덈떎. <a href='javascript:void(0);' id='btn_retry_" + badgeId + "' style='color:#cc0000;text-decoration:underline;margin-left:6px;'>[?ㅼ떆 ?붿껌]</a>");
+                    $("#btn_retry_" + badgeId).click(function () {
+                        if (confirm("湲곗〈 ?묒? ?붿껌???꾩쭅 ?쒕쾭?먯꽌 泥섎━ 以묒씪 ???덉뼱 以묐났 ?ㅽ뻾?????덉뒿?덈떎.\n洹몃옒???ㅼ떆 ?붿껌?섏떆寃좎뒿?덇퉴?")) {
+                            cleanUp();
+                        }
+                    });
+                } else if ($btn) {
+                    $btn.prop("disabled", false).removeClass("disabled");
+                }
+            }
+        }, 500);
+
+        return true;
+    };
+    // 20261105 khma End : ?묒? ?ㅼ슫濡쒕뱶 ?고? 諛⑹? 諛?鍮꾩묠?댁쟻 ?몃씪???곹깭 ?덈궡 留ㅻ땲?
+
+    // 20261105 khma : _btnObj ?뚮씪誘명꽣 諛?downloadToken 荑좏궎 ?곕룞 異붽?
+    $.SvcDownXls = function (service, _pl, _btnObj) {
+        var tokenVal = "token_" + new Date().getTime() + "_" + Math.floor(Math.random() * 1000);
+        var canProceed = $.StartExcelDownloadUX(_btnObj, tokenVal);
+        if (canProceed === false) {
+            return;
+        }
+
         var pl = new JSONClientParameters();
         pl.add("service", service);
         pl.add("method", "EXCEL");
         pl.add("type", "XLS");
+        pl.add("downloadToken", tokenVal);
 
-        var param = "";
+        var param = ",'downloadToken':'" + tokenVal + "'";
         if (_pl != undefined) {
             var ppl = _pl.toArray();
             for (var p in ppl) {
@@ -1234,13 +1323,12 @@
             }
         };
 
-        //location.href = _M.svcUrl[_M.Webtype].exceldown + "?XmlParms={'service':'" + service + "','method':'EXCEL','type':'XLS'" + param.replace("%", "%25") + "}";
-		
 		var bodyObject = $("body");
 		$("#xlsForm", bodyObject).remove();
 		var form = $("<form id='xlsForm' name='xlsForm' method='post'> </form>").appendTo(bodyObject);
 		var value = "{'service':'" + service + "','method':'EXCEL','type':'XLS'" + param.replace("%", "%25") + "}";
 		$("<input type='hidden' id='XmlParms' name='XmlParms' value='' />").appendTo(form);
+		$("<input type='hidden' id='downloadToken' name='downloadToken' value='" + tokenVal + "' />").appendTo(form);
 		form.find("#XmlParms").val(value);
 		form.attr("action", _M.svcUrl[_M.Webtype].exceldown);
 		form.submit();

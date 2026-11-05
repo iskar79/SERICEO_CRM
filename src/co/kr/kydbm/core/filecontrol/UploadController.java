@@ -1,4 +1,4 @@
-﻿package co.kr.kydbm.core.filecontrol;
+package co.kr.kydbm.core.filecontrol;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -884,6 +884,15 @@ public class UploadController {
 		// 20261102 khma : 프론트엔드에서 timeStamp 전달 시 동일하게 사용하여 실제 다운로드 파일명과 감사 로그 파일명 100% 일치
 		if (obj.containsKey("timeStamp") && StringUtils.isNotEmpty(obj.get("timeStamp")) && obj.get("timeStamp").length() >= 14) {
 			currentTimestamp = obj.get("timeStamp");
+		}
+
+		// 20261105 khma : 프론트엔드 연타 방지 및 다운로드 응답 시작 감지용 토큰 취득 후 request에 바인딩
+		String downloadToken = request.getParameter("downloadToken");
+		if (StringUtils.isEmpty(downloadToken) && obj.containsKey("downloadToken")) {
+			downloadToken = obj.get("downloadToken");
+		}
+		if (StringUtils.isNotEmpty(downloadToken)) {
+			request.setAttribute("downloadToken", downloadToken);
 		}
 		String fileName = "";
 		UID = obj.get("UID");

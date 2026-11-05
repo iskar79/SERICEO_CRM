@@ -1,4 +1,4 @@
-﻿package co.kr.kydbm.core.filecontrol;
+package co.kr.kydbm.core.filecontrol;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -142,6 +142,17 @@ public class ExcelDownload {
 					os = response.getOutputStream();
 					response.setContentLength(ifilesize);
 					response.reset();
+		// 20261105 khma : response.reset() 직후 응답 헤더에 다운로드 시작 감지용 토큰 쿠키 주입 (다운로드 응답 시작 신호)
+		String downloadToken = (String) request.getAttribute("downloadToken");
+		if (StringUtils.isEmpty(downloadToken)) {
+			downloadToken = request.getParameter("downloadToken");
+		}
+		if (StringUtils.isNotEmpty(downloadToken)) {
+			javax.servlet.http.Cookie tokenCookie = new javax.servlet.http.Cookie("fileDownloadToken", downloadToken);
+			tokenCookie.setPath("/");
+			tokenCookie.setMaxAge(60);
+			response.addCookie(tokenCookie);
+		}
 					response.setContentType("application/vnd.msexcel");
 					response.setHeader("content", "text/html; charset=utf-8");
 					response.setHeader("Content-Disposition", disposition + ".xls");
@@ -191,6 +202,17 @@ public class ExcelDownload {
 					os = response.getOutputStream();
 					response.setContentLength(ifilesize);
 					response.reset();
+		// 20261105 khma : response.reset() 직후 응답 헤더에 다운로드 시작 감지용 토큰 쿠키 주입 (다운로드 응답 시작 신호)
+		String downloadToken = (String) request.getAttribute("downloadToken");
+		if (StringUtils.isEmpty(downloadToken)) {
+			downloadToken = request.getParameter("downloadToken");
+		}
+		if (StringUtils.isNotEmpty(downloadToken)) {
+			javax.servlet.http.Cookie tokenCookie = new javax.servlet.http.Cookie("fileDownloadToken", downloadToken);
+			tokenCookie.setPath("/");
+			tokenCookie.setMaxAge(60);
+			response.addCookie(tokenCookie);
+		}
 					response.setContentType("application/vnd.msexcel");
 					response.setHeader("content", "text/html; charset=utf-8");
 					// response.setHeader("Content-Disposition",
@@ -420,6 +442,17 @@ public class ExcelDownload {
 			String disposition = getDisposition(xlsxFileName, getBrowser(request));
 
 			response.reset();
+		// 20261105 khma : response.reset() 직후 응답 헤더에 다운로드 시작 감지용 토큰 쿠키 주입 (다운로드 응답 시작 신호)
+		String downloadToken = (String) request.getAttribute("downloadToken");
+		if (StringUtils.isEmpty(downloadToken)) {
+			downloadToken = request.getParameter("downloadToken");
+		}
+		if (StringUtils.isNotEmpty(downloadToken)) {
+			javax.servlet.http.Cookie tokenCookie = new javax.servlet.http.Cookie("fileDownloadToken", downloadToken);
+			tokenCookie.setPath("/");
+			tokenCookie.setMaxAge(60);
+			response.addCookie(tokenCookie);
+		}
 			response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
 			response.setHeader("Content-Disposition", disposition);
 			response.setHeader("Content-Transfer-Encoding", "binary;");
@@ -466,6 +499,17 @@ public class ExcelDownload {
 		String disposition = getDisposition(fileName + "_" + typeName.toLowerCase() + ext, getBrowser(request));
 
 		response.reset();
+		// 20261105 khma : response.reset() 직후 응답 헤더에 다운로드 시작 감지용 토큰 쿠키 주입 (다운로드 응답 시작 신호)
+		String downloadToken = (String) request.getAttribute("downloadToken");
+		if (StringUtils.isEmpty(downloadToken)) {
+			downloadToken = request.getParameter("downloadToken");
+		}
+		if (StringUtils.isNotEmpty(downloadToken)) {
+			javax.servlet.http.Cookie tokenCookie = new javax.servlet.http.Cookie("fileDownloadToken", downloadToken);
+			tokenCookie.setPath("/");
+			tokenCookie.setMaxAge(60);
+			response.addCookie(tokenCookie);
+		}
 		if ("CSV".equals(typeName)) {
 			response.setContentType("text/csv; charset=UTF-8");
 			response.setHeader("Content-Disposition", disposition);
