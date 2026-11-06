@@ -721,6 +721,11 @@ a.icon:hover 		{background-position:inherit; }
     transition: all 0.2s ease;
     vertical-align: middle;
 }
+.logo-wrap .ui-site .selsite option {
+    padding: 4px 8px;
+    font-size: 12px;
+    font-weight: 600;
+}
 .logo-wrap .ui-top-label {
     margin-left: 14px;
     display: inline-flex;

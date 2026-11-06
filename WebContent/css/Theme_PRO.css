@@ -1,26 +1,31 @@
 .logo				{ width:146px; height:22px; background:url(../image/logo_PRO.png) top left no-repeat; background-size:auto 100%; }
-/* 20261106 khma Start : PRO 테마 헤더 상단(사이트선택/법인검색/저장버튼) 전용 녹갈색 계열 연동 */
+/* 20261106 khma Start : PRO 테마 헤더 상단(사이트선택/법인검색/저장버튼) 전용 연한 암갈색 계열 연동 */
 /*
 .logo-wrap .ui-site .selsite 	{ margin-left:23px; }
 */
 .logo-wrap .ui-site .selsite {
     margin-left: 23px;
-    color: #3b4a36;
-    background-color: #e6ede2;
-    border: 1px solid #bed0b5;
+    color: #42362b;
+    background-color: #ede5dc;
+    border: 1px solid #cbbab0;
 }
 .logo-wrap .ui-site .selsite:hover,
-.logo-wrap .ui-site .selsite:focus {
-    background-color: #dbe7d5;
+.logo-wrap .ui-site .selsite:focus,
+.logo-wrap .ui-site .selsite:active {
+    background-color: #e2d6ca;
     border-color: #F0A042;
-    color: #273323;
+    color: #33281c;
     box-shadow: 0 0 0 1px #F0A042;
+}
+.logo-wrap .ui-site .selsite option {
+    background-color: #ede5dc;
+    color: #42362b;
 }
 .logo-wrap .ui-top-label .fldTdLabel {
     color: #574b3f;
 }
 .logo-wrap .ui-corp input[for="linkkey"] {
-    border: 1px solid #bed0b5;
+    border: 1px solid #cbbab0;
     background-color: #ffffff;
     color: #222222;
 }
@@ -37,7 +42,7 @@
     background: #F0A042 !important;
     border-color: #d98c33;
 }
-/* 20261106 khma End : PRO 테마 헤더 상단 전용 녹갈색 계열 연동 */
+/* 20261106 khma End : PRO 테마 헤더 상단 전용 연한 암갈색 계열 연동 */
 .logoutarea .ui-username .name 	{ color:#14B9B9; }
 .navi-bg						{ background:#574b3f; }
 .menu-on-b > span				{ color:#F0A042; }

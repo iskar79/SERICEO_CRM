@@ -10,11 +10,16 @@
     border: 1px solid #b8ccf0;
 }
 .logo-wrap .ui-site .selsite:hover,
-.logo-wrap .ui-site .selsite:focus {
+.logo-wrap .ui-site .selsite:focus,
+.logo-wrap .ui-site .selsite:active {
     background-color: #dbe6fa;
     border-color: #185de0;
     color: #185de0;
     box-shadow: 0 0 0 1px #185de0;
+}
+.logo-wrap .ui-site .selsite option {
+    background-color: #e8eefb;
+    color: #1e3a8a;
 }
 .logo-wrap .ui-top-label .fldTdLabel {
     color: #232E5C;
