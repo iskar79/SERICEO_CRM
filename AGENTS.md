@@ -297,5 +297,7 @@ VDI 내부망 코드를 카메라로 촬영하여 전달받는 경우, 단순 OC
   * exeLoginProcess 로그인 쿼리 내 미사용 '거래처' 테이블 서브쿼리 제거 (ORA-00942 오류 원천 해결 및 NULL 바인딩).
 * **[완료] Step 10-2 (Common.css, Theme_*.css, MonArchResource.js, monform.jsp, favicon.ico)** ([① 로컬: 완료(x) / ② VDI: 완료(x)]):
   * 헤더 상단 탑바(사이트선택/법인검색/저장버튼) UI 리팩토링 및 사이트별(CEO/MS/PRO) 클래스 직결 배경색/캐시파쇄(?v=)/파비콘 404 해결 완료.
+* **[진행중] Step 10-3 (core/jquery.kdb.core.superTree.js, superChart.js, superContaner.js, MonArch.js)** ([① 로컬: 완료(x) / ② VDI: 대기( )]):
+  * superContaner.js에서 superTree(4개 메서드) 및 superChart(3개 메서드)를 js/core 하위 모듈로 독립 분리 및 디스패처 연동 완료.
 * **[대기/보류] Step 3 (SecureDB 개인정보 암복호화 - DB UDF 쿼리 함수 우선 방식)**:
   * 시스템 전반(전체 테이블 컬럼, 프로시저, 일배치, 쿼리)에 미치는 영향도가 가장 크므로, 모든 단위 기능 검증 및 시스템 안정화 완료 후 **최종 마지막 순서**로 검토 및 적용 진행 예정.
