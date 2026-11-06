@@ -1,5 +1,43 @@
 .logo				{ width:144px; height:22px; background:url(../image/logo_CEO.png) top left no-repeat; background-size:auto 100%; }
+/* 20261106 khma Start : CEO 테마 헤더 상단(사이트선택/법인검색/저장버튼) 전용 색상 연동 */
+/*
 .logo-wrap .ui-site .selsite 	{ margin-left:25px; }
+*/
+.logo-wrap .ui-site .selsite {
+    margin-left: 25px;
+    color: #1e3a8a;
+    background-color: #e8eefb;
+    border: 1px solid #b8ccf0;
+}
+.logo-wrap .ui-site .selsite:hover,
+.logo-wrap .ui-site .selsite:focus {
+    background-color: #dbe6fa;
+    border-color: #185de0;
+    color: #185de0;
+    box-shadow: 0 0 0 1px #185de0;
+}
+.logo-wrap .ui-top-label .fldTdLabel {
+    color: #232E5C;
+}
+.logo-wrap .ui-corp input[for="linkkey"] {
+    border: 1px solid #b8ccf0;
+    background-color: #ffffff;
+    color: #222222;
+}
+.logo-wrap .ui-corp input[for="linkkey"]:focus {
+    border-color: #185de0;
+    box-shadow: 0 0 0 1px #185de0;
+}
+.logo-wrap .ui-corpsave a.ActionCmd {
+    background: #232E5C !important;
+    border: 1px solid #1a2244;
+    color: #ffffff;
+}
+.logo-wrap .ui-corpsave a.ActionCmd:hover {
+    background: #185de0 !important;
+    border-color: #124bb8;
+}
+/* 20261106 khma End : CEO 테마 헤더 상단 전용 색상 연동 */
 .logoutarea .ui-username .name 	{ color:#185de0; }
 .navi-bg						{ background:#232E5C; }/* Change: body background */
 .menu-on-b > span				{ color:#A58850; }
