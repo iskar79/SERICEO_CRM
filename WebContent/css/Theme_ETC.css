@@ -1,26 +1,26 @@
 .logo				{ width:146px; height:22px; background:url(../image/logo_etc.png) top left no-repeat; background-size:auto 100%; }
-/* 20261106 khma Start : ETC(MS) 테마 헤더 상단(사이트선택/법인검색/저장버튼) 전용 색상 연동 */
+/* 20261106 khma Start : ETC(MS) 테마 헤더 상단(사이트선택/법인검색/저장버튼) 전용 보라파랑 계열 연동 */
 /*
 .logo-wrap .ui-site .selsite 	{ margin-left:23px; }
 */
 .logo-wrap .ui-site .selsite {
     margin-left: 23px;
     color: #28247B;
-    background-color: #eeecfb;
-    border: 1px solid #c5bdf4;
+    background-color: #eae5fa;
+    border: 1px solid #c2b6f4;
 }
 .logo-wrap .ui-site .selsite:hover,
 .logo-wrap .ui-site .selsite:focus {
-    background-color: #e1ddf9;
+    background-color: #ded6f7;
     border-color: #8975F2;
-    color: #28247B;
+    color: #1e1a63;
     box-shadow: 0 0 0 1px #8975F2;
 }
 .logo-wrap .ui-top-label .fldTdLabel {
     color: #28247B;
 }
 .logo-wrap .ui-corp input[for="linkkey"] {
-    border: 1px solid #c5bdf4;
+    border: 1px solid #c2b6f4;
     background-color: #ffffff;
     color: #222222;
 }
@@ -37,7 +37,7 @@
     background: #8975F2 !important;
     border-color: #6d59db;
 }
-/* 20261106 khma End : ETC(MS) 테마 헤더 상단 전용 색상 연동 */
+/* 20261106 khma End : ETC(MS) 테마 헤더 상단 전용 보라파랑 계열 연동 */
 .logoutarea .ui-username .name 	{ color:#8975f2; }
 .navi-bg						{ background:#28247B; }
 .menu-on-b > span				{ color:#FF6B06; }
