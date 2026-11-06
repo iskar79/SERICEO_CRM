@@ -114,3 +114,9 @@
 
 - [ ] **운영 DB 정보 암호화**: 로컬 개발용 JDBC 설정과 운영 접속 정보가 다르므로, 운영용 URL·계정을 적용하고 비밀번호를 `ENC(...)`로 변환한 뒤 WAR에 평문 운영 비밀번호가 포함되지 않았는지 확인한다. 운영 Tomcat의 Jasypt 복호화 키가 해당 ENC 값과 일치하는지도 확인한다.
 - [ ] **SQL 파라미터 로깅 레벨**: `WebContent/WEB-INF/log4j.properties`의 `JdbcTemplate` 및 `NamedParameterJdbcTemplate` DEBUG 설정을 운영 WAR 생성 전에 검토하고, 운영용 로그 레벨로 조정했는지 확인한다.
+
+## 📌 다음 작업 예정 (월요일 재개 포인트)
+- **Step 10-4 (superContaner.js 모듈 추가 분리)**:
+  - `superMap` (지도 컴포넌트 11개 메서드, 약 640라인) ➡️ `WebContent/js/core/jquery.kdb.core.superMap.js`
+  - `SuperAnswer` (설문/답변 컴포넌트 5개 메서드, 약 480라인) ➡️ `WebContent/js/core/jquery.kdb.core.superAnswer.js`
+  - `superContaner.js` 디스패처 위임 및 `MonArch.js` 스크립트 순차 로드 연동
