@@ -75,7 +75,7 @@
 | **Step 9** | `WebContent/js/jquery.kdb.superContaner.js` | 그리드 컬럼 마스킹 엔진 구현 (`colModel`의 `mask: "name"`, `"phone"`, `"email"` 등 속성 연동, 마우스 오버 `title` 툴팁 원본 데이터 유지) | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
 | **Step 10-1**| `WebContent/js/core/jquery.kdb.core.superCalendar.js`, `WebContent/js/MonArch.js` | Mon_LinkCRM_Maven 표준 구조 적용 (js/core 폴더 생성 및 superCalendar 이관, MonArch.js 로드 경로 갱신) | `[x]` | `[ ]` | **로컬 수정 완료 (VDI 반영 대기)** |
 | **Step 1-2c**| `src/co/kr/kydbm/core/dao/MonArchDaoImpl.java` | exeLoginProcess 로그인 쿼리 내 미사용 '거래처' 테이블 서브쿼리 제거 (ORA-00942 오류 원천 방어 및 NULL 처리) | `[x]` | `[ ]` | **로컬 수정 완료 (VDI 반영 대기)** |
-| **Step 10-2**| `WebContent/css/Common.css`, `Theme_CEO.css`, `Theme_PRO.css`, `Theme_ETC.css` | 헤더 상단 탑바(사이트선택/법인검색/저장버튼) UI 리팩토링 및 3대 사이트(CEO/PRO/MS) 테마 컬러 일체화 연동 | `[x]` | `[ ]` | **로컬 수정 완료 (VDI 반영 대기)** |
+| **Step 10-2**| `WebContent/css/Common.css`, `Theme_*.css`, `MonArchResource.js`, `monform.jsp` | 헤더 상단 탑바(사이트선택/법인검색/저장버튼) UI 리팩토링 및 사이트별(CEO/MS/PRO) 클래스 직결 배경색/캐시파쇄(?v=) 연동 | `[x]` | `[ ]` | **로컬 수정 완료 (VDI 반영 대기)** |
 
 | **Step 3** | `MonArchDaoImpl.java`, `FilterGenerator.java`, 프로시저/배치 등 | KSign SecureDB 개인정보 암복호화 (DB UDF 쿼리 함수 우선 적용 방식) | `[ ]` | `[ ]` | **최종 마지막 단계로 진행 예정 (보류)** |
 
@@ -128,4 +128,4 @@
 | **Step 9** | `WebContent/js/jquery.kdb.superContaner.js` | 그리드 컬럼 마스킹 엔진 구현 (`colModel`의 `mask: "name"`, `"phone"`, `"email"` 등 속성 연동, 마우스 오버 `title` 툴팁 원본 데이터 유지) | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
 | **Step 10-1**| `WebContent/js/core/jquery.kdb.core.superCalendar.js`, `WebContent/js/MonArch.js` | Mon_LinkCRM_Maven 표준 구조 적용 (js/core 폴더 생성 및 superCalendar 이관, MonArch.js 로드 경로 갱신) | `[x]` | `[ ]` | **로컬 수정 완료 (VDI 반영 대기)** |
 | **Step 1-2c**| `src/co/kr/kydbm/core/dao/MonArchDaoImpl.java` | exeLoginProcess 로그인 쿼리 내 미사용 '거래처' 테이블 서브쿼리 제거 (ORA-00942 오류 원천 방어 및 NULL 처리) | `[x]` | `[ ]` | **로컬 수정 완료 (VDI 반영 대기)** |
-| **Step 10-2**| `WebContent/css/Common.css`, `Theme_CEO.css`, `Theme_PRO.css`, `Theme_ETC.css` | 헤더 상단 탑바(사이트선택/법인검색/저장버튼) UI 리팩토링 및 3대 사이트(CEO/PRO/MS) 테마 컬러 일체화 연동 | `[x]` | `[ ]` | **로컬 수정 완료 (VDI 반영 대기)** |
+| **Step 10-2**| `WebContent/css/Common.css`, `Theme_*.css`, `MonArchResource.js`, `monform.jsp` | 헤더 상단 탑바(사이트선택/법인검색/저장버튼) UI 리팩토링 및 사이트별(CEO/MS/PRO) 클래스 직결 배경색/캐시파쇄(?v=) 연동 | `[x]` | `[ ]` | **로컬 수정 완료 (VDI 반영 대기)** |

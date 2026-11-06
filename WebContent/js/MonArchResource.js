@@ -68,7 +68,9 @@ var _Biz = {
                 $.SvcCallPl("SITE", "LIST", pl, function (data) {
 					if (data.resultData.length > 1) {
                         var _o = $(".ui-site", $(document.body));
-                        var _sel = $("<select class='selsite'></select>").appendTo(_o);
+                        // 20261106 khma : 사이트별(CEO/MS/PRO) 전용 테마 배경색 클래스 부여
+                        var _siteClass = "site-" + (_M.UserInfo.gsite ? _M.UserInfo.gsite.toLowerCase() : "ceo");
+                        var _sel = $("<select class='selsite " + _siteClass + "'></select>").appendTo(_o);
                         //var _sel = $(".selsite", $(document.body));
                         var _selected = "";
 						$.each(data.resultData, function (index, row){
@@ -331,18 +333,13 @@ function clearUserInfo(){
  *테마변경  
   */
 function changeTheme(cssName){
-	if(cssName ==undefined || cssName == ''){
-		$('#CSSlink').attr('href', '/css/Theme_820.css');	
+	// 20261106 khma : 테마 CSS 동적 교체 시 브라우저 캐시 무효화 버전 쿼리 파라미터 적용
+	var verParam = "?v=20261106_1";
+	if(cssName == undefined || cssName == ''){
+		$('#CSSlink').attr('href', '/css/Theme_CEO.css' + verParam);	
 	}else{
-		$('#CSSlink').attr('href', cssName);	
+		$('#CSSlink').attr('href', cssName + verParam);	
 	}
-	
-	if(cssName != undefined || cssName != ''){
-		$('#CSSlink').attr('href', cssName);
-	} else {
-		$('#CSSlink').attr('href', '/css/Theme_Thebuttons.css');
-	}
-	
 }
 
 /** 로그인 데이터 체크 */

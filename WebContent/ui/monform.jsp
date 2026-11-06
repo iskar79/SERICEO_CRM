@@ -30,9 +30,9 @@ if (clientIp == null || clientIp.length() == 0 || "unknown".equalsIgnoreCase(cli
 	var _CLIENT_IP = "<%= (clientIp != null) ? clientIp : "" %>";
 </script>
 
-<!-- 테마 및 공통 스타일시트 -->
-<link id="CSSlink" type="text/css" href="css/Theme_CEO.css" rel="stylesheet" />
-<link type="text/css" href="css/Common.css" rel="stylesheet" />
+<!-- 테마 및 공통 스타일시트 (20261106 khma : 브라우저 캐시 무효화 버전 쿼리 파라미터 적용) -->
+<link id="CSSlink" type="text/css" href="css/Theme_CEO.css?v=20261106_1" rel="stylesheet" />
+<link type="text/css" href="css/Common.css?v=20261106_1" rel="stylesheet" />
 
 <!-- 20261030 khma : 보안 취약점 개선 및 화면 엔진(superContaner.js) 렌더링 호환성을 위해 jQuery 1.10.2 -> 1.12.4로 업그레이드 -->
 <!-- <script type="text/javascript" src="js/jquery-1.10.2.min.js"></script> -->

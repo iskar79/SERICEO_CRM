@@ -726,6 +726,67 @@ a.icon:hover 		{background-position:inherit; }
     font-size: 12px;
     font-weight: 600;
 }
+/* 사이트별 전용 배지 배경색: CEO(연파랑) / MS(연한 보라파랑) / PRO(연한 암갈색) */
+.logo-wrap .ui-site .selsite,
+.logo-wrap .ui-site .selsite.site-ceo {
+    color: #1e3a8a;
+    background-color: #e8eefb;
+    border: 1px solid #b8ccf0;
+}
+.logo-wrap .ui-site .selsite:hover,
+.logo-wrap .ui-site .selsite:focus,
+.logo-wrap .ui-site .selsite:active,
+.logo-wrap .ui-site .selsite.site-ceo:hover,
+.logo-wrap .ui-site .selsite.site-ceo:focus,
+.logo-wrap .ui-site .selsite.site-ceo:active {
+    background-color: #dbe6fa;
+    border-color: #185de0;
+    color: #185de0;
+    box-shadow: 0 0 0 1px #185de0;
+}
+.logo-wrap .ui-site .selsite option,
+.logo-wrap .ui-site .selsite.site-ceo option {
+    background-color: #e8eefb;
+    color: #1e3a8a;
+}
+
+/* MS 사이트 (연한 보라파랑) */
+.logo-wrap .ui-site .selsite.site-ms {
+    color: #28247B !important;
+    background-color: #eae5fa !important;
+    border: 1px solid #c2b6f4 !important;
+}
+.logo-wrap .ui-site .selsite.site-ms:hover,
+.logo-wrap .ui-site .selsite.site-ms:focus,
+.logo-wrap .ui-site .selsite.site-ms:active {
+    background-color: #ded6f7 !important;
+    border-color: #8975F2 !important;
+    color: #1e1a63 !important;
+    box-shadow: 0 0 0 1px #8975F2 !important;
+}
+.logo-wrap .ui-site .selsite.site-ms option {
+    background-color: #eae5fa !important;
+    color: #28247B !important;
+}
+
+/* PRO 사이트 (연한 암갈색) */
+.logo-wrap .ui-site .selsite.site-pro {
+    color: #42362b !important;
+    background-color: #ede5dc !important;
+    border: 1px solid #cbbab0 !important;
+}
+.logo-wrap .ui-site .selsite.site-pro:hover,
+.logo-wrap .ui-site .selsite.site-pro:focus,
+.logo-wrap .ui-site .selsite.site-pro:active {
+    background-color: #e2d6ca !important;
+    border-color: #F0A042 !important;
+    color: #33281c !important;
+    box-shadow: 0 0 0 1px #F0A042 !important;
+}
+.logo-wrap .ui-site .selsite.site-pro option {
+    background-color: #ede5dc !important;
+    color: #42362b !important;
+}
 .logo-wrap .ui-top-label {
     margin-left: 14px;
     display: inline-flex;
