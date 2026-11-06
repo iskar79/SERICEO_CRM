@@ -102,10 +102,10 @@
 | **Step 2-14**| `UploadController.java`, `ExcelDownload.java`, `MonArch800.js`, `superContaner.js` | 엑셀 다운로드 연타 방지 및 비침해적 인라인 상태 안내 UX 연동 (클릭 즉시 버튼 잠금 + 안내 배지 노출, response.reset() 직후 fileDownloadToken 쿠키 주입, 응답 시작 시 자동 원복, 120초 타임아웃 재요청) | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
 | **Step 2-15**| `UploadController.java`, `MonArch800.js`, `superContaner.js` | 일반 엑셀 자동 INSERT와 보안 엑셀 UPDATE 분기 정밀 격리(기존 로그 덮어쓰기 간섭 원천 차단), DownXlsNew 2단계 선행잠금 재진입(Re-entry) 허용 및 실패 시 CleanUp 복원 보완 | `[x]` | `[ ]` | **로컬 수정 완료 (VDI 반영 대기)** |
 | **Step 9** | `WebContent/js/jquery.kdb.superContaner.js` | 그리드 컬럼 마스킹 엔진 구현 (`colModel`의 `mask: "name"`, `"phone"`, `"email"` 등 속성 연동, 마우스 오버 `title` 툴팁 원본 데이터 유지) | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
-| **Step 10-1**| `WebContent/js/core/jquery.kdb.core.superCalendar.js`, `WebContent/js/MonArch.js` (구형 `js/jquery.kdb.superCalendar.js` 정리 삭제) | Mon_LinkCRM_Maven 표준 구조 적용 (js/core 폴더 생성 및 superCalendar 이관, 구형 파일 정리 삭제, MonArch.js 로드 경로 갱신) | `[x]` | `[ ]` | **로컬 수정 완료 (VDI 반영 대기)** |
+| **Step 10-1**| `WebContent/js/core/jquery.kdb.core.superCalendar.js`, `WebContent/js/MonArch.js` (구형 `js/jquery.kdb.superCalendar.js` 정리 삭제) | Mon_LinkCRM_Maven 표준 구조 적용 (js/core 폴더 생성 및 superCalendar 이관, 구형 파일 정리 삭제, MonArch.js 로드 경로 갱신) | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
 | **Step 1-2c**| `src/co/kr/kydbm/core/dao/MonArchDaoImpl.java` | exeLoginProcess 로그인 쿼리 내 미사용 '거래처' 테이블 서브쿼리 제거 (ORA-00942 오류 원천 방어 및 NULL 처리) | `[x]` | `[ ]` | **로컬 수정 완료 (VDI 반영 대기)** |
 | **Step 10-2**| `WebContent/css/Common.css`, `Theme_*.css`, `MonArchResource.js`, `monform.jsp`, `favicon.ico` | 헤더 상단 탑바(사이트선택/법인검색/저장버튼) UI 리팩토링 및 사이트별(CEO/MS/PRO) 클래스 직결 배경색/캐시파쇄(?v=)/파비콘 404 해결 | `[x]` | `[x]` | **완료 (VDI 반영 및 정상동작 확인)** |
-| **Step 10-3**| `WebContent/js/core/jquery.kdb.core.superTree.js`, `superChart.js`, `superContaner.js`, `MonArch.js` | superTree(4개 메서드) 및 superChart(3개 메서드) js/core 모듈 독립 분리 및 디스패처 연동 | `[x]` | `[ ]` | **로컬 수정 완료 (VDI 반영 대기)** |
+| **Step 10-3**| `WebContent/js/core/jquery.kdb.core.superTree.js`, `superChart.js`, `superContaner.js`, `MonArch.js` | superTree(4개 메서드) 및 superChart(3개 메서드) js/core 모듈 독립 분리 및 디스패처 연동 | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
 | **Step 3** | `MonArchDaoImpl.java`, `FilterGenerator.java`, 프로시저/배치 등 | KSign SecureDB 개인정보 암복호화 (DB UDF 쿼리 함수 우선 적용 방식) | `[ ]` | `[ ]` | **최종 마지막 단계로 진행 예정 (보류)** |
 
 ## 운영 WAR 생성 전 필수 확인 알림
