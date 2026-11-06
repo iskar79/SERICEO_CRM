@@ -7506,6 +7506,14 @@ $(document).on("blur", ".t_Money", function (e) {
 
           if (_type == _M.DataType.img) _td.attr("title", "");
 
+          // 20261106 khma Start : 그리드 컬럼 마스킹 처리 (name, phone, email 등), 마우스 오버 툴팁(title)은 원본 데이터 유지
+          var _mask = _td.attr("mask");
+          if (_mask && _data && (!_mode || _mode != "edit")) {
+            var _maskedVal = $.applyGridMasking(_data, _mask);
+            _td.text(_maskedVal);
+          }
+          // 20261106 khma End : 그리드 컬럼 마스킹 처리
+
           if (_dynamicCss != undefined) {
             if (_showText != undefined) _td.text("");
             _va = eval("_json." + _dynamicCss)(_data);
@@ -16689,6 +16697,105 @@ function makeTalbleTh(colModel, option) {
   return th;
 }
 
+// 20261106 khma Start : 그리드 컬럼 마스킹(colModel mask 속성) 공통 유틸리티 함수 (이름, 전화번호, 이메일, 주민번호 등)
+$.applyGridMasking = function (val, maskType) {
+  if (val == null || val == undefined || val === "") return "";
+  var strVal = String(val);
+  var type = (maskType || "").toLowerCase();
+
+  switch (type) {
+    case "name":
+    case "cstname":
+    case "user_name":
+      // 이름 마스킹: 2자(홍*), 3자(홍*동), 4자(남**동), 5자 이상(양 끝 문자 유지, 가운데 모두 *)
+      var len = strVal.length;
+      if (len <= 1) {
+        return strVal;
+      } else if (len === 2) {
+        return strVal.substring(0, 1) + "*";
+      } else {
+        var stars = "";
+        for (var i = 0; i < len - 2; i++) {
+          stars += "*";
+        }
+        return strVal.substring(0, 1) + stars + strVal.substring(len - 1);
+      }
+
+    case "phone":
+    case "tel":
+    case "mobile":
+    case "wrktelnum":
+      // 전화번호 마스킹: 가운데 국번 마스킹
+      // 하이픈이 있는 경우 (010-1234-5678 -> 010-****-5678, 02-123-4567 -> 02-***-4567)
+      if (strVal.indexOf("-") > -1) {
+        return strVal.replace(/^(\d{2,3})-(\d{3,4})-(\d{4})$/, function (match, p1, p2, p3) {
+          var s = "";
+          for (var i = 0; i < p2.length; i++) s += "*";
+          return p1 + "-" + s + "-" + p3;
+        });
+      }
+      // 하이픈이 없는 경우 (11자리, 10자리, 9자리 분기)
+      var cleanNum = strVal.replace(/[^0-9]/g, "");
+      if (cleanNum.length === 11) {
+        return cleanNum.replace(/^(\d{3})(\d{4})(\d{4})$/, "$1-****-$3");
+      } else if (cleanNum.length === 10) {
+        if (cleanNum.indexOf("02") === 0) {
+          return cleanNum.replace(/^(\d{2})(\d{4})(\d{4})$/, "$1-****-$3");
+        } else {
+          return cleanNum.replace(/^(\d{3})(\d{3})(\d{4})$/, "$1-***-$3");
+        }
+      } else if (cleanNum.length === 9 && cleanNum.indexOf("02") === 0) {
+        return cleanNum.replace(/^(\d{2})(\d{3})(\d{4})$/, "$1-***-$3");
+      }
+      return strVal;
+
+    case "email":
+      // 이메일 마스킹: 앞 2글자 유지 후 @ 앞까지 * (ho*****@kdb.co.kr)
+      var atIdx = strVal.indexOf("@");
+      if (atIdx > 0) {
+        var idPart = strVal.substring(0, atIdx);
+        var domainPart = strVal.substring(atIdx);
+        var maskedId = "";
+        if (idPart.length <= 1) {
+          maskedId = "*";
+        } else if (idPart.length === 2) {
+          maskedId = idPart.substring(0, 1) + "*";
+        } else {
+          var visibleLen = 2;
+          var starLen = idPart.length - visibleLen;
+          var stars = "";
+          for (var i = 0; i < starLen; i++) stars += "*";
+          maskedId = idPart.substring(0, visibleLen) + stars;
+        }
+        return maskedId + domainPart;
+      }
+      return strVal;
+
+    case "jumin":
+    case "ssn":
+    case "rrn":
+      // 주민등록번호 마스킹 (앞 6자리 생년월일 유지, 뒷자리 7자리 중 첫자리 성별 외 모두 *)
+      var cleanJumin = strVal.replace(/[^0-9]/g, "");
+      if (cleanJumin.length === 13) {
+        return cleanJumin.substring(0, 6) + "-" + cleanJumin.substring(6, 7) + "******";
+      }
+      return strVal;
+
+    case "card":
+    case "cardno":
+      // 카드번호 마스킹 (1234-****-****-5678)
+      var cleanCard = strVal.replace(/[^0-9]/g, "");
+      if (cleanCard.length === 16) {
+        return cleanCard.substring(0, 4) + "-****-****-" + cleanCard.substring(12, 16);
+      }
+      return strVal;
+
+    default:
+      return strVal;
+  }
+};
+// 20261106 khma End : 그리드 컬럼 마스킹 공통 유틸리티 함수
+
 /* 슈퍼테이블 목록 TD작성 메소드 */
 function makeTalbleTd(colModel, tr) {
   // json의 컬럼설정값을 읽어서 td에 데이터용 필드를 설정한다.
@@ -16726,6 +16833,9 @@ function makeTalbleTd(colModel, tr) {
     td += " showText='" + colModel.showText + "'";
   if (colModel.dynamicCss != undefined)
     td += " dynamicCss='" + colModel.dynamicCss + "'";
+  // 20261106 khma : colModel mask 속성 바인딩
+  if (colModel.mask != undefined)
+    td += " mask='" + colModel.mask + "'";
 
   // if (value.css != undefined) _td.append("<span
   // class='"+value.css+"'></span>");
