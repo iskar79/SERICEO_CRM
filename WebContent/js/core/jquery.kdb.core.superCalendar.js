@@ -14,7 +14,7 @@
   if (!$.fn.superContaner) {
     if (window.console && console.error) {
       console.error(
-        "[ERROR] jquery.kdb.superContaner 플러그인이 로드되지 않았습니다. jquery.kdb.superCalendar.js는 superContaner.js 이후에 로드되어야 합니다."
+        "[ERROR] jquery.kdb.superContaner 플러그인이 로드되지 않았습니다. jquery.kdb.core.superCalendar.js는 superContaner.js 이후에 로드되어야 합니다."
       );
     }
     return;

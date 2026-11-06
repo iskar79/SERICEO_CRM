@@ -291,8 +291,8 @@ VDI 내부망 코드를 카메라로 촬영하여 전달받는 경우, 단순 OC
   * 일반 엑셀 자동 INSERT와 보안 엑셀 UPDATE 분기 정밀 격리(기존 로그 덮어쓰기 간섭 원천 차단), DownXlsNew 2단계 선행잠금 재진입(Re-entry) 허용 및 실패 시 CleanUp 복원 보완.
 * **[완료] Step 9 (superContaner.js)** ([① 로컬: 완료(x) / ② VDI: 완료(x)]):
   * 그리드 컬럼 마스킹 엔진 구현 (`colModel` mask 속성: name, phone, email, jumin, card 등 연동, 마우스 오버 title 툴팁 원본 유지).
-* **[진행중] Step 10-1 (MonArch.js, js/core/jquery.kdb.core.superCalendar.js)** ([① 로컬: 완료(x) / ② VDI: 대기( )]):
-  * Mon_LinkCRM_Maven 표준 구조 적용: WebContent/js/core 폴더 생성 및 superCalendar 이관, MonArch.js 스크립트 경로 갱신.
+* **[진행중] Step 10-1 (MonArch.js, js/core/jquery.kdb.core.superCalendar.js, js/jquery.kdb.superCalendar.js 삭제)** ([① 로컬: 완료(x) / ② VDI: 대기( )]):
+  * Mon_LinkCRM_Maven 표준 구조 적용: WebContent/js/core 폴더 생성 및 superCalendar 이관, 구형 js/jquery.kdb.superCalendar.js 정리 삭제, MonArch.js 스크립트 경로 갱신.
 * **[진행중] Step 1-2c (MonArchDaoImpl.java)** ([① 로컬: 완료(x) / ② VDI: 대기( )]):
   * exeLoginProcess 로그인 쿼리 내 미사용 '거래처' 테이블 서브쿼리 제거 (ORA-00942 오류 원천 해결 및 NULL 바인딩).
 * **[완료] Step 10-2 (Common.css, Theme_*.css, MonArchResource.js, monform.jsp, favicon.ico)** ([① 로컬: 완료(x) / ② VDI: 완료(x)]):
