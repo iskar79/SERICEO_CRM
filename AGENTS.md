@@ -293,5 +293,7 @@ VDI 내부망 코드를 카메라로 촬영하여 전달받는 경우, 단순 OC
   * 그리드 컬럼 마스킹 엔진 구현 (`colModel` mask 속성: name, phone, email, jumin, card 등 연동, 마우스 오버 title 툴팁 원본 유지).
 * **[진행중] Step 10-1 (MonArch.js, js/core/jquery.kdb.core.superCalendar.js)** ([① 로컬: 완료(x) / ② VDI: 대기( )]):
   * Mon_LinkCRM_Maven 표준 구조 적용: WebContent/js/core 폴더 생성 및 superCalendar 이관, MonArch.js 스크립트 경로 갱신.
+* **[진행중] Step 1-2c (MonArchDaoImpl.java)** ([① 로컬: 완료(x) / ② VDI: 대기( )]):
+  * exeLoginProcess 로그인 쿼리 내 미사용 '거래처' 테이블 서브쿼리 제거 (ORA-00942 오류 원천 해결 및 NULL 바인딩).
 * **[대기/보류] Step 3 (SecureDB 개인정보 암복호화 - DB UDF 쿼리 함수 우선 방식)**:
   * 시스템 전반(전체 테이블 컬럼, 프로시저, 일배치, 쿼리)에 미치는 영향도가 가장 크므로, 모든 단위 기능 검증 및 시스템 안정화 완료 후 **최종 마지막 순서**로 검토 및 적용 진행 예정.

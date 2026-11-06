@@ -1081,9 +1081,17 @@ public class MonArchDaoImpl   extends DataSourceSupport{
 		.append(", CASE WHEN " + QueryGenerator.genNvlStmt(DB_TYPE, "R.M_ROLE_USER_NO", "0", null, false) + " = 0 THEN '0' ELSE '1' END AS DV_LEVEL ")
 		//SeriCEO용 추가항목 CORP,CORP_NAME,TCORP,TCORP_NAME
 		.append(", U.CORP ")
+		// 20261106 khma : 미사용 '거래처' 테이블 제거에 따른 서브쿼리 제외 및 NULL 처리
+		/*
 		.append(", (SELECT 거래처명 FROM 거래처 B WHERE B.거래처번호 = U.CORP) AS CORPNM ")
+		*/
+		.append(", NULL AS CORPNM ")
 		.append(", U.TCORP ")
+		// 20261106 khma : 미사용 '거래처' 테이블 제거에 따른 서브쿼리 제외 및 NULL 처리
+		/*
 		.append(", (SELECT 거래처명 FROM 거래처 B WHERE B.거래처번호 = U.TCORP) AS TCORPNM ")
+		*/
+		.append(", NULL AS TCORPNM ")
 		.append(", FN_DVL_CONFIRM(U.M_USER_NO) AS dvLevel ")
 		.append(", FN_EXCEL_AUTH(U.M_USER_NO) AS excelAuth ")
 		.append("FROM   M_USER U")
