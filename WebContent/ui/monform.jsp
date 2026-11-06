@@ -23,7 +23,9 @@ if (clientIp == null || clientIp.length() == 0 || "unknown".equalsIgnoreCase(cli
 
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="apple-touch-icon" href="MonArch-blue57x57.ico" />
+<!-- 20261106 khma : favicon.ico 404 방지 및 브라우저 탭 아이콘 지정 -->
+<link rel="shortcut icon" href="/favicon.ico" />
+<link rel="icon" type="image/x-icon" href="/favicon.ico" />
 <title>::: SERICEO CRM :::</title>
 
 <script type="text/javascript">

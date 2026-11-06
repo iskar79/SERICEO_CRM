@@ -15,7 +15,8 @@
 	content="width=device-width, initial-scale=0.7, minimum-scale=0.4, maximum-scale=3">
 
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<link rel="apple-touch-icon" href="MonArch-blue57x57.ico" />
+<link rel="shortcut icon" href="/favicon.ico" />
+<link rel="icon" type="image/x-icon" href="/favicon.ico" />
 <title>::: SERICEO CRM :::</title>
 
 <!-- 테마 및 공통 스타일시트 -->
