@@ -19,11 +19,14 @@ CREATE SEQUENCE "CRM"."M_FILE_MGMT_SEQ"
 
 -- ---------------------------------------------------------------------
 -- 2. 테이블 생성 ("CRM"."M_FILE_MGMT")
--- 20261109 khma : 최초 INSERT 시에도 UPD_DATE / UPD_USER가 함께 기록되도록 DEFAULT SYSDATE NOT NULL 적용
+-- 20261109 khma :
+--   - M_USITE_NO : SERICEO CRM 사이트 기본값 DEFAULT 44 적용
+--   - REG_USER / UPD_USER : M_USER.M_USER_NO(UID 숫자 키, 예: 1000305)가 저장되므로 NUMBER(10) 적용
+--   - REG_DATE / UPD_DATE : 최초 INSERT 시에도 함께 기록되도록 DEFAULT SYSDATE NOT NULL 적용
 -- ---------------------------------------------------------------------
 CREATE TABLE "CRM"."M_FILE_MGMT" (
     "M_FILE_MGMT_NO"   NUMBER(18)        NOT NULL,                      -- 파일 관리 식별 번호 (PK, M_FILE_MGMT_TRG 자동 채번)
-    "M_USITE_NO"       NUMBER(10)        DEFAULT 1 NOT NULL,            -- 사이트 식별 번호 (USITE / M_USITE_NO)
+    "M_USITE_NO"       NUMBER(10)        DEFAULT 44 NOT NULL,           -- 사이트 식별 번호 (SERICEO CRM 기본값: 44)
     "FILE_PATH"        VARCHAR2(500)     NOT NULL,                      -- 서버 물리 저장 상대 경로 (예: /FileData/2026/11/)
     "FILE_NAME"        VARCHAR2(500)     NOT NULL,                      -- 사용자 업로드 원본 파일명
     "FILE_SIZE"        NUMBER(18)        DEFAULT 0 NOT NULL,            -- 파일 바이트 용량
@@ -33,9 +36,9 @@ CREATE TABLE "CRM"."M_FILE_MGMT" (
     "FILE_SEARCH_KEY"  VARCHAR2(100),                                   -- 화면 폼 연계 1:N 임시/식별 검색키
     "USE_FLAG"         VARCHAR2(1)       DEFAULT '1' NOT NULL,          -- 사용 여부 플래그 ('1': 정상 사용, '0': 삭제)
     "REG_DATE"         DATE              DEFAULT SYSDATE NOT NULL,      -- 최초 등록 일시
-    "REG_USER"         VARCHAR2(50)      NOT NULL,                      -- 최초 등록자 ID (UID)
+    "REG_USER"         NUMBER(10)        NOT NULL,                      -- 최초 등록자 고유키 (M_USER.M_USER_NO / UID)
     "UPD_DATE"         DATE              DEFAULT SYSDATE NOT NULL,      -- 최종 수정 일시 (최초 INSERT 시에도 SYSDATE 필수 기록)
-    "UPD_USER"         VARCHAR2(50)      NOT NULL,                      -- 최종 수정자 ID (최초 INSERT 시에도 등록자 UID 기록)
+    "UPD_USER"         NUMBER(10)        NOT NULL,                      -- 최종 수정자 고유키 (M_USER.M_USER_NO / UID)
     "DEL_DATE"         DATE,                                            -- 소프트 삭제 일시 (휴지통 보존용)
     CONSTRAINT "PK_M_FILE_MGMT" PRIMARY KEY ("M_FILE_MGMT_NO")
 );
@@ -71,7 +74,7 @@ ALTER TRIGGER "CRM"."M_FILE_MGMT_TRG" ENABLE;
 -- ---------------------------------------------------------------------
 COMMENT ON TABLE  "CRM"."M_FILE_MGMT"                   IS '모나크 표준 공통 파일 관리 테이블';
 COMMENT ON COLUMN "CRM"."M_FILE_MGMT"."M_FILE_MGMT_NO"  IS '파일 관리 번호 (PK, M_FILE_MGMT_TRG 자동 채번)';
-COMMENT ON COLUMN "CRM"."M_FILE_MGMT"."M_USITE_NO"      IS '사이트/회원사 번호 (USITE)';
+COMMENT ON COLUMN "CRM"."M_FILE_MGMT"."M_USITE_NO"      IS '사이트/회원사 번호 (기본값: 44)';
 COMMENT ON COLUMN "CRM"."M_FILE_MGMT"."FILE_PATH"       IS '서버 물리 저장 상대 경로';
 COMMENT ON COLUMN "CRM"."M_FILE_MGMT"."FILE_NAME"       IS '업로드 원본 파일명';
 COMMENT ON COLUMN "CRM"."M_FILE_MGMT"."FILE_SIZE"       IS '파일 바이트 용량';
@@ -81,9 +84,9 @@ COMMENT ON COLUMN "CRM"."M_FILE_MGMT"."JOB_KEY"         IS '부모 업무 레코
 COMMENT ON COLUMN "CRM"."M_FILE_MGMT"."FILE_SEARCH_KEY" IS '화면 연계 파일 검색키';
 COMMENT ON COLUMN "CRM"."M_FILE_MGMT"."USE_FLAG"        IS '사용 여부 (1: 사용, 0: 삭제)';
 COMMENT ON COLUMN "CRM"."M_FILE_MGMT"."REG_DATE"        IS '최초 등록 일시';
-COMMENT ON COLUMN "CRM"."M_FILE_MGMT"."REG_USER"        IS '최초 등록자 ID';
+COMMENT ON COLUMN "CRM"."M_FILE_MGMT"."REG_USER"        IS '최초 등록자 고유키 (M_USER_NO)';
 COMMENT ON COLUMN "CRM"."M_FILE_MGMT"."UPD_DATE"        IS '최종 수정 일시 (최초 등록 시 SYSDATE 동일 기록)';
-COMMENT ON COLUMN "CRM"."M_FILE_MGMT"."UPD_USER"        IS '최종 수정자 ID (최초 등록 시 REG_USER 동일 기록)';
+COMMENT ON COLUMN "CRM"."M_FILE_MGMT"."UPD_USER"        IS '최종 수정자 고유키 (M_USER_NO)';
 COMMENT ON COLUMN "CRM"."M_FILE_MGMT"."DEL_DATE"        IS '삭제 일시';
 
 -- ---------------------------------------------------------------------
@@ -117,7 +120,7 @@ INSERT INTO CRM.M_FILE_MGMT (
     UPD_DATE,
     UPD_USER
 ) VALUES (
-    NVL(TO_NUMBER(@USITE@), 1),
+    NVL(TO_NUMBER(@USITE@), 44),
     @FILE_PATH@,
     @FILE_NAME@,
     NVL(TO_NUMBER(@FILE_SIZE@), 0),
@@ -125,9 +128,9 @@ INSERT INTO CRM.M_FILE_MGMT (
     @FILE_SEARCH_KEY@,
     NVL(@USE_FLAG@, '1'),
     SYSDATE,
-    @UID@,
+    TO_NUMBER(@UID@),
     SYSDATE,
-    @UID@
+    TO_NUMBER(@UID@)
 )
 
 -- [2] 파일 목록 조회 (MON_COMMON / MULTIFILE_LIST)
