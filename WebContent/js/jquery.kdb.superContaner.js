@@ -495,7 +495,7 @@ $(document).on(
 );
 
 // ---------------------------------------------------------------------
-// 20261102 khma Start : 차세대 singleFileNew & multiFileNew 드래그앤드롭 및 지연업로드(Client Staging) 이벤트 정의
+// 20261102 khma Start : 신규 singleFileNew & multiFileNew 드래그앤드롭 및 지연업로드(Client Staging) 이벤트 정의
 // [singleFileNew 드래그앤드롭]
 $(document).on("dragover dragenter", ".SuperView .fieldContaner[type='singlefilenew'] .singlefile-dropzone", function (e) {
   e.preventDefault();
@@ -595,7 +595,7 @@ $(document).on("click", ".SuperView .fieldContaner[type='multifilenew'] .multifi
   var fid = $(this).attr("data-fid");
   _contaner.superContaner("toggleMultiDeleteFile", fid, $(this));
 });
-// 20261102 khma End : 차세대 singleFileNew & multiFileNew 드래그앤드롭 및 지연업로드 이벤트 정의
+// 20261102 khma End : 신규 singleFileNew & multiFileNew 드래그앤드롭 및 지연업로드 이벤트 정의
 // SuperOlap live 이벤트 정의
 // ---------------------------------------------------------------------
 /*
@@ -4757,7 +4757,7 @@ $(document).on("blur", ".t_Money", function (e) {
       _Obj.attr("parentKeyValue", _parentKey);
       $(this).superContaner("List");
     },
-    // 20261102 khma Start : 차세대 singleFileNew 지연 업로드 대기(Staging) 및 취소 메서드
+    // 20261102 khma Start : 신규 singleFileNew 지연 업로드 대기(Staging) 및 취소 메서드
     stageSingleFile: function (file) {
       var _contaner = $(this);
       var _dropZone = $(".singlefile-dropzone", _contaner);
@@ -4823,9 +4823,9 @@ $(document).on("blur", ".t_Money", function (e) {
       }
       _contaner.removeClass("fldChange");
     },
-    // 20261102 khma End : 차세대 singleFileNew 지연 업로드 대기(Staging) 및 취소 메서드
+    // 20261102 khma End : 신규 singleFileNew 지연 업로드 대기(Staging) 및 취소 메서드
 
-    // 20261102 khma Start : 차세대 multiFileNew 지연 업로드 대기(Staging) 및 삭제토글 메서드
+    // 20261102 khma Start : 신규 multiFileNew 지연 업로드 대기(Staging) 및 삭제토글 메서드
     stageMultiFiles: function (files) {
       var _contaner = $(this);
       var _fieldEdit = $(".fieldEdit", _contaner);
@@ -4900,7 +4900,7 @@ $(document).on("blur", ".t_Money", function (e) {
         _pendingBox.html(htm);
       }
     },
-    // 20261102 khma End : 차세대 multiFileNew 지연 업로드 대기(Staging) 및 삭제토글 메서드
+    // 20261102 khma End : 신규 multiFileNew 지연 업로드 대기(Staging) 및 삭제토글 메서드
     ListGallery: function () {
       var _Obj = $(this);
       _Obj.attr("_viewpage", 1);
@@ -10147,7 +10147,7 @@ $(document).on("blur", ".t_Money", function (e) {
             attachLabels(value, _span);
           }
           break;
-        case "singlefilenew": // 20261102 khma 차세대 드래그앤드롭 단일파일
+        case "singlefilenew": // 20261102 khma 신규 드래그앤드롭 단일파일
           var jobType = option.jobType != undefined ? option.jobType : "FILE";
           _fieldEdit.attr("jobType", jobType).css("position", "relative");
 
@@ -10172,7 +10172,7 @@ $(document).on("blur", ".t_Money", function (e) {
             attachLabels(value, _dropZone);
           }
           break;
-        case "multifilenew": // 20261102 khma 차세대 드래그앤드롭 멀티파일
+        case "multifilenew": // 20261102 khma 신규 드래그앤드롭 멀티파일
           var jobType = option.jobType != undefined ? option.jobType : "FILE";
           _fieldEdit.attr("jobType", jobType).css("position", "relative");
 
@@ -12712,19 +12712,19 @@ $(document).on("blur", ".t_Money", function (e) {
           var jobType = _fieldEdit.attr("jobType") || "FILE";
           var parentKey = _Obj.parents(".SuperView").attr("keyvalue") || "";
 
-          // 1. 삭제 대기 파일 일괄 휴지통 정리
+          // 1. 삭제 대기 파일 일괄 휴지통 정리 (20261109 khma : multiFileNew는 M_FILE_MGMT 테이블 대상 분기 전달)
           var pendingDel = _fieldEdit.data("pendingDelFids") || [];
           for (var d = 0; d < pendingDel.length; d++) {
             $.ajax({
               url: _M.svcUrl[_M.Webtype].deleteFileSafe,
               type: "POST",
-              data: { fid: pendingDel[d], uid: _M.UserInfo.id },
+              data: { fid: pendingDel[d], uid: _M.UserInfo.id, fileTarget: "M_FILE_MGMT" },
               async: false
             });
           }
           _fieldEdit.removeData("pendingDelFids");
 
-          // 2. 신규 추가 대기 파일 일괄 업로드 전송
+          // 2. 신규 추가 대기 파일 일괄 업로드 전송 (20261109 khma : multiFileNew는 M_FILE_MGMT 테이블 대상 분기 전달)
           var pendingAdd = _fieldEdit.data("pendingAddFiles") || [];
           for (var a = 0; a < pendingAdd.length; a++) {
             var fData = new FormData();
@@ -12734,6 +12734,7 @@ $(document).on("blur", ".t_Money", function (e) {
             fData.append("ParentKey", parentKey);
             fData.append("UID", _M.UserInfo.id);
             fData.append("USITE", _M.UserInfo.SID);
+            fData.append("fileTarget", "M_FILE_MGMT");
 
             $.ajax({
               url: _M.svcUrl[_M.Webtype].uploadFileNew,
@@ -14329,7 +14330,7 @@ $(document).on("blur", ".t_Money", function (e) {
               );
           }
           break;
-        case "singlefilenew": // 20261102 khma 차세대 드래그앤드롭 단일파일 값 바인딩
+        case "singlefilenew": // 20261102 khma 신규 드래그앤드롭 단일파일 값 바인딩 (M_IMAGE_GAL 연동)
           var _dropZone = $(".singlefile-dropzone", _Obj);
           var _statusText = $(".singlefile-status-text", _dropZone);
           var _viewBox = $(".fieldView .fldfiledown", _Obj);
@@ -14366,7 +14367,7 @@ $(document).on("blur", ".t_Money", function (e) {
           }
           break;
 
-        case "multifilenew": // 20261102 khma 차세대 드래그앤드롭 멀티파일 값 바인딩 및 목록 조회
+        case "multifilenew": // 20261102 khma 신규 드래그앤드롭 멀티파일 값 바인딩 및 목록 조회 (20261109 khma : M_FILE_MGMT 테이블 및 MULTIFILE_LIST 쿼리 연동으로 분기)
           var _mCont = $(".multifilenew-contaner", _Obj);
           var _serverList = $(".multifile-server-list", _mCont);
           var _viewBox = $(".fieldView .fldfiledown", _Obj);
@@ -14386,11 +14387,23 @@ $(document).on("blur", ".t_Money", function (e) {
             $("#fileSearchKey", _mCont).val(fSearchKey);
             _Obj.attr("value", fSearchKey);
 
-            // M_IMAGE_GAL 목록 조회 (SIGNFILE_LIST 쿼리 연동)
+            // 20261109 khma : multiFileNew는 M_FILE_MGMT 목록 조회 (MON_COMMON / MULTIFILE_LIST 쿼리 연동)
+            /*
             var pl = new JSONClientParameters();
             pl.add("service", "MON_COMMON");
             pl.add("method", "SIGNFILE_LIST");
             pl.add("UPPER_INFO", fSearchKey);
+            pl.add("_viewpage", 1);
+            pl.add("_pagecnt", 999);
+            */
+            var jobType = _fieldEdit.attr("jobType") || "FILE";
+            var pl = new JSONClientParameters();
+            pl.add("service", "MON_COMMON");
+            pl.add("method", "MULTIFILE_LIST");
+            pl.add("USITE", _M.UserInfo.SID);
+            pl.add("UID", _M.UserInfo.id);
+            pl.add("JOB_TYPE", jobType);
+            pl.add("FILE_SEARCH_KEY", fSearchKey);
             pl.add("_viewpage", 1);
             pl.add("_pagecnt", 999);
 
@@ -14401,11 +14414,12 @@ $(document).on("blur", ".t_Money", function (e) {
                 var vHtm = "<ul style='list-style: none; padding: 0; margin: 0;'>";
                 for (var i = 0; i < rst.length; i++) {
                   var item = rst[i];
-                  var dUrl = _M.svcUrl[_M.Webtype].downloadFileNew + "?fid=" + item.M_IMAGE_GAL_NO;
+                  var fNo = item.M_FILE_MGMT_NO || item.M_IMAGE_GAL_NO;
+                  var dUrl = _M.svcUrl[_M.Webtype].downloadFileNew + "?fid=" + fNo + "&fileTarget=M_FILE_MGMT";
                   var kb = (item.FILE_SIZE / 1024).toFixed(1);
                   sHtm += "<li class='multifile-item' style='padding: 3px 6px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #e2e8f0; font-size: 12px;'>"
                        + "  <span><span class='icon i-20 icon-file align-middle'></span> <a href='" + dUrl + "' target='_blank' class='file-title' style='color: #1d4ed8; text-decoration: underline; font-weight: bold;'>" + item.FILE_NAME + "</a> <span style='color:#64748b;'>(" + kb + " KB)</span></span>"
-                       + "  <span class='multifile-toggle-delete' data-fid='" + item.M_IMAGE_GAL_NO + "' style='color: #ef4444; font-weight: bold; cursor: pointer; padding: 1px 4px; border: 1px solid #fecaca; border-radius: 3px; background: #fff;' title='삭제 토글'>✖ 삭제</span>"
+                       + "  <span class='multifile-toggle-delete' data-fid='" + fNo + "' style='color: #ef4444; font-weight: bold; cursor: pointer; padding: 1px 4px; border: 1px solid #fecaca; border-radius: 3px; background: #fff;' title='삭제 토글'>✖ 삭제</span>"
                        + "</li>";
                   vHtm += "<li style='padding: 1px 0;'><a href='" + dUrl + "' target='_blank' style='color: #1d4ed8; text-decoration: underline;'>" + item.FILE_NAME + "</a> (" + kb + " KB)</li>";
                 }

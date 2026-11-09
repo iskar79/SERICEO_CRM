@@ -64,7 +64,7 @@ var _M = {
             signFileUpload:"signFileUpload.mon", //계약파일 업로드 20240619
             signFileDownload:"signFileDownload.mon", //계약파일 다운로드 20240619
             signFileDelete:"signFileDelete.mon", //계약파일 업로드 20240619
-            // 20261102 khma : 차세대 드래그앤드롭 파일 시스템 신규 서비스 URL
+            // 20261102 khma : 신규 드래그앤드롭 파일 시스템 서비스 URL
             uploadFileNew: "uploadFileNew.mon",
             downloadFileNew: "downloadFileNew.mon",
             deleteFileSafe: "deleteFileSafe.mon",

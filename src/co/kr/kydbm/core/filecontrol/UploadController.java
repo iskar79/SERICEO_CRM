@@ -64,7 +64,7 @@ import co.kr.kydbm.core.utils.QueryGenerator;
  * SERICEO CRM MonArch 8.2.0 파일 업로드/다운로드 및 보안 엑셀 다운로드 컨트롤러
  * 
  * [시스템 역할 및 기능 명세]
- * 1. 차세대 파일 제어: HTML5 Drag&Drop 클라이언트 지연 업로드(/uploadFileNew), 안전 다운로드(/downloadFileNew), 휴지통 이동(/deleteFileSafe)
+ * 1. 신규 파일 제어: HTML5 Drag&Drop 클라이언트 지연 업로드(/uploadFileNew), 안전 다운로드(/downloadFileNew), 휴지통 이동(/deleteFileSafe)
  * 2. 레거시 파일 제어: 멀티파트 업로드(/multiFileUpload, /upload), 다운로드(/fileDownload, /download), ZIP 압축 다운로드(/zipFileDownload)
  * 3. 보안 엑셀 다운로드(/downExcel): POI 4.1.2 Agile AES 암호화 엑셀 스트리밍 및 감사 이력(M_EXCEL_DOWN_LOG) 정밀 연동
  * 4. 예외 및 스트림 안전성: @ExceptionHandler 표준 ResultInfo JSON 응답, HTTP 상태 유지 및 스트림 전송 전/후 에러 격리
@@ -1430,18 +1430,19 @@ public class UploadController {
 		monArchDao.exeCreate(sqlCommand, uselogParam);
 	}
 
-	// 20261102 khma Start : 차세대 드래그앤드롭 파일 시스템 신규 엔드포인트 (/uploadFileNew, /downloadFileNew, /deleteFileSafe)
+	// 20261102 khma Start : 신규 드래그앤드롭 파일 시스템 엔드포인트 (/uploadFileNew, /downloadFileNew, /deleteFileSafe)
 
 	/**
-	 * 차세대 드래그앤드롭 파일 업로드 (singleFileNew / multiFileNew 전용)
-	 * 파일을 지정된 물리 경로(monarch.fileupload.path/년/월/)에 저장하고, M_IMAGE_GAL 테이블에 메타데이터를 등록한다.
+	 * 신규 드래그앤드롭 파일 업로드 (singleFileNew: M_IMAGE_GAL / multiFileNew: M_FILE_MGMT 분기)
+	 * 파일을 지정된 물리 경로(monarch.fileupload.path/년/월/)에 저장하고, 대상 테이블에 메타데이터를 등록한다.
 	 *
 	 * @param Filename 업로드할 MultipartFile
-	 * @param fileSearchKey 화면에서 전달된 그룹/식별키 (UPPER_INFO 에 매핑)
+	 * @param fileSearchKey 화면에서 전달된 그룹/식별키 (UPPER_INFO 또는 FILE_SEARCH_KEY 에 매핑)
 	 * @param jobType 업무 분류
-	 * @param ParentKey 부모 업무 PK (UPPER_KEY 에 매핑, 숫자 변환 가능 시)
+	 * @param ParentKey 부모 업무 PK (UPPER_KEY 또는 JOB_KEY 에 매핑, 숫자 변환 가능 시)
 	 * @param UID 등록자 ID
 	 * @param USITE 사이트 번호
+	 * @param fileTarget 저장 대상 테이블 구분 (기본값: M_IMAGE_GAL, multiFileNew: M_FILE_MGMT)
 	 * @param request HttpServletRequest
 	 * @param response HttpServletResponse
 	 * @throws Exception 파일 저장 및 DB 등록 예외
@@ -1454,6 +1455,7 @@ public class UploadController {
 			@RequestParam(value = "ParentKey", required = false, defaultValue = "") String ParentKey,
 			@RequestParam(value = "UID", required = false, defaultValue = "1") String UID,
 			@RequestParam(value = "USITE", required = false, defaultValue = "44") String USITE,
+			@RequestParam(value = "fileTarget", required = false, defaultValue = "M_IMAGE_GAL") String fileTarget,
 			HttpServletRequest request,
 			HttpServletResponse response) throws Exception {
 
@@ -1533,47 +1535,87 @@ public class UploadController {
 			// 물리 파일 저장
 			if (writeFile(Filename, realPath, realfileName)) {
 				MonArchDaoImpl monArchDao = new MonArchDaoImpl();
-				// 신규 시퀀스 채번
-				Long newFid = null;
-				try {
-					Map<String, Object> seqMap = monArchDao.queryForMap("SELECT M_IMAGE_GAL_SEQ.NEXTVAL AS NEXTVAL FROM DUAL", new HashMap<String, String>());
-					if (seqMap != null && seqMap.get("NEXTVAL") != null) {
-						newFid = Long.parseLong(seqMap.get("NEXTVAL").toString());
-					}
-				} catch (Exception ex) {
-					log.warn("M_IMAGE_GAL_SEQ 채번 실패, 기본 시퀀스 바인딩 대체", ex);
-				}
-
 				String relativeFilePath = uploadFolder + "/" + realfileName;
 				String upperKeyVal = (StringUtils.isNotEmpty(ParentKey) && StringUtils.isNumeric(ParentKey)) ? ParentKey : null;
+				Long newFid = null;
 
-				String insertSql = "INSERT INTO M_IMAGE_GAL ("
-						+ (newFid != null ? "M_IMAGE_GAL_NO, " : QueryGenerator.genSequenceCol(DB_TYPE, "M_IMAGE_GAL_NO", true))
-						+ "FILE_NAME, FILE_SIZE, FILE_CONTENT_TYPE, FILE_TYPE_CODE, FILE_DESC, "
-						+ "FILE_PATH, UPPER_INFO, "
-						+ (upperKeyVal != null ? "UPPER_KEY, " : "")
-						+ "REG_DATE, UPD_DATE, REG_USER, UPD_USER, M_USITE_NO) VALUES ("
-						+ (newFid != null ? newFid + ", " : QueryGenerator.genSequenceStmt(DB_TYPE, "M_IMAGE_GAL_SEQ", true))
-						+ "@FILE_NAME@, @FILE_SIZE@, @FILE_CONTENT_TYPE@, @FILE_TYPE_CODE@, @FILE_DESC@, "
-						+ "@FILE_PATH@, @UPPER_INFO@, "
-						+ (upperKeyVal != null ? upperKeyVal + ", " : "")
-						+ QueryGenerator.genSysDate(DB_TYPE, true)
-						+ QueryGenerator.genSysDate(DB_TYPE, true)
-						+ "@REG_USER@, @UPD_USER@, @M_USITE_NO@)";
+				// 20261109 khma Start : multiFileNew(M_FILE_MGMT)와 singleFileNew(M_IMAGE_GAL) 저장 테이블 분기 처리
+				if ("M_FILE_MGMT".equalsIgnoreCase(fileTarget)) {
+					try {
+						Map<String, Object> seqMap = monArchDao.queryForMap("SELECT M_FILE_MGMT_SEQ.NEXTVAL AS NEXTVAL FROM DUAL", new HashMap<String, String>());
+						if (seqMap != null && seqMap.get("NEXTVAL") != null) {
+							newFid = Long.parseLong(seqMap.get("NEXTVAL").toString());
+						}
+					} catch (Exception ex) {
+						log.warn("M_FILE_MGMT_SEQ 채번 실패, 트리거 자동 채번 대체", ex);
+					}
 
-				Map<String, String> mapParam = new HashMap<String, String>();
-				mapParam.put("FILE_NAME", originalFileName);
-				mapParam.put("FILE_SIZE", fileSize);
-				mapParam.put("FILE_CONTENT_TYPE", ext);
-				mapParam.put("FILE_TYPE_CODE", "파일");
-				mapParam.put("FILE_DESC", jobType);
-				mapParam.put("FILE_PATH", relativeFilePath);
-				mapParam.put("UPPER_INFO", fileSearchKey);
-				mapParam.put("REG_USER", realUid);
-				mapParam.put("UPD_USER", realUid);
-				mapParam.put("M_USITE_NO", realUsite);
+					String insertSql = "INSERT INTO M_FILE_MGMT ("
+							+ (newFid != null ? "M_FILE_MGMT_NO, " : "")
+							+ "M_USITE_NO, FILE_PATH, FILE_NAME, FILE_SIZE, FILE_EXT, JOB_TYPE, "
+							+ (upperKeyVal != null ? "JOB_KEY, " : "")
+							+ "FILE_SEARCH_KEY, USE_FLAG, REG_DATE, REG_USER, UPD_DATE, UPD_USER) VALUES ("
+							+ (newFid != null ? newFid + ", " : "")
+							+ "NVL(TO_NUMBER(@M_USITE_NO@), 44), @FILE_PATH@, @FILE_NAME@, NVL(TO_NUMBER(@FILE_SIZE@), 0), @FILE_EXT@, @JOB_TYPE@, "
+							+ (upperKeyVal != null ? upperKeyVal + ", " : "")
+							+ "@FILE_SEARCH_KEY@, '1', "
+							+ QueryGenerator.genSysDate(DB_TYPE, true)
+							+ "TO_NUMBER(@REG_USER@), "
+							+ QueryGenerator.genSysDate(DB_TYPE, true)
+							+ "TO_NUMBER(@UPD_USER@))";
 
-				monArchDao.exeUpdate(insertSql, mapParam);
+					Map<String, String> mapParam = new HashMap<String, String>();
+					mapParam.put("M_USITE_NO", realUsite);
+					mapParam.put("FILE_PATH", relativeFilePath);
+					mapParam.put("FILE_NAME", originalFileName);
+					mapParam.put("FILE_SIZE", fileSize);
+					mapParam.put("FILE_EXT", ext);
+					mapParam.put("JOB_TYPE", jobType);
+					mapParam.put("FILE_SEARCH_KEY", fileSearchKey);
+					mapParam.put("REG_USER", realUid);
+					mapParam.put("UPD_USER", realUid);
+
+					monArchDao.exeUpdate(insertSql, mapParam);
+				} else {
+					// 신규 시퀀스 채번
+					try {
+						Map<String, Object> seqMap = monArchDao.queryForMap("SELECT M_IMAGE_GAL_SEQ.NEXTVAL AS NEXTVAL FROM DUAL", new HashMap<String, String>());
+						if (seqMap != null && seqMap.get("NEXTVAL") != null) {
+							newFid = Long.parseLong(seqMap.get("NEXTVAL").toString());
+						}
+					} catch (Exception ex) {
+						log.warn("M_IMAGE_GAL_SEQ 채번 실패, 기본 시퀀스 바인딩 대체", ex);
+					}
+
+					String insertSql = "INSERT INTO M_IMAGE_GAL ("
+							+ (newFid != null ? "M_IMAGE_GAL_NO, " : QueryGenerator.genSequenceCol(DB_TYPE, "M_IMAGE_GAL_NO", true))
+							+ "FILE_NAME, FILE_SIZE, FILE_CONTENT_TYPE, FILE_TYPE_CODE, FILE_DESC, "
+							+ "FILE_PATH, UPPER_INFO, "
+							+ (upperKeyVal != null ? "UPPER_KEY, " : "")
+							+ "REG_DATE, UPD_DATE, REG_USER, UPD_USER, M_USITE_NO) VALUES ("
+							+ (newFid != null ? newFid + ", " : QueryGenerator.genSequenceStmt(DB_TYPE, "M_IMAGE_GAL_SEQ", true))
+							+ "@FILE_NAME@, @FILE_SIZE@, @FILE_CONTENT_TYPE@, @FILE_TYPE_CODE@, @FILE_DESC@, "
+							+ "@FILE_PATH@, @UPPER_INFO@, "
+							+ (upperKeyVal != null ? upperKeyVal + ", " : "")
+							+ QueryGenerator.genSysDate(DB_TYPE, true)
+							+ QueryGenerator.genSysDate(DB_TYPE, true)
+							+ "@REG_USER@, @UPD_USER@, @M_USITE_NO@)";
+
+					Map<String, String> mapParam = new HashMap<String, String>();
+					mapParam.put("FILE_NAME", originalFileName);
+					mapParam.put("FILE_SIZE", fileSize);
+					mapParam.put("FILE_CONTENT_TYPE", ext);
+					mapParam.put("FILE_TYPE_CODE", "파일");
+					mapParam.put("FILE_DESC", jobType);
+					mapParam.put("FILE_PATH", relativeFilePath);
+					mapParam.put("UPPER_INFO", fileSearchKey);
+					mapParam.put("REG_USER", realUid);
+					mapParam.put("UPD_USER", realUid);
+					mapParam.put("M_USITE_NO", realUsite);
+
+					monArchDao.exeUpdate(insertSql, mapParam);
+				}
+				// 20261109 khma End : multiFileNew(M_FILE_MGMT)와 singleFileNew(M_IMAGE_GAL) 저장 테이블 분기 처리
 
 				resultMap.put("result", "OK");
 				resultMap.put("fid", newFid != null ? String.valueOf(newFid) : "");
@@ -1606,11 +1648,12 @@ public class UploadController {
 	}
 
 	/**
-	 * 차세대 드래그앤드롭 파일 다운로드 (singleFileNew / multiFileNew 전용)
-	 * M_IMAGE_GAL 의 fid(M_IMAGE_GAL_NO) 또는 상대 filePath 를 기반으로 물리 파일을 안전 스트림 다운로드한다.
+	 * 신규 드래그앤드롭 파일 다운로드 (singleFileNew: M_IMAGE_GAL / multiFileNew: M_FILE_MGMT 분기)
+	 * 대상 테이블의 fid 또는 상대 filePath 를 기반으로 물리 파일을 안전 스트림 다운로드한다.
 	 *
-	 * @param fid 이미지 갤러리 번호 (M_IMAGE_GAL_NO)
-	 * @param filePath 상대 파일 경로 (fid 부재 시 대체)
+	 * @param fid 파일 식별 번호 (M_IMAGE_GAL_NO 또는 M_FILE_MGMT_NO)
+	 * @param filePath 상대 파일 경로 (singleFileNew 등 fid 부재 시 대체)
+	 * @param fileTarget 조회 대상 테이블 구분 (기본값: M_IMAGE_GAL, multiFileNew: M_FILE_MGMT)
 	 * @param request HttpServletRequest
 	 * @param response HttpServletResponse
 	 * @throws Exception 파일 다운로드 예외
@@ -1619,6 +1662,7 @@ public class UploadController {
 	public void downloadFileNew(
 			@RequestParam(value = "fid", required = false, defaultValue = "") String fid,
 			@RequestParam(value = "filePath", required = false, defaultValue = "") String filePath,
+			@RequestParam(value = "fileTarget", required = false, defaultValue = "M_IMAGE_GAL") String fileTarget,
 			HttpServletRequest request,
 			HttpServletResponse response) throws Exception {
 
@@ -1651,11 +1695,26 @@ public class UploadController {
 			String targetFilePath = "";
 			String downloadFileName = "";
 
-			// 20261103 khma : 임의 filePath 파라미터 직접 다운로드 차단, 오직 DB(M_IMAGE_GAL)에 등록된 fid로만 다운로드 허용
-			if (StringUtils.isNotEmpty(fid)) {
-				String sql = "SELECT * FROM M_IMAGE_GAL WHERE M_IMAGE_GAL_NO = ? AND (USE_YN IS NULL OR USE_YN <> 'N')";
+			// 20261109 khma Start : multiFileNew(M_FILE_MGMT) 및 singleFileNew(M_IMAGE_GAL) 조회 분기 처리
+			if (StringUtils.isNotEmpty(fid) || StringUtils.isNotEmpty(filePath)) {
 				MonArchDaoImpl monArchDao = new MonArchDaoImpl();
-				Map<String, Object> mapFileInfo = monArchDao.downloadFile(sql, fid);
+				Map<String, Object> mapFileInfo = null;
+
+				if ("M_FILE_MGMT".equalsIgnoreCase(fileTarget)) {
+					if (StringUtils.isNotEmpty(fid)) {
+						String sql = "SELECT * FROM M_FILE_MGMT WHERE M_FILE_MGMT_NO = ? AND USE_FLAG = '1'";
+						mapFileInfo = monArchDao.downloadFile(sql, fid);
+					}
+				} else {
+					if (StringUtils.isNotEmpty(fid)) {
+						String sql = "SELECT * FROM M_IMAGE_GAL WHERE M_IMAGE_GAL_NO = ? AND (USE_YN IS NULL OR USE_YN <> 'N')";
+						mapFileInfo = monArchDao.downloadFile(sql, fid);
+					} else if (StringUtils.isNotEmpty(filePath)) {
+						String sql = "SELECT * FROM M_IMAGE_GAL WHERE FILE_PATH = ? AND (USE_YN IS NULL OR USE_YN <> 'N')";
+						mapFileInfo = monArchDao.downloadFile(sql, filePath);
+					}
+				}
+
 				if (mapFileInfo != null && !mapFileInfo.isEmpty()) {
 					String fileUsite = (mapFileInfo.get("M_USITE_NO") != null) ? mapFileInfo.get("M_USITE_NO").toString() : "";
 					if (StringUtils.isNotEmpty(sessionUsite) && StringUtils.isNotEmpty(fileUsite) && !sessionUsite.equals(fileUsite)) {
@@ -1682,7 +1741,7 @@ public class UploadController {
 					return;
 				}
 			} else {
-				log.warn("fid 누락 파일 다운로드 시도 차단");
+				log.warn("fid 및 filePath 누락 파일 다운로드 시도 차단");
 				response.setContentType("text/html; charset=UTF-8");
 				PrintWriter out = response.getWriter();
 				out.write("<script>alert('비정상적인 파일 요청입니다. (파일 식별자 누락)'); history.back();</script>");
@@ -1690,6 +1749,7 @@ public class UploadController {
 				out.close();
 				return;
 			}
+			// 20261109 khma End : multiFileNew(M_FILE_MGMT) 및 singleFileNew(M_IMAGE_GAL) 조회 분기 처리
 
 			if (StringUtils.isEmpty(downloadFileName) && StringUtils.isNotEmpty(targetFilePath)) {
 				downloadFileName = FilenameUtils.getName(targetFilePath);
@@ -1780,12 +1840,13 @@ public class UploadController {
 	}
 
 	/**
-	 * 차세대 안전 파일 삭제 및 휴지통 이동 (/deleteFileSafe)
+	 * 개선 안전 파일 삭제 및 휴지통 이동 (/deleteFileSafe)
 	 * 파일을 영구 파기하지 않고 휴지통 디렉토리(/FileData/trash/년/월/)로 안전 이동하여 롤백 및 감사 보존을 지원한다.
 	 *
-	 * @param fid 대상 M_IMAGE_GAL_NO
-	 * @param filePath 대상 상대 경로 (fid 부재 시)
+	 * @param fid 대상 M_IMAGE_GAL_NO 또는 M_FILE_MGMT_NO
+	 * @param filePath 대상 상대 경로 (singleFileNew 등 fid 부재 시)
 	 * @param uid 삭제 요청자 ID
+	 * @param fileTarget 삭제 대상 테이블 구분 (기본값: M_IMAGE_GAL, multiFileNew: M_FILE_MGMT)
 	 * @param request HttpServletRequest
 	 * @param response HttpServletResponse
 	 * @throws Exception 파일 삭제 및 이동 예외
@@ -1795,6 +1856,7 @@ public class UploadController {
 			@RequestParam(value = "fid", required = false, defaultValue = "") String fid,
 			@RequestParam(value = "filePath", required = false, defaultValue = "") String filePath,
 			@RequestParam(value = "uid", required = false, defaultValue = "") String uid,
+			@RequestParam(value = "fileTarget", required = false, defaultValue = "M_IMAGE_GAL") String fileTarget,
 			HttpServletRequest request,
 			HttpServletResponse response) throws Exception {
 
@@ -1822,8 +1884,8 @@ public class UploadController {
 			String sessionUid = StringUtils.isNotEmpty(userInfo.getUserNo()) ? userInfo.getUserNo() : userInfo.getUserCode();
 			String sessionUsite = StringUtils.isNotEmpty(userInfo.getUsiteNo()) ? userInfo.getUsiteNo() : "";
 
-			// 20261103 khma : fid 식별자 누락 시 삭제 거부 (임의 경로 직접 삭제 방지)
-			if (StringUtils.isEmpty(fid)) {
+			// 20261109 khma : fid 및 filePath 모두 누락된 경우 삭제 거부
+			if (StringUtils.isEmpty(fid) && StringUtils.isEmpty(filePath)) {
 				resultMap.put("result", "FAIL");
 				resultMap.put("message", "삭제 대상 파일 식별자(fid)가 누락되었습니다.");
 				out.print(new ObjectMapper().writeValueAsString(resultMap));
@@ -1833,9 +1895,23 @@ public class UploadController {
 			// 20261102 khma : D: 드라이브 부재 로컬/VDI 환경 자동 Fallback 지원 기본 업로드 경로 취득
 			String defaultFilePath = getBaseUploadPath(request);
 			MonArchDaoImpl monArchDao = new MonArchDaoImpl();
+			Map<String, Object> mapFileInfo = null;
 
-			String sql = "SELECT * FROM M_IMAGE_GAL WHERE M_IMAGE_GAL_NO = ?";
-			Map<String, Object> mapFileInfo = monArchDao.downloadFile(sql, fid);
+			// 20261109 khma Start : multiFileNew(M_FILE_MGMT) 및 singleFileNew(M_IMAGE_GAL) 삭제 대상 조회 분기
+			if ("M_FILE_MGMT".equalsIgnoreCase(fileTarget)) {
+				String sql = "SELECT * FROM M_FILE_MGMT WHERE M_FILE_MGMT_NO = ?";
+				mapFileInfo = monArchDao.downloadFile(sql, fid);
+			} else {
+				if (StringUtils.isNotEmpty(fid)) {
+					String sql = "SELECT * FROM M_IMAGE_GAL WHERE M_IMAGE_GAL_NO = ?";
+					mapFileInfo = monArchDao.downloadFile(sql, fid);
+				} else if (StringUtils.isNotEmpty(filePath)) {
+					String sql = "SELECT * FROM M_IMAGE_GAL WHERE FILE_PATH = ? AND (USE_YN IS NULL OR USE_YN <> 'N')";
+					mapFileInfo = monArchDao.downloadFile(sql, filePath);
+				}
+			}
+			// 20261109 khma End : multiFileNew(M_FILE_MGMT) 및 singleFileNew(M_IMAGE_GAL) 삭제 대상 조회 분기
+
 			if (mapFileInfo == null || mapFileInfo.isEmpty()) {
 				resultMap.put("result", "FAIL");
 				resultMap.put("message", "삭제 대상 파일 정보가 존재하지 않습니다.");
@@ -1904,18 +1980,34 @@ public class UploadController {
 					}
 				}
 
-				// 20261103 khma : DB 행 완전 삭제 대신 소프트 삭제(USE_YN='N', DEL_DATE=SYSDATE, DEL_USER) 적용
-				String delSql = "UPDATE M_IMAGE_GAL "
-						+ "   SET USE_YN = 'N', "
-						+ "       DEL_DATE = SYSDATE, "
-						+ "       DEL_USER = @DEL_USER@, "
-						+ "       UPD_DATE = SYSDATE, "
-						+ "       UPD_USER = @DEL_USER@ "
-						+ " WHERE M_IMAGE_GAL_NO = @M_IMAGE_GAL_NO@";
-				Map<String, String> delParam = new HashMap<String, String>();
-				delParam.put("M_IMAGE_GAL_NO", fid);
-				delParam.put("DEL_USER", sessionUid);
-				monArchDao.exeUpdate(delSql, delParam);
+				// 20261109 khma Start : multiFileNew(M_FILE_MGMT: USE_FLAG='0') 및 singleFileNew(M_IMAGE_GAL: USE_YN='N') 소프트 삭제 분기
+				if ("M_FILE_MGMT".equalsIgnoreCase(fileTarget)) {
+					String targetFid = StringUtils.isNotEmpty(fid) ? fid : (mapFileInfo.get("M_FILE_MGMT_NO") != null ? mapFileInfo.get("M_FILE_MGMT_NO").toString() : "");
+					String delSql = "UPDATE M_FILE_MGMT "
+							+ "   SET USE_FLAG = '0', "
+							+ "       DEL_DATE = SYSDATE, "
+							+ "       UPD_DATE = SYSDATE, "
+							+ "       UPD_USER = TO_NUMBER(@DEL_USER@) "
+							+ " WHERE M_FILE_MGMT_NO = TO_NUMBER(@M_FILE_MGMT_NO@)";
+					Map<String, String> delParam = new HashMap<String, String>();
+					delParam.put("M_FILE_MGMT_NO", targetFid);
+					delParam.put("DEL_USER", sessionUid);
+					monArchDao.exeUpdate(delSql, delParam);
+				} else {
+					String targetFid = StringUtils.isNotEmpty(fid) ? fid : (mapFileInfo.get("M_IMAGE_GAL_NO") != null ? mapFileInfo.get("M_IMAGE_GAL_NO").toString() : "");
+					String delSql = "UPDATE M_IMAGE_GAL "
+							+ "   SET USE_YN = 'N', "
+							+ "       DEL_DATE = SYSDATE, "
+							+ "       DEL_USER = @DEL_USER@, "
+							+ "       UPD_DATE = SYSDATE, "
+							+ "       UPD_USER = @DEL_USER@ "
+							+ " WHERE M_IMAGE_GAL_NO = @M_IMAGE_GAL_NO@";
+					Map<String, String> delParam = new HashMap<String, String>();
+					delParam.put("M_IMAGE_GAL_NO", targetFid);
+					delParam.put("DEL_USER", sessionUid);
+					monArchDao.exeUpdate(delSql, delParam);
+				}
+				// 20261109 khma End : multiFileNew(M_FILE_MGMT: USE_FLAG='0') 및 singleFileNew(M_IMAGE_GAL: USE_YN='N') 소프트 삭제 분기
 			}
 
 			resultMap.put("result", "OK");
@@ -2010,6 +2102,6 @@ public class UploadController {
 	}
 	// 20261102 khma End : 물리 파일 업로드 기본 경로 취득
 
-	// 20261102 khma End : 차세대 드래그앤드롭 파일 시스템 신규 엔드포인트 (/uploadFileNew, /downloadFileNew, /deleteFileSafe)
+	// 20261102 khma End : 신규 드래그앤드롭 파일 시스템 엔드포인트 (/uploadFileNew, /downloadFileNew, /deleteFileSafe)
 
 }
