@@ -77,7 +77,7 @@
 | **Step 1-2c**| `src/co/kr/kydbm/core/dao/MonArchDaoImpl.java` | exeLoginProcess 로그인 쿼리 내 미사용 '거래처' 테이블 서브쿼리 제거 (ORA-00942 오류 원천 방어 및 NULL 처리) | `[x]` | `[ ]` | **로컬 수정 완료 (VDI 반영 대기)** |
 | **Step 10-2**| `WebContent/css/Common.css`, `Theme_*.css`, `MonArchResource.js`, `monform.jsp`, `favicon.ico` | 헤더 상단 탑바(사이트선택/법인검색/저장버튼) UI 리팩토링 및 사이트별(CEO/MS/PRO) 클래스 직결 배경색/캐시파쇄(?v=)/파비콘 404 해결 | `[x]` | `[x]` | **완료 (VDI 반영 및 정상동작 확인)** |
 | **Step 10-3**| `WebContent/js/core/jquery.kdb.core.superTree.js`, `superChart.js`, `superContaner.js`, `MonArch.js` | superTree(4개 메서드) 및 superChart(3개 메서드) js/core 모듈 독립 분리 및 디스패처 연동 | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
-| **Step 5-5** | `운영쿼리정보/M_FILE_MGMT.sql`, `UploadController.java`, `superContaner.js`, `Resource.js`, `Monarch820-servlet.xml` | CRM.M_FILE_MGMT 테이블/트리거/인덱스 DDL 작성, singleFileNew(M_IMAGE_GAL 유지) vs multiFileNew(M_FILE_MGMT 및 MULTIFILE_LIST 분기), 주석 내 '차세대' 표현을 '신규'로 일괄 정비 | `[x]` | `[ ]` | **로컬 수정 완료 (VDI 반영 대기)** |
+| **Step 5-5** | `운영쿼리정보/M_FILE_MGMT.sql`, `UploadController.java`, `superContaner.js`, `Resource.js`, `Monarch820-servlet.xml` | CRM.M_FILE_MGMT 테이블/트리거/인덱스 DDL 작성, singleFileNew(M_IMAGE_GAL 유지) vs multiFileNew(M_FILE_MGMT 및 MULTIFILE_LIST 분기), 주석 내 '차세대' 표현을 '신규'로 일괄 정비, 데이터 수정 이력 서비스명(M_DATA_HIST) 변경 | `[x]` | `[ ]` | **로컬 수정 완료 (VDI 반영 대기)** |
 
 | **Step 3** | `MonArchDaoImpl.java`, `FilterGenerator.java`, 프로시저/배치 등 | KSign SecureDB 개인정보 암복호화 (DB UDF 쿼리 함수 우선 적용 방식) | `[ ]` | `[ ]` | **최종 마지막 단계로 진행 예정 (보류)** |
 

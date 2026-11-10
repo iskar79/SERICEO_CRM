@@ -11600,7 +11600,11 @@ $(document).on("blur", ".t_Money", function (e) {
 				
 				if (option.UpdateLogName != "" && _logval != undefined && _logval != "") {
 					var pl = new JSONClientParameters();
+					// 20261110 khma : 데이터 수정 이력 저장 서비스명을 M_DATA_HIST 표준 서비스명으로 변경
+					/*
 					pl.add("service", "데이터수정이력");
+					*/
+					pl.add("service", "M_DATA_HIST");
 					pl.add("method", "CREATE");
 					pl.add("데이터명", option.UpdateLogName);
 					pl.add("키번호", _key);
