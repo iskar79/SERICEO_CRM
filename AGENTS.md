@@ -299,7 +299,7 @@ VDI 내부망 코드를 카메라로 촬영하여 전달받는 경우, 단순 OC
   * 헤더 상단 탑바(사이트선택/법인검색/저장버튼) UI 리팩토링 및 사이트별(CEO/MS/PRO) 클래스 직결 배경색/캐시파쇄(?v=)/파비콘 404 해결 완료.
 * **[완료] Step 10-3 (core/jquery.kdb.core.superTree.js, superChart.js, superContaner.js, MonArch.js)** ([① 로컬: 완료(x) / ② VDI: 완료(x)]):
   * superContaner.js에서 superTree(4개 메서드) 및 superChart(3개 메서드)를 js/core 하위 모듈로 독립 분리 및 디스패처 연동 완료.
-* **[진행중] Step 5-5 (운영쿼리정보/M_FILE_MGMT.sql, UploadController.java, superContaner.js, Resource.js, Monarch820-servlet.xml)** ([① 로컬: 완료(x) / ② VDI: 대기( )]):
-  * CRM.M_FILE_MGMT 풀 DDL(시퀀스/트리거/코멘트/인덱스 3종) 작성, singleFileNew 및 multiFileNew 모두 M_FILE_MGMT 테이블(FILE_SEARCH_KEY 기준, MON_COMMON / MULTIFILE_LIST 쿼리 연동)로 일원화, 주석 내 '차세대' 표현을 '신규'로 일괄 정비, 데이터 수정 이력 저장 서비스명(`데이터수정이력` ➡️ `M_DATA_HIST`) 변경 완료.
+* **[완료] Step 5-5 (운영쿼리정보/M_FILE_MGMT.sql, UploadController.java, superContaner.js, Resource.js, Monarch820-servlet.xml)** ([① 로컬: 완료(x) / ② VDI: 완료(x)]):
+  * CRM.M_FILE_MGMT 풀 DDL(시퀀스/트리거/코멘트/인덱스 3종) 작성, singleFileNew 및 multiFileNew 모두 M_FILE_MGMT 테이블(FILE_SEARCH_KEY 기준, MON_COMMON / MULTIFILE_LIST 쿼리 연동)로 일원화, 주석 내 '차세대' 표현을 '신규'로 일괄 정비, 데이터 수정 이력 저장 서비스명(`데이터수정이력` ➡️ `M_DATA_HIST`) 변경 및 VDI 반영 확인 완료.
 * **[대기/보류] Step 3 (SecureDB 개인정보 암복호화 - DB UDF 쿼리 함수 우선 방식)**:
   * 시스템 전반(전체 테이블 컬럼, 프로시저, 일배치, 쿼리)에 미치는 영향도가 가장 크므로, 모든 단위 기능 검증 및 시스템 안정화 완료 후 **최종 마지막 순서**로 검토 및 적용 진행 예정.
