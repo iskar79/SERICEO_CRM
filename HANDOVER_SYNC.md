@@ -109,7 +109,7 @@
 | **Step 5-5** | `운영쿼리정보/M_FILE_MGMT.sql`, `UploadController.java`, `superContaner.js`, `Resource.js`, `Monarch820-servlet.xml` | CRM.M_FILE_MGMT 테이블/트리거/인덱스 DDL 작성, singleFileNew 및 multiFileNew 모두 M_FILE_MGMT(FILE_SEARCH_KEY 및 MULTIFILE_LIST)로 일원화, 데이터 수정 이력 서비스명(M_DATA_HIST) 변경 | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
 | **Step 11-1**| `WebContent/js/jquery.kdb.superContaner.js` | 그리드 렌더링(tableShowData) 시 템플릿 행(TrData)에서 컬럼별 메타데이터(colMetaList) 1회 사전 캐싱으로 매 행·셀 반복 DOM .attr() 조회 제거 | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
 | **Step 11-2**| `WebContent/js/jquery.kdb.MonArch800.js` | `$.decHTML` 함수에서 변환 대상 엔티티(`&`) 및 `<br>` 태그가 없는 일반 문자열 조기 반환(Early Return) 처리로 불필요한 정규식 체인 실행 제거 | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
-| **Step 10-4**| `WebContent/js/core/jquery.kdb.core.superMap.js`, `jquery.kdb.core.superAnswer.js`, `superContaner.js`, `MonArch.js` | superMap(지도 11개 메서드) 및 SuperAnswer(설문/답변 5개 메서드) js/core 모듈 독립 분리 및 디스패처 연동 | `[x]` | `[ ]` | **로컬 수정 완료 (VDI 반영 대기)** |
+| **Step 10-4**| `WebContent/js/core/jquery.kdb.core.superMap.js`, `jquery.kdb.core.superAnswer.js`, `superContaner.js`, `MonArch.js` | superMap(지도 11개 메서드) 및 SuperAnswer(설문/답변 5개 메서드) js/core 모듈 독립 분리 및 디스패처 연동 | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
 | **Step 3** | `MonArchDaoImpl.java`, `FilterGenerator.java`, 프로시저/배치 등 | KSign SecureDB 개인정보 암복호화 (DB UDF 쿼리 함수 우선 적용 방식) | `[ ]` | `[ ]` | **최종 마지막 단계로 진행 예정 (보류)** |
 
 ## 운영 WAR 생성 전 필수 확인 알림
@@ -119,8 +119,6 @@
 - [ ] **운영 DB 정보 암호화**: 로컬 개발용 JDBC 설정과 운영 접속 정보가 다르므로, 운영용 URL·계정을 적용하고 비밀번호를 `ENC(...)`로 변환한 뒤 WAR에 평문 운영 비밀번호가 포함되지 않았는지 확인한다. 운영 Tomcat의 Jasypt 복호화 키가 해당 ENC 값과 일치하는지도 확인한다.
 - [ ] **SQL 파라미터 로깅 레벨**: `WebContent/WEB-INF/log4j.properties`의 `JdbcTemplate` 및 `NamedParameterJdbcTemplate` DEBUG 설정을 운영 WAR 생성 전에 검토하고, 운영용 로그 레벨로 조정했는지 확인한다.
 
-## 📌 다음 작업 예정 (월요일 재개 포인트)
-- **Step 10-4 (superContaner.js 모듈 추가 분리)**:
-  - `superMap` (지도 컴포넌트 11개 메서드, 약 640라인) ➡️ `WebContent/js/core/jquery.kdb.core.superMap.js`
-  - `SuperAnswer` (설문/답변 컴포넌트 5개 메서드, 약 480라인) ➡️ `WebContent/js/core/jquery.kdb.core.superAnswer.js`
-  - `superContaner.js` 디스패처 위임 및 `MonArch.js` 스크립트 순차 로드 연동
+## 📌 다음 작업 예정
+- **Step 3 (SecureDB 개인정보 암복호화 - DB UDF 쿼리 함수 우선 방식)**:
+  - 모든 단위 기능 검증 및 시스템 안정화 완료 후 최종 마지막 단계로 검토 및 진행 예정.
