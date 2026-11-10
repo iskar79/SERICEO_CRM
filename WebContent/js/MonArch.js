@@ -74,6 +74,10 @@
     document.writeln('<script type="text/javascript" src="/js/core/jquery.kdb.core.superCalendar.js"></script>');
     document.writeln('<script type="text/javascript" src="/js/core/jquery.kdb.core.superTree.js"></script>');
     document.writeln('<script type="text/javascript" src="/js/core/jquery.kdb.core.superChart.js"></script>');
+    // 20261110 khma Start : 지도(superMap) 및 설문/답변(SuperAnswer) 분리 모듈 순차 로드 추가
+    document.writeln('<script type="text/javascript" src="/js/core/jquery.kdb.core.superMap.js"></script>');
+    document.writeln('<script type="text/javascript" src="/js/core/jquery.kdb.core.superAnswer.js"></script>');
+    // 20261110 khma End : 지도 및 설문/답변 분리 모듈 순차 로드 추가
     // 20261106 khma End : core 하위 분리 모듈 순차 로드
     document.writeln('<script type="text/javascript" src="/js/jquery.kdb.Controls.Menu.js"></script>');
     document.writeln('<script type="text/javascript" src="/js/jquery.kdb.jobButton.js"></script>');
