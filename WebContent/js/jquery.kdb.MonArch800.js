@@ -89,6 +89,10 @@
     $.decHTML = function (html) {
         if (html == undefined) return '';
 		if ( typeof html !== "string" ) { return html; }
+        // 20261110 khma : 변환 대상 엔티티(&) 및 줄바꿈 태그(<br>)가 없는 일반 문자열은 정규식 체인 생략 후 즉시 반환
+        if (html.indexOf('&') === -1 && html.indexOf('<br>') === -1) {
+            return html;
+        }
         return html.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&#92;/g, '\\').replace(/&nbsp;/g, ' ').replace(/<br>/g, "\n").replace(/&apos;/g, "'").replace(/&quot;/g, "\"").replace(/&amp;/g, "&");
     };
     $.isEncHTML = function (str) {
