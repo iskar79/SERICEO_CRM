@@ -4766,9 +4766,10 @@ $(document).on("blur", ".t_Money", function (e) {
 
       if (!file) return;
 
-      // 20261102 khma : 기존 파일이 있는 상태에서 새 파일 교체 선택 시 확인 컨펌창 제공
-      var oldVal = _contaner.attr("value");
-      var isReplace = (oldVal && oldVal !== "");
+      // 20261110 khma : 기존 첨부 파일(oldFid 또는 oldFilePath) 존재 시 새 파일 교체 확인 컨펌창 제공
+      var oldFid = $("#oldFid", _dropZone).val();
+      var oldFilePath = $("#oldFilePath", _dropZone).val();
+      var isReplace = ((oldFid && oldFid !== "") || (oldFilePath && oldFilePath !== ""));
       if (isReplace) {
         if (!confirm("기존에 첨부된 파일이 있습니다.\n새 파일 첨부 시 기존 파일은 자동 삭제(교체)됩니다.\n계속 진행하시겠습니까?")) {
           _contaner.find(".singlefile-input").val("");
@@ -4804,16 +4805,14 @@ $(document).on("blur", ".t_Money", function (e) {
       var _fieldEdit = $(".fieldEdit", _contaner);
       _fieldEdit.removeData("pendingFile");
 
-      var oldVal = _contaner.attr("value");
-      if (oldVal && oldVal !== "") {
-        var dispName = oldVal;
-        if (dispName.indexOf("/") >= 0) dispName = dispName.substring(dispName.lastIndexOf("/") + 1);
-        if (dispName.indexOf("_") >= 0) dispName = dispName.substring(dispName.indexOf("_") + 1);
-        var downUrl = _M.svcUrl[_M.Webtype].downloadFileNew + "?filePath=" + encodeURIComponent(oldVal);
-
+      // 20261110 khma : M_FILE_MGMT 기준 기존 파일 정보(oldFid, oldFileName) 복원
+      var oldFid = $("#oldFid", _dropZone).val();
+      var oldFileName = $("#oldFileName", _dropZone).val();
+      if (oldFid && oldFid !== "") {
+        var downUrl = _M.svcUrl[_M.Webtype].downloadFileNew + "?fid=" + encodeURIComponent(oldFid);
         var fileHtm = "<span class='icon i-20 icon-file align-middle' style='margin-right: 4px; color: #2563eb;'></span>"
                     + "<a href='" + downUrl + "' class='singlefile-down-link' target='_blank' style='font-weight: bold; color: #1d4ed8; text-decoration: underline; margin-right: 8px;' title='클릭하여 다운로드'>"
-                    + dispName + "</a>"
+                    + (oldFileName || "첨부파일") + "</a>"
                     + "<span style='color: #e11d48; font-size: 11px;'>※ 1개의 파일만 첨부 가능하며, 새 파일 첨부 시 기존 파일은 자동 삭제(교체)됩니다.</span>";
         _statusText.html(fileHtm);
       } else {
@@ -10158,6 +10157,8 @@ $(document).on("blur", ".t_Money", function (e) {
                           + "  </span>"
                           + "  <input type='file' class='singlefile-input' style='display: none;' />"
                           + "  <input id='fileSearchKey' type='hidden' value='' />"
+                          + "  <input id='oldFid' type='hidden' value='' />"
+                          + "  <input id='oldFileName' type='hidden' value='' />"
                           + "  <input id='oldFilePath' type='hidden' value='' />"
                           + "</div>";
 
@@ -12645,17 +12646,19 @@ $(document).on("blur", ".t_Money", function (e) {
           _Obj.attr("Value", _retVal);
           if (apl != undefined) apl.add(_Obj.attr("field"), _Obj.attr("Value"));
           break;
-        case "singlefilenew": // 20261102 khma 지연 업로드 확정 처리 (Client Staging -> Server Commit)
+        case "singlefilenew": // 20261102 khma 지연 업로드 확정 처리 (20261110 khma : M_FILE_MGMT 및 FILE_SEARCH_KEY 기준으로 일원화)
           var _dropZone = $(".singlefile-dropzone", _Obj);
           var _fieldEdit = $(".fieldEdit", _Obj);
           var pendingFile = _fieldEdit.data("pendingFile");
-          var _retVal = _Obj.attr("Value");
+          var fileSearchKey = $("#fileSearchKey", _dropZone).val();
+          if (!fileSearchKey) {
+            fileSearchKey = _M.UserInfo.id.toString() + "_" + new Date().getTime().toString();
+            $("#fileSearchKey", _dropZone).val(fileSearchKey);
+          }
+          var _retVal = fileSearchKey;
 
           if (pendingFile != undefined && pendingFile != null) {
-            var fileSearchKey = $("#fileSearchKey", _dropZone).val();
-            if (!fileSearchKey) {
-              fileSearchKey = _M.UserInfo.id.toString() + "_" + new Date().getTime().toString();
-            }
+            var oldFid = $("#oldFid", _dropZone).val();
             var oldFilePath = $("#oldFilePath", _dropZone).val();
             var jobType = _fieldEdit.attr("jobType") || "FILE";
             var parentKey = _Obj.parents(".SuperView").attr("keyvalue") || "";
@@ -12678,12 +12681,22 @@ $(document).on("blur", ".t_Money", function (e) {
               dataType: "json",
               success: function (res) {
                 if (res && res.result == "OK") {
-                  _retVal = res.filePath;
+                  _retVal = fileSearchKey;
                   _Obj.attr("Value", _retVal);
-                  $("#oldFilePath", _dropZone).val(_retVal);
+                  $("#oldFid", _dropZone).val(res.fid || "");
+                  $("#oldFileName", _dropZone).val(res.fileName || "");
+                  $("#oldFilePath", _dropZone).val(res.filePath || "");
                   _fieldEdit.removeData("pendingFile");
 
-                  if (oldFilePath && oldFilePath != _retVal) {
+                  // 기존 첨부 파일이 있었던 경우 휴지통 이동 및 소프트 삭제 처리
+                  if (oldFid && oldFid != "" && oldFid != res.fid) {
+                    $.ajax({
+                      url: _M.svcUrl[_M.Webtype].deleteFileSafe,
+                      type: "POST",
+                      data: { fid: oldFid, uid: _M.UserInfo.id },
+                      async: false
+                    });
+                  } else if (oldFilePath && oldFilePath != "" && oldFilePath != res.filePath) {
                     $.ajax({
                       url: _M.svcUrl[_M.Webtype].deleteFileSafe,
                       type: "POST",
@@ -12705,7 +12718,7 @@ $(document).on("blur", ".t_Money", function (e) {
           if (apl != undefined) apl.add(_Obj.attr("field"), _Obj.attr("Value"));
           break;
 
-        case "multifilenew": // 20261102 khma 다중 파일 지연 업로드 및 삭제 일괄 확정 처리
+        case "multifilenew": // 20261102 khma 다중 파일 지연 업로드 및 삭제 일괄 확정 처리 (M_FILE_MGMT 및 FILE_SEARCH_KEY 기준)
           var _mCont = $(".multifilenew-contaner", _Obj);
           var _fieldEdit = $(".fieldEdit", _Obj);
           var fileSearchKey = $("#fileSearchKey", _mCont).val();
@@ -12716,19 +12729,19 @@ $(document).on("blur", ".t_Money", function (e) {
           var jobType = _fieldEdit.attr("jobType") || "FILE";
           var parentKey = _Obj.parents(".SuperView").attr("keyvalue") || "";
 
-          // 1. 삭제 대기 파일 일괄 휴지통 정리 (20261109 khma : multiFileNew는 M_FILE_MGMT 테이블 대상 분기 전달)
+          // 1. 삭제 대기 파일 일괄 휴지통 정리
           var pendingDel = _fieldEdit.data("pendingDelFids") || [];
           for (var d = 0; d < pendingDel.length; d++) {
             $.ajax({
               url: _M.svcUrl[_M.Webtype].deleteFileSafe,
               type: "POST",
-              data: { fid: pendingDel[d], uid: _M.UserInfo.id, fileTarget: "M_FILE_MGMT" },
+              data: { fid: pendingDel[d], uid: _M.UserInfo.id },
               async: false
             });
           }
           _fieldEdit.removeData("pendingDelFids");
 
-          // 2. 신규 추가 대기 파일 일괄 업로드 전송 (20261109 khma : multiFileNew는 M_FILE_MGMT 테이블 대상 분기 전달)
+          // 2. 신규 추가 대기 파일 일괄 업로드 전송
           var pendingAdd = _fieldEdit.data("pendingAddFiles") || [];
           for (var a = 0; a < pendingAdd.length; a++) {
             var fData = new FormData();
@@ -12738,7 +12751,6 @@ $(document).on("blur", ".t_Money", function (e) {
             fData.append("ParentKey", parentKey);
             fData.append("UID", _M.UserInfo.id);
             fData.append("USITE", _M.UserInfo.SID);
-            fData.append("fileTarget", "M_FILE_MGMT");
 
             $.ajax({
               url: _M.svcUrl[_M.Webtype].uploadFileNew,
@@ -14334,44 +14346,75 @@ $(document).on("blur", ".t_Money", function (e) {
               );
           }
           break;
-        case "singlefilenew": // 20261102 khma 신규 드래그앤드롭 단일파일 값 바인딩 (M_IMAGE_GAL 연동)
+        case "singlefilenew": // 20261102 khma 신규 드래그앤드롭 단일파일 값 바인딩 (20261110 khma : M_FILE_MGMT 및 FILE_SEARCH_KEY 기준으로 일원화)
           var _dropZone = $(".singlefile-dropzone", _Obj);
           var _statusText = $(".singlefile-status-text", _dropZone);
           var _viewBox = $(".fieldView .fldfiledown", _Obj);
           var _fieldEdit = $(".fieldEdit", _Obj);
           _fieldEdit.removeData("pendingFile");
 
-          if (_value == "" || _value == null || _value == undefined) {
+          var sFileKey = _value;
+          if (sFileKey == "" || sFileKey == null || sFileKey == undefined) {
             var newFileKey = _M.UserInfo.id.toString() + "_" + new Date().getTime().toString();
             $("#fileSearchKey", _dropZone).val(newFileKey);
+            $("#oldFid", _dropZone).val("");
+            $("#oldFileName", _dropZone).val("");
             $("#oldFilePath", _dropZone).val("");
-            _Obj.attr("value", "");
+            _Obj.attr("value", newFileKey);
 
             var emptyHtm = "<span class='icon i-20 icon-attachment align-middle' style='margin-right: 4px;'></span>"
                          + "<span class='msg-text' style='color: #64748b;'>파일을 이곳에 드래그하거나 클릭하여 첨부하세요. (1개 파일만 첨부 가능, 최대 20MB)</span>";
             _statusText.html(emptyHtm);
             _viewBox.html("<span style='color: #94a3b8;'>파일없음</span>");
           } else {
-            $("#oldFilePath", _dropZone).val(_value);
-            _Obj.attr("value", _value);
+            $("#fileSearchKey", _dropZone).val(sFileKey);
+            _Obj.attr("value", sFileKey);
 
-            var dispName = _value;
-            if (dispName.indexOf("/") >= 0) dispName = dispName.substring(dispName.lastIndexOf("/") + 1);
-            if (dispName.indexOf("_") >= 0) dispName = dispName.substring(dispName.indexOf("_") + 1);
+            var sJobType = _fieldEdit.attr("jobType") || "FILE";
+            var sPl = new JSONClientParameters();
+            sPl.add("service", "MON_COMMON");
+            sPl.add("method", "MULTIFILE_LIST");
+            sPl.add("USITE", _M.UserInfo.SID);
+            sPl.add("UID", _M.UserInfo.id);
+            sPl.add("JOB_TYPE", sJobType);
+            sPl.add("FILE_SEARCH_KEY", sFileKey);
+            sPl.add("_viewpage", 1);
+            sPl.add("_pagecnt", 999);
 
-            var downUrl = _M.svcUrl[_M.Webtype].downloadFileNew + "?filePath=" + encodeURIComponent(_value);
+            PostJsonData(_M.svcUrl[_M.Webtype].crudUrl, sPl, function (_data) {
+              var rst = _data.resultData || [];
+              if (rst.length > 0) {
+                var item = rst[rst.length - 1];
+                var fNo = item.M_FILE_MGMT_NO;
+                var kb = (item.FILE_SIZE / 1024).toFixed(1);
+                var dispName = item.FILE_NAME + " (" + kb + " KB)";
+                var downUrl = _M.svcUrl[_M.Webtype].downloadFileNew + "?fid=" + encodeURIComponent(fNo);
 
-            var fileHtm = "<span class='icon i-20 icon-file align-middle' style='margin-right: 4px; color: #2563eb;'></span>"
-                        + "<a href='" + downUrl + "' class='singlefile-down-link' target='_blank' style='font-weight: bold; color: #1d4ed8; text-decoration: underline; margin-right: 8px;' title='클릭하여 다운로드'>"
-                        + dispName + "</a>"
-                        + "<span style='color: #e11d48; font-size: 11px;'>※ 1개의 파일만 첨부 가능하며, 새 파일 첨부 시 기존 파일은 자동 삭제(교체)됩니다.</span>";
+                $("#oldFid", _dropZone).val(fNo);
+                $("#oldFileName", _dropZone).val(dispName);
+                $("#oldFilePath", _dropZone).val(item.FILE_PATH || "");
 
-            _statusText.html(fileHtm);
-            _viewBox.html("<a href='" + downUrl + "' target='_blank' style='font-weight: bold; color: #1d4ed8; text-decoration: underline;'>" + dispName + "</a>");
+                var fileHtm = "<span class='icon i-20 icon-file align-middle' style='margin-right: 4px; color: #2563eb;'></span>"
+                            + "<a href='" + downUrl + "' class='singlefile-down-link' target='_blank' style='font-weight: bold; color: #1d4ed8; text-decoration: underline; margin-right: 8px;' title='클릭하여 다운로드'>"
+                            + dispName + "</a>"
+                            + "<span style='color: #e11d48; font-size: 11px;'>※ 1개의 파일만 첨부 가능하며, 새 파일 첨부 시 기존 파일은 자동 삭제(교체)됩니다.</span>";
+
+                _statusText.html(fileHtm);
+                _viewBox.html("<a href='" + downUrl + "' target='_blank' style='font-weight: bold; color: #1d4ed8; text-decoration: underline;'>" + dispName + "</a>");
+              } else {
+                $("#oldFid", _dropZone).val("");
+                $("#oldFileName", _dropZone).val("");
+                $("#oldFilePath", _dropZone).val("");
+                var emptyHtm = "<span class='icon i-20 icon-attachment align-middle' style='margin-right: 4px;'></span>"
+                             + "<span class='msg-text' style='color: #64748b;'>파일을 이곳에 드래그하거나 클릭하여 첨부하세요. (1개 파일만 첨부 가능, 최대 20MB)</span>";
+                _statusText.html(emptyHtm);
+                _viewBox.html("<span style='color: #94a3b8;'>파일없음</span>");
+              }
+            }, function () {}, false);
           }
           break;
 
-        case "multifilenew": // 20261102 khma 신규 드래그앤드롭 멀티파일 값 바인딩 및 목록 조회 (20261109 khma : M_FILE_MGMT 테이블 및 MULTIFILE_LIST 쿼리 연동으로 분기)
+        case "multifilenew": // 20261102 khma 신규 드래그앤드롭 멀티파일 값 바인딩 및 목록 조회 (M_FILE_MGMT 테이블 및 MULTIFILE_LIST 쿼리 연동)
           var _mCont = $(".multifilenew-contaner", _Obj);
           var _serverList = $(".multifile-server-list", _mCont);
           var _viewBox = $(".fieldView .fldfiledown", _Obj);
@@ -14391,15 +14434,7 @@ $(document).on("blur", ".t_Money", function (e) {
             $("#fileSearchKey", _mCont).val(fSearchKey);
             _Obj.attr("value", fSearchKey);
 
-            // 20261109 khma : multiFileNew는 M_FILE_MGMT 목록 조회 (MON_COMMON / MULTIFILE_LIST 쿼리 연동)
-            /*
-            var pl = new JSONClientParameters();
-            pl.add("service", "MON_COMMON");
-            pl.add("method", "SIGNFILE_LIST");
-            pl.add("UPPER_INFO", fSearchKey);
-            pl.add("_viewpage", 1);
-            pl.add("_pagecnt", 999);
-            */
+            // 20261110 khma : M_FILE_MGMT 목록 조회 (MON_COMMON / MULTIFILE_LIST 쿼리 연동)
             var jobType = _fieldEdit.attr("jobType") || "FILE";
             var pl = new JSONClientParameters();
             pl.add("service", "MON_COMMON");
@@ -14418,8 +14453,8 @@ $(document).on("blur", ".t_Money", function (e) {
                 var vHtm = "<ul style='list-style: none; padding: 0; margin: 0;'>";
                 for (var i = 0; i < rst.length; i++) {
                   var item = rst[i];
-                  var fNo = item.M_FILE_MGMT_NO || item.M_IMAGE_GAL_NO;
-                  var dUrl = _M.svcUrl[_M.Webtype].downloadFileNew + "?fid=" + fNo + "&fileTarget=M_FILE_MGMT";
+                  var fNo = item.M_FILE_MGMT_NO;
+                  var dUrl = _M.svcUrl[_M.Webtype].downloadFileNew + "?fid=" + fNo;
                   var kb = (item.FILE_SIZE / 1024).toFixed(1);
                   sHtm += "<li class='multifile-item' style='padding: 3px 6px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #e2e8f0; font-size: 12px;'>"
                        + "  <span><span class='icon i-20 icon-file align-middle'></span> <a href='" + dUrl + "' target='_blank' class='file-title' style='color: #1d4ed8; text-decoration: underline; font-weight: bold;'>" + item.FILE_NAME + "</a> <span style='color:#64748b;'>(" + kb + " KB)</span></span>"
