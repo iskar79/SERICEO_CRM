@@ -1,5 +1,5 @@
 /* jQuery grid plugin:
-* version 2.0 2026-11-04
+* version 2.0 2026-11-10
 * Requires jQuery v1.12.4 or later
 * Dual licensed under the MIT and GPL licenses:
 * http://www.opensource.org/licenses/mit-license.php
@@ -8,9 +8,39 @@
 * Company : KYDBM
 */
 
+/**
+ * MonArch CRM 달력/일정(SuperCalendar) 렌더링 및 일정 이벤트 제어 코어 모듈
+ *
+ * [모듈 개요]
+ * - 기존 jquery.kdb.superContaner.js 내부에 포함되어 있던 FullCalendar 1.5.3 기반
+ *   달력 컴포넌트 메서드 17종을 독립 모듈(js/core/jquery.kdb.core.superCalendar.js)로 분리한 파일이다.
+ * - $.fn.superContaner.calendarMethods 네임스페이스에 메서드를 등록하며,
+ *   호출 시 superContaner 본체 디스패처에서 본 모듈의 메서드로 위임(apply) 실행된다.
+ *
+ * [제공 메서드 목록 (총 17종)]
+ * 1. superCalendar      : 달력 컨테이너(SuperCalendar) 초기화, 미니 달력(datepicker), 다중 캘린더 카테고리 체크박스 및 FullCalendar 생성
+ * 2. CalList            : 표시 기간(visStart ~ visEnd) 및 체크된 캘린더 카테고리 기준으로 백엔드 일정을 조회하여 일괄 바인딩(addEventSource)
+ * 3. CalShow            : 단건 일정 데이터를 FullCalendar에 개별 렌더링(renderEvent)
+ * 4. CalRender          : 각 일정 엘리먼트 렌더링 시 시간/타이틀 아이콘 및 스티커(sticker) 스타일 적용
+ * 5. CalSetEventStyle   : 일정 DOM 요소 내부에 아이콘(calicon) 및 툴팁 타이틀 HTML 태그 삽입
+ * 6. CalDayClick        : 달력 날짜 셀 클릭 이벤트 핸들러 (확장 포인트)
+ * 7. CalClick           : 등록된 일정 클릭 시 편집 가능 여부(editable)에 따라 수정용 팝업(ShowReadEditJson) 또는 조회 전용 팝업(ShowReadOnlyJson) 호출
+ * 8. CalAfterRender     : 일정 렌더링 완료 후 후처리 콜백 핸들러
+ * 9. CalDragStop        : 일정 드래그 종료 시점 핸들러
+ * 10. CalReSizeStop     : 일정 기간 리사이즈 종료 시점 핸들러
+ * 11. CalAdd            : 달력 빈 영역 드래그 선택 시 단일 입력폼 즉시 팝업 또는 다중 입력폼 선택 다이얼로그 표시
+ * 12. CalShowDetail     : 선택된 캘린더 카테고리의 신규 일정 등록 팝업(ShowCalEditJson) 오픈 및 저장 후 일정 목록 갱신
+ * 13. CalDrop           : 일정을 다른 날짜/시간으로 드래그 앤 드롭 이동 완료 시 CalUpdate 호출
+ * 14. CalResize         : 일정 종료일/시간 리사이즈 완료 시 CalUpdate 호출
+ * 15. CalUpdate         : 이동 또는 리사이즈된 일정의 시작/종료 일시 및 종일 여부(allDayFlag)를 백엔드에 동기 업데이트
+ * 16. CalClear          : 전체 또는 특정 클래스명의 일정 소스를 달력에서 제거
+ * 17. CalendarListParent: 상위 부모 컨테이너의 키값(key) 변경 시 연동된 하위 캘린더(subCalendar) 일정을 재조회
+ */
 // 20261104 khma : superContaner.js 달력(superCalendar) 컴포넌트 모듈 분리 추출
 // 20261106 khma : js/core 폴더 구조 표준화에 따라 core/jquery.kdb.core.superCalendar.js로 이관 배치
+// 20261110 khma : 모듈 개요, 메서드별 상세 Javadoc 및 내부 로직 단계별 설명 주석 보강
 (function ($) {
+  // 20261104 khma : 상위 플러그인(superContaner) 선행 로드 여부 검증
   if (!$.fn.superContaner) {
     if (window.console && console.error) {
       console.error(
@@ -20,14 +50,23 @@
     return;
   }
 
+  // 20261104 khma : 달력 전용 메서드 네임스페이스 초기화
   if (!$.fn.superContaner.calendarMethods) {
     $.fn.superContaner.calendarMethods = {};
   }
 
   $.extend($.fn.superContaner.calendarMethods, {
+    /**
+     * 달력 컨테이너(SuperCalendar) 레이아웃, 좌측 미니 달력(datepicker), 카테고리별 체크박스 및 FullCalendar 본문을 생성한다.
+     *
+     * @param {string|Object} option 화면 구조체 JSON 명칭 또는 구조체 옵션 객체
+     * @param {string} [objKey] 초기 연동 키값
+     */
     superCalendar: function (option, objKey) {
       var _Obj = $(this);
       var _jsonName = option;
+
+      // 1. 문자열 형태로 구조체명이 전달된 경우 서버/캐시에서 JSON 설정 객체를 로드한다.
       if (typeof _jsonName == "string") {
         option = GETJSON(_jsonName);
         $(this).attr("jsonName", _jsonName);
@@ -38,34 +77,29 @@
       if (option == undefined) {
         option = viewOption;
       }
+
+      // 2. 컨테이너 DOM에 구조체 옵션을 바인딩하고 SuperCalendar 클래스를 적용한다.
       _Obj
         .data("jsonData", option)
         .removeClass()
         .addClass("SuperContaner SuperCalendar");
 
-      /* ----------------------------------------------------------------------------- */
-      // 외곽디자인 구성
-      /* ----------------------------------------------------------------------------- */
+      // 3. 상단 헤더(.head) 및 작업 버튼 영역(.jobArea)을 생성한다.
       var _head = $("<div class='head'></div>").appendTo(_Obj);
-      /* ----------------------------------------------------------------------------- */
-      // 작업버턴영역 생성
-      /* ----------------------------------------------------------------------------- */
       var _jobArea = $("<div class='jobArea jobArea-bg'></div>").appendTo(
         _head
       );
       var _Btnset = $("<div class='buttonset'></div>").appendTo(_jobArea);
       _Obj.makeButtons(_jobArea);
 
-      /* ----------------------------------------------------------------------------- */
-      // Body생성
-      /* ----------------------------------------------------------------------------- */
-      // var _body = $("<div class='body body-bg'></div>").appendTo(_Obj);
+      // 4. 본문(.body) 및 좌측 미니 달력/카테고리 영역(.calChkArea)을 생성한다.
       var _body = $("<div class='body'></div>").appendTo(_Obj);
 
       var _calChkArea = $(
         "<div class='calChkArea'><div class='calTitle'><div class='calDiv'><a>Calendar</a></div></div></div>"
       ).appendTo(_body);
 
+      // 좌측 미니 달력(jQuery UI datepicker) 바인딩: 날짜 클릭 시 우측 FullCalendar를 해당 일자(agendaDay)로 이동시킨다.
       $(".calChkArea").datepicker({
         nextText: ">",
         prevText: "<",
@@ -83,7 +117,6 @@
           switch (mm) {
             case -1:
               mm == 0;
-
             case 13:
               mm == 0;
               break;
@@ -93,7 +126,7 @@
           Mover = $(".calArea");
           Checker = Mover.fullCalendar("getView");
           if (oldDate != dateText) {
-            // 동일날짜클릭 방지
+            // 동일 날짜 중복 클릭이 아닌 경우에만 해당 날짜의 일간 뷰(agendaDay)로 전환한다.
             Mover.fullCalendar("gotoDate", yy, mm, dd);
             Mover.fullCalendar("changeView", "agendaDay");
           }
@@ -101,6 +134,7 @@
         },
       });
 
+      // 5. 다중 캘린더 카테고리 목록(My Calendar) 체크박스를 생성한다.
       $("<div class='calCategory'>My Calendar</div>").appendTo(
         $(".calChkArea")
       );
@@ -112,15 +146,6 @@
       $.each(option.calendars, function (index, value) {
         if (value == undefined) return;
         checkBoxid = "calcheck" + formCID++;
-        // var _calChkSpan =
-        // $("<div></div>").appendTo(_calChkArea);
-        // _calChkSpan.css("background-color",
-        // value.eventColor).css("color", 'white');
-        // var calChkBox = $("<input type='checkbox'
-        // value='1' id='" + checkBoxid + "' /><label
-        // for='" + checkBoxid + "'>" + value.name +
-        // "</label>").appendTo(_calChkSpan).css('width',
-        // 'auto');
         var _calChkSpan = $(
           "<div class='selectArea' style='position:relative'></div>"
         ).appendTo(_calChkArea);
@@ -146,10 +171,9 @@
           .css("width", "auto");
 
         calChkBox.attr("service", value.service);
-        // 체크박스가 변경될때 새로 검색하도록 액션을 넣는다.
+
+        // 카테고리 체크박스 변경 시: 체크되면 해당 캘린더 일정을 조회(CalList)하고, 해제되면 해당 이벤트 소스를 제거한다.
         calChkBox.change(function () {
-          // var _calArea =
-          // $(this).parents('superCalendar').find('.calArea');
           if ($(this).is(":checked")) {
             $(".calcheck" + index).css("background-position", "2px -17px");
             var view = $(".calArea").fullCalendar("getView");
@@ -173,6 +197,7 @@
           }
         });
 
+        // 캘린더 카테고리별 CRUD 메서드, 색상, 상세 뷰(viewJson), 편집 가능 여부(editable), 종일 여부(allDayFlag)를 속성에 저장한다.
         if (value.method.Create != undefined) {
           calChkBox.attr("methodCreate", value.method.Create);
         }
@@ -218,16 +243,15 @@
           calChkBox.attr("objKeyName", value.keyName);
         }
       });
+
+      // 6. 우측 본문 FullCalendar 영역(.calArea)을 생성하고 기본 뷰 모드(month/week/day)를 설정한다.
       var _calArea = $(
         "<div class='calArea' initDisplayTf='0' ></div>"
       ).appendTo(_body);
       if (option.isShowCalChkArea) {
         $(".calChkArea", _Obj).show();
-        // $('.calArea', _Obj).css("margin-left", "126px");
-        // $('.calArea', _Obj).css("margin-left", "196px"); JDM
       } else {
         $(".calChkArea", _Obj).hide();
-        // $('.calArea', _Obj).css("margin-left", "0px"); JDM
       }
       _calArea.fullCalendar(_M.fullCalendar);
 
@@ -237,23 +261,25 @@
         _calArea.fullCalendar("changeView", "agendaDay");
       }
 
-      /* ----------------------------------------------------------------------------- */
-      // status생성
-      /* ----------------------------------------------------------------------------- */
+      // 7. 하단 상태줄(.status) 생성 및 옵션에 따른 표시 여부 제어 후 창 리사이즈 이벤트를 트리거하여 요일 폭 비율을 맞춘다.
       var _status = $("<div class='status'>status</div>").appendTo(_Obj);
 
-      // 필터표시여부 결정
       $(".jobArea", _Obj).toggle(
         option.isShowjobArea == undefined ? true : option.isShowjobArea
       );
-
       $(".status", _Obj).toggle(option.isShowStatus);
 
-      // 2018.01.30 dmjung :: resize 이벤트를 Calendar 생성 이후 호출, 특정 요일만 비율 맞지
-      // 않는 문제 해결하기 위함.
       $(window).resize();
     },
 
+    /**
+     * 현재 달력 표시 기간(view.visStart ~ view.visEnd)과 체크된 카테고리를 기준으로 백엔드에서 일정을 조회하여 달력에 일괄 바인딩한다.
+     *
+     * @param {Object} view FullCalendar View 객체 (visStart, visEnd 보유)
+     * @param {jQuery} [obj] SuperCalendar 컨테이너 객체
+     * @param {string} [targetCalName] 특정 캘린더 카테고리만 조회할 경우 대상 카테고리명 (미지정 시 체크된 전체 카테고리 조회)
+     * @param {string} [key] 상위 부모 컨테이너 연동 키값
+     */
     CalList: function (view, obj, targetCalName, key) {
       var _Obj = $(this).parents(".SuperCalendar");
       if (obj != undefined) {
@@ -261,26 +287,25 @@
       }
 
       var _calArea = _Obj.find(".calArea");
-
       _json = _Obj.data("jsonData");
 
+      // 1. 조회 시작일(_s)과 종료일(_e) 타임스탬프를 추출한다.
       _s = _M.f.d.DateGetTimeStamp(view.visStart);
       _e = _M.f.d.DateGetTimeStamp(view.visEnd);
 
+      // 전체 카테고리 재조회인 경우 기존 일정을 먼저 비운다.
       if (targetCalName == undefined) {
         var targetEvent = _calArea.fullCalendar("getEvents");
         _calArea.fullCalendar("removeEvents");
       }
 
-      // 칼렌더 수만큼 반복
+      // 2. 좌측 카테고리 체크박스 중 선택된 항목을 순회하며 각각의 서비스/메서드로 일정을 비동기 조회한다.
       $(".calChkArea input[type='checkbox']", _Obj).each(function (
         index,
         value
       ) {
         var calinfo = $(this);
         if (calinfo.is(":checked")) {
-          // alert(targetCalName + '/' +
-          // value.className);
           if (
             targetCalName == undefined ||
             targetCalName == calinfo.attr("calName")
@@ -301,37 +326,21 @@
             var eventColor = calinfo.attr("eventColor");
             var jsonName = $(this).attr("viewJson");
             var editable = calinfo.attr("editable");
-            var allDayFlag = calinfo.attr("allDayFlag"); // 구조체에서
-            // 셋팅된
-            // alldayflag
-            // khma
+            var allDayFlag = calinfo.attr("allDayFlag");
             var service = calinfo.attr("service");
             var methodUpdate = calinfo.attr("methodUpdate");
             var methodDelete = calinfo.attr("methodDelete");
             var methodRead = calinfo.attr("methodRead");
-            // eventParam.add("methodUpdate",
-            // $(this).attr('methodUpdate'));
-            // eventParam.add("methodDelete",
-            // $(this).attr('methodDelete'));
-            // eventParam.add("methodRead",
-            // $(this).attr('methodRead'));
 
-            // eventParam.add("eventTitleCss",
-            // $(this).attr('eventTitleCss'));
-            // eventParam.add("eventTimeCss",
-            // $(this).attr('eventTimeCss'));
             PostJsonData(
               _M.svcUrl[_M.Webtype].crudUrl,
               pl,
               function (_data) {
                 if (_data.resultData.length > 0) {
-                  /*
-                   * 20180328 khma 캘린더 속도
-                   * 개선용 Start
-                   */
-                  var eventList = new Array(); // khma
+                  // 3. 조회된 일정 레코드들을 eventList 배열로 일괄 조립한 뒤 addEventSource로 한 번에 렌더링한다 (렌더링 속도 개선).
+                  var eventList = new Array();
                   $.each(_data.resultData, function (index, row) {
-                    var event = new Object(); // khma
+                    var event = new Object();
 
                     // 20261104 khma : Java Spring 단일 환경 표준화 (미사용 .NET 날짜 /Date()/ eval 분기 정리)
                     var _from = row.fromdatetime;
@@ -346,75 +355,16 @@
                     } else {
                       _to = eval(_to);
                     }
-                    /*
-                    var _from = row.fromdatetime;
-                    if (_from != null) {
-                      if (_M.Webtype == "NET") {
-                        _from = eval(_from.replace(/\/Date\((\d+)\)\//gi, "new Date($1)"));
-                      } else {
-                        _from = new Date(_from);
-                      }
-                    }
-                    */
 
-                    /*
-                     * if
-                     * (row.TitleCss !=
-                     * undefined) {
-                     * eventParam.add("eventTitleCss",
-                     * row.TitleCss); }
-                     * else {
-                     * eventParam.add("eventTitleCss",
-                     * calinfo.attr('eventTitleCss')); }
-                     *
-                     * if
-                     * (row.TimeCss !=
-                     * undefined) {
-                     * eventParam.add("eventTimeCss",
-                     * row.TimeCss); }
-                     * else {
-                     * eventParam.add("eventTimeCss",
-                     * calinfo.attr('eventTimeCss')); }
-                     * if(row.allDayFlag !=
-                     * undefined){
-                     * //20180327
-                     * db에서
-                     * 설정된
-                     * alldayflag
-                     * 셋팅
-                     * 추가
-                     * khma
-                     * if(row.allDayFlag ==
-                     * '1'){
-                     * eventParam.add("allDayFlag",
-                     * 'true');
-                     * }else{
-                     * eventParam.add("allDayFlag",
-                     * 'false'); } }
-                     * _Obj.superContaner("CalShow",
-                     * row.title,
-                     * row.id,
-                     * _from,
-                     * _to,
-                     * eventParam.toArray());
-                     */
-
-                    // khma
-                    // start
                     event.title = $.decHTML(row.title);
                     event.id = classType + row.id;
                     event.className = classType;
                     event.start = _from;
                     event.end = _to;
                     event.sticker = row.sticker;
+
+                    // DB 조회 결과에 allDayFlag('1'/'0')가 있으면 우선 적용하고, 없으면 구조체 기본값을 따른다.
                     if (row.allDayFlag != undefined) {
-                      // 20180327
-                      // db에서
-                      // 설정된
-                      // alldayflag
-                      // 셋팅
-                      // 추가
-                      // khma
                       if (row.allDayFlag == "1") {
                         event.allDay = true;
                       } else {
@@ -450,30 +400,17 @@
                       event.eventTimeCss = calinfo.attr("eventTimeCss");
                     }
 
-                    eventList.push(event); // 이벤트
-                    // 목록
-                    // 일괄
-                    // 셋팅
+                    eventList.push(event);
                   });
-                  // 리스트 표시전 대상 칼렌더를 클리어함
+
+                  // 조립된 일정 배열을 FullCalendar 이벤트 소스로 일괄 추가한다.
                   _calArea.fullCalendar("addEventSource", eventList);
-                  /*
-                   * 20180328 khma 캘린더 속도
-                   * 개선용 End
-                   */
 
                   if (_json.afterListCallBack != undefined)
                     eval(_json.afterListCallBack)(_Obj);
-                } else {
-                  // _Obj.superContaner("tableShowMessage",
-                  // "0 Recodes ...");
                 }
               },
-              function (response) {
-                // _Obj.superContaner("tableShowMessage",
-                // response.Message);
-                // alert(response);
-              },
+              function (response) {},
               _M.aSync.async
             );
           }
@@ -481,8 +418,16 @@
       });
     },
 
+    /**
+     * 단건 일정을 FullCalendar 화면에 즉시 추가(renderEvent)한다.
+     *
+     * @param {string} Title 일정 제목
+     * @param {string} id 일정 고유 키값
+     * @param {Date|string} fromDatetime 시작 일시
+     * @param {Date|string} endDatetime 종료 일시
+     * @param {Object} eventParam 카테고리명, 색상, 편집 가능 여부, 연결 viewJson 등 부가 속성 객체
+     */
     CalShow: function (Title, id, fromDatetime, endDatetime, eventParam) {
-      // if (eventParam.classType == undefined) classType = "할일";
       if (fromDatetime == undefined) fromDatetime = _M.f.d.getTimeStamp();
       if (endDatetime == undefined) endDatetime = _M.f.d.getTimeStamp();
       var allDayFlag = false;
@@ -510,18 +455,23 @@
       });
     },
 
+    /**
+     * FullCalendar가 각 일정 블록(element)을 렌더링할 때 시간(eventTimeCss), 제목(eventTitleCss), 스티커(sticker) 아이콘 스타일을 적용한다.
+     *
+     * @param {Object} event FullCalendar 이벤트 데이터 객체
+     * @param {jQuery} element 렌더링되는 일정 DOM 엘리먼트
+     */
     CalRender: function (event, element) {
       var _Obj = $(this).parents(".SuperCalendar");
       var sticker = event.sticker;
 
+      // 1. 일정 시간 영역 아이콘 스타일 적용 (시간 영역이 없는 종일 일정은 제목 영역에 대체 적용)
       if (undefined != event.eventTimeCss) {
-        // 이벤트타임의 태그적용
         var _elementName = "span.fc-event-time";
         if (
           element.find(_elementName).text() == undefined ||
           element.find(_elementName).text() == ""
         ) {
-          // 엘레멘트가 없을때는 타이틀로 속성을 대신함
           _elementName = "span.fc-event-title";
         }
         _Obj.superContaner(
@@ -532,8 +482,8 @@
         );
       }
 
+      // 2. 일정 제목 영역 아이콘 스타일 적용
       if (undefined != event.eventTitleCss) {
-        // 이벤트타이틀의 태그적용
         _Obj.superContaner(
           "CalSetEventStyle",
           element,
@@ -541,13 +491,9 @@
           event.eventTitleCss
         );
       }
-      // else {
-      // _Obj.superContaner("CalSetEventStyle", element,
-      // "span.fc-event-title", '');
-      // }
 
+      // 3. 일정 스티커 아이콘 표시
       if (sticker != undefined) {
-        // sticker 표시
         _Obj.superContaner(
           "CalSetEventStyle",
           element,
@@ -556,18 +502,25 @@
         );
       }
     },
+
+    /**
+     * 일정 엘리먼트 내부의 지정된 선택자(elementName)에 아이콘 클래스(cssName)와 툴팁 타이틀이 포함된 HTML을 삽입한다.
+     *
+     * @param {jQuery} element 일정 DOM 엘리먼트
+     * @param {string} elementName 대상 하위 선택자 ('div.fc-event-inner', 'span.fc-event-title', 'span.fc-event-time')
+     * @param {string} cssName 적용할 아이콘 CSS 클래스명
+     */
     CalSetEventStyle: function (element, elementName, cssName) {
-      // 이벤트의 타이틀과 타입의 텍스트에 태그를 적용 할수있다.
       var tagStr = "";
       if (elementName == "div.fc-event-inner") {
-        // TODO sticker
+        // 스티커 아이콘을 일정 내부 컨테이너 앞에 추가한다.
         tagStr +=
           "<span class='icon calicon " +
           cssName +
           " align-middle'></span>" +
           element.find("div.fc-event-inner").html();
       } else {
-        // TODO eventIcon
+        // 시간 또는 제목 텍스트 앞에 아이콘을 추가하고 마우스 오버 title 툴팁을 부여한다.
         tagStr +=
           "<span class='icon calicon " +
           cssName +
@@ -576,38 +529,37 @@
           element.find(elementName).text() +
           "'>" +
           element.find(elementName).text() +
-          "</span>"; // html태그를
-        // 포함한
-        // title의
-        // 문자열을
-        // 취득
+          "</span>";
       }
       eventElem = element.find(elementName);
       eventElem.html(tagStr);
     },
-    CalDayClick: function (date, allDay, jsEvent, view, obj) {
-      // alert('caldayclcick');
-      // var _Obj = $(this).parents('.SuperCalendar');
-      // var _json = _Obj.data('jsonData');
-      // var _calArea = $(this).parents('.calArea');
-      // $.ShowEditJson(_json.MainCalendar.viewJson,
-      // _json.MainCalendar.name,function(){
-      // var view = _calArea.fullCalendar("getView");
-      // var targetEvent =
-      // _calArea.fullCalendar("getEventsByClassName",_json.MainCalendar.name);
-      // for (i = 0; i < targetEvent.length; i++) {
-      // _calArea.fullCalendar('removeEvents',targetEvent[i].id);
-      // }
-      // _Obj.superContaner("CalList",view, _Obj,
-      // _json.MainCalendar.name);
-      // });
-    },
+
+    /**
+     * 달력 날짜 셀 클릭 이벤트 핸들러 (FullCalendar dayClick 콜백 연동용).
+     *
+     * @param {Date} date 클릭된 날짜
+     * @param {boolean} allDay 종일 여부
+     * @param {Event} jsEvent 브라우저 네이티브 이벤트
+     * @param {Object} view FullCalendar View 객체
+     * @param {jQuery} obj 컨테이너 객체
+     */
+    CalDayClick: function (date, allDay, jsEvent, view, obj) {},
+
+    /**
+     * 달력에 표시된 일정을 클릭했을 때 상세 조회/수정 팝업을 오픈하고 팝업 종료 시 해당 카테고리 일정을 갱신한다.
+     *
+     * @param {Object} calEvent 클릭된 FullCalendar 이벤트 객체 (editable, viewJson, eventKey, className 포함)
+     * @param {Event} jsEvent 브라우저 네이티브 이벤트
+     * @param {Object} view FullCalendar View 객체
+     * @param {jQuery} obj 컨테이너 객체
+     */
     CalClick: function (calEvent, jsEvent, view, obj) {
       var _Obj = $(this).parents(".SuperCalendar");
       var _calArea = $(this).parents(".calArea");
+
+      // 편집 가능(editable == true) 일정인 경우 조회/수정 겸용 팝업(ShowReadEditJson)을 호출한다.
       if (calEvent.editable == true) {
-        // $.ShowCalEditJson(calEvent.viewJson, _Obj,calEvent.start,
-        // calEvent.end, calEvent.allDay, function(_key) {
         $.ShowReadEditJson(
           calEvent.viewJson,
           calEvent.eventKey,
@@ -626,14 +578,15 @@
                 view,
                 _Obj,
                 calEvent.className[0]
-              ); // 리스트표시
+              );
             } else {
-              $(this).superContaner("CalendarListParent"); // 리스트표시
+              $(this).superContaner("CalendarListParent");
             }
           },
           true
         );
       } else {
+        // 읽기 전용 일정인 경우 조회 전용 팝업(ShowReadOnlyJson)을 호출한다.
         $.ShowReadOnlyJson(
           calEvent.viewJson,
           calEvent.eventKey,
@@ -651,24 +604,37 @@
       }
     },
 
+    /**
+     * 일정 렌더링 완료 직후 호출되는 FullCalendar eventAfterRender 훅 핸들러.
+     */
     CalAfterRender: function (event, element, view) {},
-    CalDragStop: function (event, jsEvent, ui, view, obj) {
-      // TODO
-    },
-    CalReSizeStop: function (event, jsEvent, ui, view, obj) {
-      //
-    },
+
+    /**
+     * 일정 드래그 종료 시 호출되는 FullCalendar eventDragStop 훅 핸들러.
+     */
+    CalDragStop: function (event, jsEvent, ui, view, obj) {},
+
+    /**
+     * 일정 기간 리사이즈 종료 시 호출되는 FullCalendar eventResizeStop 훅 핸들러.
+     */
+    CalReSizeStop: function (event, jsEvent, ui, view, obj) {},
+
+    /**
+     * 달력에서 날짜/시간 영역을 선택하여 새 일정을 등록할 때 편집 가능한 캘린더 수에 따라 즉시 입력 팝업을 열거나 입력폼 선택 팝업을 표시한다.
+     *
+     * @param {Date} start 선택된 시작 일시
+     * @param {Date} end 선택된 종료 일시
+     * @param {boolean} allDay 종일 일정 여부
+     */
     CalAdd: function (start, end, allDay) {
       var _Obj = $(".SuperCalendar");
       var _json = _Obj.data("jsonData");
       var _calArea = _Obj.find(".calArea");
       var view = _calArea.fullCalendar("getView");
 
-      // 20150212 khma 켈린더 복수 입력 기능 추가
-      // alert("새 칼란더 추가: start::" + start + " end::" + end + "allDay::" +
-      // allDay);
-      var targetCalendar; // 보여줄 켈린더
-      var targetCalendarCnt = 0; // editable true인 켈린더수
+      // 1. 구조체에 정의된 캘린더 중 편집 가능(editable !== false)한 캘린더 개수를 확인한다.
+      var targetCalendar;
+      var targetCalendarCnt = 0;
 
       for (var i = 0; i < _json.calendars.length; i++) {
         if (
@@ -680,12 +646,9 @@
         }
       }
 
-      // TODO 켈린더 목록 취득
+      // 2. 편집 가능한 캘린더가 1개뿐이면 즉시 해당 캘린더의 상세 등록 팝업(CalShowDetail)을 오픈한다.
       if (targetCalendarCnt == 1) {
         $(document.body).find(".kcontextMenu").remove();
-        // 해당 켈린더 1건의 뷰화면을 팝업으로 표시한다.
-        // targetCalendar = _json.calendars[0]; // 상기 추가코드에서 미리 지정하므로
-        // 주석처리함
         $(this).superContaner(
           "CalShowDetail",
           _Obj,
@@ -694,23 +657,19 @@
           start,
           end,
           allDay
-        ); // 리스트표시
+        );
       } else if (targetCalendarCnt > 1) {
-        // TODO 팝업 선택 화면을 표시한다.
+        // 3. 편집 가능한 캘린더가 2개 이상이면 사용자가 입력할 캘린더 양식을 선택할 수 있는 모달 다이얼로그를 표시한다.
         var popTitle = "입력 폼 선택 팝업";
         $(document.body).find(".kcontextMenu").remove();
         $(document.body).append(
           "<div class='kcontextMenu calendarViewPopup' ></div>"
         );
 
-        // 셀렉트TAG를 그림
         var _calListTag = $('<div class="row"></div>').appendTo(
           $(document.body).find(".kcontextMenu")
         );
-        //
         $('<a class="Label">입력 폼 선택</a>').appendTo(_calListTag);
-        // css({"color":"#000000", "font-weight":"bold",
-        // "min-width":"90px", "padding-right": "10px"}).
 
         var _selTag = $(
           '<select name="calendarForm" id="calendarForm" size="1"></select>'
@@ -728,7 +687,7 @@
           }
         }
 
-        // 다이얼로그 열기
+        // 입력 폼 선택 다이얼로그 오픈
         $(document.body)
           .find(".kcontextMenu")
           .dialog({
@@ -751,7 +710,7 @@
                   start,
                   end,
                   allDay
-                ); // 리스트표시
+                );
               },
               닫기: function () {
                 $(this).dialog("close");
@@ -766,6 +725,17 @@
         return false;
       }
     },
+
+    /**
+     * 선택된 캘린더 카테고리의 신규 일정 등록 팝업($.ShowCalEditJson)을 열고, 저장 완료 후 해당 캘린더 일정을 재조회한다.
+     *
+     * @param {jQuery} _Obj SuperCalendar 컨테이너 객체
+     * @param {jQuery} _calArea FullCalendar(.calArea) 객체
+     * @param {Object} targetCalendar 등록 대상 캘린더 설정 객체 (viewJson, name 포함)
+     * @param {Date} start 시작 일시
+     * @param {Date} end 종료 일시
+     * @param {boolean} allDay 종일 여부
+     */
     CalShowDetail: function (
       _Obj,
       _calArea,
@@ -776,7 +746,6 @@
     ) {
       var parentKey = _calArea.data("keyValue");
 
-      // 메인켈린더를 뷰에 표시함..
       if (
         undefined != targetCalendar.viewJson &&
         "" != targetCalendar.viewJson
@@ -804,16 +773,18 @@
 
             var option = $(".SuperCalendar").data("jsonData");
             if (option.calendarMode != "subCalendar") {
-              $(this).superContaner("CalList", view, _Obj, targetCalendar.name); // 리스트표시
+              $(this).superContaner("CalList", view, _Obj, targetCalendar.name);
             } else {
-              $(this).superContaner("CalendarListParent"); // 리스트표시
+              $(this).superContaner("CalendarListParent");
             }
-            // _Obj.superContaner("CalList",view, _Obj,
-            // _json.MainCalendar.name);
           }
         );
       }
     },
+
+    /**
+     * 일정을 드래그하여 다른 날짜/시간에 드롭했을 때 변경된 일시를 백엔드에 업데이트(CalUpdate)한다.
+     */
     CalDrop: function (
       event,
       dayDelta,
@@ -825,10 +796,13 @@
       view,
       obj
     ) {
-      // 이벤트를 이동시켜 드랍된 경우 날자를 갱신
       var _Obj = $(this).parents(".SuperCalendar");
       _Obj.superContaner("CalUpdate", event);
     },
+
+    /**
+     * 일정 블록의 끝을 드래그하여 기간(종료 일시)을 리사이즈했을 때 변경된 일시를 백엔드에 업데이트(CalUpdate)한다.
+     */
     CalResize: function (
       event,
       dayDelta,
@@ -839,16 +813,20 @@
       view,
       obj
     ) {
-      // 이벤트를 리사이징시켜서 완료된경우 날자를 갱신
       var _Obj = $(this).parents(".SuperCalendar");
       if (event.end == undefined) {
-        // 리사이즈시 스케쥴일자가 하루인경우 날자를 가져오지 못하므로 dayDelta를 기준으로 변경한다.
+        // 하루짜리 일정 리사이즈 시 종료일(end)이 비어 있으면 시작일(start)로 보정한다.
         event.end = event.start;
       }
       _Obj.superContaner("CalUpdate", event);
     },
+
+    /**
+     * 드래그 이동(CalDrop) 또는 기간 변경(CalResize)된 일정의 시작/종료 일시와 종일 여부를 백엔드에 동기 저장한다.
+     *
+     * @param {Object} updateEvent 변경된 FullCalendar 이벤트 객체
+     */
     CalUpdate: function (updateEvent) {
-      // 카렌더가 이동되면 변경사항을 업데이트한다.
       var pl = new JSONClientParameters();
       pl.add("service", updateEvent.serviceName);
       pl.add("method", updateEvent.methodUpdate);
@@ -868,22 +846,22 @@
       PostJsonData(
         _M.svcUrl[_M.Webtype].crudUrl,
         pl,
-        function (_data) {
-          // // if (_json.afterUpdateCallBack != undefined &&
-          // _json.afterUpdateCallBack != "")
-          // eval(_json.afterUpdateCallBack)(oCmd);
-        },
+        function (_data) {},
         function (response) {
-          // // $("#hm").html('Error : ' + response.Message);
           alert(response.Message);
         },
         _M.aSync.sync
       );
     },
+
+    /**
+     * 달력 영역(calArea)에서 전체('all') 또는 특정 카테고리('className')의 일정 소스를 제거한다.
+     *
+     * @param {jQuery} calArea FullCalendar(.calArea) 객체
+     * @param {string} [opt] 삭제 옵션 ('all' 또는 'className')
+     * @param {string} [value] 클래스명 조건값
+     */
     CalClear: function (calArea, opt, value) {
-      // [opt]'all':AllClear,
-      // 'className'
-      // alert('opt: ' + opt );
       var targetEvent;
       if (calArea != undefined) {
         if (opt == undefined || opt == "all") {
@@ -899,9 +877,14 @@
         if (targetEvent.length > 0)
           calArea.fullCalendar("removeEventSource", targetEvent[0].source);
       }
-    }, // 20180329 미사용
+    },
+
+    /**
+     * 상위 부모 컨테이너에서 행 선택 등으로 키값(key)이 전달되었을 때 하위 연동 달력(subCalendar)의 일정을 재조회한다.
+     *
+     * @param {string} [key] 상위 부모 레코드 키값 (미전달 시 기존에 저장된 keyValue 사용)
+     */
     CalendarListParent: function (key) {
-      // var _Obj = $('#MainView').find('.SuperCalendar');
       var _Obj = $(".SuperCalendar");
       var _caljson = _Obj.data("jsonData");
       var _calArea = _Obj.find(".calArea");
@@ -915,8 +898,6 @@
 
       if (_calArea.data("keyValue") != undefined) {
         var view = _calArea.fullCalendar("getView");
-        // alert("mituketa!!!" + key + " : " +_caljson.MainCalendar.name
-        // );
         var targetEvent = _calArea.fullCalendar(
           "getEventsByClassName",
           _caljson.MainCalendar.name
@@ -934,4 +915,3 @@
     },
   });
 })(jQuery);
-
