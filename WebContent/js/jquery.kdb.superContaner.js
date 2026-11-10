@@ -6830,6 +6830,26 @@ $(document).on("blur", ".t_Money", function (e) {
           $("td:eq(" + index + ")", TrData).addClass("none");
         }
       });
+
+      // 20261110 khma Start : 그리드 렌더링 시 매 행·매 셀마다 반복되던 DOM 속성(.attr) 조회를 방지하기 위해 템플릿 행(TrData)에서 컬럼 메타데이터 1회 사전 캐싱
+      var colMetaList = [];
+      $("td", TrData).each(function (cIdx, cTd) {
+        var $cTd = $(cTd);
+        colMetaList[cIdx] = {
+          name: $cTd.attr("name"),
+          field: $cTd.attr("field"),
+          subfield: $cTd.attr("subfield"),
+          type: $cTd.attr("type"),
+          dynamicCss: $cTd.attr("dynamicCss"),
+          showText: $cTd.attr("showText"),
+          sizewidth: $cTd.attr("sizewidth"),
+          sizeheight: $cTd.attr("sizeheight"),
+          mode: $cTd.attr("mode"),
+          mask: $cTd.attr("mask")
+        };
+      });
+      // 20261110 khma End : 템플릿 행(TrData) 컬럼 메타데이터 1회 사전 캐싱
+
       // 레코드만큼 반복하면서 데이터를 바인딩한다
       $.each(_rows, function (index, row) {
         var newTr = TrData.clone();
@@ -6856,6 +6876,8 @@ $(document).on("blur", ".t_Money", function (e) {
         $.each($("td", newTr), function (index, td) {
           if (index < 1) return;
           var _td = $(td);
+          // 20261110 khma Start : 사전 캐싱된 컬럼 메타데이터(colMetaList) 참조로 반복 DOM .attr() 호출 제거
+          /*
           _name = _td.attr("name");
           _field = _td.attr("field");
           _subfield = _td.attr("subfield");
@@ -6865,6 +6887,18 @@ $(document).on("blur", ".t_Money", function (e) {
           _sizewidth = _td.attr("sizewidth");
           _sizeheight = _td.attr("sizeheight");
           _mode = _td.attr("mode");
+          */
+          var meta = colMetaList[index] || {};
+          _name = meta.name;
+          _field = meta.field;
+          _subfield = meta.subfield;
+          _type = meta.type;
+          _dynamicCss = meta.dynamicCss;
+          _showText = meta.showText;
+          _sizewidth = meta.sizewidth;
+          _sizeheight = meta.sizeheight;
+          _mode = meta.mode;
+          // 20261110 khma End : 사전 캐싱된 컬럼 메타데이터(colMetaList) 참조로 반복 DOM .attr() 호출 제거
 
           _data = row[_field];
           if (_subfield) {
@@ -6995,7 +7029,11 @@ $(document).on("blur", ".t_Money", function (e) {
           if (_type == _M.DataType.img) _td.attr("title", "");
 
           // 20261106 khma Start : 그리드 컬럼 마스킹 처리 (name, phone, email 등), 마우스 오버 툴팁(title)은 원본 데이터 유지
+          // 20261110 khma : 사전 캐싱된 meta.mask 참조로 변경
+          /*
           var _mask = _td.attr("mask");
+          */
+          var _mask = meta.mask;
           if (_mask && _data && (!_mode || _mode != "edit")) {
             var _maskedVal = $.applyGridMasking(_data, _mask);
             _td.text(_maskedVal);
