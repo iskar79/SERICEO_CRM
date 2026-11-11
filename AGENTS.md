@@ -305,7 +305,7 @@ VDI 내부망 코드를 카메라로 촬영하여 전달받는 경우, 단순 OC
   * 그리드 렌더링(`tableShowData`) 시 템플릿 행(`TrData`)에서 컬럼별 메타데이터(`colMetaList`)를 1회 사전 캐싱하여 매 행·셀마다 반복되던 DOM `.attr()` 조회 제거 완료.
 * **[완료] Step 11-2 (MonArch800.js)** ([① 로컬: 완료(x) / ② VDI: 완료(x)]):
   * `$.decHTML` 함수에서 변환 대상 엔티티(`&`) 및 `<br>` 태그가 없는 일반 문자열은 정규식 9종 체인을 생략하고 즉시 반환(Early Return)하도록 개선 완료.
-* **[진행중] Step 10-4 (core/jquery.kdb.core.superMap.js, superAnswer.js, superTree.js, superChart.js, superCalendar.js, superContaner.js, MonArch.js, MonArch_Simple.js, SurveyAnsform.htm)** ([① 로컬: 완료(x) / ② VDI: 대기( )]):
-  * `superContaner.js`에서 `superMap`(지도 11개 메서드) 및 `SuperAnswer`(설문/답변 5개 메서드)를 `js/core` 하위 모듈로 독립 분리하고, `js/core/` 하위 5대 분리 모듈 전체 상세 Javadoc/단계별 설명 주석 보강, `MonArch_Simple.js` 코어 모듈 로드 추가, `SurveyAnsform.htm` jQuery 1.12.4 상향 및 `superAnswer.js` 내 `dspmode == 1` 비교 연산자 수정 완료.
+* **[완료] Step 10-4 (core/jquery.kdb.core.superMap.js, superAnswer.js, superTree.js, superChart.js, superCalendar.js, superContaner.js, MonArch.js, MonArch_Simple.js, SurveyAnsform.htm)** ([① 로컬: 완료(x) / ② VDI: 완료(x)]):
+  * `superContaner.js`에서 `superMap`(지도 11개 메서드) 및 `SuperAnswer`(설문/답변 5개 메서드)를 `js/core` 하위 모듈로 독립 분리하고, `js/core/` 하위 5대 분리 모듈 전체 상세 Javadoc/단계별 설명 주석 보강, `MonArch_Simple.js` 코어 모듈 로드 추가, `SurveyAnsform.htm` jQuery 1.12.4 상향 및 `superAnswer.js` 내 `dspmode == 1` 비교 연산자 수정 및 VDI 반영 확인 완료.
 * **[대기/보류] Step 3 (SecureDB 개인정보 암복호화 - DB UDF 쿼리 함수 우선 방식)**:
   * 시스템 전반(전체 테이블 컬럼, 프로시저, 일배치, 쿼리)에 미치는 영향도가 가장 크므로, 모든 단위 기능 검증 및 시스템 안정화 완료 후 **최종 마지막 순서**로 검토 및 적용 진행 예정.
