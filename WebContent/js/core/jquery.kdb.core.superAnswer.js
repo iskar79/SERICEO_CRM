@@ -163,7 +163,11 @@
         $(".ansbody", _Obj).empty();
         $(".ansbody", _Obj).attr("SNO", mSurveyNo);
 
+        // 20261111 khma : 기존 대입 연산자(dspmode = 1) 오타로 인해 기응답 체크(AnswerCheck)가 생략되고 항상 미리보기 모드(1)로 고정되어 응답완료 버튼 이벤트가 바인딩되지 않던 오류를 비교 연산자(dspmode == 1)로 수정
+        /*
         if ((dspmode = 1 || _Obj.superContaner("AnswerCheck") == 0)) {
+        */
+        if (dspmode == 1 || _Obj.superContaner("AnswerCheck") == 0) {
           _Obj.superContaner("AnswerGenForm", mSurveyNo, dspmode);
         } else {
           $.MessageBox("설문응답", "이미 등록된 설문입니다.");

@@ -1,13 +1,13 @@
 ﻿/// <reference path="../Resource.js" />
 
-/*  
-* version 0.1 2012-02-21
-* Requires jQuery v1.6.2 or later
+/* jQuery grid plugin: 
+* version 2.0 2026-11-11
+* Requires jQuery v1.12.4 or later
 * Dual licensed under the MIT and GPL licenses:
 * http://www.opensource.org/licenses/mit-license.php
 * http://www.gnu.org/licenses/gpl.html
-* Authors: Kim Seoung Min
-* Company : Kongyoung DB
+* Authors: Ma KyoungHo
+* Company : KYDBM
 */
 
 // 폼의 최초 관련리소스를 바인딩하기 //
@@ -60,6 +60,13 @@
     document.writeln('<script type="text/javascript" src="/js/jquery.kdb.utils.js"></script>'); //20130814 khma 공통유틸 추가
     document.writeln('<script type="text/javascript" src="/js/MonArchResource.js"></script>');
     document.writeln('<script type="text/javascript" src="/js/jquery.kdb.superContaner.js"></script>');
+    // 20261111 khma Start : SurveyAnsform.htm 등 단독 페이지에서도 분리된 core 하위 모듈(superAnswer 등)이 정상 동작하도록 순차 로드 추가
+    document.writeln('<script type="text/javascript" src="/js/core/jquery.kdb.core.superCalendar.js"></script>');
+    document.writeln('<script type="text/javascript" src="/js/core/jquery.kdb.core.superTree.js"></script>');
+    document.writeln('<script type="text/javascript" src="/js/core/jquery.kdb.core.superChart.js"></script>');
+    document.writeln('<script type="text/javascript" src="/js/core/jquery.kdb.core.superMap.js"></script>');
+    document.writeln('<script type="text/javascript" src="/js/core/jquery.kdb.core.superAnswer.js"></script>');
+    // 20261111 khma End : 분리된 core 하위 모듈 순차 로드 추가
     //document.writeln('<script type="text/javascript" src="/js/jquery.kdb.Controls.Menu.js"></script>');
     document.writeln('<script type="text/javascript" src="/js/jquery.kdb.jobButton.js"></script>');
     //document.writeln('<script type="text/javascript" src="/js/jquery.kdb.superContaner.min.js"></script>');

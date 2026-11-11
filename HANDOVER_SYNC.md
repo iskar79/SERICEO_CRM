@@ -109,7 +109,7 @@
 | **Step 5-5** | `운영쿼리정보/M_FILE_MGMT.sql`, `UploadController.java`, `superContaner.js`, `Resource.js`, `Monarch820-servlet.xml` | CRM.M_FILE_MGMT 테이블/트리거/인덱스 DDL 작성, singleFileNew 및 multiFileNew 모두 M_FILE_MGMT(FILE_SEARCH_KEY 및 MULTIFILE_LIST)로 일원화, 데이터 수정 이력 서비스명(M_DATA_HIST) 변경 | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
 | **Step 11-1**| `WebContent/js/jquery.kdb.superContaner.js` | 그리드 렌더링(tableShowData) 시 템플릿 행(TrData)에서 컬럼별 메타데이터(colMetaList) 1회 사전 캐싱으로 매 행·셀 반복 DOM .attr() 조회 제거 | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
 | **Step 11-2**| `WebContent/js/jquery.kdb.MonArch800.js` | `$.decHTML` 함수에서 변환 대상 엔티티(`&`) 및 `<br>` 태그가 없는 일반 문자열 조기 반환(Early Return) 처리로 불필요한 정규식 체인 실행 제거 | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
-| **Step 10-4**| `WebContent/js/core/jquery.kdb.core.superMap.js`, `jquery.kdb.core.superAnswer.js`, `superTree.js`, `superChart.js`, `superCalendar.js`, `superContaner.js`, `MonArch.js` | superMap(지도 11개 메서드) 및 SuperAnswer(설문/답변 5개 메서드) js/core 모듈 독립 분리, 디스패처 연동 및 core 5종 모듈 상세 Javadoc/단계별 주석 보강 | `[x]` | `[ ]` | **로컬 주석 보강 완료 (VDI 반영 대기)** |
+| **Step 10-4**| `WebContent/js/core/jquery.kdb.core.superMap.js`, `jquery.kdb.core.superAnswer.js`, `superTree.js`, `superChart.js`, `superCalendar.js`, `superContaner.js`, `MonArch.js`, `MonArch_Simple.js`, `SurveyAnsform.htm` | superMap(11개)·SuperAnswer(5개) 모듈 분리, core 5종 상세 Javadoc/단계별 주석 보강, MonArch_Simple.js 모듈 로드/SurveyAnsform.htm jQuery 1.12.4 상향 및 dspmode == 1 버그 수정 | `[x]` | `[ ]` | **로컬 수정 완료 (VDI 반영 대기)** |
 | **Step 3** | `MonArchDaoImpl.java`, `FilterGenerator.java`, 프로시저/배치 등 | KSign SecureDB 개인정보 암복호화 (DB UDF 쿼리 함수 우선 적용 방식) | `[ ]` | `[ ]` | **최종 마지막 단계로 진행 예정 (보류)** |
 
 ## 운영 WAR 생성 전 필수 확인 알림
