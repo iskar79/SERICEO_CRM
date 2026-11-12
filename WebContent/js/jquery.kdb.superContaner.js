@@ -4933,9 +4933,19 @@ $(document).on("blur", ".t_Money", function (e) {
         if (inComm == "getJson" || $(this).hasClass("btn-dev")) {
           e.stopPropagation();
           $.JsonEditPop("XLS_REASON_POPUP");
+          // 20261112 khma : 전체 .ui-widget-overlay 일괄 z-index 변경 코드 제외 (부모/타 모달 오버레이 오염 차단, 자식 다이얼로그 및 해당 오버레이만 핀포인트 상향)
+          /*
           setTimeout(function () {
             $(".ui-dialog:has(.JsonEditPop)").css("z-index", 100005);
             $(".ui-widget-overlay").css("z-index", 100004);
+          }, 50);
+          */
+          setTimeout(function () {
+            var $dlg = $(".ui-dialog:has(.JsonEditPop)");
+            if ($dlg.length > 0) {
+              $dlg.css("z-index", 100005);
+              $dlg.prev(".ui-widget-overlay").css("z-index", 100004);
+            }
           }, 50);
         }
       });
@@ -13893,11 +13903,14 @@ $(document).on("blur", ".t_Money", function (e) {
         _nm = $(this).attr("jsonName");
         // _js = $.Json2Str($(this).data("jsonData"));
         $.JsonEditPop(_nm);
+        // 20261112 khma : getJson 구조체 모달 호출 시 전체 .ui-widget-overlay z-index 일괄 변경 코드 제외 처리 (자식 모달 닫힌 후 부모 모달의 오버레이가 부모 모달을 덮어 클릭 차단/비활성화되는 현상 해결, jQuery UI 기본 스택으로 관리)
+        /*
         // 20261102 khma : 모달 팝업 내부 호출 시 다이얼로그 z-index 최상위 상향
         setTimeout(function () {
           $(".ui-dialog:has(.JsonEditPop)").css("z-index", 100005);
           $(".ui-widget-overlay").css("z-index", 100004);
         }, 50);
+        */
       }
     },
     testJson: function (Str) {
