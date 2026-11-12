@@ -111,7 +111,7 @@
 | **Step 11-2**| `WebContent/js/jquery.kdb.MonArch800.js` | `$.decHTML` 함수에서 변환 대상 엔티티(`&`) 및 `<br>` 태그가 없는 일반 문자열 조기 반환(Early Return) 처리로 불필요한 정규식 체인 실행 제거 | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
 | **Step 10-4**| `WebContent/js/core/jquery.kdb.core.superMap.js`, `jquery.kdb.core.superAnswer.js`, `superTree.js`, `superChart.js`, `superCalendar.js`, `superContaner.js`, `MonArch.js`, `MonArch_Simple.js`, `SurveyAnsform.htm` | superMap(11개)·SuperAnswer(5개) 모듈 분리, core 5종 상세 Javadoc/단계별 주석 보강, MonArch_Simple.js 모듈 로드/SurveyAnsform.htm jQuery 1.12.4 상향 및 dspmode == 1 버그 수정 | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
 | **Step 11-3**| `WebContent/js/jquery.kdb.superContaner.js` | getJson 구조체 모달 호출 시 전체 .ui-widget-overlay z-index 일괄 변경 제거 (구조체 모달 닫힌 후 부모 모달 overlay 클릭 차단/비활성화 버그 수정) | `[x]` | `[ ]` | **로컬 수정 완료 (VDI 반영 대기)** |
-| **Step 3** | `MonArchDaoImpl.java`, `FilterGenerator.java`, 프로시저/배치 등 | KSign SecureDB 개인정보 암복호화 (DB UDF 쿼리 함수 우선 적용 방식) | `[ ]` | `[ ]` | **최종 마지막 단계로 진행 예정 (보류)** |
+| **Step 3** | `CryptoService.java`, `MonArchDaoImpl.java`, `FilterGenerator.java` | KSign SecureDB Java API V2 및 NTS 검색 토큰 기반 개인정보 10개 컬럼(_ENC/_HASH) 자동 암복호화 및 색인검색 구현 (SDBAPIforJAVA-V3.7.3-2.0.4.jar) | `[ ]` | `[ ]` | **착수 대기 (API 방식 확정)** |
 
 ## 운영 WAR 생성 전 필수 확인 알림
 
@@ -121,5 +121,9 @@
 - [ ] **SQL 파라미터 로깅 레벨**: `WebContent/WEB-INF/log4j.properties`의 `JdbcTemplate` 및 `NamedParameterJdbcTemplate` DEBUG 설정을 운영 WAR 생성 전에 검토하고, 운영용 로그 레벨로 조정했는지 확인한다.
 
 ## 📌 다음 작업 예정
-- **Step 3 (SecureDB 개인정보 암복호화 - DB UDF 쿼리 함수 우선 방식)**:
-  - 모든 단위 기능 검증 및 시스템 안정화 완료 후 최종 마지막 단계로 검토 및 진행 예정.
+- **Step 3 (KSign SecureDB Java API V2 및 NTS 검색 토큰 연동 - API 표준 방식)**:
+  - 라이브러리: `WebContent/WEB-INF/lib/SDBAPIforJAVA-V3.7.3-2.0.4.jar`
+  - 공통 모듈: `src/co/kr/kydbm/common/crypto/CryptoService.java` 신규 작성
+  - 환경 설정: `src/monarch.properties` (Agent IP/Port 9909, AES256_DEV, SHA512_DEV)
+  - 대상 테이블/컬럼: `A_USER`, `A_FAMILY`, `US_USER` 10개 컬럼(`_ENC` 대칭키 암호화, `_HASH` NTS 색인 검색)
+  - 코어 연동: `MonArchDaoImpl.java` 입출력 가로채기(INSERT 전처리/SELECT 후처리), `FilterGenerator.java` NTS 조건절 변환.

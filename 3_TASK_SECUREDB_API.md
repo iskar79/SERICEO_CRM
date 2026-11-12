@@ -8,9 +8,12 @@
 * **모듈 구축 현황**: 고객사 DB 및 WAS 서버에 **KSign SecureDB 모듈 구축이 이미 완료**되어 있습니다. (DB Plugin UDF 및 Java API 방식 모두 즉시 사용 가능 상태)
 * **개념**: DB는 암호문과 검색 색인 토큰(NTS)을 보관하며, Java 코어 엔진(`MonArchDaoImpl`, `SvcCRUD`, `FilterGenerator`)이 데이터를 밀어넣기 전과 꺼낸 직후에 **`KSign SecureDB Java API V2`**를 호출하여 암/복호화 및 NTS 토큰 변환을 수행하는 방식입니다.
 * **필요 라이브러리 및 환경 요건 (KSign 공식 V2 가이드)**:
-  * `WebContent/WEB-INF/lib/` 경로에 벤더사 제공 **`ksign-sdb-api-v2.x.x.jar`** 단 1개만 배치 (구형 V1 JAR와 혼용 절대 금지).
+  * `WebContent/WEB-INF/lib/` 경로에 벤더사 제공 **`SDBAPIforJAVA-V3.7.3-2.0.4.jar`** (SecureDB Java API V2 공식 라이브러리) 단 1개만 배치 (구형 V1 JAR와 혼용 절대 금지).
   * 실행 계정에 `$SDB_HOME/conf`, `$SDB_HOME/license` 읽기 권한 및 `$SDB_HOME/logs`, 상태 파일 쓰기 권한 부여.
 * **핵심 장점**: 인덱스를 타는 초고속 검색(NTS 토큰)이 가능하여 DB 부하가 없고, 기존 DB 쿼리(`M_SERVICE`) 원본을 1건도 수정하지 않고 프레임워크 레벨에서 일괄 적용 가능합니다.
+* **DB 환경 및 시노님 연동 구조 (20261112 khma 확인)**:
+  * `MICRODEV`의 `CRM.A_USER`는 `A_USER@DBL_CEO`로 오라클 시노님(SYNONYM)이 등록되어 있어, DB 링크(`DBL_CEO`)를 통해 원격 `CEODEV`의 실제 원본 테이블을 투명하게 참조합니다.
+  * 대상 테이블(`A_USER`, `A_FAMILY`, `US_USER`)에 개인정보 10개 컬럼 각각 `_ENC`(대칭키 양방향 암호문) 및 `_HASH`(단방향 HASH NTS 검색 토큰) 컬럼이 이미 증설 완료되어 있습니다.
 
 ### 🔍 [사전 실증 완료] 고객사 DB SecureDB 동작 검증 쿼리 (20261014 khma 확인)
 DBA/보안팀에서 세팅 완료 후 실제 정상 동작을 확인한 쿼리 스펙입니다:
@@ -238,38 +241,57 @@ public class CryptoService {
 
 * **대상 파일**: `src/co/kr/kydbm/core/dao/MonArchDaoImpl.java`
 
-### 0) 실제 운영 테이블별 개인정보 컬럼 매핑 (`운영쿼리정보/` 원문 기준)
-| 운영 테이블 | 구분 | 실제 컬럼명 (`운영쿼리정보/`) | 비고 |
-| :--- | :--- | :--- | :--- |
-| **`"CEO"."A_USER"`** | 회원 마스터 | `NAME`, `EMAIL`, `SUBEMAIL`, `TELNO`, `MTELNO`, `FAXNO`, `ADDRESS1`, `ADDRESS2`, `SUBADDRESS1`, `SUBADDRESS2` | 패스워드는 `ENPW2`에 `F_SHA512(FN_MD5_CRIPT(...))` 단방향 적용 중 |
-| **`"CEO"."A_FAMILY"`** | 비서(`SEC`)/세무(`TAX`)/추천(`REC`) | `NAME`, `TELNO`, `MTELNO`, `EMAIL` | `USEQ` + `GBN` 키 구조 |
-| **`"CEO"."A_CORP"`** | 법인 마스터 | `CEONAME`, `TELNO`, `FAXNO`, `ADDRESS1`, `ADDRESS2` | 법인 대표자 및 연락처 |
-| **`"CEO"."A_CONT"` / `"A_CONT_SERV"`** | 콘텐츠 강사정보 | `PR_NAME`, `PR_EMAIL` | 발표자/강사 성명 및 이메일 |
-| **`US_USER`** | 일일배치 통합 회원 마트 | `NAME`, `EMAIL`, `SUBEMAIL`, `TELNO`, `MTELNO`, `FAXNO`, `ADDRESS1`, `ADDRESS2`, `SUBADDRESS1`, `SUBADDRESS2`, `SEC_NAME`, `SEC_TELNO`, `SEC_MTELNO`, `SEC_EMAIL`, `TAX_NAME`, `TAX_TELNO`, `TAX_MTELNO`, `TAX_EMAIL` | `USP_M_CONT_USE_STATUS` 배치에서 `A_USER` + `A_FAMILY` 조인 생성 |
+### 0) 실제 운영 테이블별 개인정보 컬럼 매핑 (20261112 khma 10개 컬럼 확인 완비)
+| 운영 테이블 | 구분 | 기본 컬럼명 | 생성된 SecureDB 컬럼 (1:1 쌍) | 비고 |
+| :--- | :--- | :--- | :--- | :--- |
+| **`"CEO"."A_USER"`** | 회원 마스터 (DBL_CEO 시노님) | `NAME`, `BIRTHDAY`, `EMAIL`, `SUBEMAIL`, `TELNO`, `MTELNO`, `ADDRESS1`, `ADDRESS2`, `SUBADDRESS1`, `SUBADDRESS2` | `컬럼명_ENC` (대칭키 암호문)<br>`컬럼명_HASH` (NTS 검색토큰) | 패스워드는 `ENPW2`에 단방향 해시 유지 |
+| **`"CEO"."A_FAMILY"`** | 비서(`SEC`)/세무(`TAX`)/추천(`REC`) | `NAME`, `TELNO`, `MTELNO`, `EMAIL` | `NAME_ENC/HASH`, `TELNO_ENC/HASH`, `MTELNO_ENC/HASH`, `EMAIL_ENC/HASH` | `USEQ` + `GBN` 키 구조 |
+| **`US_USER`** | 일일집계 통합 회원 마트 | `NAME`, `BIRTHDAY`, `EMAIL`, `SUBEMAIL`, `TELNO`, `MTELNO`, `ADDRESS1/2`, `SUBADDRESS1/2` | `컬럼명_ENC`, `컬럼명_HASH` 동일 구성 | `USP_M_CONT_USE_STATUS` 배치 적재 대상 |
 
-### 1) 파라미터 암호화 (INSERT/UPDATE 전처리)
-`SvcCRUD`에서 전달된 파라미터 Map 중 개인정보 대상 컬럼(`A_USER`, `A_FAMILY` 등)을 가로채 암호화합니다:
+### 1) 파라미터 암호화 및 NTS 토큰 생성 (INSERT/UPDATE 전처리)
+`SvcCRUD`에서 전달된 파라미터 Map 중 개인정보 대상 컬럼(10종)을 가로채 `_ENC`와 `_HASH` 파라미터를 자동 주입합니다:
 ```java
-// 20261001 khma : 개인정보 컬럼 암호화 전처리 (운영 A_USER, A_FAMILY 기준)
-String[] targetParamCols = {
-    "NAME", "EMAIL", "SUBEMAIL", "TELNO", "MTELNO", "FAXNO",
-    "ADDRESS2", "SUBADDRESS2",
-    "SEC_NAME", "SEC_TELNO", "SEC_MTELNO", "SEC_EMAIL",
-    "TAX_NAME", "TAX_TELNO", "TAX_MTELNO", "TAX_EMAIL",
-    "PR_EMAIL"
+// 20261112 khma : 개인정보 10개 컬럼 암호화 및 NTS 검색 토큰 자동 주입 (A_USER, A_FAMILY, US_USER 기준)
+String[] privacyCols = {
+    "NAME", "BIRTHDAY", "EMAIL", "SUBEMAIL", "TELNO", "MTELNO",
+    "ADDRESS1", "ADDRESS2", "SUBADDRESS1", "SUBADDRESS2"
 };
-for (String col : targetParamCols) {
+for (String col : privacyCols) {
     if (paramMap.containsKey(col) && paramMap.get(col) instanceof String) {
         String strVal = (String) paramMap.get(col);
-        paramMap.put(col, CryptoService.getInstance().encrypt(strVal));
+        if (strVal != null && !strVal.trim().isEmpty()) {
+            paramMap.put(col + "_ENC", CryptoService.getInstance().encrypt(strVal));
+            paramMap.put(col + "_HASH", CryptoService.getInstance().getNts(strVal));
+        }
     }
 }
 ```
 
 ### 2) 결과 복호화 (SELECT 후처리)
-DB에서 반환된 `ResultSet` 또는 List<Map>에서 데이터를 추출할 때 복호화합니다 (`decrypt()` 내부에서 `'$.'` 접두어 여부를 먼저 체크하므로 평문/암호문 혼재 시에도 안전하게 동작):
+DB에서 반환된 `ResultSet` 또는 List<Map>에서 데이터를 추출할 때 복호화합니다 (`_ENC` 컬럼이 있으면 복호화하여 원래 컬럼명으로 덮어쓰고, `decrypt()` 내부에서 `'$.'` 접두어 여부를 먼저 체크하므로 평문/암호문 혼재 시에도 안전하게 동작):
 ```java
-// 20261001 khma : 개인정보 컬럼 복호화 후처리 (운영 A_USER, US_USER, A_FAMILY, A_CONT 기준)
+// 20261112 khma : 개인정보 컬럼 복호화 후처리 (운영 A_USER, US_USER, A_FAMILY 기준)
+public Map<String, Object> decryptRow(Map<String, Object> rowMap) {
+    if (rowMap == null) return null;
+    String[] privacyCols = {
+        "NAME", "BIRTHDAY", "EMAIL", "SUBEMAIL", "TELNO", "MTELNO",
+        "ADDRESS1", "ADDRESS2", "SUBADDRESS1", "SUBADDRESS2"
+    };
+    for (String col : privacyCols) {
+        // 1. _ENC 컬럼이 조회된 경우 우선 복호화하여 기본 필드명(col)으로 매핑
+        String encCol = col + "_ENC";
+        if (rowMap.containsKey(encCol) && rowMap.get(encCol) != null) {
+            String cipherVal = rowMap.get(encCol).toString();
+            rowMap.put(col, CryptoService.getInstance().decrypt(cipherVal));
+        } else if (rowMap.containsKey(col) && rowMap.get(col) != null) {
+            // 2. 기본 필드명 자체에 암호문('$.')이 저장된 경우 복호화
+            String val = rowMap.get(col).toString();
+            rowMap.put(col, CryptoService.getInstance().decrypt(val));
+        }
+    }
+    return rowMap;
+}
+```
 public Map<String, Object> decryptRow(Map<String, Object> rowMap) {
     if (rowMap == null) return null;
     String[] privacyCols = {
