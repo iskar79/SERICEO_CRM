@@ -111,7 +111,10 @@
 | **Step 11-2**| `WebContent/js/jquery.kdb.MonArch800.js` | `$.decHTML` 함수에서 변환 대상 엔티티(`&`) 및 `<br>` 태그가 없는 일반 문자열 조기 반환(Early Return) 처리로 불필요한 정규식 체인 실행 제거 | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
 | **Step 10-4**| `WebContent/js/core/jquery.kdb.core.superMap.js`, `jquery.kdb.core.superAnswer.js`, `superTree.js`, `superChart.js`, `superCalendar.js`, `superContaner.js`, `MonArch.js`, `MonArch_Simple.js`, `SurveyAnsform.htm` | superMap(11개)·SuperAnswer(5개) 모듈 분리, core 5종 상세 Javadoc/단계별 주석 보강, MonArch_Simple.js 모듈 로드/SurveyAnsform.htm jQuery 1.12.4 상향 및 dspmode == 1 버그 수정 | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
 | **Step 11-3**| `WebContent/js/jquery.kdb.superContaner.js` | getJson 구조체 모달 호출 시 전체 .ui-widget-overlay z-index 일괄 변경 제거 (구조체 모달 닫힌 후 부모 모달 overlay 클릭 차단/비활성화 버그 수정) | `[x]` | `[ ]` | **로컬 수정 완료 (VDI 반영 대기)** |
-| **Step 3** | `CryptoService.java`, `MonArchDaoImpl.java`, `FilterGenerator.java` | KSign SecureDB Java API V2 및 NTS 검색 토큰 기반 개인정보 10개 컬럼(_ENC/_HASH) 자동 암복호화 및 색인검색 구현 (SDBAPIforJAVA-V3.7.3-2.0.4.jar) | `[ ]` | `[ ]` | **착수 대기 (API 방식 확정)** |
+| **Step 3-1** | `src/monarch.properties` | SecureDB Agent 데몬 접속 설정(IP/Port 9909) 및 정책명(AES256_DEV/SHA512_DEV) 추가 | `[x]` | `[ ]` | **로컬 수정 완료 (VDI 반영 대기)** |
+| **Step 3-2** | `src/co/kr/kydbm/common/crypto/CryptoService.java` | KSign SecureDB Java API V2 공통 암복호화 서비스 클래스 신규 작성 (Sample.java 패턴 준수, 싱글턴, 10분 DEK 동기화, 로컬 Mock Fallback 내장) | `[x]` | `[ ]` | **로컬 수정 완료 (VDI 반영 대기)** |
+| **Step 3-3** | `src/co/kr/kydbm/core/dao/MonArchDaoImpl.java` | 개인정보 10개 컬럼 INSERT/UPDATE 파라미터 암호화(_ENC) 및 NTS 토큰(_HASH) 자동 주입, SELECT 복호화(decryptRow) 연동 | `[ ]` | `[ ]` | 착수 대기 |
+| **Step 3-4** | `src/co/kr/kydbm/core/utils/FilterGenerator.java` | 개인정보 10개 컬럼 검색 시 기존 LIKE 대신 NTS 토큰(_HASH = nts_bsh) 인덱스 일치 검색 자동 변환 | `[ ]` | `[ ]` | 착수 대기 |
 
 ## 운영 WAR 생성 전 필수 확인 알림
 
