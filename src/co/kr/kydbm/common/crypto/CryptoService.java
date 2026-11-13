@@ -28,9 +28,11 @@ public class CryptoService {
     private SDBAgentlessApi sdbApi = null;
     private boolean isAvailable = false;
 
-    // 기본 정책명 (properties 설정값 우선, 미설정 시 Fallback 기본값)
+    // 기본 정책명 (properties 설정값 우선, 미설정 시 기본값)
     private String policyCipher = "AES256_DEV";
     private String policyHash = "SHA512_DEV";
+    // 20261113 khma : API 장애 시 평문 저장/검색 우회를 차단하는 Fail-Closed 기본 활성화 여부
+    private boolean failClosed = true;
 
     /**
      * 기본 생성자: 프로퍼티 설정을 로드하고 SecureDB Agentless API 인스턴스를 초기화한다.
@@ -72,12 +74,19 @@ public class CryptoService {
             String rootCaPath = prop.getProperty("securedb.agentless.rootca.path");
             String confCipher = prop.getProperty("securedb.policy.cipher");
             String confHash   = prop.getProperty("securedb.policy.hash");
+            String confFailClosed = prop.getProperty("securedb.fail.closed");
 
             if (confCipher != null && !confCipher.trim().isEmpty()) {
                 this.policyCipher = confCipher.trim();
             }
             if (confHash != null && !confHash.trim().isEmpty()) {
                 this.policyHash = confHash.trim();
+            }
+            // 20261113 khma : 명시적으로 false 설정한 경우에만 미연결 Fallback 우회 허용
+            if (confFailClosed != null && "false".equalsIgnoreCase(confFailClosed.trim())) {
+                this.failClosed = false;
+            } else {
+                this.failClosed = true;
             }
 
             if (urlsProp == null || urlsProp.trim().isEmpty() || apiToken == null || apiToken.trim().isEmpty()) {
@@ -133,11 +142,17 @@ public class CryptoService {
             // 1. SDBAgentlessApi 싱글턴 인스턴스 생성
             this.sdbApi = AgentlessApiFactory.create(config);
 
-            // 2. 정책 로드 상태 점검
+            // 2. 정책 로드 및 에이전트 연결 상태 점검
             if (this.sdbApi != null) {
                 String status = this.sdbApi.checkAgent();
-                log.info("20261113 khma : SecureDB Agentless API 초기화 완료. 상태: " + status);
-                this.isAvailable = true;
+                // 20261113 khma : checkAgent() 반환값을 검증하여 실제 정책 연동 가능 상태만 가용으로 판정
+                if (isAgentHealthy(status)) {
+                    log.info("20261113 khma : SecureDB Agentless API 초기화 완료. 상태: " + status);
+                    this.isAvailable = true;
+                } else {
+                    log.error("20261113 khma : SecureDB Agentless 상태 점검 비정상 응답: " + status);
+                    this.isAvailable = false;
+                }
             }
 
         } catch (Throwable t) {
@@ -167,10 +182,18 @@ public class CryptoService {
 
     /**
      * SecureDB 에이전트 가용 여부를 반환한다.
-     * @return 가용 상태 (true: 정상 연동, false: Fallback 모드)
+     * @return 가용 상태 (true: 정상 연동, false: 미연결/오류)
      */
     public boolean isAvailable() {
         return this.isAvailable && this.sdbApi != null;
+    }
+
+    /**
+     * 20261113 khma : API 장애 시 평문 우회 차단(Fail-Closed) 설정 여부를 반환한다.
+     * @return true: 장애 시 예외 발생, false: Fallback 원문 반환 허용
+     */
+    public boolean isFailClosed() {
+        return this.failClosed;
     }
 
     /**
@@ -180,6 +203,37 @@ public class CryptoService {
      */
     public String encrypt(String plainText) {
         return encrypt(plainText, this.policyCipher);
+    }
+
+    /**
+     * 20261113 khma : checkAgent() 상태 응답 문자열의 정상 여부를 판정한다.
+     * @param status checkAgent() 반환 문자열
+     * @return 정상 응답 여부
+     */
+    private boolean isAgentHealthy(String status) {
+        if (status == null || status.trim().isEmpty()) {
+            return false;
+        }
+        String upper = status.trim().toUpperCase();
+        return !upper.contains("FAIL") && !upper.contains("ERROR") && !upper.contains("DISCONNECT");
+    }
+
+    /**
+     * 20261113 khma : 암호화 또는 NTS 토큰 생성 실패 시 Fail-Closed 정책에 따라 예외를 발생시키거나 Fallback 처리한다.
+     * @param operation 수행 작업명 (암호화, NTS 등)
+     * @param detail 상세 사유
+     * @param cause 원인 예외 (없으면 null)
+     */
+    private void handleCryptoFailure(String operation, String detail, Throwable cause) {
+        String msg = "20261113 khma : SecureDB " + operation + " 실패 - " + detail;
+        if (cause != null) {
+            log.error(msg, cause);
+        } else {
+            log.error(msg);
+        }
+        if (this.failClosed) {
+            throw new IllegalStateException("개인정보 " + operation + " 처리 중 보안 모듈 오류가 발생했습니다. (" + detail + ")", cause);
+        }
     }
 
     /**
@@ -196,15 +250,18 @@ public class CryptoService {
         if (plainText.startsWith("$.")) {
             return plainText;
         }
-        if (isAvailable()) {
-            try {
-                String cipherText = this.sdbApi.encrypt(plainText, policy != null ? policy : this.policyCipher);
-                if (cipherText != null && !cipherText.isEmpty()) {
-                    return cipherText;
-                }
-            } catch (KSException e) {
-                log.error("20261112 khma : SecureDB 암호화 처리 중 오류 발생 (원문 반환)", e);
+        if (!isAvailable()) {
+            handleCryptoFailure("암호화", "SecureDB API 미연결 상태", null);
+            return plainText;
+        }
+        try {
+            String cipherText = this.sdbApi.encrypt(plainText, policy != null ? policy : this.policyCipher);
+            if (cipherText != null && !cipherText.isEmpty()) {
+                return cipherText;
             }
+            handleCryptoFailure("암호화", "암호화 결과값이 비어있음", null);
+        } catch (KSException e) {
+            handleCryptoFailure("암호화", e.getMessage(), e);
         }
         return plainText;
     }
@@ -223,17 +280,20 @@ public class CryptoService {
         if (plainText.startsWith("$.")) {
             return plainText;
         }
-        if (isAvailable()) {
-            try {
-                String ip = (clientIp != null && !clientIp.isEmpty()) ? clientIp : "127.0.0.1";
-                String user = (userId != null && !userId.isEmpty()) ? userId : "SYSTEM";
-                String cipherText = this.sdbApi.encrypt(plainText, this.policyCipher, ip, user, "SERICEO_CRM");
-                if (cipherText != null && !cipherText.isEmpty()) {
-                    return cipherText;
-                }
-            } catch (KSException e) {
-                log.error("20261112 khma : SecureDB 감사정보 암호화 처리 중 오류 발생 (원문 반환)", e);
+        if (!isAvailable()) {
+            handleCryptoFailure("감사정보 암호화", "SecureDB API 미연결 상태", null);
+            return plainText;
+        }
+        try {
+            String ip = (clientIp != null && !clientIp.isEmpty()) ? clientIp : "127.0.0.1";
+            String user = (userId != null && !userId.isEmpty()) ? userId : "SYSTEM";
+            String cipherText = this.sdbApi.encrypt(plainText, this.policyCipher, ip, user, "SERICEO_CRM");
+            if (cipherText != null && !cipherText.isEmpty()) {
+                return cipherText;
             }
+            handleCryptoFailure("감사정보 암호화", "암호화 결과값이 비어있음", null);
+        } catch (KSException e) {
+            handleCryptoFailure("감사정보 암호화", e.getMessage(), e);
         }
         return plainText;
     }
@@ -312,12 +372,18 @@ public class CryptoService {
         if (plainText == null || plainText.isEmpty()) {
             return plainText;
         }
-        if (isAvailable()) {
-            try {
-                return this.sdbApi.nts(this.policyHash, plainText, "UTF-8");
-            } catch (Throwable t) {
-                log.error("20261112 khma : NTS 토큰 생성 실패", t);
+        if (!isAvailable()) {
+            handleCryptoFailure("NTS 토큰 생성", "SecureDB API 미연결 상태", null);
+            return plainText;
+        }
+        try {
+            String token = this.sdbApi.nts(this.policyHash, plainText, "UTF-8");
+            if (token != null && !token.isEmpty()) {
+                return token;
             }
+            handleCryptoFailure("NTS 토큰 생성", "토큰 결과값이 비어있음", null);
+        } catch (Throwable t) {
+            handleCryptoFailure("NTS 토큰 생성", t.getMessage(), t);
         }
         return plainText;
     }
@@ -331,12 +397,18 @@ public class CryptoService {
         if (prefix == null || prefix.isEmpty()) {
             return prefix;
         }
-        if (isAvailable()) {
-            try {
-                return this.sdbApi.nts_bsh(this.policyHash, prefix, "UTF-8");
-            } catch (Throwable t) {
-                log.error("20261112 khma : NTS_BSH 패턴 토큰 생성 실패", t);
+        if (!isAvailable()) {
+            handleCryptoFailure("NTS_BSH 토큰 생성", "SecureDB API 미연결 상태", null);
+            return prefix;
+        }
+        try {
+            String token = this.sdbApi.nts_bsh(this.policyHash, prefix, "UTF-8");
+            if (token != null && !token.isEmpty()) {
+                return token;
             }
+            handleCryptoFailure("NTS_BSH 토큰 생성", "토큰 결과값이 비어있음", null);
+        } catch (Throwable t) {
+            handleCryptoFailure("NTS_BSH 토큰 생성", t.getMessage(), t);
         }
         return prefix;
     }
@@ -350,12 +422,18 @@ public class CryptoService {
         if (suffix == null || suffix.isEmpty()) {
             return suffix;
         }
-        if (isAvailable()) {
-            try {
-                return this.sdbApi.nts_fsh(this.policyHash, suffix, "UTF-8");
-            } catch (Throwable t) {
-                log.error("20261112 khma : NTS_FSH 패턴 토큰 생성 실패", t);
+        if (!isAvailable()) {
+            handleCryptoFailure("NTS_FSH 토큰 생성", "SecureDB API 미연결 상태", null);
+            return suffix;
+        }
+        try {
+            String token = this.sdbApi.nts_fsh(this.policyHash, suffix, "UTF-8");
+            if (token != null && !token.isEmpty()) {
+                return token;
             }
+            handleCryptoFailure("NTS_FSH 토큰 생성", "토큰 결과값이 비어있음", null);
+        } catch (Throwable t) {
+            handleCryptoFailure("NTS_FSH 토큰 생성", t.getMessage(), t);
         }
         return suffix;
     }

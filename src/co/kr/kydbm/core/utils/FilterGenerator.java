@@ -68,7 +68,8 @@ public class FilterGenerator {
 	public static String getFilterQuery(
 			ArrayList<Map<String, Object>> arrExtFilters, String sqlCommand) {
 		String rstFltQry = "";
-		boolean useNts = isNtsTargetQuery(sqlCommand) && CryptoService.getInstance().isAvailable();
+		CryptoService crypto = CryptoService.getInstance();
+		boolean useNts = isNtsTargetQuery(sqlCommand) && (crypto.isAvailable() || crypto.isFailClosed());
 		// type에 따라 Generator 처리를 분기함.
 		for (Map<String, Object> ef : arrExtFilters) {
 			String genQry = filterGenController(ef, useNts);
@@ -766,7 +767,7 @@ public class FilterGenerator {
 			String sqlCommand) {
 
 		CryptoService crypto = CryptoService.getInstance();
-		boolean useNts = isNtsTargetQuery(sqlCommand) && crypto.isAvailable();
+		boolean useNts = isNtsTargetQuery(sqlCommand) && (crypto.isAvailable() || crypto.isFailClosed());
 
 		for (Map<String, Object> extFilter : arrExtFilters) {
 			String key = extFilter.get("field").toString();

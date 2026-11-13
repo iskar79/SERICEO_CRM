@@ -1232,7 +1232,8 @@ public class MonArchDaoImpl   extends DataSourceSupport{
 			return;
 		}
 		CryptoService crypto = CryptoService.getInstance();
-		if (!crypto.isAvailable()) {
+		// 20261113 khma : Fail-Closed 활성 시 미연결 상태에서도 encrypt/getNts 호출을 통해 예외가 발생하도록 조기 반환하지 않음
+		if (!crypto.isAvailable() && !crypto.isFailClosed()) {
 			return;
 		}
 		String upperSql = (sqlCmd != null) ? sqlCmd.toUpperCase() : "";
@@ -1313,7 +1314,8 @@ public class MonArchDaoImpl   extends DataSourceSupport{
 			return rawVal;
 		}
 		CryptoService crypto = CryptoService.getInstance();
-		if (!crypto.isAvailable()) {
+		// 20261113 khma : Fail-Closed 활성 시 미연결 상태에서도 getNts 호출을 통해 예외가 발생하도록 조기 반환하지 않음
+		if (!crypto.isAvailable() && !crypto.isFailClosed()) {
 			return rawVal;
 		}
 		String upperSql = (sqlCmd != null) ? sqlCmd.toUpperCase() : "";

@@ -1,19 +1,21 @@
-# SecureDB 적용 방안 2: Java API 및 NTS 검색 토큰 기반 마이그레이션 가이드
+# SecureDB 적용 가이드: Agentless Java API V2 및 NTS 검색 토큰 연동
 
-본 문서는 SERICEO CRM 시스템에 개인정보 암호화를 적용할 때, DB 스키마를 보완하고 **Java WAS 메모리 상에서 API를 통해 암복호화 및 NTS(검색 토큰)를 처리하는 2안(표준 권장)**의 세부 실무 작업 가이드입니다.
+> **2026-11-13 khma 현행화**: 초기 Agent 데몬 방식 설계에서 **KSign SecureDB Agentless Java API V2 (HTTPS + 인증서 방식)** 및 **`*_ENC` / `*_HASH` 네이밍 컨벤션 기반 공통 자동화**로 전환·적용 완료되었습니다. (고객 설명 및 운영 상세 매뉴얼은 [SECUREDB_GUIDE.md](SECUREDB_GUIDE.md) 참조)
 
 ---
 
 ## 1. 개요 및 아키텍처 원칙
-* **모듈 구축 현황**: 고객사 DB 및 WAS 서버에 **KSign SecureDB 모듈 구축이 이미 완료**되어 있습니다. (DB Plugin UDF 및 Java API 방식 모두 즉시 사용 가능 상태)
-* **개념**: DB는 암호문과 검색 색인 토큰(NTS)을 보관하며, Java 코어 엔진(`MonArchDaoImpl`, `SvcCRUD`, `FilterGenerator`)이 데이터를 밀어넣기 전과 꺼낸 직후에 **`KSign SecureDB Java API V2`**를 호출하여 암/복호화 및 NTS 토큰 변환을 수행하는 방식입니다.
-* **필요 라이브러리 및 환경 요건 (KSign 공식 V2 가이드)**:
-  * `WebContent/WEB-INF/lib/` 경로에 벤더사 제공 **`SDBAPIforJAVA-V3.7.3-2.0.4.jar`** (SecureDB Java API V2 공식 라이브러리) 단 1개만 배치 (구형 V1 JAR와 혼용 절대 금지).
-  * 실행 계정에 `$SDB_HOME/conf`, `$SDB_HOME/license` 읽기 권한 및 `$SDB_HOME/logs`, 상태 파일 쓰기 권한 부여.
-* **핵심 장점**: 인덱스를 타는 초고속 검색(NTS 토큰)이 가능하여 DB 부하가 없고, 기존 DB 쿼리(`M_SERVICE`) 원본을 1건도 수정하지 않고 프레임워크 레벨에서 일괄 적용 가능합니다.
+* **연동 방식**: WAS 서버에 별도 로컬 데몬(`SecureDBAgent`)이나 네이티브 모듈을 설치하지 않는 **Agentless HTTPS 방식**을 사용합니다.
+* **개념**: DB는 암호문(`*_ENC`)과 검색 색인 토큰(`*_HASH`)을 보관하며, Java 코어 엔진(`MonArchDaoImpl`, `FilterGenerator`, `ExcelDownload`)이 `CryptoService`를 통해 **`KSign SecureDB Agentless Java API V2`**를 호출하여 암·복호화 및 NTS 토큰 변환을 수행합니다.
+* **필요 라이브러리 및 환경 요건**:
+  * `WebContent/WEB-INF/lib/` 경로에 **`SDBAgentlessAPIforJava-V3.7.3-2.0.4.jar`** 배치.
+  * WAS 서버의 지정 경로(예: `C:/SecureDB/ca_dev.pem`, 운영 `ca.pem` / `rootca.pem`)에 SecureDB 정책서버 인증서 배치 및 `8090` 포트 HTTPS 통신 허용.
+* **SQL / 화면 연동 원칙 (`*_ENC` / `*_HASH` 컨벤션)**:
+  * 특정 테이블/컬럼을 Java 코드에 하드코딩하지 않고, SQL 및 화면 `colModel`에서 `*_ENC`(암복호화 대상), `*_HASH`(검색용 NTS 토큰) 네이밍 규칙을 사용합니다.
+  * `INSERT`/`UPDATE` 시 `@*_ENC@` 자동 암호화 및 SQL 내 `@*_HASH@` 존재 시 NTS 토큰 자동 생성, `SELECT`/엑셀 다운로드 시 `"$."` 접두어 `*_ENC` 자동 복호화, 검색 시 `@*_HASH@` 자동 NTS 변환이 동작합니다.
 * **DB 환경 및 시노님 연동 구조 (20261112 khma 확인)**:
   * `MICRODEV`의 `CRM.A_USER`는 `A_USER@DBL_CEO`로 오라클 시노님(SYNONYM)이 등록되어 있어, DB 링크(`DBL_CEO`)를 통해 원격 `CEODEV`의 실제 원본 테이블을 투명하게 참조합니다.
-  * 대상 테이블(`A_USER`, `A_FAMILY`, `US_USER`)에 개인정보 10개 컬럼 각각 `_ENC`(대칭키 양방향 암호문) 및 `_HASH`(단방향 HASH NTS 검색 토큰) 컬럼이 이미 증설 완료되어 있습니다.
+  * 대상 테이블(`A_USER`, `A_FAMILY`, `US_USER`)에 개인정보 컬럼별 `_ENC`(대칭키 양방향 암호문) 및 `_HASH`(단방향 HASH NTS 검색 토큰) 컬럼이 증설되어 있습니다.
 
 ### 🔍 [사전 실증 완료] 고객사 DB SecureDB 동작 검증 쿼리 (20261014 khma 확인)
 DBA/보안팀에서 세팅 완료 후 실제 정상 동작을 확인한 쿼리 스펙입니다:
@@ -37,26 +39,21 @@ SELECT sdb_crypto.nts_fsh('SHA512_DEV', '동') FROM dual;
 
 ---
 
-## 2. [Step 1] 환경 설정 추가 (`src/monarch.properties`)
+## 2. [Step 1] 환경 설정 (`src/monarch.properties`)
 
-환경(개발/운영)에 따라 암호화 정책명이 달라지므로 `src/monarch.properties` 하단에 설정을 추가합니다:
+환경(VDI / 개발서버 `112.106.119.13` / 운영서버 `112.106.119.183`)에 따라 `src/monarch.properties`에서 해당 블록 1개만 주석 해제하여 사용합니다:
 
 ```properties
-####### KSign SecureDB 연동 설정 (20261001 khma) #######
-# SecureDB Agent 데몬 접속 정보
-securedb.agent.home = /opt/SecureDBAgent
-securedb.agent.ip = 127.0.0.1
-securedb.agent.port = 9909
-
-# 암호화 정책명 (개발: AES256_DEV / 운영: AES256_PRD)
+# [1] VDI 로컬 테스트용 예시
+securedb.agentless.urls = https://70.2.243.122:8090
+securedb.agentless.shuffle = false
+securedb.agentless.token = <API_TOKEN>
+securedb.agentless.log.level = INFO
+securedb.agentless.ca.path = C:/SecureDB/ca_dev.pem
+securedb.agentless.rootca.path =
 securedb.policy.cipher = AES256_DEV
-
-# HASH 및 NTS 검색 정책명 (개발: SHA512_DEV / 운영: SHA512_PRD)
 securedb.policy.hash = SHA512_DEV
-
-# DEK 주기적 동기화 주기 (단위: MINUTES)
-securedb.sync.interval = 10
-#######################################################
+securedb.fail.closed = true
 ```
 
 ---
