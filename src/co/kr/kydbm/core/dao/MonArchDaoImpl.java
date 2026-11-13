@@ -30,6 +30,7 @@ import org.springframework.jdbc.support.lob.LobHandler;
 import org.springframework.web.multipart.MultipartFile;
 
 import co.kr.kydbm.common.CommonConst;
+import co.kr.kydbm.common.crypto.CryptoService; // 20261113 khma : SecureDB 암복호화 서비스 연동
 import co.kr.kydbm.core.bean.ServiceInfo;
 import co.kr.kydbm.core.bean.UserInfo;
 import co.kr.kydbm.core.utils.ConfigProperties;
@@ -47,6 +48,11 @@ import co.kr.kydbm.core.utils.QueryGenerator;
 public class MonArchDaoImpl   extends DataSourceSupport{
 	private static final String REGEX_PARAM = "@+[ a-zA-Z0-9가-힣-_ ]*@";
 	private static final Object RETURN_PROCEDURE_KEY = "RT_DATA";
+	// 20261113 khma : SecureDB 개인정보 10개 핵심 컬럼 정의 (A_USER, A_FAMILY, US_USER 기준)
+	private static final String[] PRIVACY_COLS = {
+		"NAME", "BIRTHDAY", "EMAIL", "SUBEMAIL", "TELNO", "MTELNO",
+		"ADDRESS1", "ADDRESS2", "SUBADDRESS1", "SUBADDRESS2"
+	};
 //	protected static JdbcTemplate jdbcTemplate;
 //	protected static NamedParameterJdbcTemplate namedParameterJdbcTemplate; //20140117
 //	private static DataSource datasource;
@@ -152,6 +158,9 @@ public class MonArchDaoImpl   extends DataSourceSupport{
 			, NamedParameterJdbcTemplate namedParameterJdbcTemplate )
 			throws DataAccessException {
 
+		// 20261113 khma : 개인정보 10개 컬럼 암호문(_ENC) 및 NTS 검색토큰(_HASH) 자동 주입
+		injectPrivacyParams(parameters);
+
 		int rCnt = 0;
 
 		Pattern rows = Pattern.compile("\\/[\\*](.*?)[@](.*?)[\\*]\\/",Pattern.MULTILINE);
@@ -187,6 +196,9 @@ public class MonArchDaoImpl   extends DataSourceSupport{
 	public int exeCreate(String SqlCommand, Map<String, String> parameters
 			, NamedParameterJdbcTemplate namedParameterJdbcTemplate) throws DataAccessException {
 		
+		// 20261113 khma : 개인정보 10개 컬럼 암호문(_ENC) 및 NTS 검색토큰(_HASH) 자동 주입
+		injectPrivacyParams(parameters);
+
 		int rCnt = 0;
 		Pattern regs = Pattern.compile(REGEX_PARAM, Pattern.MULTILINE);
 		Matcher matchCol = regs.matcher(SqlCommand);
@@ -220,6 +232,9 @@ public class MonArchDaoImpl   extends DataSourceSupport{
 			String seqTbName, Map<String, String> parameters, 
 			NamedParameterJdbcTemplate namedParameterJdbcTemplate, String dsName)
 			throws DataAccessException {
+		// 20261113 khma : 개인정보 10개 컬럼 암호문(_ENC) 및 NTS 검색토큰(_HASH) 자동 주입
+		injectPrivacyParams(parameters);
+
 		int rltKey = 0;
 		int rCnt = 0;
 		Pattern regs = Pattern.compile(REGEX_PARAM, Pattern.MULTILINE);
@@ -356,6 +371,9 @@ public class MonArchDaoImpl   extends DataSourceSupport{
 		execSqlCmd = replaceNameTemplateType(execSqlCmd, mapParam);
 		rstMapList = namedParameterJdbcTemplate.queryForList(execSqlCmd, mapParam);
 
+		// 20261113 khma : SELECT 결과 개인정보 컬럼 복호화 후처리
+		decryptRows(rstMapList);
+
 		return rstMapList;
 	}
 
@@ -396,6 +414,9 @@ public class MonArchDaoImpl   extends DataSourceSupport{
 		Map<String, Object> rstMap = new HashMap<String, Object>();
 		if(rstMapList.size() > 0) rstMap =rstMapList.get(0);
 		
+		// 20261113 khma : SELECT 단건 결과 개인정보 컬럼 복호화 후처리
+		decryptRow(rstMap);
+
 		return rstMap;
 	}
 	
@@ -411,6 +432,9 @@ public class MonArchDaoImpl   extends DataSourceSupport{
 	public int exeUpdate(String SqlCommand, Map<String, String> parameters, 
 			NamedParameterJdbcTemplate namedParameterJdbcTemplate)
 			throws DataAccessException {
+
+		// 20261113 khma : 다이나믹 주석 블록(/* ... @COL_ENC@ ... */) 평가 전 개인정보 파라미터 선주입
+		injectPrivacyParams(parameters);
 
 		int rCnt = 0;
 		Pattern rows = Pattern.compile("\\/[\\*](.*?)[@](.*?)[\\*]\\/",Pattern.MULTILINE);
@@ -950,6 +974,8 @@ public class MonArchDaoImpl   extends DataSourceSupport{
 		if(size > 0){
 			mapParams = new HashMap[size];
 			for (int i = 0; i < parameters.size() ; i++) {
+				// 20261113 khma : 배치 처리 전 개인정보 암호문(_ENC) 및 NTS 검색토큰(_HASH) 주입
+				injectPrivacyParams(parameters.get(i));
 				mapParams[i] = parameters.get(i);
 			}
 			
@@ -970,6 +996,8 @@ public class MonArchDaoImpl   extends DataSourceSupport{
 		if(size > 0){
 			mapParams = new HashMap[size];
 			for (int i = 0; i < parameters.size() ; i++) {
+				// 20261113 khma : 배치 처리 전 개인정보 암호문(_ENC) 및 NTS 검색토큰(_HASH) 주입
+				injectPrivacyParams(parameters.get(i));
 				mapParams[i] = parameters.get(i);
 			}
 			
@@ -1185,5 +1213,91 @@ public class MonArchDaoImpl   extends DataSourceSupport{
 		int result = namedParameterJdbcTemplate.update(sb.toString(), userInfo);
 		return result;
 	}
+
+	// 20261113 khma Start : KSign SecureDB 개인정보 10개 컬럼 자동 암·복호화 및 NTS 검색토큰 연동 헬퍼
+	/**
+	 * INSERT/UPDATE 실행 전 개인정보 10개 컬럼의 암호문(_ENC) 및 NTS 검색토큰(_HASH) 자동 주입
+	 * @param parameters SQL 바인딩 파라미터 맵
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private void injectPrivacyParams(Map parameters) {
+		if (parameters == null || parameters.isEmpty()) {
+			return;
+		}
+		CryptoService crypto = CryptoService.getInstance();
+		if (!crypto.isAvailable()) {
+			return;
+		}
+		for (String col : PRIVACY_COLS) {
+			Object rawVal = parameters.get(col);
+			if (rawVal instanceof String) {
+				String strVal = ((String) rawVal).trim();
+				if (!strVal.isEmpty()) {
+					if (!strVal.startsWith("$.")) {
+						parameters.put(col + "_ENC", crypto.encrypt(strVal));
+						parameters.put(col + "_HASH", crypto.getNts(strVal));
+					} else {
+						parameters.put(col + "_ENC", strVal);
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * SELECT 결과 단건 행의 개인정보 컬럼 복호화 후처리
+	 * - _ENC 컬럼이 조회된 경우 복호화하여 기본 컬럼명(col)에 매핑
+	 * - 기본 컬럼 값 자체가 SecureDB 암호문('$.')인 경우 복호화 처리
+	 * @param rowMap DB 조회 결과 행 맵
+	 * @return 복호화가 반영된 행 맵
+	 */
+	public Map<String, Object> decryptRow(Map<String, Object> rowMap) {
+		if (rowMap == null || rowMap.isEmpty()) {
+			return rowMap;
+		}
+		CryptoService crypto = CryptoService.getInstance();
+		if (!crypto.isAvailable()) {
+			return rowMap;
+		}
+		for (String col : PRIVACY_COLS) {
+			String encCol = col + "_ENC";
+			Object encObj = rowMap.get(encCol);
+			if (encObj != null) {
+				String cipherVal = encObj.toString();
+				if (!cipherVal.trim().isEmpty()) {
+					rowMap.put(col, crypto.decrypt(cipherVal));
+					continue;
+				}
+			}
+			Object plainOrEncObj = rowMap.get(col);
+			if (plainOrEncObj != null) {
+				String val = plainOrEncObj.toString();
+				if (val.startsWith("$.")) {
+					rowMap.put(col, crypto.decrypt(val));
+				}
+			}
+		}
+		return rowMap;
+	}
+
+	/**
+	 * SELECT 결과 다건 목록의 개인정보 컬럼 일괄 복호화 후처리
+	 * @param rows DB 조회 결과 목록
+	 * @return 복호화가 반영된 목록
+	 */
+	private List<Map<String, Object>> decryptRows(List<Map<String, Object>> rows) {
+		if (rows == null || rows.isEmpty()) {
+			return rows;
+		}
+		CryptoService crypto = CryptoService.getInstance();
+		if (!crypto.isAvailable()) {
+			return rows;
+		}
+		for (Map<String, Object> row : rows) {
+			decryptRow(row);
+		}
+		return rows;
+	}
+	// 20261113 khma End : KSign SecureDB 개인정보 10개 컬럼 자동 암·복호화 및 NTS 검색토큰 연동 헬퍼
 }
 
