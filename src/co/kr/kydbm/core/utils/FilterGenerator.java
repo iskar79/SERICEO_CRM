@@ -1,10 +1,7 @@
 package co.kr.kydbm.core.utils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -25,15 +22,8 @@ public class FilterGenerator {
 	private static final String DB_TYPE = prop.getProperty("monarch.db.type");
 	private static String strSep = QueryGenerator.genStrSeperator(DB_TYPE);
 
-	// 20261113 khma : SecureDB NTS 색인 검색 대상 개인정보 10개 컬럼 정의
-	private static final Set<String> PRIVACY_COL_SET = new HashSet<String>(Arrays.asList(
-			"NAME", "BIRTHDAY", "EMAIL", "SUBEMAIL", "TELNO", "MTELNO",
-			"ADDRESS1", "ADDRESS2", "SUBADDRESS1", "SUBADDRESS2"
-	));
-
 	/**
-	 * 20261113 khma : 대상 SQL이 _HASH(NTS 색인 컬럼)를 포함하는 암호화 테이블 조회 쿼리인지 동적으로 판별한다.
-	 * (테이블명 하드코딩 없이 SELECT/WHERE/주석 내 _HASH 존재 여부로 자동 인식, 비암호화 테이블 ORA-00904 오류 방지)
+	 * 20261113 khma : 대상 SQL이 _HASH(NTS 색인 컬럼)를 포함하는 조회 쿼리인지 판별한다.
 	 * @param sqlCommand 실행 SQL 원문
 	 * @return NTS 변환 대상 여부
 	 */
@@ -45,37 +35,16 @@ public class FilterGenerator {
 	}
 
 	/**
-	 * 20261113 khma : 필드명이 개인정보 암호화 대상 10개 컬럼(또는 _ENC, _HASH 접미사 포함)인지 확인한다.
+	 * 20261113 khma : 확장필터 검색 필드가 _HASH 컬럼인지 판별한다.
+	 * (@NAME@, @NAME_ENC@ 등은 일반 바인딩을 유지하고 *_HASH 필드만 NTS 토큰으로 변환)
 	 * @param field 필드명
-	 * @return 대상 여부
+	 * @return _HASH 필드 여부
 	 */
-	private static boolean isPrivacyField(String field) {
+	private static boolean isHashField(String field) {
 		if (field == null || field.trim().isEmpty()) {
 			return false;
 		}
-		String upper = field.trim().toUpperCase();
-		if (upper.endsWith("_ENC")) {
-			upper = upper.substring(0, upper.length() - 4);
-		} else if (upper.endsWith("_HASH")) {
-			upper = upper.substring(0, upper.length() - 5);
-		}
-		return PRIVACY_COL_SET.contains(upper);
-	}
-
-	/**
-	 * 20261113 khma : 개인정보 필드명(NAME, NAME_ENC, NAME_HASH 등)을 _HASH 컬럼명으로 변환한다.
-	 * @param field 필드명
-	 * @return _HASH 컬럼명
-	 */
-	private static String toHashField(String field) {
-		String trimmed = field.trim();
-		String upper = trimmed.toUpperCase();
-		if (upper.endsWith("_ENC")) {
-			trimmed = trimmed.substring(0, trimmed.length() - 4);
-		} else if (upper.endsWith("_HASH")) {
-			return trimmed;
-		}
-		return trimmed + "_HASH";
+		return field.trim().toUpperCase().endsWith("_HASH");
 	}
 
 	/**
@@ -169,9 +138,9 @@ public class FilterGenerator {
 		/*
 		 * 이다 = 포함되는 키워드 ~ 아니다 ! 포함하지 않는 키워드 !~ 모두 * 없음 !*
 		 */
-		// 20261113 khma : 개인정보 10개 컬럼인 경우 _HASH 컬럼 및 NTS 색인 검색 조건으로 변환
-		if (useNts && isPrivacyField(ef.getField())) {
-			String hashCol = toHashField(ef.getField());
+		// 20261113 khma : *_HASH 검색 필드인 경우 NTS 색인 검색 조건으로 변환
+		if (useNts && isHashField(ef.getField())) {
+			String hashCol = ef.getField().trim();
 			if (ef.getOperators().equals("=")) {
 				rstQry = hashCol + " = @" + hashCol + "@ ";
 			} else if (ef.getOperators().equals("~")) {
@@ -839,9 +808,9 @@ public class FilterGenerator {
 				} else if (type.equals("dept") && op.equals("md")) {
 					// type이 dept 이고 operator가 md 인경우
 					mapParam.put("UDEPT", parameters.get("UDEPT").toString());
-				} else if (useNts && "text".equals(type) && isPrivacyField(key)) {
-					// 20261113 khma : 개인정보 10개 컬럼 검색어를 NTS 색인 토큰으로 변환 바인딩
-					String hashKey = toHashField(key);
+				} else if (useNts && "text".equals(type) && isHashField(key)) {
+					// 20261113 khma : *_HASH 검색 필드의 검색어를 NTS 색인 토큰으로 변환 바인딩
+					String hashKey = key.trim();
 					if ("=".equals(op) || "!".equals(op)) {
 						mapParam.put(hashKey, crypto.getNts(val));
 					} else {

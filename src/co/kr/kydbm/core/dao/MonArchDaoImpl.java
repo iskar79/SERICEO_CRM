@@ -48,11 +48,6 @@ import co.kr.kydbm.core.utils.QueryGenerator;
 public class MonArchDaoImpl   extends DataSourceSupport{
 	private static final String REGEX_PARAM = "@+[ a-zA-Z0-9가-힣-_ ]*@";
 	private static final Object RETURN_PROCEDURE_KEY = "RT_DATA";
-	// 20261113 khma : SecureDB 개인정보 10개 핵심 컬럼 정의 (A_USER, A_FAMILY, US_USER 기준)
-	private static final String[] PRIVACY_COLS = {
-		"NAME", "BIRTHDAY", "EMAIL", "SUBEMAIL", "TELNO", "MTELNO",
-		"ADDRESS1", "ADDRESS2", "SUBADDRESS1", "SUBADDRESS2"
-	};
 //	protected static JdbcTemplate jdbcTemplate;
 //	protected static NamedParameterJdbcTemplate namedParameterJdbcTemplate; //20140117
 //	private static DataSource datasource;
@@ -158,8 +153,8 @@ public class MonArchDaoImpl   extends DataSourceSupport{
 			, NamedParameterJdbcTemplate namedParameterJdbcTemplate )
 			throws DataAccessException {
 
-		// 20261113 khma : 개인정보 10개 컬럼 암호문(_ENC) 및 NTS 검색토큰(_HASH) 자동 주입
-		injectPrivacyParams(parameters);
+		// 20261113 khma : *_ENC 파라미터 암호화 및 SQL 내 @*_HASH@ 존재 시 NTS 토큰 자동 주입
+		injectPrivacyParams(SqlCommand, parameters);
 
 		int rCnt = 0;
 
@@ -196,8 +191,8 @@ public class MonArchDaoImpl   extends DataSourceSupport{
 	public int exeCreate(String SqlCommand, Map<String, String> parameters
 			, NamedParameterJdbcTemplate namedParameterJdbcTemplate) throws DataAccessException {
 		
-		// 20261113 khma : 개인정보 10개 컬럼 암호문(_ENC) 및 NTS 검색토큰(_HASH) 자동 주입
-		injectPrivacyParams(parameters);
+		// 20261113 khma : *_ENC 파라미터 암호화 및 SQL 내 @*_HASH@ 존재 시 NTS 토큰 자동 주입
+		injectPrivacyParams(SqlCommand, parameters);
 
 		int rCnt = 0;
 		Pattern regs = Pattern.compile(REGEX_PARAM, Pattern.MULTILINE);
@@ -232,8 +227,8 @@ public class MonArchDaoImpl   extends DataSourceSupport{
 			String seqTbName, Map<String, String> parameters, 
 			NamedParameterJdbcTemplate namedParameterJdbcTemplate, String dsName)
 			throws DataAccessException {
-		// 20261113 khma : 개인정보 10개 컬럼 암호문(_ENC) 및 NTS 검색토큰(_HASH) 자동 주입
-		injectPrivacyParams(parameters);
+		// 20261113 khma : *_ENC 파라미터 암호화 및 SQL 내 @*_HASH@ 존재 시 NTS 토큰 자동 주입
+		injectPrivacyParams(SqlCommand, parameters);
 
 		int rltKey = 0;
 		int rCnt = 0;
@@ -436,8 +431,8 @@ public class MonArchDaoImpl   extends DataSourceSupport{
 			NamedParameterJdbcTemplate namedParameterJdbcTemplate)
 			throws DataAccessException {
 
-		// 20261113 khma : 다이나믹 주석 블록(/* ... @COL_ENC@ ... */) 평가 전 개인정보 파라미터 선주입
-		injectPrivacyParams(parameters);
+		// 20261113 khma : 다이나믹 주석 블록(/* ... @COL_ENC@ ... */) 평가 전 *_ENC 암호화 및 @*_HASH@ 선주입
+		injectPrivacyParams(SqlCommand, parameters);
 
 		int rCnt = 0;
 		Pattern rows = Pattern.compile("\\/[\\*](.*?)[@](.*?)[\\*]\\/",Pattern.MULTILINE);
@@ -979,8 +974,8 @@ public class MonArchDaoImpl   extends DataSourceSupport{
 		if(size > 0){
 			mapParams = new HashMap[size];
 			for (int i = 0; i < parameters.size() ; i++) {
-				// 20261113 khma : 배치 처리 전 개인정보 암호문(_ENC) 및 NTS 검색토큰(_HASH) 주입
-				injectPrivacyParams(parameters.get(i));
+				// 20261113 khma : 배치 처리 전 *_ENC 암호화 및 @*_HASH@ 주입
+				injectPrivacyParams(sqlComm, parameters.get(i));
 				mapParams[i] = parameters.get(i);
 			}
 			
@@ -1001,8 +996,8 @@ public class MonArchDaoImpl   extends DataSourceSupport{
 		if(size > 0){
 			mapParams = new HashMap[size];
 			for (int i = 0; i < parameters.size() ; i++) {
-				// 20261113 khma : 배치 처리 전 개인정보 암호문(_ENC) 및 NTS 검색토큰(_HASH) 주입
-				injectPrivacyParams(parameters.get(i));
+				// 20261113 khma : 배치 처리 전 *_ENC 암호화 및 @*_HASH@ 주입
+				injectPrivacyParams(sqlComm, parameters.get(i));
 				mapParams[i] = parameters.get(i);
 			}
 			
@@ -1219,13 +1214,16 @@ public class MonArchDaoImpl   extends DataSourceSupport{
 		return result;
 	}
 
-	// 20261113 khma Start : KSign SecureDB 개인정보 10개 컬럼 자동 암·복호화 및 NTS 검색토큰 연동 헬퍼
+	// 20261113 khma Start : KSign SecureDB *_ENC / *_HASH 규칙 기반 자동 암·복호화 및 NTS 검색토큰 연동 헬퍼
 	/**
-	 * INSERT/UPDATE 실행 전 개인정보 10개 컬럼의 암호문(_ENC) 및 NTS 검색토큰(_HASH) 자동 주입
+	 * INSERT/UPDATE 실행 전 *_ENC 파라미터를 자동 암호화하고,
+	 * 실행 SQL 내에 대응되는 @*_HASH@ 파라미터가 존재하는 경우에만 NTS 검색토큰(_HASH)을 자동 생성한다.
+	 * (원본 일반 파라미터 @NAME@ 등은 변경하지 않고 그대로 유지)
+	 * @param sqlCmd 실행할 SQL 원문
 	 * @param parameters SQL 바인딩 파라미터 맵
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private void injectPrivacyParams(Map parameters) {
+	private void injectPrivacyParams(String sqlCmd, Map parameters) {
 		if (parameters == null || parameters.isEmpty()) {
 			return;
 		}
@@ -1233,44 +1231,42 @@ public class MonArchDaoImpl   extends DataSourceSupport{
 		if (!crypto.isAvailable()) {
 			return;
 		}
-		for (String col : PRIVACY_COLS) {
-			if (parameters.containsKey(col)) {
-				Object rawVal = parameters.get(col);
-				if (rawVal instanceof String) {
-					String strVal = ((String) rawVal).trim();
-					if (strVal.isEmpty()) {
-						// 빈 값으로 수정 시 기존 _ENC, _HASH 컬럼도 함께 초기화
-						parameters.put(col + "_ENC", "");
-						parameters.put(col + "_HASH", "");
-					} else if (!strVal.startsWith("$.")) {
-						parameters.put(col + "_ENC", crypto.encrypt(strVal));
-						parameters.put(col + "_HASH", crypto.getNts(strVal));
-					} else {
-						parameters.put(col + "_ENC", strVal);
-					}
+		String upperSql = (sqlCmd != null) ? sqlCmd.toUpperCase() : "";
+		List<String> encKeys = new ArrayList<String>();
+		for (Object keyObj : parameters.keySet()) {
+			if (keyObj instanceof String) {
+				String key = (String) keyObj;
+				if (key.toUpperCase().endsWith("_ENC")) {
+					encKeys.add(key);
 				}
-			} else if (parameters.containsKey(col + "_ENC")) {
-				// 20261113 khma : 화면에서 _ENC 필드명으로 직접 전달한 경우 _ENC(암호화), _HASH(토큰), 기본필드(평문) 일괄 세팅
-				Object rawEncVal = parameters.get(col + "_ENC");
-				if (rawEncVal instanceof String) {
-					String strEncVal = ((String) rawEncVal).trim();
-					if (strEncVal.isEmpty()) {
-						parameters.put(col, "");
-						parameters.put(col + "_HASH", "");
-					} else if (!strEncVal.startsWith("$.")) {
-						parameters.put(col, strEncVal);
-						parameters.put(col + "_ENC", crypto.encrypt(strEncVal));
-						parameters.put(col + "_HASH", crypto.getNts(strEncVal));
-					}
+			}
+		}
+		for (String encKey : encKeys) {
+			Object rawVal = parameters.get(encKey);
+			if (!(rawVal instanceof String)) {
+				continue;
+			}
+			String strVal = ((String) rawVal).trim();
+			String baseCol = encKey.substring(0, encKey.length() - 4);
+			String hashKey = baseCol + "_HASH";
+			boolean hasHashInSql = upperSql.contains("@" + hashKey.toUpperCase() + "@");
+
+			if (strVal.isEmpty()) {
+				if (hasHashInSql) {
+					parameters.put(hashKey, "");
+				}
+			} else if (!strVal.startsWith("$.")) {
+				parameters.put(encKey, crypto.encrypt(strVal));
+				if (hasHashInSql) {
+					parameters.put(hashKey, crypto.getNts(strVal));
 				}
 			}
 		}
 	}
 
 	/**
-	 * SELECT 결과 단건 행의 개인정보 컬럼 복호화 후처리
-	 * - _ENC 컬럼이 조회된 경우 복호화하여 기본 컬럼명(col)에 매핑
-	 * - 기본 컬럼 값 자체가 SecureDB 암호문('$.')인 경우 복호화 처리
+	 * SELECT 결과 단건 행의 *_ENC 컬럼 복호화 후처리
+	 * - 컬럼명이 _ENC로 끝나고 값이 SecureDB 암호문('$.')인 경우 복호화 처리
 	 * @param rowMap DB 조회 결과 행 맵
 	 * @return 복호화가 반영된 행 맵
 	 */
@@ -1282,23 +1278,13 @@ public class MonArchDaoImpl   extends DataSourceSupport{
 		if (!crypto.isAvailable()) {
 			return rowMap;
 		}
-		for (String col : PRIVACY_COLS) {
-			String encCol = col + "_ENC";
-			Object encObj = rowMap.get(encCol);
-			if (encObj != null) {
-				String cipherVal = encObj.toString();
-				if (!cipherVal.trim().isEmpty()) {
-					String decrypted = crypto.decrypt(cipherVal);
-					rowMap.put(col, decrypted);
-					rowMap.put(encCol, decrypted);
-					continue;
-				}
-			}
-			Object plainOrEncObj = rowMap.get(col);
-			if (plainOrEncObj != null) {
-				String val = plainOrEncObj.toString();
-				if (val.startsWith("$.")) {
-					rowMap.put(col, crypto.decrypt(val));
+		for (Map.Entry<String, Object> entry : rowMap.entrySet()) {
+			String key = entry.getKey();
+			Object val = entry.getValue();
+			if (key != null && val != null && key.toUpperCase().endsWith("_ENC")) {
+				String cipherVal = val.toString();
+				if (cipherVal.startsWith("$.")) {
+					entry.setValue(crypto.decrypt(cipherVal));
 				}
 			}
 		}
@@ -1306,8 +1292,9 @@ public class MonArchDaoImpl   extends DataSourceSupport{
 	}
 
 	/**
-	 * 20261113 khma : 조회 SQL의 @COL_HASH@ 검색 파라미터를 NTS 색인 토큰으로 변환한다.
-	 * - SQL이 LIKE @COL_HASH@ 형태이면 getNtsBsh(토큰%), 그 외(= 또는 '%' 결합)이면 getNts(토큰) 적용
+	 * 20261113 khma : 조회 SQL의 @*_HASH@ 검색 파라미터를 NTS 색인 토큰으로 변환한다.
+	 * - _HASH로 끝나는 파라미터만 변환 대상이며, @NAME@ / @NAME_ENC@ 등 일반 파라미터는 원문 그대로 유지
+	 * - SQL이 LIKE @*_HASH@ 형태이면 getNtsBsh(토큰%), 그 외(= 또는 '%' 결합)이면 getNts(토큰) 적용
 	 * @param sqlCmd 실행 SQL문
 	 * @param paramName 파라미터명
 	 * @param rawVal 화면에서 전달된 평문 검색어
@@ -1319,17 +1306,6 @@ public class MonArchDaoImpl   extends DataSourceSupport{
 		}
 		String upperParam = paramName.trim().toUpperCase();
 		if (!upperParam.endsWith("_HASH")) {
-			return rawVal;
-		}
-		String baseCol = upperParam.substring(0, upperParam.length() - 5);
-		boolean isPrivacy = false;
-		for (String col : PRIVACY_COLS) {
-			if (col.equals(baseCol)) {
-				isPrivacy = true;
-				break;
-			}
-		}
-		if (!isPrivacy) {
 			return rawVal;
 		}
 		CryptoService crypto = CryptoService.getInstance();
