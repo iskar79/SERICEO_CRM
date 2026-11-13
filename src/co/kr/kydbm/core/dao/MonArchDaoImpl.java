@@ -1231,15 +1231,31 @@ public class MonArchDaoImpl   extends DataSourceSupport{
 			return;
 		}
 		for (String col : PRIVACY_COLS) {
-			Object rawVal = parameters.get(col);
-			if (rawVal instanceof String) {
-				String strVal = ((String) rawVal).trim();
-				if (!strVal.isEmpty()) {
-					if (!strVal.startsWith("$.")) {
+			if (parameters.containsKey(col)) {
+				Object rawVal = parameters.get(col);
+				if (rawVal instanceof String) {
+					String strVal = ((String) rawVal).trim();
+					if (strVal.isEmpty()) {
+						// 빈 값으로 수정 시 기존 _ENC, _HASH 컬럼도 함께 초기화
+						parameters.put(col + "_ENC", "");
+						parameters.put(col + "_HASH", "");
+					} else if (!strVal.startsWith("$.")) {
 						parameters.put(col + "_ENC", crypto.encrypt(strVal));
 						parameters.put(col + "_HASH", crypto.getNts(strVal));
 					} else {
 						parameters.put(col + "_ENC", strVal);
+					}
+				}
+			} else if (parameters.containsKey(col + "_ENC")) {
+				// 화면에서 _ENC 필드명으로 직접 평문을 전달한 경우에도 자동 암호화 및 _HASH 생성
+				Object rawEncVal = parameters.get(col + "_ENC");
+				if (rawEncVal instanceof String) {
+					String strEncVal = ((String) rawEncVal).trim();
+					if (strEncVal.isEmpty()) {
+						parameters.put(col + "_HASH", "");
+					} else if (!strEncVal.startsWith("$.")) {
+						parameters.put(col + "_ENC", crypto.encrypt(strEncVal));
+						parameters.put(col + "_HASH", crypto.getNts(strEncVal));
 					}
 				}
 			}
