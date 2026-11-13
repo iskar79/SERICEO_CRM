@@ -113,8 +113,8 @@
 | **Step 11-3**| `WebContent/js/jquery.kdb.superContaner.js` | getJson 구조체 모달 호출 시 전체 .ui-widget-overlay z-index 일괄 변경 제거 (구조체 모달 닫힌 후 부모 모달 overlay 클릭 차단/비활성화 버그 수정) | `[x]` | `[ ]` | **로컬 수정 완료 (VDI 반영 대기)** |
 | **Step 3-1** | `src/monarch.properties` | SecureDB Agentless HTTPS 접속 설정(VDI: 70.2.243.122:8090 / 서버: 26.2.37.28:8090, 토큰, ca_dev.pem) 및 정책명(AES256_DEV/SHA512_DEV) 추가 | `[x]` | `[x]` | **완료 (VDI 컴파일/반영 확인)** |
 | **Step 3-2** | `src/co/kr/kydbm/common/crypto/CryptoService.java` | KSign SecureDB Agentless Java API V2 공통 암복호화 서비스 클래스 작성 (`AgentlessApiFactory`, `SDBAgentlessApi` 싱글턴 재사용, `close()` 리소스 해제, Fallback 내장) | `[x]` | `[x]` | **완료 (VDI 컴파일 에러 0건 확인)** |
-| **Step 3-3** | `src/co/kr/kydbm/core/dao/MonArchDaoImpl.java` | 개인정보 10개 컬럼 INSERT/UPDATE/BATCH 암호문(_ENC) 및 NTS 토큰(_HASH) 자동 주입, SELECT 단건/목록 복호화(decryptRow/decryptRows) 연동 | `[x]` | `[ ]` | **로컬 수정 완료 (VDI 반영 대기)** |
-| **Step 3-4** | `src/co/kr/kydbm/core/utils/FilterGenerator.java` | 개인정보 10개 컬럼 검색 시 기존 LIKE 대신 NTS 토큰(_HASH = nts_bsh) 인덱스 일치 검색 자동 변환 | `[ ]` | `[ ]` | 착수 대기 |
+| **Step 3-3** | `src/co/kr/kydbm/core/dao/MonArchDaoImpl.java` | 개인정보 10개 컬럼 INSERT/UPDATE/BATCH 암호문(_ENC) 및 NTS 토큰(_HASH) 자동 주입, SELECT 단건/목록 복호화(decryptRow/decryptRows) 및 FilterGenerator SQL 전달 연동 | `[x]` | `[ ]` | **로컬 수정 완료 (VDI 반영 대기)** |
+| **Step 3-4** | `src/co/kr/kydbm/core/utils/FilterGenerator.java` | A_USER/A_FAMILY/US_USER 대상 SQL 판별 후 개인정보 10개 컬럼 검색 시 _HASH 및 NTS 토큰(= nts / LIKE nts_bsh) 색인 검색 자동 변환 | `[x]` | `[ ]` | **로컬 수정 완료 (VDI 반영 대기)** |
 
 ## 운영 WAR 생성 전 필수 확인 알림
 

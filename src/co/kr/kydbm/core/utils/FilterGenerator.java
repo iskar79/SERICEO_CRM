@@ -1,11 +1,15 @@
 package co.kr.kydbm.core.utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 
 import co.kr.kydbm.common.CommonConst;
+import co.kr.kydbm.common.crypto.CryptoService; // 20261113 khma : SecureDB NTS 검색토큰 연동
 import co.kr.kydbm.core.bean.FilterGeneratorBean;
 
 /**
@@ -20,6 +24,40 @@ public class FilterGenerator {
 	private static ConfigProperties  prop = ConfigProperties.getInstance(); //속성정의 정보 취득
 	private static final String DB_TYPE = prop.getProperty("monarch.db.type");
 	private static String strSep = QueryGenerator.genStrSeperator(DB_TYPE);
+
+	// 20261113 khma : SecureDB NTS 색인 검색 대상 개인정보 10개 컬럼 정의
+	private static final Set<String> PRIVACY_COL_SET = new HashSet<String>(Arrays.asList(
+			"NAME", "BIRTHDAY", "EMAIL", "SUBEMAIL", "TELNO", "MTELNO",
+			"ADDRESS1", "ADDRESS2", "SUBADDRESS1", "SUBADDRESS2"
+	));
+
+	/**
+	 * 20261113 khma : 대상 SQL이 개인정보 암호화 테이블(A_USER, A_FAMILY, US_USER) 조회 쿼리인지 판별한다.
+	 * (비암호화 테이블의 NAME 등 일반 컬럼 검색 시 ORA-00904 오류 방지)
+	 * @param sqlCommand 실행 SQL 원문
+	 * @return NTS 변환 대상 여부
+	 */
+	public static boolean isNtsTargetQuery(String sqlCommand) {
+		if (sqlCommand == null || sqlCommand.isEmpty()) {
+			return false;
+		}
+		String upper = sqlCommand.toUpperCase();
+		return upper.contains("A_USER") || upper.contains("A_FAMILY")
+				|| upper.contains("US_USER") || upper.contains("_HASH");
+	}
+
+	/**
+	 * 20261113 khma : 필드명이 개인정보 암호화 대상 10개 컬럼인지 확인한다.
+	 * @param field 필드명
+	 * @return 대상 여부
+	 */
+	private static boolean isPrivacyField(String field) {
+		if (field == null || field.trim().isEmpty()) {
+			return false;
+		}
+		return PRIVACY_COL_SET.contains(field.trim().toUpperCase());
+	}
+
 	/**
 	 * 확장필드용 쿼리를 취득하는 메소드
 	 * 
@@ -28,11 +66,24 @@ public class FilterGenerator {
 	 */
 	public static String getFilterQuery(
 			ArrayList<Map<String, Object>> arrExtFilters) {
+		return getFilterQuery(arrExtFilters, null);
+	}
+
+	/**
+	 * 20261113 khma : 확장필드용 쿼리를 취득하는 메소드 (대상 SQL 기반 NTS 변환 지원)
+	 * 
+	 * @param arrExtFilters 확장필터 목록
+	 * @param sqlCommand 실행 SQL 원문
+	 * @return 생성된 WHERE 조건절 문자열
+	 */
+	public static String getFilterQuery(
+			ArrayList<Map<String, Object>> arrExtFilters, String sqlCommand) {
 		String rstFltQry = "";
+		boolean useNts = isNtsTargetQuery(sqlCommand) && CryptoService.getInstance().isAvailable();
 		// type에 따라 Generator 처리를 분기함.
 		for (Map<String, Object> ef : arrExtFilters) {
-			String genQry = filterGenController(ef);
-			if (genQry != null && genQry != "") {
+			String genQry = filterGenController(ef, useNts);
+			if (genQry != null && !genQry.isEmpty()) {
 				rstFltQry += " AND " + genQry;
 			}
 		}
@@ -45,7 +96,7 @@ public class FilterGenerator {
 	 * @param ef
 	 * @return
 	 */
-	private static String filterGenController(Map<String, Object> filter) {
+	private static String filterGenController(Map<String, Object> filter, boolean useNts) {
 
 		String rstQry = "";
 
@@ -66,7 +117,7 @@ public class FilterGenerator {
 			ef.setCodes(filter.get("codes").toString());
 
 		if (("text").equals(ef.getType())) {
-			rstQry = makeTextQry(ef);
+			rstQry = makeTextQry(ef, useNts);
 		} else if (("select").equals(ef.getType())) {
 			rstQry = makeSelectQry(ef);
 		} else if (("boolean").equals(ef.getType())) {
@@ -90,13 +141,33 @@ public class FilterGenerator {
 	 * Text 타입의 필터 쿼리 작성 메소드
 	 * 
 	 * @param ef
+	 * @param useNts NTS 색인 검색 변환 적용 여부
 	 * @return
 	 */
-	private static String makeTextQry(FilterGeneratorBean ef) {
+	private static String makeTextQry(FilterGeneratorBean ef, boolean useNts) {
 		String rstQry = "";
 		/*
 		 * 이다 = 포함되는 키워드 ~ 아니다 ! 포함하지 않는 키워드 !~ 모두 * 없음 !*
 		 */
+		// 20261113 khma : 개인정보 10개 컬럼인 경우 _HASH 컬럼 및 NTS 색인 검색 조건으로 변환
+		if (useNts && isPrivacyField(ef.getField())) {
+			String hashCol = ef.getField().trim() + "_HASH";
+			if (ef.getOperators().equals("=")) {
+				rstQry = hashCol + " = @" + hashCol + "@ ";
+			} else if (ef.getOperators().equals("~")) {
+				rstQry = hashCol + " LIKE @" + hashCol + "@ ";
+			} else if (ef.getOperators().equals("!")) {
+				rstQry = hashCol + " <> @" + hashCol + "@ ";
+			} else if (ef.getOperators().equals("!~")) {
+				rstQry = hashCol + " NOT LIKE @" + hashCol + "@ ";
+			} else if (ef.getOperators().equals("*")) {
+				rstQry = "";
+			} else if (ef.getOperators().equals("!*")) {
+				rstQry = hashCol + " is null ";
+			}
+			return rstQry;
+		}
+
 		rstQry += ef.getField(); // 필드명
 		
 		//2013-12-17 khma : db분기처리 필요
@@ -693,6 +764,20 @@ public class FilterGenerator {
 			Map<String, String> mapParam,
 			ArrayList<Map<String, Object>> arrExtFilters,
 			Map<String, String> parameters) {
+		return getExtFilterParams(mapParam, arrExtFilters, parameters, null);
+	}
+
+	/**
+	 * 20261113 khma : 확장필드 파라메터 추가 메소드 (대상 SQL 기반 NTS 검색토큰 자동 변환 지원)
+	 */
+	public static Map<String, String> getExtFilterParams(
+			Map<String, String> mapParam,
+			ArrayList<Map<String, Object>> arrExtFilters,
+			Map<String, String> parameters,
+			String sqlCommand) {
+
+		CryptoService crypto = CryptoService.getInstance();
+		boolean useNts = isNtsTargetQuery(sqlCommand) && crypto.isAvailable();
 
 		for (Map<String, Object> extFilter : arrExtFilters) {
 			String key = extFilter.get("field").toString();
@@ -734,6 +819,14 @@ public class FilterGenerator {
 				} else if (type.equals("dept") && op.equals("md")) {
 					// type이 dept 이고 operator가 md 인경우
 					mapParam.put("UDEPT", parameters.get("UDEPT").toString());
+				} else if (useNts && "text".equals(type) && isPrivacyField(key)) {
+					// 20261113 khma : 개인정보 10개 컬럼 검색어를 NTS 색인 토큰으로 변환 바인딩
+					String hashKey = key.trim() + "_HASH";
+					if ("=".equals(op) || "!".equals(op)) {
+						mapParam.put(hashKey, crypto.getNts(val));
+					} else {
+						mapParam.put(hashKey, crypto.getNtsBsh(val));
+					}
 				} else {
 					mapParam.put(key, val);
 				}

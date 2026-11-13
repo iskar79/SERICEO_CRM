@@ -361,10 +361,11 @@ public class MonArchDaoImpl   extends DataSourceSupport{
 		
 		//확장필드가 존자해면 아래의 처리를 행한다.
 		 if (arrExtFilters != null && arrExtFilters.size() > 0){
+			 // 20261113 khma : 대상 SQL(A_USER/A_FAMILY/US_USER) 판별 후 개인정보 NTS 검색토큰 변환 연동
 			 //parameter에 확장필드 파라메터 추가
-			 mapParam = FilterGenerator.getExtFilterParams(mapParam ,arrExtFilters, parameters);
+			 mapParam = FilterGenerator.getExtFilterParams(mapParam ,arrExtFilters, parameters, SqlCommand);
 			 //필터 옵션에 따른 Sql제너레이터 작성후 /* EXTFILTERS */ 로 replace시킴
-			 String strExtFilters = FilterGenerator.getFilterQuery(arrExtFilters);
+			 String strExtFilters = FilterGenerator.getFilterQuery(arrExtFilters, SqlCommand);
 			 execSqlCmd = SqlCommand.replace("/* EXTFILTERS */", strExtFilters);
 			 
          }
@@ -684,8 +685,9 @@ public class MonArchDaoImpl   extends DataSourceSupport{
 
 		// 3단계: 화면 동적 확장 필터(/* EXTFILTERS */)가 존재하는 경우 SQL WHERE 절에 병합 치환
 		if (arrExtFilters != null && arrExtFilters.size() > 0) {
-			mapParam = FilterGenerator.getExtFilterParams(mapParam, arrExtFilters, parameters);
-			String strExtFilters = FilterGenerator.getFilterQuery(arrExtFilters);
+			// 20261113 khma : 대상 SQL(A_USER/A_FAMILY/US_USER) 판별 후 개인정보 NTS 검색토큰 변환 연동
+			mapParam = FilterGenerator.getExtFilterParams(mapParam, arrExtFilters, parameters, SqlCommand);
+			String strExtFilters = FilterGenerator.getFilterQuery(arrExtFilters, SqlCommand);
 			execSqlCmd = SqlCommand.replace("/* EXTFILTERS */", strExtFilters);
 		}
 
