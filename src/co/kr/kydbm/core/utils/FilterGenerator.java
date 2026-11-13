@@ -45,7 +45,7 @@ public class FilterGenerator {
 	}
 
 	/**
-	 * 20261113 khma : 필드명이 개인정보 암호화 대상 10개 컬럼(또는 _ENC 접미사 포함)인지 확인한다.
+	 * 20261113 khma : 필드명이 개인정보 암호화 대상 10개 컬럼(또는 _ENC, _HASH 접미사 포함)인지 확인한다.
 	 * @param field 필드명
 	 * @return 대상 여부
 	 */
@@ -56,19 +56,24 @@ public class FilterGenerator {
 		String upper = field.trim().toUpperCase();
 		if (upper.endsWith("_ENC")) {
 			upper = upper.substring(0, upper.length() - 4);
+		} else if (upper.endsWith("_HASH")) {
+			upper = upper.substring(0, upper.length() - 5);
 		}
 		return PRIVACY_COL_SET.contains(upper);
 	}
 
 	/**
-	 * 20261113 khma : 개인정보 필드명(NAME 또는 NAME_ENC 등)을 _HASH 컬럼명으로 변환한다.
+	 * 20261113 khma : 개인정보 필드명(NAME, NAME_ENC, NAME_HASH 등)을 _HASH 컬럼명으로 변환한다.
 	 * @param field 필드명
 	 * @return _HASH 컬럼명
 	 */
 	private static String toHashField(String field) {
 		String trimmed = field.trim();
-		if (trimmed.toUpperCase().endsWith("_ENC")) {
+		String upper = trimmed.toUpperCase();
+		if (upper.endsWith("_ENC")) {
 			trimmed = trimmed.substring(0, trimmed.length() - 4);
+		} else if (upper.endsWith("_HASH")) {
+			return trimmed;
 		}
 		return trimmed + "_HASH";
 	}

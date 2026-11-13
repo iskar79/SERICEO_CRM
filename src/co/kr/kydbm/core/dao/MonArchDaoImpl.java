@@ -346,7 +346,8 @@ public class MonArchDaoImpl   extends DataSourceSupport{
 				//if(_data.isEmpty()){ //jdk 1.6 					
 //					SqlCommand = SqlCommand.replace(oldChar, newChar);
 				}else{
-					mapParam.put(para, _data);
+					// 20261113 khma : _HASH 검색 파라미터 자동 NTS 토큰 변환
+					mapParam.put(para, convertHashSearchParam(execSqlCmd, para, _data));
 				}
 
 			} catch (Exception e1) {
@@ -397,7 +398,8 @@ public class MonArchDaoImpl   extends DataSourceSupport{
 					
 //					SqlCommand = SqlCommand.replace(oldChar, newChar);
 				}else{
-					mapParam.put(para, _data);
+					// 20261113 khma : _HASH 검색 파라미터 자동 NTS 토큰 변환
+					mapParam.put(para, convertHashSearchParam(SqlCommand, para, _data));
 				}
 				
 			} catch (Exception e1) {
@@ -672,7 +674,8 @@ public class MonArchDaoImpl   extends DataSourceSupport{
 			try {
 				String _data = parameters.get(para);
 				if (!StringUtils.isEmpty(_data)) {
-					mapParam.put(para, _data);
+					// 20261113 khma : _HASH 검색 파라미터 자동 NTS 토큰 변환
+					mapParam.put(para, convertHashSearchParam(execSqlCmd, para, _data));
 				}
 			} catch (Exception e1) {
 				String _msg = "MonArch[CRUD :ReadStream ] READ SQL에서 검색할 키["
@@ -1300,6 +1303,44 @@ public class MonArchDaoImpl   extends DataSourceSupport{
 			}
 		}
 		return rowMap;
+	}
+
+	/**
+	 * 20261113 khma : 조회 SQL의 @COL_HASH@ 검색 파라미터를 NTS 색인 토큰으로 변환한다.
+	 * - SQL이 LIKE @COL_HASH@ 형태이면 getNtsBsh(토큰%), 그 외(= 또는 '%' 결합)이면 getNts(토큰) 적용
+	 * @param sqlCmd 실행 SQL문
+	 * @param paramName 파라미터명
+	 * @param rawVal 화면에서 전달된 평문 검색어
+	 * @return 변환된 NTS 토큰 문자열 (대상 외 파라미터는 원문 반환)
+	 */
+	private String convertHashSearchParam(String sqlCmd, String paramName, String rawVal) {
+		if (rawVal == null || rawVal.trim().isEmpty() || paramName == null) {
+			return rawVal;
+		}
+		String upperParam = paramName.trim().toUpperCase();
+		if (!upperParam.endsWith("_HASH")) {
+			return rawVal;
+		}
+		String baseCol = upperParam.substring(0, upperParam.length() - 5);
+		boolean isPrivacy = false;
+		for (String col : PRIVACY_COLS) {
+			if (col.equals(baseCol)) {
+				isPrivacy = true;
+				break;
+			}
+		}
+		if (!isPrivacy) {
+			return rawVal;
+		}
+		CryptoService crypto = CryptoService.getInstance();
+		if (!crypto.isAvailable()) {
+			return rawVal;
+		}
+		String upperSql = (sqlCmd != null) ? sqlCmd.toUpperCase() : "";
+		if (upperSql.contains("LIKE @" + upperParam + "@")) {
+			return crypto.getNtsBsh(rawVal.trim());
+		}
+		return crypto.getNts(rawVal.trim());
 	}
 
 	/**
