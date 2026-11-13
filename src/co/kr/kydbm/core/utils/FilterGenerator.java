@@ -32,8 +32,8 @@ public class FilterGenerator {
 	));
 
 	/**
-	 * 20261113 khma : 대상 SQL이 개인정보 암호화 테이블(A_USER, A_FAMILY, US_USER) 조회 쿼리인지 판별한다.
-	 * (비암호화 테이블의 NAME 등 일반 컬럼 검색 시 ORA-00904 오류 방지)
+	 * 20261113 khma : 대상 SQL이 _HASH(NTS 색인 컬럼)를 포함하는 암호화 테이블 조회 쿼리인지 동적으로 판별한다.
+	 * (테이블명 하드코딩 없이 SELECT/WHERE/주석 내 _HASH 존재 여부로 자동 인식, 비암호화 테이블 ORA-00904 오류 방지)
 	 * @param sqlCommand 실행 SQL 원문
 	 * @return NTS 변환 대상 여부
 	 */
@@ -41,9 +41,7 @@ public class FilterGenerator {
 		if (sqlCommand == null || sqlCommand.isEmpty()) {
 			return false;
 		}
-		String upper = sqlCommand.toUpperCase();
-		return upper.contains("A_USER") || upper.contains("A_FAMILY")
-				|| upper.contains("US_USER") || upper.contains("_HASH");
+		return sqlCommand.toUpperCase().contains("_HASH");
 	}
 
 	/**
