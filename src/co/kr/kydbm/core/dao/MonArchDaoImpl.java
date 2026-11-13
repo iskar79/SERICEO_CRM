@@ -1247,13 +1247,15 @@ public class MonArchDaoImpl   extends DataSourceSupport{
 					}
 				}
 			} else if (parameters.containsKey(col + "_ENC")) {
-				// 화면에서 _ENC 필드명으로 직접 평문을 전달한 경우에도 자동 암호화 및 _HASH 생성
+				// 20261113 khma : 화면에서 _ENC 필드명으로 직접 전달한 경우 _ENC(암호화), _HASH(토큰), 기본필드(평문) 일괄 세팅
 				Object rawEncVal = parameters.get(col + "_ENC");
 				if (rawEncVal instanceof String) {
 					String strEncVal = ((String) rawEncVal).trim();
 					if (strEncVal.isEmpty()) {
+						parameters.put(col, "");
 						parameters.put(col + "_HASH", "");
 					} else if (!strEncVal.startsWith("$.")) {
+						parameters.put(col, strEncVal);
 						parameters.put(col + "_ENC", crypto.encrypt(strEncVal));
 						parameters.put(col + "_HASH", crypto.getNts(strEncVal));
 					}
@@ -1283,7 +1285,9 @@ public class MonArchDaoImpl   extends DataSourceSupport{
 			if (encObj != null) {
 				String cipherVal = encObj.toString();
 				if (!cipherVal.trim().isEmpty()) {
-					rowMap.put(col, crypto.decrypt(cipherVal));
+					String decrypted = crypto.decrypt(cipherVal);
+					rowMap.put(col, decrypted);
+					rowMap.put(encCol, decrypted);
 					continue;
 				}
 			}

@@ -45,7 +45,7 @@ public class FilterGenerator {
 	}
 
 	/**
-	 * 20261113 khma : 필드명이 개인정보 암호화 대상 10개 컬럼인지 확인한다.
+	 * 20261113 khma : 필드명이 개인정보 암호화 대상 10개 컬럼(또는 _ENC 접미사 포함)인지 확인한다.
 	 * @param field 필드명
 	 * @return 대상 여부
 	 */
@@ -53,7 +53,24 @@ public class FilterGenerator {
 		if (field == null || field.trim().isEmpty()) {
 			return false;
 		}
-		return PRIVACY_COL_SET.contains(field.trim().toUpperCase());
+		String upper = field.trim().toUpperCase();
+		if (upper.endsWith("_ENC")) {
+			upper = upper.substring(0, upper.length() - 4);
+		}
+		return PRIVACY_COL_SET.contains(upper);
+	}
+
+	/**
+	 * 20261113 khma : 개인정보 필드명(NAME 또는 NAME_ENC 등)을 _HASH 컬럼명으로 변환한다.
+	 * @param field 필드명
+	 * @return _HASH 컬럼명
+	 */
+	private static String toHashField(String field) {
+		String trimmed = field.trim();
+		if (trimmed.toUpperCase().endsWith("_ENC")) {
+			trimmed = trimmed.substring(0, trimmed.length() - 4);
+		}
+		return trimmed + "_HASH";
 	}
 
 	/**
@@ -149,7 +166,7 @@ public class FilterGenerator {
 		 */
 		// 20261113 khma : 개인정보 10개 컬럼인 경우 _HASH 컬럼 및 NTS 색인 검색 조건으로 변환
 		if (useNts && isPrivacyField(ef.getField())) {
-			String hashCol = ef.getField().trim() + "_HASH";
+			String hashCol = toHashField(ef.getField());
 			if (ef.getOperators().equals("=")) {
 				rstQry = hashCol + " = @" + hashCol + "@ ";
 			} else if (ef.getOperators().equals("~")) {
@@ -819,7 +836,7 @@ public class FilterGenerator {
 					mapParam.put("UDEPT", parameters.get("UDEPT").toString());
 				} else if (useNts && "text".equals(type) && isPrivacyField(key)) {
 					// 20261113 khma : 개인정보 10개 컬럼 검색어를 NTS 색인 토큰으로 변환 바인딩
-					String hashKey = key.trim() + "_HASH";
+					String hashKey = toHashField(key);
 					if ("=".equals(op) || "!".equals(op)) {
 						mapParam.put(hashKey, crypto.getNts(val));
 					} else {
