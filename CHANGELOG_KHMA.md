@@ -82,10 +82,12 @@
 | **Step 11-2**| `WebContent/js/jquery.kdb.MonArch800.js` | `$.decHTML` 함수에서 변환 대상 엔티티(`&`) 및 `<br>` 태그가 없는 일반 문자열 조기 반환(Early Return) 처리로 불필요한 정규식 체인 실행 제거 | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
 | **Step 10-4**| `WebContent/js/core/jquery.kdb.core.superMap.js`, `jquery.kdb.core.superAnswer.js`, `superTree.js`, `superChart.js`, `superCalendar.js`, `superContaner.js`, `MonArch.js`, `MonArch_Simple.js`, `SurveyAnsform.htm` | superMap(11개)·SuperAnswer(5개) 모듈 분리, core 5종 상세 Javadoc/단계별 주석 보강, MonArch_Simple.js 모듈 로드/SurveyAnsform.htm jQuery 1.12.4 상향 및 dspmode == 1 버그 수정 | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
 | **Step 11-3**| `WebContent/js/jquery.kdb.superContaner.js` | getJson 구조체 모달 호출 시 전체 .ui-widget-overlay z-index 일괄 변경 제거 (구조체 모달 닫힌 후 부모 모달 overlay 클릭 차단/비활성화 버그 수정) | `[x]` | `[ ]` | **로컬 수정 완료 (VDI 반영 대기)** |
-| **Step 3-1** | `src/monarch.properties` | SecureDB Agent 데몬 접속 설정(IP/Port 9909) 및 정책명(AES256_DEV/SHA512_DEV) 추가 | `[x]` | `[ ]` | **로컬 수정 완료 (VDI 반영 대기)** |
-| **Step 3-2** | `src/co/kr/kydbm/common/crypto/CryptoService.java` | KSign SecureDB Java API V2 공통 암복호화 서비스 클래스 신규 작성 (Sample.java 패턴 준수, 싱글턴, 10분 DEK 동기화, 로컬 Mock Fallback 내장) | `[x]` | `[ ]` | **로컬 수정 완료 (VDI 반영 대기)** |
-| **Step 3-3** | `src/co/kr/kydbm/core/dao/MonArchDaoImpl.java` | 개인정보 10개 컬럼 INSERT/UPDATE 파라미터 암호화(_ENC) 및 NTS 토큰(_HASH) 자동 주입, SELECT 복호화(decryptRow) 연동 | `[ ]` | `[ ]` | 착수 대기 |
-| **Step 3-4** | `src/co/kr/kydbm/core/utils/FilterGenerator.java` | 개인정보 10개 컬럼 검색 시 기존 LIKE 대신 NTS 토큰(_HASH = nts_bsh) 인덱스 일치 검색 자동 변환 | `[ ]` | `[ ]` | 착수 대기 |
+| **Step 3-1** | `src/monarch.properties` | SecureDB Agentless HTTPS 접속 설정(VDI/개발 112.106.119.13/운영 112.106.119.183 주석 블록 및 인증서/D:\CRM 배포 안내) | `[x]` | `[x]` | **완료 (VDI 반영 완료)** |
+| **Step 3-1b**| `src/properties/jdbc.properties` | 배포 환경별([1] VDI / [2] 개발 112.106.119.13 / [3] 운영 112.106.119.183) Oracle JDBC 접속 정보 블록 및 D:\CRM 배포 주석 정리 | `[x]` | `[x]` | **완료 (VDI 반영 완료)** |
+| **Step 3-2** | `src/co/kr/kydbm/common/crypto/CryptoService.java` | KSign SecureDB Agentless Java API V2 공통 암복호화 서비스 클래스 신규 작성 (`AgentlessApiFactory`, `SDBAgentlessApi` 싱글턴, Fallback 내장) | `[x]` | `[x]` | **완료 (VDI 반영 완료)** |
+| **Step 3-3** | `src/co/kr/kydbm/core/dao/MonArchDaoImpl.java` | `*_ENC` 파라미터 자동 암호화 및 `@*_HASH@` 존재 시 NTS 토큰 자동 주입, SELECT `*_ENC` 복호화, `ReadQuery` 진단 로그 보강 | `[x]` | `[x]` | **완료 (VDI 반영 완료)** |
+| **Step 3-4** | `src/co/kr/kydbm/core/utils/FilterGenerator.java`, `SvcCRUD.java` | SQL 내 `_HASH` 포함 여부 동적 판별 후 확장필터 `*_HASH` 검색 필드 NTS 색인 검색(`= nts` / `LIKE nts_bsh`) 자동 변환, `SvcCRUD` 실행타입 오류 진단 로그 보강 | `[x]` | `[x]` | **완료 (VDI 반영 완료)** |
+| **Step 3-5** | `src/co/kr/kydbm/core/filecontrol/ExcelDownload.java` | 대용량 스트리밍 엑셀(XLSX)/CSV `RowCallbackHandler` 내 `*_ENC` 컬럼 자동 복호화(`decryptIfEncCell`) 연동 | `[x]` | `[x]` | **완료 (VDI 반영 완료)** |
 
 ### 📖 Step 0. 사전 환경 정상화 및 아키텍처 숙지 (완료)
 > 📘 관련 문서: `ARCHITECTURE.md`, `AGENTS.md`, `0_MASTER_EXECUTION_PLAN.md`
