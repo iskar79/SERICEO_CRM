@@ -97,29 +97,41 @@ public class CryptoService {
             boolean shuffleUrls = "true".equalsIgnoreCase(shuffle != null ? shuffle.trim() : "");
             String level = (logLevel != null && !logLevel.trim().isEmpty()) ? logLevel.trim() : "INFO";
 
-            TrustedCertificates.Builder certBuilder = TrustedCertificates.builder();
-            boolean hasCert = false;
-            if (caPath != null && !caPath.trim().isEmpty()) {
-                certBuilder.ca(CertificateSource.path(caPath.trim()));
-                hasCert = true;
-            }
-            if (rootCaPath != null && !rootCaPath.trim().isEmpty()) {
-                certBuilder.rootCa(CertificateSource.path(rootCaPath.trim()));
-                hasCert = true;
+            boolean hasCa = (caPath != null && !caPath.trim().isEmpty());
+            boolean hasRootCa = (rootCaPath != null && !rootCaPath.trim().isEmpty());
+            TrustedCertificates trustedCerts = null;
+            if (hasCa && hasRootCa) {
+                trustedCerts = TrustedCertificates.builder()
+                        .ca(CertificateSource.path(caPath.trim()))
+                        .rootCa(CertificateSource.path(rootCaPath.trim()))
+                        .build();
+            } else if (hasCa) {
+                trustedCerts = TrustedCertificates.builder()
+                        .ca(CertificateSource.path(caPath.trim()))
+                        .build();
+            } else if (hasRootCa) {
+                trustedCerts = TrustedCertificates.builder()
+                        .rootCa(CertificateSource.path(rootCaPath.trim()))
+                        .build();
             }
 
-            AgentlessApiConfig.Builder configBuilder = AgentlessApiConfig.builder()
-                    .serverUrls(serverUrls)
-                    .shuffleServerUrls(shuffleUrls)
-                    .apiToken(apiToken.trim())
-                    .logLevel(level);
-
-            if (hasCert) {
-                configBuilder.trustedCertificates(certBuilder.build());
-            }
+            AgentlessApiConfig config = (trustedCerts != null)
+                    ? AgentlessApiConfig.builder()
+                            .serverUrls(serverUrls)
+                            .shuffleServerUrls(shuffleUrls)
+                            .apiToken(apiToken.trim())
+                            .logLevel(level)
+                            .trustedCertificates(trustedCerts)
+                            .build()
+                    : AgentlessApiConfig.builder()
+                            .serverUrls(serverUrls)
+                            .shuffleServerUrls(shuffleUrls)
+                            .apiToken(apiToken.trim())
+                            .logLevel(level)
+                            .build();
 
             // 1. SDBAgentlessApi 싱글턴 인스턴스 생성
-            this.sdbApi = AgentlessApiFactory.create(configBuilder.build());
+            this.sdbApi = AgentlessApiFactory.create(config);
 
             // 2. 정책 로드 상태 점검
             if (this.sdbApi != null) {
