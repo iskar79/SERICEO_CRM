@@ -115,6 +115,7 @@
 | **Step 3-2** | `src/co/kr/kydbm/common/crypto/CryptoService.java` | KSign SecureDB Agentless Java API V2 공통 암복호화 서비스 클래스 작성 (`AgentlessApiFactory`, `SDBAgentlessApi` 싱글턴 재사용, `close()` 리소스 해제, Fallback 내장) | `[x]` | `[x]` | **완료 (VDI 컴파일 에러 0건 확인)** |
 | **Step 3-3** | `src/co/kr/kydbm/core/dao/MonArchDaoImpl.java` | `*_ENC` 파라미터 자동 암호화 및 SQL 내 `@*_HASH@` 존재 시 NTS 토큰 자동 주입, SELECT `*_ENC` 자동 복호화, `@*_HASH@` 검색어 NTS 변환 연동 | `[x]` | `[x]` | **완료 (VDI 반영 완료 / 구동 테스트 대기)** |
 | **Step 3-4** | `src/co/kr/kydbm/core/utils/FilterGenerator.java` | SQL 내 `_HASH` 포함 여부 동적 판별 후 확장필터 `*_HASH` 검색 필드 NTS 색인 검색(`= nts` / `LIKE nts_bsh`) 자동 변환 | `[x]` | `[x]` | **완료 (VDI 반영 완료 / 구동 테스트 대기)** |
+| **Step 3-5** | `src/co/kr/kydbm/core/filecontrol/ExcelDownload.java` | 대용량 스트리밍 엑셀(XLSX)/CSV `RowCallbackHandler` 내 `*_ENC` 컬럼 자동 복호화(`decryptIfEncCell`) 연동 | `[x]` | `[ ]` | **로컬 수정 완료 (VDI 반영 대기)** |
 
 ## 운영 WAR 생성 전 필수 확인 알림
 

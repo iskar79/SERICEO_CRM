@@ -33,6 +33,8 @@ import org.apache.log4j.Logger;
 import org.apache.poi.util.StringUtil;
 import org.springframework.stereotype.Controller;
 
+import co.kr.kydbm.common.crypto.CryptoService; // 20261113 khma : 대용량 스트리밍 엑셀/CSV *_ENC 컬럼 복호화 연동
+
 // 20261030 khma Start : Apache POI 4.1.2 Agile AES 암호화 관련 import
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
@@ -534,6 +536,7 @@ public class ExcelDownload {
 			org.springframework.jdbc.core.RowCallbackHandler rch = new org.springframework.jdbc.core.RowCallbackHandler() {
 				int colCount = 0;
 				int[] colMapping;
+				boolean[] encColFlags; // 20261113 khma : *_ENC 컬럼 여부 캐싱
 
 				@Override
 				public void processRow(java.sql.ResultSet rs) throws java.sql.SQLException {
@@ -550,15 +553,18 @@ public class ExcelDownload {
 							}
 						}
 						colMapping = new int[mapping.size()];
+						encColFlags = new boolean[mapping.size()];
 						for (int m = 0; m < mapping.size(); m++) {
 							colMapping[m] = mapping.get(m);
+							encColFlags[m] = headers.get(m) != null && headers.get(m).toUpperCase().endsWith("_ENC");
 						}
 						cw.writeNext(headers.toArray(new String[0]));
 						headerWritten[0] = true;
 					}
 					String[] rowData = new String[colMapping.length];
 					for (int i = 0; i < colMapping.length; i++) {
-						String val = rs.getString(colMapping[i]);
+						// 20261113 khma : *_ENC 컬럼인 경우 SecureDB 복호화 처리
+						String val = decryptIfEncCell(encColFlags[i], rs.getString(colMapping[i]));
 						rowData[i] = "\t" + (val == null ? " " : val);
 					}
 					cw.writeNext(rowData);
@@ -602,6 +608,7 @@ public class ExcelDownload {
 			org.springframework.jdbc.core.RowCallbackHandler rch = new org.springframework.jdbc.core.RowCallbackHandler() {
 				int colCount = 0;
 				int[] colMapping;
+				boolean[] encColFlags; // 20261113 khma : *_ENC 컬럼 여부 캐싱
 				int rowIndex = 0;
 
 				@Override
@@ -619,8 +626,10 @@ public class ExcelDownload {
 							}
 						}
 						colMapping = new int[mapping.size()];
+						encColFlags = new boolean[mapping.size()];
 						for (int m = 0; m < mapping.size(); m++) {
 							colMapping[m] = mapping.get(m);
+							encColFlags[m] = headers.get(m) != null && headers.get(m).toUpperCase().endsWith("_ENC");
 						}
 
 						Row row = sheet.createRow(rowIndex++);
@@ -637,7 +646,8 @@ public class ExcelDownload {
 					for (int i = 0; i < colMapping.length; i++) {
 						Cell cell = row.createCell(i);
 						cell.setCellStyle(dataFormat);
-						String data = rs.getString(colMapping[i]);
+						// 20261113 khma : *_ENC 컬럼인 경우 SecureDB 복호화 처리
+						String data = decryptIfEncCell(encColFlags[i], rs.getString(colMapping[i]));
 						if (data == null) {
 							data = " ";
 						}
@@ -1144,6 +1154,23 @@ public class ExcelDownload {
 			return "Opera";
 		}
 		return "FireFox";
+	}
+
+	/**
+	 * 20261113 khma : 대용량 스트리밍 엑셀/CSV *_ENC 셀 복호화 헬퍼
+	 * (isEncCol이 true이고 값이 '$.'로 시작할 때만 SecureDB 복호화 수행)
+	 * @param isEncCol *_ENC 컬럼 여부
+	 * @param val 셀 원본 값
+	 * @return 복호화된 평문 (또는 원본 값)
+	 */
+	private static String decryptIfEncCell(boolean isEncCol, String val) {
+		if (isEncCol && val != null && val.startsWith("$.")) {
+			CryptoService crypto = CryptoService.getInstance();
+			if (crypto.isAvailable()) {
+				return crypto.decrypt(val);
+			}
+		}
+		return val;
 	}
 
 }
