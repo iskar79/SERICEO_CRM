@@ -114,7 +114,11 @@ public class MonArchDaoImpl   extends DataSourceSupport{
 		try {
 			rstMap = namedParameterJdbcTemplate.queryForMap(sqlCommand, paramMap);
 		} catch(EmptyResultDataAccessException e){
+			// 20261113 khma : M_SERVICE 미조회 시 원인 파악을 위해 service/method/usite 정보 함께 기록
+			/*
 			log.warn("데이터가 존재하지 않습니다.", e);
+			*/
+			log.warn("20261113 khma : 데이터가 존재하지 않습니다. [service=" + service + ", method=" + method + ", usite=" + usite + "]", e);
 		}
 		
 		if(null != rstMap) {

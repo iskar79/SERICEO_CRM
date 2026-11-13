@@ -458,7 +458,11 @@ public class SvcCRUD {
             		ds = monArchDao.exeReadProcedure(si.getSql(), obj);
             	}
             }else{
+            	// 20261113 khma : 실행타입 미존재 시 원인 파악을 위해 service/method/usite/jobType 정보 함께 기록
+            	/*
             	throw new Exception("존재하지 않는 실행타입입니다.");
+            	*/
+            	throw new Exception("존재하지 않는 실행타입입니다. [service=" + service + ", method=" + method + ", usite=" + uSite + ", jobType=" + (si != null ? si.getJobType() : "null") + "]");
             }
             
             log.info("[svcCRUD] " + service + ", " + method + ", " + MENUID);
