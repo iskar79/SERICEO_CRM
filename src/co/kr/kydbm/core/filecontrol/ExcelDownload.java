@@ -125,8 +125,7 @@ public class ExcelDownload {
 		}
 
 		if ("CSV".equals(StringUtils.upperCase(type))) {
-			/* CSV형식으로 다운르도 함 */
-			// 파일 실제경로 취득하여 파일명 설정
+			// 20261113 khma : CSV 형식 다운로드 처리 (UTF-8 BOM 포함 스트림 출력)
 			filePath = request.getSession().getServletContext()
 					.getRealPath("/FileData/excelTemp/")
 					+ System.getProperty("file.separator") + fileName + ".csv";
@@ -184,9 +183,7 @@ public class ExcelDownload {
 			}
 
 		} else {
-			/* EXCEL형식으로 다운르도 함 */
-
-			// 파일 실제경로 취득하여 파일명 설정
+			// 20261113 khma : 일반 XLS(JXL) 형식 다운로드 처리 (암호 미입력 일반 엑셀)
 			filePath = request.getSession().getServletContext().getRealPath("/FileData/excelTemp/");
 			fullFilePath = filePath + System.getProperty("file.separator") + fileName + ".xls";
 			String disposition = getDisposition(fileName + ".xls", getBrowser(request));

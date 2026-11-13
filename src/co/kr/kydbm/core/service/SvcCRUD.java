@@ -71,7 +71,6 @@ public class SvcCRUD {
 	private static ConfigProperties  prop = ConfigProperties.getInstance(); //속성정의 정보 취득
 	private static final String DB_TYPE = prop.getProperty("monarch.db.type");
 	Logger log = Logger.getLogger(SvcCRUD.class);
-//	MonArchExtDaoImpl monArchExtDaoImpl; 20140117
 	
 
 	
@@ -110,16 +109,11 @@ public class SvcCRUD {
 	 @RequestMapping("/DATACRUD")
 	  public ModelAndView dataCRUD( @RequestBody  String XmlParms, HttpServletRequest request, HttpSession session, boolean extOpt) throws Exception  {
 		
-		ResultInfo resultInfo = new ResultInfo(); //결과정보 
+		ResultInfo resultInfo = new ResultInfo();
 		// 20261104 khma : parsingForJonType을 try 블록 내부로 이동하여 파싱 예외 시에도 FAIL ResultInfo 응답 반환 보장
-		/*
-		String xmlParams  = parsingForJonType(XmlParms);
-		*/
 		String xmlParams = "";
 		List<Map<String,Object>> ds = null;
-		//json스트링을 객체로 전환
         String sqlComm = "";
-//        String rlt = "";
         int nRlt = 0;
         String service = "";
         String method  = "";
@@ -127,26 +121,21 @@ public class SvcCRUD {
         String uSite = "";
         String gSite = "";
         String key = "";
-        //20130312 khma SCODE추가 
         String uSiteCode = null;
-        //20121025 khma 추가 로그용 
         String MENUID = "";
         String STEPMENU = "";
         String ACTIONNAME = "";
         String KeyString = "";
-        long 서비스시작시간 = System.currentTimeMillis();//서비스시작시간
+        long 서비스시작시간 = System.currentTimeMillis();
         
-        
-		//json 데이터를 읽어서 타입변경하기
 		Map<String, String> obj;
 		ObjectMapper om = new ObjectMapper();
 		ServiceInfo  si= null;
 		MonArchDaoImpl monArchDao = new MonArchDaoImpl();
-//		monArchExtDaoImpl =new MonArchExtDaoImpl(); //20140117
 		try{
-			// 20261104 khma : 요청 JSON 파라미터 디코딩 및 특수문자 처리를 try 내부에서 안전하게 실행
+			// 20261113 khma : 1) 요청 JSON 파라미터 디코딩 및 서비스/메뉴 기본 정보 추출
 			xmlParams = parsingForJonType(XmlParms);
-			obj = om.readValue(xmlParams, new TypeReference<Map<String, Object>>(){}); //맵으로 가져옴
+			obj = om.readValue(xmlParams, new TypeReference<Map<String, Object>>(){});
 			service = obj.get("service");
 			method = obj.get("method");
 			uId = obj.get("UID");
@@ -166,48 +155,8 @@ public class SvcCRUD {
 			MENUID = obj.get("MENUID");
 			STEPMENU = obj.get("STEPMENU");
 			ACTIONNAME = obj.get("ACTIONNAME");
-             /*인증시작*/
-			// 이전 방식 사용자 인증 : UKEY를 가지고 procedure()를 이용, 사용자 정보를 가져온다. 
-//            if (("").equals(obj.get("UKEY"))) {
-//            	//파라메터로 UKEY를 셋팅
-//            	Map<String, String> mapAuthParam = new HashMap<String, String>();
-//            	mapAuthParam.put("V_KEY", obj.get("UKEY"));
-//                //SQL 로그인 인증 프로시져 호출을 위한 쿼리 작성
-//                String SqlCommand = "@USP_LOGINAUTH@, @V_KEY@";
-//                //호출 및 결과 반환
-//                List<Map<String, Object>> authInfo = monArchDao.exeReadProcedure(SqlCommand, mapAuthParam);
-//                //결과 확인후 처리
-//                if ("0".equals(authInfo.get(0).get("MESSAGE_CODE").toString())) {
-//                    uId = authInfo.get(0).get("M_USER_NO").toString();
-//                    uSite = authInfo.get(0).get("M_USITE_NO").toString();
-//                } else {
-//                	resultInfo.setResult(CommonConst.FAIL);
-//                	resultInfo.setErrorCode("E00001");
-//                	resultInfo.setMessage("인증실패");
-//                	//resultInfo.setExceptionMsg(exceptionMsg);
-//                	return new ModelAndView("", CommonConst.RESULT_INFO, resultInfo);
-//                }
-//            } else if (method == "정보" || method == "정보테스트") {
-//                Map<String, String> mapAuthParam = new HashMap<String, String>();
-//            	mapAuthParam.put("V_KEY", obj.get("USER_AUTH_KEY"));
-//            	String SqlCommand = "@USP_LOGINAUTH@, @V_KEY@";
-//            	List<Map<String, Object>> authInfo = monArchDao.exeReadProcedure(SqlCommand, mapAuthParam);
-//            	 if ("0".equals(authInfo.get(0).get("MESSAGE_CODE").toString())) {
-//                     uId = authInfo.get(0).get("M_USER_NO").toString();
-//                     uSite = authInfo.get(0).get("M_USITE_NO").toString();
-//                 } else {
-////                 	throw new Exception("인증실패");
-//                 	resultInfo.setResult(CommonConst.FAIL);
-//                 	resultInfo.setErrorCode("E00001");
-//                 	resultInfo.setMessage("인증실패");
-//                 	//resultInfo.setExceptionMsg(exceptionMsg);
-//                	 return new ModelAndView("", CommonConst.RESULT_INFO, resultInfo);
-//                 }
-//
-//            }
-            //인증종료*/
 
-			// 세션에서 사용자 정보 가져오기
+			// 20261113 khma : 2) 세션 인증 토큰(authValue vs 요청 UKEY) 검증 및 세션 사용자(UserInfo) 반영
 			String sAuthValue = (String)session.getAttribute("authValue");
 			String mAuthValue = obj.get("UKEY");
 			if ( !sAuthValue.equals(mAuthValue) ) {
@@ -216,18 +165,15 @@ public class SvcCRUD {
             	resultInfo.setResult(CommonConst.FAIL);
             	resultInfo.setErrorCode("E00011");
             	resultInfo.setMessage(_msg);
-            	//resultInfo.setExceptionMsg(exceptionMsg);
                 return new ModelAndView("", CommonConst.RESULT_INFO, resultInfo);
 			}
 			UserInfo userInfo = (UserInfo)session.getAttribute("userInfo");
-        	// 세션에서 가져온 유저 정보를 가지고 uid와 usite에 넣어준다.
 			
+			// 외부 호출(extOpt=true)이 아닌 경우 세션 사용자 정보 기준으로 UID/USITE/GSITE 강제 세팅
 			if(!extOpt){
 	        	uId = userInfo.getUserNo();
 	        	uSite = userInfo.getUsiteNo();
 	        	gSite = userInfo.getGSite();
-			}else {
-				//extOpt가 아니면 uSite는 
 			}
 			
 			try{
@@ -236,22 +182,18 @@ public class SvcCRUD {
 				key = "0";
 			}
 			
-			//해당하는 서비스와 메소드 회원사번호로 쿼리를 읽어옴
-			if ( CommonConst.MON_COMMON.equals(service)) { //서비스가 MON_COMMON일 경우는 모나크 공통서비스 이용을 위한 처리임
-				si = monArchDao.ReadQuery(service,method,"44");  // MON_COMMON일때에는 [1] 모나크프레임워크 공통서비스 이용
+			// 20261113 khma : 3) 서비스 메타데이터(ServiceInfo) 조회 (MON_COMMON은 공통 사이트 "44" 기준)
+			if ( CommonConst.MON_COMMON.equals(service)) {
+				si = monArchDao.ReadQuery(service,method,"44");
 				
+				// 사용자 생성/수정 시 비밀번호 평문을 솔트 적용 SHA-256 해시로 변환하여 파라미터에 주입
 				if(method.equals("USER_CREATE") || method.equals("USER_UPDATE") ){
-					//TODO 해당 서비스 일때에는 패스워드 필드를 솔트적용하여 해싱화 SHA256  시킴
-					// USER_CREATE =>@USER_PASSWORD@
 					if(obj.containsKey("USER_PASSWORD")) {
 						String encryptedPw = QueryGenerator.encryptPw(obj.get("USER_PASSWORD"), userInfo.getUsiteCode(),obj.get("USER_CODE"));
 						obj.put("MON_ENCRYPTED_NEW_PW", encryptedPw);
 					}
 					
 				} else if (method.equals("MYINFO_UPDATE")){
-					//TODO 해당 서비스 일때에는 패스워드 필드를 솔트적용하여 해싱화 SHA256  시킴
-					//MYINFO_UPDATE || USER_UPDATE => @NEW_USER_PASSWORD@
-					// TODO @ENCRYPTED_PASSWORD@ 를 강제로 파라메터로 추가하여 사용
 					if(obj.containsKey("NEW_USER_PASSWORD")) {
 						String encryptedNewPw = QueryGenerator.encryptPw(obj.get("NEW_USER_PASSWORD"),  userInfo.getUsiteCode(), userInfo.getUserCode());
 						String encryptedCurrPw = QueryGenerator.encryptPw(obj.get("USER_PASSWORD"), userInfo.getUsiteCode(), userInfo.getUserCode());
@@ -264,6 +206,7 @@ public class SvcCRUD {
 				si = monArchDao.ReadQuery(service,method,uSite);
 			}
 			
+			// EXCEL 요청 시 전용 서비스가 없으면 동일 서비스의 LIST 쿼리를 대체 조회
 			if(si == null && method.equals("EXCEL")){
                 si = monArchDao.ReadQuery(service, "LIST", uSite);
                 if (si == null)
@@ -285,204 +228,116 @@ public class SvcCRUD {
             	resultInfo.setResult(CommonConst.FAIL);
             	resultInfo.setErrorCode("E00002");
             	resultInfo.setMessage(_msg);
-            	//resultInfo.setExceptionMsg(exceptionMsg);
                 return new ModelAndView("", CommonConst.RESULT_INFO, resultInfo);
             }
             
-            resultInfo.setJobType(si.getJobType()); //resultInfo에 실행하는 실행타입을 셋팅
+            resultInfo.setJobType(si.getJobType());
             
-//        	log.debug("해당 사용자가 서비스[" + si.getSvcID() + ":" + si.getJobType() + "] 이용 " + userInfo.toString());
-            
+            // 20261113 khma : 4) JobType(CREATE/CREATEIDENTITY/READ/UPDATE/DELETE/LIST/QUERY/P_READ)별 DAO 실행
             if(CREATE.equals(si.getJobType()) ){
-            	//외부커넥션인지 코어커넥션인지 구분하여 처리
                 if(!StringUtils.isEmpty( si.getTargetDatasource() ) && !si.getTargetDatasource().equals("DEFAULT") ){
-//            		monArchExtDaoImpl.setDS(si.getTargetDatasource()); //20140117
-//            		nRlt = monArchExtDaoImpl.exeCreate(si.getSql(), obj); //20140117
-                	nRlt = monArchDao.exeCreate(si.getSql(), obj, monArchDao.getExtNamedParameterJdbcTemplate(si.getTargetDatasource())); //20140117
+                	nRlt = monArchDao.exeCreate(si.getSql(), obj, monArchDao.getExtNamedParameterJdbcTemplate(si.getTargetDatasource()));
             	}else{
             		nRlt = monArchDao.exeCreate(si.getSql(), obj);
             	}
                 
-//				String tempSql = "'rlt':'CREATE', 'RltCount':{0} ";
-//                rlt = "{"+MessageFormat.format(tempSql, new Object[]{nRlt}) + "}";
-//                Map<String, Object> rltMap = new HashMap<String, Object>();
-//                rltMap.put("rlt", "CREATE");
-//                rltMap.put("RltCount", nRlt);
-//                ds = new ArrayList<Map<String,Object>>();
-//                ds.add(rltMap);
-                
             }else if(CREATEIDENTITY.equals(si.getJobType()) ){
-            	
-            	//외부커넥션인지 코어커넥션인지 구분하여 처리
                 if(!StringUtils.isEmpty( si.getTargetDatasource() ) && !si.getTargetDatasource().equals("DEFAULT") ){
-//            		monArchExtDaoImpl.setDS(si.getTargetDatasource());	//20140117
-//            		nRlt = monArchExtDaoImpl.exeCreateIdentity(si.getSql(), si.getTbName(),obj); //20140117
-                	nRlt = monArchDao.exeCreateIdentity(si.getSql(), si.getTbName(),obj,monArchDao.getExtNamedParameterJdbcTemplate(si.getTargetDatasource()),si.getTargetDatasource()); //20140117
+                	nRlt = monArchDao.exeCreateIdentity(si.getSql(), si.getTbName(),obj,monArchDao.getExtNamedParameterJdbcTemplate(si.getTargetDatasource()),si.getTargetDatasource());
             	}else{
             		nRlt = monArchDao.exeCreateIdentity(si.getSql(), si.getTbName(),obj);
             	}
                 
-//                rlt = "{"+MessageFormat.format(tempSql, new Object[]{nRlt}) + "}";
+                // 채번된 시퀀스 키(rltKey)를 결과 리스트에 담아 반환
                 Map<String, Object> rltMap = new HashMap<String, Object>();
-//                rltMap.put("rlt", "CREATEIDENTITY");
-//                rltMap.put("RltCount", nRlt);
-                rltMap.put("rltKey", nRlt); //시퀀스 키
+                rltMap.put("rltKey", nRlt);
                 ds = new ArrayList<Map<String,Object>>();
                 ds.add(rltMap);
                 
             }else if(READ.equals(si.getJobType()) ){
-            	
-            	//데이터 취득하고 JSON형태로 변환
-//            	List<Map<String,Object>> ds = monArchDao.exeRead(si.getSql(), obj);
-            	
-            	//외부커넥션인지 코어커넥션인지 구분하여 처리
             	if(!StringUtils.isEmpty( si.getTargetDatasource() ) && !si.getTargetDatasource().equals("DEFAULT") ){
-//            		monArchExtDaoImpl.setDS(si.getTargetDatasource()); //20140117
-//            		ds = monArchExtDaoImpl.exeRead(si.getSql(), obj); //20140117
-            		ds = monArchDao.exeRead(si.getSql(), obj,monArchDao.getExtNamedParameterJdbcTemplate(si.getTargetDatasource())); //20140117);
+            		ds = monArchDao.exeRead(si.getSql(), obj,monArchDao.getExtNamedParameterJdbcTemplate(si.getTargetDatasource()));
             	}else{
             		ds = monArchDao.exeRead(si.getSql(), obj);
             	}
             	
             }else if(UPDATE.equals(si.getJobType()) ){
-            	//외부커넥션인지 코어커넥션인지 구분하여 처리
                 if(!StringUtils.isEmpty( si.getTargetDatasource() ) && !si.getTargetDatasource().equals("DEFAULT") ){
-//            		monArchExtDaoImpl.setDS(si.getTargetDatasource()); //20140117
-//            		nRlt = monArchExtDaoImpl.exeUpdate(si.getSql(), obj); //20140117
-                	nRlt = monArchDao.exeUpdate(si.getSql(), obj,monArchDao.getExtNamedParameterJdbcTemplate(si.getTargetDatasource())); //20140117);
+                	nRlt = monArchDao.exeUpdate(si.getSql(), obj,monArchDao.getExtNamedParameterJdbcTemplate(si.getTargetDatasource()));
             	}else{
             		nRlt = monArchDao.exeUpdate(si.getSql(), obj);
             	}
-                
-//                String tempSql = "'rlt':'UPDATE', 'RltCount':{0} ";
-//                rlt = "{"+MessageFormat.format(tempSql, new Object[]{nRlt}) + "}";
-//                Map<String, Object> rltMap = new HashMap<String, Object>();
-//                rltMap.put("rlt", "CREATE");
-//                rltMap.put("RltCount", nRlt);
-//                ds = new ArrayList<Map<String,Object>>();
-//                ds.add(rltMap);
                 
             }else if(DELETE.equals(si.getJobType()) ){
-            	
-            	//외부커넥션인지 코어커넥션인지 구분하여 처리
             	if(!StringUtils.isEmpty( si.getTargetDatasource() ) && !si.getTargetDatasource().equals("DEFAULT") ){
-//            		monArchExtDaoImpl.setDS(si.getTargetDatasource());  //20140117
-//            		nRlt = monArchExtDaoImpl.exeUpdate(si.getSql(), obj); //20140117
-            		nRlt = monArchDao.exeUpdate(si.getSql(), obj,monArchDao.getExtNamedParameterJdbcTemplate(si.getTargetDatasource())); //20140117);
+            		nRlt = monArchDao.exeUpdate(si.getSql(), obj,monArchDao.getExtNamedParameterJdbcTemplate(si.getTargetDatasource()));
             	}else{
             		nRlt = monArchDao.exeUpdate(si.getSql(), obj);
             	}
-            	
-//                String tempSql = "'rlt':'DELETE', 'RltCount':{0} ";
-//                rlt = "{"+MessageFormat.format(tempSql, new Object[]{nRlt}) + "}";
-//                Map<String, Object> rltMap = new HashMap<String, Object>();
-//                rltMap.put("rlt", "DELETE");
-//                rltMap.put("RltCount", nRlt);
-//                ds = new ArrayList<Map<String,Object>>();
-//                ds.add(rltMap);
             }else if(LIST.equals(si.getJobType()) ){
-            	
-            	//orderby에 대한 SQL injection방지에 대해서... 20130124 jwkim Start
+            	// 정렬 파라미터(_sort) SQL 인젝션 방어용 화이트리스트 정제
             	String prevOrderType = obj.get("_order");
             	String newOrderType = obj.get("_sort");
             	String OrderStr = prevOrderType;
             	if(StringUtils.isNotEmpty(newOrderType)){
             		OrderStr = CommonUtil.getOrderByStatement(newOrderType);
             	}
-            	//orderby에 대한 SQL injection방지에 대해서... 20130124 jwkim End
 
-            	
             	int viewpage =  Integer.parseInt(obj.get("_viewpage"));
             	int pagecnt =  Integer.parseInt(obj.get("_pagecnt"));
             	
-            	 //확장필드 처리 Start 2011107 khma
+            	// 확장 검색 필터(extFilters) JSON 배열 파싱
             	String extFilterObj = obj.get("extFilters");
-            	//extFilterObj = parsingForJonType(extFilterObj);
             	Map<String, Object> extFilters = new HashMap<String,Object>();
             	ArrayList<Map<String, Object>> arrExtFilters = new ArrayList<Map<String,Object>>();
             	if( StringUtils.isNotEmpty(extFilterObj)){
             		om.configure(Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
-            		extFilters = om.readValue(extFilterObj, new TypeReference<Map<String, Object>>(){}); //맵으로 가져옴
+            		extFilters = om.readValue(extFilterObj, new TypeReference<Map<String, Object>>(){});
             		arrExtFilters = (ArrayList<Map<String, Object>>) extFilters.get("extFilters");
             	}
-                //확장필드 처리 End 20131107 khma
                 
-            	
-            	//외부커넥션인지 코어커넥션인지 구분하여 처리
             	if(!StringUtils.isEmpty(si.getTargetDatasource()) && !si.getTargetDatasource().equals("DEFAULT") ){
-//            		monArchExtDaoImpl.setDS(si.getTargetDatasource()); //20140117
-//            		ds  = monArchExtDaoImpl.exeList(si.getSql(), obj, OrderStr, viewpage , pagecnt, arrExtFilters); //20140117
-            		ds  = monArchDao.exeList(si.getSql(), obj, OrderStr, viewpage , pagecnt, arrExtFilters,monArchDao.getExtNamedParameterJdbcTemplate(si.getTargetDatasource()),monArchDao.getDbType(si.getTargetDatasource())); //20140117);
+            		ds  = monArchDao.exeList(si.getSql(), obj, OrderStr, viewpage , pagecnt, arrExtFilters,monArchDao.getExtNamedParameterJdbcTemplate(si.getTargetDatasource()),monArchDao.getDbType(si.getTargetDatasource()));
             	}else{
             		ds  = monArchDao.exeList(si.getSql(), obj, OrderStr, viewpage , pagecnt, arrExtFilters);
             	}
             	
-//            	rlt = om.writeValueAsString(ds);
-            	
             }else if(QUERY.equals(si.getJobType()) ){
-            	
-            	//외부커넥션인지 코어커넥션인지 구분하여 처리
             	if(!StringUtils.isEmpty(si.getTargetDatasource()) && !si.getTargetDatasource().equals("DEFAULT") ){
-//            		monArchExtDaoImpl.setDS(si.getTargetDatasource());  //20140117
-//            		nRlt = monArchExtDaoImpl.exeQuery(si.getSql(), obj);  //20140117
-            		nRlt = monArchDao.exeQuery(si.getSql(), obj,monArchDao.getExtNamedParameterJdbcTemplate(si.getTargetDatasource())); //20140117);
+            		nRlt = monArchDao.exeQuery(si.getSql(), obj,monArchDao.getExtNamedParameterJdbcTemplate(si.getTargetDatasource()));
             	}else{
             		nRlt = monArchDao.exeQuery(si.getSql(), obj);
             	}
             	
-            }else  if(EXCEL.equals(si.getJobType()) ){
-//                String exOrderStr =  obj.get("_viewpage");
-//                int exviewpage = 1;
-//                int expagecnt = 99999999;
-//                String OrderStr = obj.get("_order");
-//                //EXCEL처리
-//                //1. 데이터 취득
-//                ds  = monArchDao.exeList(si.getSql(), obj, OrderStr, exviewpage , expagecnt);
-//                //TODO 2. 액셀다운로드 처리 
-//                ExcelDownload excelDownload = new ExcelDownload();
-//                excelDownload.downExcel(ds, Service, si.getJobType());
-////                rlt = "{" + string.Format(@"'rlt':'EXCEL', 'RltCount':{0}", "0") + "}";
-//                String tempSql = "{'rlt':'EXCEL', 'RltCount':{0}}";
-//                rlt =  java.text.MessageFormat.format(tempSql, String.valueOf(ds.size()));
+            }else if(EXCEL.equals(si.getJobType()) ){
+                // 엑셀 다운로드는 UploadController(/downExcel.json) 및 ExcelDownload에서 별도 스트리밍 처리
                 
             }else if(PROCEDURE_READ.equals(si.getJobType())){
-            	//TODO 프로시져 처리후 SELECT를 반환할때
-            	//데이터 취득하고 
-//            	ds = monArchDao.exeReadProcedure(si.getSql(), obj);
-            	//외부커넥션인지 코어커넥션인지 구분하여 처리
+            	// 저장 프로시저 호출 및 결과셋 반환
             	if(!StringUtils.isEmpty(si.getTargetDatasource()) && !si.getTargetDatasource().equals("DEFAULT") ){
-//            		monArchExtDaoImpl.setDS(si.getTargetDatasource());  //20140117
-//            		ds = monArchExtDaoImpl.exeReadProcedure(si.getSql(), obj);  //20140117
-            		ds = monArchDao.exeReadProcedure(si.getSql(), obj,monArchDao.getExtSimpleJdbcCall(si.getTargetDatasource())); //20140117);
+            		ds = monArchDao.exeReadProcedure(si.getSql(), obj,monArchDao.getExtSimpleJdbcCall(si.getTargetDatasource()));
             	}else{
             		ds = monArchDao.exeReadProcedure(si.getSql(), obj);
             	}
             }else{
             	// 20261113 khma : 실행타입 미존재 시 원인 파악을 위해 service/method/usite/jobType 정보 함께 기록
-            	/*
-            	throw new Exception("존재하지 않는 실행타입입니다.");
-            	*/
             	throw new Exception("존재하지 않는 실행타입입니다. [service=" + service + ", method=" + method + ", usite=" + uSite + ", jobType=" + (si != null ? si.getJobType() : "null") + "]");
             }
             
+            // 20261113 khma : 5) 실행 성공 ResultInfo 설정 및 사용 이력(M_USE_LOG) 저장
             log.info("[svcCRUD] " + service + ", " + method + ", " + MENUID);
             resultInfo.setMenuId(MENUID);
             resultInfo.setMessage("[Service] " + service + ", " + "[Method] " + method);
-            resultInfo.setResult(CommonConst.SUCCESS); //처리 성공
-            long 서비스종료시간 = System.currentTimeMillis();//서비스종료시간
+            resultInfo.setResult(CommonConst.SUCCESS);
+            long 서비스종료시간 = System.currentTimeMillis();
 			long 서비스소요시간 = 서비스종료시간 - 서비스시작시간;
 			사용로그(service, method, key, xmlParams, uSite, uId, 서비스소요시간, MENUID, STEPMENU, ACTIONNAME);
 		}
 		catch (DataAccessException e) {
-			//데이터엑세스 예외처리
-			// 20261104 khma : printStackTrace() 제거 및 Log4j 프로젝트 로거로 에러 기록
-			/*
-			e.printStackTrace();
-			*/
+			// 20261104 khma : DB 예외 발생 시 printStackTrace 대신 Log4j 및 M_ERROR_LOG에 기록하고 ORA-20000 사용자 메시지 추출
 			String sqlCommand = "";
 			String outputMsg =  CommonConst.COMM_ERROR_MESSAGE;
-//			errmsg.match(new RegExp("\\${(.*?)}\\$", "gim"))
-			//ORA - 2000 번 이상일때는 RAISE 에러로 발생시킨 오류이므로 해당 오류 메시지를 강제로 출력한다.
+			// 오라클 프로시저/트리거 RAISE_APPLICATION_ERROR(ORA-20000)의 ${메시지}$ 패턴 추출
 			String exceptionMsg = e.getMostSpecificCause().getMessage();
 			if(exceptionMsg.indexOf("ORA-20000") >= 0) {
 				String ORA_REGEX_PARAM = "\\$\\{.*\\}\\$";
@@ -498,20 +353,13 @@ public class SvcCRUD {
 			if(null != si ) sqlCommand = si.getSql();
 			
 			String msg = "MonArch[CRUD Service] : " + e.getMessage() + "\r\r ----------------- \r Service = " + service + "\r Method = " + method;
-			//String msg = "예상치 못한 에러가 발생하였습니다. \r 관리자에게 문의하여 주십시요.";
 			log.error(msg, e);
 			Log("DATACRUD", sqlCommand, msg, uSite, uId);
 			
 			return new ModelAndView("", CommonConst.RESULT_INFO, new ResultInfo(CommonConst.FAIL, "E00003", outputMsg));
-//			return new ModelAndView("", CommonConst.RESULT_INFO, new ResultInfo(CommonConst.FAIL, "E00001", MetaCommMsg.getMessage("E00001", "ja", "test", "test") ,e.getMessage()));
 		}
 		catch (Exception e) {
-			//그외 예외처리
-			// 20261104 khma : printStackTrace() 제거 및 Log4j 프로젝트 로거로 에러 기록
-			/*
-			e.printStackTrace();
-			*/
-			
+			// 20261104 khma : 일반 예외 발생 시 printStackTrace 제거 및 Log4j/M_ERROR_LOG 기록
 			String sqlCommand = "";
 			if(null != si ) sqlCommand = si.getSql();
 			
@@ -521,7 +369,6 @@ public class SvcCRUD {
 			return new ModelAndView("", CommonConst.RESULT_INFO, new ResultInfo(CommonConst.FAIL, "E00004", CommonConst.COMM_ERROR_MESSAGE));
 		}
 		ModelAndView mav = new ModelAndView("", CommonConst.RESULT_DATA, ds);
-//		mav.addObject(new ResultInfo(CommonConst.SUCCESS));
 		mav.addObject(resultInfo);
 		return mav;
 	 }
@@ -1035,20 +882,6 @@ public class SvcCRUD {
 	
 	
 	// 20261104 khma Start : @ExceptionHandler 표준 ResultInfo JSON 응답 구조 통일 및 보안 로거 적용
-	/*
-	// Exception 처리 메소드 
-	@ExceptionHandler(Exception.class)
-	public ModelAndView handleException(Exception e, HttpServletResponse response){
-		// 구현
-		// e 객체에 익셉션에러 들어있음
-		response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-		Map<String, Object> rstMap = new HashMap<String, Object>();
-		//rstMap.put("errorMessage", e.getMessage());
-		rstMap.put("errorMessage", CommonConst.COMM_ERROR_MESSAGE);
-		ModelAndView mav = new ModelAndView("", rstMap);
-		return mav;
-	}
-	*/
 	/**
 	 * SvcCRUD 컨트롤러 예외 처리 핸들러
 	 * - 컨트롤러 내부에서 미처리된 예외 발생 시 표준 ResultInfo(FAIL, E00004) JSON 모델 반환
