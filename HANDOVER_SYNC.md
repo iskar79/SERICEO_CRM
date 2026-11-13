@@ -113,8 +113,8 @@
 | **Step 11-3**| `WebContent/js/jquery.kdb.superContaner.js` | getJson 구조체 모달 호출 시 전체 .ui-widget-overlay z-index 일괄 변경 제거 (구조체 모달 닫힌 후 부모 모달 overlay 클릭 차단/비활성화 버그 수정) | `[x]` | `[ ]` | **로컬 수정 완료 (VDI 반영 대기)** |
 | **Step 3-1** | `src/monarch.properties` | SecureDB Agentless HTTPS 접속 설정(VDI: 70.2.243.122:8090 / 서버: 26.2.37.28:8090, 토큰, ca_dev.pem) 및 정책명(AES256_DEV/SHA512_DEV) 추가 | `[x]` | `[x]` | **완료 (VDI 컴파일/반영 확인)** |
 | **Step 3-2** | `src/co/kr/kydbm/common/crypto/CryptoService.java` | KSign SecureDB Agentless Java API V2 공통 암복호화 서비스 클래스 작성 (`AgentlessApiFactory`, `SDBAgentlessApi` 싱글턴 재사용, `close()` 리소스 해제, Fallback 내장) | `[x]` | `[x]` | **완료 (VDI 컴파일 에러 0건 확인)** |
-| **Step 3-3** | `src/co/kr/kydbm/core/dao/MonArchDaoImpl.java` | 개인정보 10개 컬럼 INSERT/UPDATE/BATCH 암호문(_ENC) 및 NTS 토큰(_HASH) 자동 주입, SELECT 단건/목록 복호화(decryptRow/decryptRows) 및 FilterGenerator SQL 전달 연동 | `[x]` | `[ ]` | **로컬 수정 완료 (VDI 반영 대기)** |
-| **Step 3-4** | `src/co/kr/kydbm/core/utils/FilterGenerator.java` | SQL 내 _HASH 포함 여부 동적 판별(테이블명 하드코딩 제거) 후 개인정보 10개 컬럼 검색 시 _HASH 및 NTS 토큰(= nts / LIKE nts_bsh) 색인 검색 자동 변환 | `[x]` | `[ ]` | **로컬 수정 완료 (VDI 반영 대기)** |
+| **Step 3-3** | `src/co/kr/kydbm/core/dao/MonArchDaoImpl.java` | `*_ENC` 파라미터 자동 암호화 및 SQL 내 `@*_HASH@` 존재 시 NTS 토큰 자동 주입, SELECT `*_ENC` 자동 복호화, `@*_HASH@` 검색어 NTS 변환 연동 | `[x]` | `[x]` | **완료 (VDI 반영 완료 / 구동 테스트 대기)** |
+| **Step 3-4** | `src/co/kr/kydbm/core/utils/FilterGenerator.java` | SQL 내 `_HASH` 포함 여부 동적 판별 후 확장필터 `*_HASH` 검색 필드 NTS 색인 검색(`= nts` / `LIKE nts_bsh`) 자동 변환 | `[x]` | `[x]` | **완료 (VDI 반영 완료 / 구동 테스트 대기)** |
 
 ## 운영 WAR 생성 전 필수 확인 알림
 
