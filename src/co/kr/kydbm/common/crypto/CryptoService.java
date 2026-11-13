@@ -1,28 +1,31 @@
 package co.kr.kydbm.common.crypto;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 
-import com.ksign.sdb.api.KSSecurityFactory;
-import com.ksign.sdb.api.SDBApi;
-import com.ksign.sdb.api.config.APIConfig;
 import com.ksign.sdb.api.KSException;
-import com.ksign.sdb.common.util.Data;
+import com.ksign.sdb.api.agentless.AgentlessApiFactory;
+import com.ksign.sdb.api.config.AgentlessApiConfig;
+import com.ksign.sdb.api.config.CertificateSource;
+import com.ksign.sdb.api.config.TrustedCertificates;
+import com.ksign.sdb.api.security.SDBAgentlessApi;
 
 import co.kr.kydbm.core.utils.ConfigProperties;
 
 /**
- * 20261112 khma : KSign SecureDB Java API V2 공통 암복호화 서비스 클래스 신규 작성
- * - SecureDB Java API V2 개발자 가이드 및 공식 Sample.java 표준 패턴 100% 준수
- * - KSSecurityFactory 기반 SDBApi 싱글턴 인스턴스 관리 및 DEK 주기적 자동 동기화
+ * 20261113 khma : KSign SecureDB Agentless Java API V2 공통 암복호화 서비스 클래스
+ * - AgentlessApiFactory 기반 SDBAgentlessApi 싱글턴 인스턴스 재사용 및 종료 시 리소스 정리(close)
  * - 대칭키 암호화(AES256_DEV), 복호화('$.' 접두어 방어), 단방향 HASH NTS 색인 검색 토큰 생성
- * - KSign Agent 미기동 로컬 개발/테스트 환경 대응 Fallback(Bypass) 안전장치 내장
+ * - VDI/서버 네트워크 및 인증서 미구성 로컬 개발 환경 대응 Fallback(Bypass) 안전장치 내장
  */
 public class CryptoService {
 
     private static final Logger log = Logger.getLogger(CryptoService.class);
     private static CryptoService instance = null;
 
-    private SDBApi sdbApi = null;
+    private SDBAgentlessApi sdbApi = null;
     private boolean isAvailable = false;
 
     // 기본 정책명 (properties 설정값 우선, 미설정 시 Fallback 기본값)
@@ -30,10 +33,17 @@ public class CryptoService {
     private String policyHash = "SHA512_DEV";
 
     /**
-     * 기본 생성자: 프로퍼티 설정을 로드하고 SecureDB 에이전트를 초기화한다.
+     * 기본 생성자: 프로퍼티 설정을 로드하고 SecureDB Agentless API 인스턴스를 초기화한다.
      */
     private CryptoService() {
         init();
+        // 20261113 khma : WAS 종료 시 AutoCloseable 리소스 정상 해제
+        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+            @Override
+            public void run() {
+                close();
+            }
+        }));
     }
 
     /**
@@ -48,18 +58,20 @@ public class CryptoService {
     }
 
     /**
-     * 20261112 khma : SecureDB Java API V2 에이전트 초기화 (공식 Sample.java 패턴 준수)
+     * 20261113 khma : SecureDB Agentless Java API V2 초기화
      */
     private void init() {
         try {
             ConfigProperties prop = ConfigProperties.getInstance();
 
-            String agentHome  = prop.getProperty("securedb.agent.home");
-            String agentIp    = prop.getProperty("securedb.agent.ip");
-            String agentPort  = prop.getProperty("securedb.agent.port");
+            String urlsProp   = prop.getProperty("securedb.agentless.urls");
+            String shuffle    = prop.getProperty("securedb.agentless.shuffle");
+            String apiToken   = prop.getProperty("securedb.agentless.token");
+            String logLevel   = prop.getProperty("securedb.agentless.log.level");
+            String caPath     = prop.getProperty("securedb.agentless.ca.path");
+            String rootCaPath = prop.getProperty("securedb.agentless.rootca.path");
             String confCipher = prop.getProperty("securedb.policy.cipher");
             String confHash   = prop.getProperty("securedb.policy.hash");
-            String interval   = prop.getProperty("securedb.sync.interval");
 
             if (confCipher != null && !confCipher.trim().isEmpty()) {
                 this.policyCipher = confCipher.trim();
@@ -68,55 +80,76 @@ public class CryptoService {
                 this.policyHash = confHash.trim();
             }
 
-            int port = 9909;
-            if (agentPort != null && !agentPort.trim().isEmpty()) {
-                try {
-                    port = Integer.parseInt(agentPort.trim());
-                } catch (NumberFormatException e) {
-                    port = 9909;
+            if (urlsProp == null || urlsProp.trim().isEmpty() || apiToken == null || apiToken.trim().isEmpty()) {
+                this.isAvailable = false;
+                this.sdbApi = null;
+                log.warn("20261113 khma : SecureDB Agentless URL 또는 토큰 설정이 비어있어 Fallback 모드로 동작합니다.");
+                return;
+            }
+
+            List<String> serverUrls = new ArrayList<String>();
+            for (String u : urlsProp.split(",")) {
+                if (u != null && !u.trim().isEmpty()) {
+                    serverUrls.add(u.trim());
                 }
             }
 
-            int syncInterval = 10;
-            if (interval != null && !interval.trim().isEmpty()) {
-                try {
-                    syncInterval = Integer.parseInt(interval.trim());
-                } catch (NumberFormatException e) {
-                    syncInterval = 10;
-                }
+            boolean shuffleUrls = "true".equalsIgnoreCase(shuffle != null ? shuffle.trim() : "");
+            String level = (logLevel != null && !logLevel.trim().isEmpty()) ? logLevel.trim() : "INFO";
+
+            TrustedCertificates.Builder certBuilder = TrustedCertificates.builder();
+            boolean hasCert = false;
+            if (caPath != null && !caPath.trim().isEmpty()) {
+                certBuilder.ca(CertificateSource.path(caPath.trim()));
+                hasCert = true;
+            }
+            if (rootCaPath != null && !rootCaPath.trim().isEmpty()) {
+                certBuilder.rootCa(CertificateSource.path(rootCaPath.trim()));
+                hasCert = true;
             }
 
-            // 1. APIConfig 설정 (Sample.java 기준)
-            APIConfig config = APIConfig.getInstance();
-            if (Data.isEmpty(config.getAppHome())) {
-                config.setAgentHome(agentHome != null && !agentHome.trim().isEmpty() ? agentHome.trim() : "../");
-            }
-            if (config.getFirstPort() < 1) {
-                config.setFirstPort(port);
-            }
-            if (agentIp != null && !agentIp.trim().isEmpty()) {
-                config.setFirstIp(agentIp.trim());
+            AgentlessApiConfig.Builder configBuilder = AgentlessApiConfig.builder()
+                    .serverUrls(serverUrls)
+                    .shuffleServerUrls(shuffleUrls)
+                    .apiToken(apiToken.trim())
+                    .logLevel(level);
+
+            if (hasCert) {
+                configBuilder.trustedCertificates(certBuilder.build());
             }
 
-            // 2. 주기적 DEK 키 자동 동기화 설정 (기본 10분)
-            config.setIntervalValue(syncInterval);
-            config.setIntervalUnit("MINUTES");
+            // 1. SDBAgentlessApi 싱글턴 인스턴스 생성
+            this.sdbApi = AgentlessApiFactory.create(configBuilder.build());
 
-            // 3. SDBApi 싱글턴 인스턴스 취득
-            this.sdbApi = KSSecurityFactory.getInstance(config);
-
-            // 4. 에이전트 상태 점검 및 헬스체크
+            // 2. 정책 로드 상태 점검
             if (this.sdbApi != null) {
                 String status = this.sdbApi.checkAgent();
-                log.info("20261112 khma : SecureDB Agent 초기화 완료. 상태: " + status);
+                log.info("20261113 khma : SecureDB Agentless API 초기화 완료. 상태: " + status);
                 this.isAvailable = true;
             }
 
         } catch (Throwable t) {
-            // 에이전트 미기동 또는 로컬 개발 환경 대응 Fallback
+            // 네트워크 미연결 또는 인증서 미배치 환경 대응 Fallback
             this.isAvailable = false;
             this.sdbApi = null;
-            log.warn("20261112 khma : SecureDB Agent 연결 실패 (로컬 Fallback 모드로 동작합니다): " + t.getMessage());
+            log.warn("20261113 khma : SecureDB Agentless API 연결 실패 (Fallback 모드로 동작합니다): " + t.getMessage());
+        }
+    }
+
+    /**
+     * 20261113 khma : SDBAgentlessApi 리소스를 안전하게 해제한다.
+     */
+    public synchronized void close() {
+        if (this.sdbApi != null) {
+            try {
+                this.sdbApi.close();
+                log.info("20261113 khma : SecureDB Agentless API 리소스 해제 완료");
+            } catch (Exception e) {
+                log.warn("20261113 khma : SecureDB Agentless API 리소스 해제 중 오류: " + e.getMessage());
+            } finally {
+                this.sdbApi = null;
+                this.isAvailable = false;
+            }
         }
     }
 
