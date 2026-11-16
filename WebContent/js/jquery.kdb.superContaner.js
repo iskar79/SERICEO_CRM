@@ -15332,9 +15332,10 @@ function makeTalbleTd(colModel, tr) {
     td += " showText='" + colModel.showText + "'";
   if (colModel.dynamicCss != undefined)
     td += " dynamicCss='" + colModel.dynamicCss + "'";
-  // 20261106 khma : colModel mask 속성 바인딩
-  if (colModel.mask != undefined)
-    td += " mask='" + colModel.mask + "'";
+  // 20261116 khma : colModel masking 속성 우선 바인딩 (기존 mask 속성 하위호환 유지)
+  var _colMasking = colModel.masking != undefined ? colModel.masking : colModel.mask;
+  if (_colMasking != undefined)
+    td += " mask='" + _colMasking + "'";
 
   // if (value.css != undefined) _td.append("<span
   // class='"+value.css+"'></span>");
