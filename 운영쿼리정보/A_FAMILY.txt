@@ -1,0 +1,23 @@
+"CEO"."A_FAMILY"
+이름          널?       유형             비고
+----------- -------- -------------- ----------------------------------------------------
+USEQ                 NUMBER(18)     
+CORP                 NUMBER(10)     
+GBN                  VARCHAR2(18)   
+NAME                 VARCHAR2(60)   
+JIKWI                VARCHAR2(100)  
+DEPART               VARCHAR2(100)  
+COMPANY              VARCHAR2(100)  
+TELNO                VARCHAR2(50)   
+MTELNO               VARCHAR2(50)   
+EMAIL                VARCHAR2(50)   
+NOTE                 VARCHAR2(300)  
+SIGNSEQ              NUMBER(18)     계약정보 (a_sign.signseq)
+ORDNO                NUMBER(2)      정렬 순서
+NAME_ENC             VARCHAR2(94)   
+TELNO_ENC            VARCHAR2(94)   
+MTELNO_ENC           VARCHAR2(94)   
+NAME_HASH            VARCHAR2(2640) 
+TELNO_HASH           VARCHAR2(2200) 
+MTELNO_HASH          VARCHAR2(2200) 
+EMAIL_ENC            VARCHAR2(94)   

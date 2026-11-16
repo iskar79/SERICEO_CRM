@@ -1,0 +1,20 @@
+"CEO"."A_SIGN_ACC"
+이름                널?       유형             비고
+----------------- -------- -------------- ----------------------------------------------------
+ACCSEQ            NOT NULL NUMBER(18)     
+SIGNSEQ           NOT NULL NUMBER(18)     
+ACCNO             NOT NULL NUMBER(10)     
+ISSUEDATE                  DATE           
+PRICE                      NUMBER(18)     
+SURTAX                     NUMBER(18)     
+PAYDATE                    DATE           
+CARDYN                     VARCHAR2(1)    
+SLIP                       VARCHAR2(300)  
+USEYN                      VARCHAR2(1)    
+REGTIME                    DATE           
+REGUSEQ                    NUMBER(18)     
+CHGTIME                    DATE           
+CHGUSEQ                    NUMBER(18)     
+CONTRACT_NO                VARCHAR2(100)  계약서 번호
+CONTRACT_FILENAME          VARCHAR2(100)  계약서 파일명
+CONTRACT_FILEPATH          VARCHAR2(100)  계약서 파일 업로드 위치

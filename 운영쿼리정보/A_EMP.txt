@@ -1,0 +1,12 @@
+"CEO"."A_EMP"
+이름          널?       유형             
+----------- -------- -------------- 
+HNAME                VARCHAR2(150)  
+RESNO                VARCHAR2(45)   
+EMPNO                VARCHAR2(45)   
+TELNO                VARCHAR2(300)  
+EMAIL                VARCHAR2(600)  
+JIKGUBNM             VARCHAR2(90)   
+SDEPTNM              VARCHAR2(300)  
+DEPT                 VARCHAR2(60)   
+USEYN                VARCHAR2(15)   
