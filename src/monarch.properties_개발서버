@@ -1,0 +1,29 @@
+# 20261117 khma : [개발서버(112.106.119.13) 배포용] monarch.properties
+# - 사용방법: 전체 복사(Ctrl+A -> Ctrl+C) 후 monarch.properties에 덮어쓰기(Ctrl+V) -> WAR 생성 -> 112.106.119.13 (D:\CRM\ROOT.war) 배포
+# - 사전준비: 개발서버(112.106.119.13) C:/SecureDB/ca_dev.pem 인증서 복사 및 26.2.37.28:8090 통신 허용 확인
+
+monarch.db.type = oracle
+monarch.url = http://182.198.77.183:8090
+monarch.url.fileserver = http://182.198.77.183:8090
+monarch.url.realpath = D:/CRM/ROOT/
+monarch.fileupload.limitsize = 20000000
+monarch.fileupload.path = D:/CRM/ROOT/FileData/signFile/
+
+# 다이렉트 메일 발송 설정 (mode 0: 테스트, 1: 운영)
+email.indv.unit = 100
+email.indv.mode = 1
+email.indv.test.tomail = sericeo@@multicampus.com
+email.smtp.host = 121.78.144.225
+email.smtp.id = u9g6XpCHOUgpx3q44Jah11hkDgBQn+qh
+email.smtp.password = Kt0dMc68KYY9Lwq65dGX+Wfh/ea4GfP4
+
+# KSign SecureDB Agentless Java API V2 [개발서버용]
+securedb.agentless.urls = https://26.2.37.28:8090
+securedb.agentless.shuffle = false
+securedb.agentless.token = sdbpat-5c4d5b22f94c4e6ae97e5af77e6d7b34f7e0ed76b5cc3344af165a9ea137bedb
+securedb.agentless.log.level = INFO
+securedb.agentless.ca.path = C:/SecureDB/ca_dev.pem
+securedb.agentless.rootca.path =
+securedb.policy.cipher = AES256_DEV
+securedb.policy.hash = SHA512_DEV
+securedb.fail.closed = true
