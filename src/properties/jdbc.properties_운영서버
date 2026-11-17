@@ -1,9 +1,11 @@
 # 20261117 khma : [운영서버(112.106.119.183) 배포용] jdbc.properties
 # - 사용방법: 전체 복사(Ctrl+A -> Ctrl+C) 후 jdbc.properties에 덮어쓰기(Ctrl+V) -> WAR 생성 -> 112.106.119.183 (D:\CRM\ROOT.war) 배포
-# - 주의: 운영 배포 전 비밀번호 ENC(...) 암호화 적용 여부 확인
+# - 암호화기준: Monarch820-servlet.xml (PBEWithMD5AndDES / kydbmJasyptPass) Jasypt ENC(...) 적용 완료
+#   * jdbc.url      = jdbc:oracle:thin:@26.2.51.37:1622:MICRODB
+#   * jdbc.username = crm
+#   * jdbc.password = crm00db
 
 jdbc.driverClassName=oracle.jdbc.driver.OracleDriver
-jdbc.url=jdbc:oracle:thin:@26.2.51.37:1622:MICRODB
-#jdbc.url=ENC(ueM0rigT5qgPEAhieu/kOFw1kwCOn7K8pUSqjGYjXqBx3n1IpGHFhmfR/KWOjTSMY3qqhDZGaXE=)
-jdbc.username=crm
-jdbc.password=crm00db
+jdbc.url=ENC(obJPHUb1VCnb91n+Z6XbPJrobDC3NcKlI+LlhSvSurrgdAPcmozpo4vQ2CdHO6bFvhVKVB9XAhw=)
+jdbc.username=ENC(1iki2/lg8MpDzGJhYgMDMg==)
+jdbc.password=ENC(A+IiwmIg93bOjS19aWELBA==)
