@@ -12894,18 +12894,17 @@ $(document).on("blur", ".t_Money", function (e) {
           if (!_Obj.find(".fieldEdit").length) _Obj.html(_value);
           break;
         case "textarea":
-          //$("textarea", _Obj).val($.decHTML(_value));
-		  $("textarea", _Obj).val(_value);
+          // 20261117 khma : textarea 및 읽기 전용 pre 영역 HTML 엔티티(&quot; 등) 디코딩 및 안전 텍스트 바인딩
+          var _decTextareaVal = $.decHTML(_value);
+          $("textarea", _Obj).val(_decTextareaVal);
           var _fldheight = $("textarea", _Obj).height();
           var _fldview = $(".fieldView", _Obj).html(
             '<pre class="readonlyPre input-bg" style="height:' +
               _fldheight +
-              'px">' +
-              _value +
-              "</pre>"
+              'px"></pre>'
           );
-          // CSS JDM_fldview.parent().css("overflow","auto");
-          if (!_Obj.find(".fieldEdit").length) _Obj.html(_value);
+          _fldview.find("pre").text(_decTextareaVal);
+          if (!_Obj.find(".fieldEdit").length) _Obj.text(_decTextareaVal);
           break;
 
         case "codeEditor":
