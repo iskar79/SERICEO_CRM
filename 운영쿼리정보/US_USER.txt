@@ -1,0 +1,36 @@
+"CRM"."US_USER"
+이름              널?       유형             
+--------------- -------- -------------- 
+SITE            NOT NULL VARCHAR2(8)    
+USEQ            NOT NULL NUMBER(18)     
+CORP                     NUMBER(10)     
+SIGNCORP                 NUMBER(10)     
+USERGBN                  VARCHAR2(8)    
+USEYN                    VARCHAR2(1)    
+LOGINID                  VARCHAR2(100)  
+NAME                     VARCHAR2(100)  
+COMPANY                  VARCHAR2(100)  
+DEPART                   VARCHAR2(100)  
+BIZGBN                   VARCHAR2(8)    
+JIKWI                    VARCHAR2(100)  
+MTELNO                   VARCHAR2(100)  
+EMAIL                    VARCHAR2(100)  
+BIRTHDAY                 DATE           
+SEX                      VARCHAR2(1)    
+REGION                   VARCHAR2(45)   
+EMAILYN                  VARCHAR2(1)    
+SMSYN                    VARCHAR2(1)    
+DMYN                     VARCHAR2(1)    
+MANAGER                  VARCHAR2(20)   
+MANAGER_NM               NVARCHAR2(4000) 
+SERVSTIME                DATE           
+SERVETIME                DATE           
+OUTTIME                  DATE           
+RELATED_COMPANY          VARCHAR2(50)   
+SIGNSEQ                  NUMBER         
+SIGNUSERGBN              VARCHAR2(1)    
+SIGNSTIME                DATE           
+SIGNETIME                DATE           
+CHGTIME                  DATE           
+OUTCODE                  VARCHAR2(20)   
+OUTDESC                  VARCHAR2(300)  
