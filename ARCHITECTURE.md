@@ -18,7 +18,7 @@
   * Quartz Scheduler 1.8.3 (배치 및 다이렉트 메일 발송)
   * Jasypt 1.9.1 (데이터베이스 접속 암호화 `PEBEncrytor`)
   * Log4j 1.2.16 (코드 수정 리스크가 커서 **업그레이드 금지**)
-  * 보안/암호화 (신규): **(Task 3: KSign SecureDB Java API V2 및 UDF 연동 모듈)**
+  * 보안/암호화 (신규): **(Task 3: KSign SecureDB Agentless Java API V2 연동 모듈)**
 * **프론트엔드 (AS-IS 및 TO-BE)**:
   * jQuery `1.10.2` ➡️ **(Task 1: 화면 렌더링 호환성 유지를 위해 `1.12.4`로 업그레이드 예정)**
 * **데이터베이스 및 인프라 연동 환경**:
@@ -207,7 +207,7 @@ sequenceDiagram
     participant JS as 프론트엔드 UI (그리드 / 폼)
     participant Svc as SvcCRUD.java (저장 전처리)
     participant Dao as MonArchDaoImpl.java (조회 후처리)
-    participant Crypto as CryptoService.java (SecureDB API / UDF)
+    participant Crypto as CryptoService.java (SecureDB Agentless API V2)
     participant DB as 연계 DB (CEODB)
 
     %% 저장 흐름
@@ -216,7 +216,7 @@ sequenceDiagram
         User->>JS: 개인정보 입력 후 저장 요청
         JS->>Svc: POST /DATACRUD.json (평문 데이터 전송)
         Svc->>Crypto: 개인정보 대상 컬럼 암호화 요청 (CryptoService.encrypt)
-        Crypto-->>Svc: 암호문 반환 (또는 SQL INSERT 시 UDF 함수 래핑)
+        Crypto-->>Svc: 암호문 반환 (SDBAgentlessApi.encrypt)
         Svc->>Dao: 쿼리 실행 요청 (바인딩 변수에 암호화 데이터 탑재)
         Dao->>DB: INSERT / UPDATE 수행
     end
@@ -226,7 +226,7 @@ sequenceDiagram
         note right of User: [데이터 화면 조회 흐름]
         User->>JS: 고객 리스트 및 상세화면 조회
         JS->>Dao: POST /DATACRUD.json (SELECT 쿼리)
-        Dao->>DB: 쿼리 실행 (또는 SELECT 시 DB UDF 복호화 함수 적용)
+        Dao->>DB: 쿼리 실행 (DB 저장 암호문 조회)
         DB-->>Dao: 암호화 데이터 포함 ResultSet 반환
         Dao->>Crypto: 타깃 컬럼 복호화 요청 (CryptoService.decrypt)
         Crypto-->>Dao: 복호화된 평문 데이터 반환
@@ -308,7 +308,7 @@ sequenceDiagram
 | 파일명 | 역할 및 세부 용도 |
 | :--- | :--- |
 | **`CommonExcelUtil.java`** | **엑셀 셀 파싱 유틸**.<br>• 엑셀 셀 포맷 판별. POI 3.8 정수 상수를 POI 4.1.2 `CellType` Enum으로 마이그레이션 대상. |
-| **`FilterGenerator.java`** | 화면 그리드의 다중 조건 검색 필터 SQL 생성기. (암호화 컬럼 검색 시 NTS 토큰 UDF 래핑) |
+| **`FilterGenerator.java`** | 화면 그리드의 다중 조건 검색 필터 SQL 생성기. (암호화 컬럼 검색 시 `CryptoService` NTS 토큰 변환) |
 | **`QueryGenerator.java`** | 오라클/MariaDB 등 DB 종류에 맞는 함수(NVL 등)를 조합하는 동적 쿼리 빌더. |
 | **`PEBEncrytor.java`** | DB 접속 정보(JDBC URL, PW) Jasypt PBE 암복호화. |
 | **`CommonConst.java`** | 시스템 전역 상수 정의 (DB_TYPE, 화이트리스트 확장자, 공통 에러코드 등). |
@@ -367,7 +367,7 @@ WAS(Tomcat) 구동 시 `Monarch820-servlet.xml`의 `init-method="init"`에 의�
 
 #### ② 일일 DataMart 집계 배치 프로시저 파이프라인
 * **[`USP_M_CONT_DAILY_BATCH.txt`](file:///c:/Users/khma7/eclipse-workspace/sericeo_crm_origin/%EC%9A%B4%EC%98%81%EC%BF%BC%EB%A6%AC%EC%A0%95%EB%B3%B4/USP_M_CONT_DAILY_BATCH.txt)**: 일일 배치 최상위 진입 프로시저
-  1. `USP_M_USER_INFO_BACKUP`: 사용자 정보 일일 백업 캡처
+  1. ~~`USP_M_USER_INFO_BACKUP`~~: *(미사용·삭제 대상 결정에 따라 일일 배치 호출 제외)*
   2. **[`USP_M_CONT_RPT`](file:///c:/Users/khma7/eclipse-workspace/sericeo_crm_origin/%EC%9A%B4%EC%98%81%EC%BF%BC%EB%A6%AC%EC%A0%95%EB%B3%B4/USP_M_CONT_RPT.txt)**: 오즈(OZ) 리포트 대체 및 현황 메뉴(회원현황/이용현황/콘텐츠현황/구독현황)용 집계 테이블(`M_CONT_SERV`, `M_CONT_MYGRADE`, `M_CONT_MYREP`, `M_CONT_MYCNT`, `M_CONT_MYSHARE`, `M_CONT_LMS`, `M_CONT_RPT`) 갱신
   3. **[`USP_M_CONT_USE_STATUS`](file:///c:/Users/khma7/eclipse-workspace/sericeo_crm_origin/%EC%9A%B4%EC%98%81%EC%BF%BC%EB%A6%AC%EC%A0%95%EB%B3%B4/USP_M_CONT_USE_STATUS.txt)**: SERICEO REPORT용 마트 테이블(`US_USER`, `M_CONT_MYLOGIND`, `M_FOLDER_ITEM`, `M_CEO_PAYLOG`, `M_CONT_GGMENU`, `M_CONT_PREFER`, `M_CONT_BEST`, `M_CONT_VIEW`, `M_CONT_VIEW_COMB`, `M_CONT_USE_STATUS`, `M_CONT_USE_STATUS_CORP`, `M_CONT_VIEW_YEAR`) 일괄 집계
 
@@ -384,9 +384,9 @@ WAS(Tomcat) 구동 시 `Monarch820-servlet.xml`의 `init-method="init"`에 의�
   1. `A_USER`, `A_FAMILY` 등의 개인정보 컬럼(`NAME`, `EMAIL`, `SUBEMAIL`, `TELNO`, `MTELNO`, `ADDRESS2` 등)을 암호화할 경우, 일반적인 그리드 검색 필터(`%LIKE%`) 부분 일치 검색이 불가능해집니다.
   2. 엑셀 대량업로드 프로시저(`USP_USER_UPDATE_EXUPLOAD` 등)와 일일 마트 배치(`USP_M_CONT_USE_STATUS`의 `US_USER` 생성 로직)가 DB 내부에서 직접 `A_USER`, `A_FAMILY`를 읽고 쓰므로, Java DAO만 수정하면 엑셀 업로드 시 평문이 적재되거나 배치에서 암/복호화 누락이 발생할 수 있습니다.
 * **아키텍처 원칙**:
-  * **SecureDB NTS 토큰 활용**: KSign SecureDB의 NTS UDF(`nts`, `nts_bsh`, `nts_fsh`)를 사용하여 색인 기반의 부분 일치 검색을 지원합니다.
+  * **SecureDB NTS 토큰 활용**: KSign SecureDB Agentless API의 NTS 토큰(`nts`, `nts_bsh`, `nts_fsh`)을 사용하여 색인 기반의 부분 일치 검색을 지원합니다.
   * **Exact Match(일치 검색) 적용**: NTS 토큰이 적용되지 않은 중요 개인정보는 일치 검색으로 유도하고, WHERE 절 바인딩 전 파라미터 자체를 사전 암호화하여 `=` 조건으로 비교합니다.
-  * **DB 프로시저(`USP_*_EXUPLOAD`, `USP_M_CONT_USE_STATUS`) 동시 정비**: 엑셀 업로드 프로시저에서 `A_USER`/`A_FAMILY` 적재 시 `dbsecnew.sdb_crypto.encrypt` UDF를 호출하도록 함께 정비하고, `US_USER` 등 마트 테이블 조회 쿼리(`M_SERVICE`)의 복호화 대상 컬럼 매핑을 일원화합니다.
+  * **DB 프로시저(`USP_*_EXUPLOAD`, `USP_M_CONT_USE_STATUS`) 동시 정비**: 엑셀 업로드 프로시저(`A_USER`/`A_FAMILY` 적재) 및 마트 적재(`US_USER`)의 `*_ENC`/`*_HASH` 컬럼 매핑과 조회 쿼리(`M_SERVICE`)의 복호화 대상 컬럼 매핑을 일원화합니다.
 
 ### 3) [백엔드] 엑셀 업로드(Import) 기능의 연쇄 에러(Side-effect) 차단
 * **위험 요소**: POI 버전을 3.8에서 4.1.2로 상향함에 따라, 엑셀 업로드 모듈(`CommonExcelUpload.java`, `UploadDataController.java`)이 구형 POI 문법에 의존할 경우 런타임 에러가 발생할 수 있습니다.

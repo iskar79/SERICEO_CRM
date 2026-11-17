@@ -63,13 +63,16 @@
 ## 4. 개인정보 암호화 대상 테이블 및 컬럼 범위
 
 ### 4.1 `CEO` 스키마 (`CRM`에서 `@DBL_CEO` 시노님 참조)
-- **`A_USER` (10개)**: `NAME`, `BIRTHDAY`, `MTELNO`, `TELNO`, `EMAIL`, `SUBEMAIL`, `ADDRESS1`, `ADDRESS2`, `SUBADDRESS1`, `SUBADDRESS2` (`*_ENC` / 검색 대상 `*_HASH`)
+- **`A_USER` (전체 적용 목표 10개)**: `NAME`, `BIRTHDAY`, `MTELNO`, `TELNO`, `EMAIL`, `SUBEMAIL`, `ADDRESS1`, `ADDRESS2`, `SUBADDRESS1`, `SUBADDRESS2` (`*_ENC` / 검색 대상 `*_HASH`)
   - 원본 컬럼 축소 기준: `NAME` 60 byte, `EMAIL`/`MTELNO`/`TELNO` 50 byte
-- **`A_FAMILY` (4개)**: `NAME`, `TELNO`, `MTELNO`, `EMAIL` (`NAME_ENC/HASH`, `TELNO_ENC/HASH`, `MTELNO_ENC/HASH`, `EMAIL_ENC`)
+  - **현재 개발DB 스키마(`a_user.txt`) 실제 보유 컬럼**: `NAME_ENC`, `NAME_HASH`, `MTELNO_ENC`, `MTELNO_HASH`, `TELNO_ENC`, `EMAIL_ENC`, `EMAIL_HASH`, `SUBEMAIL_ENC` *(총 5개 `_ENC` + 3개 `_HASH` 증설 완료, `BIRTHDAY_ENC`/`ADDRESS*_ENC`/`SUBADDRESS*_ENC`는 미증설)*
+- **`A_FAMILY` (전체 적용 목표 4개)**: `NAME`, `TELNO`, `MTELNO`, `EMAIL`
+  - **현재 개발DB 스키마(`A_FAMILY.txt`) 실제 보유 컬럼**: `NAME_ENC`, `NAME_HASH`, `TELNO_ENC`, `TELNO_HASH`, `MTELNO_ENC`, `MTELNO_HASH`, `EMAIL_ENC` *(4개 `_ENC` + 3개 `_HASH` 증설 완료)*
+- **`A_EMP`, `A_SIGN_ACC`**: 현재 개발DB 스키마(`A_EMP.txt`, `A_SIGN_ACC.txt`) 기준 `*_ENC`/`*_HASH` 미증설 *(필요 시 별도 검토)*
 - **`A_*` 시노님 13개**: `A_ACT_LOG`, `A_CONT`, `A_CONT_LMS`, `A_CONT_NLMS`, `A_CONT_SERV`, `A_CORP`, `A_EMP`, `A_FAMILY`, `A_ORDER`, `A_PNT`, `A_SIGN`, `A_SIGN_USER`, `A_USER` *(+ `A_USER_DMINFO`)*
 
 ### 4.2 `CRM` 스키마 (`MICRO` 소유)
-- **`US_USER` (집계 테이블, 7개 증설)**: `NAME_ENC`, `NAME_HASH`, `MTELNO_ENC`, `MTELNO_HASH`, `EMAIL_ENC`, `EMAIL_HASH`, `BIRTHDAY_ENC` (`USP_M_CONT_USE_STATUS` 일배치 매핑)
+- **`US_USER` (집계 테이블, 7개 증설 및 일배치 매핑 완료)**: `NAME_ENC`, `NAME_HASH`, `MTELNO_ENC`, `MTELNO_HASH`, `EMAIL_ENC`, `EMAIL_HASH`, `BIRTHDAY_ENC` (`US_USER.txt` 및 `USP_M_CONT_USE_STATUS` 반영 완료)
 - **기타 사용 중 테이블 (개발DB 기준 최근 데이터 존재)**: `키맨`, `VOC접수`, `M_USER`, `사용자`, `M_EXUP_TEMP`, `TBALSONG`, `접촉관리`, `거래처` 등
 - **삭제 금지 주의 테이블**: `M_USITE`, `M_DEPT` (Java `MonArchDaoImpl` 로그인/사용자 조회에서 직접 `JOIN` 참조)
 

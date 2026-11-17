@@ -29,7 +29,7 @@
 | :--- | :--- | :--- | :--- |
 | **라이브러리** | `WebContent/WEB-INF/lib/SDBAgentlessAPIforJava-V3.7.3-2.0.4.jar` | `AgentlessApiFactory`, `SDBAgentlessApi` | KSign SecureDB Agentless Java API V2 공식 라이브러리 |
 | **환경설정** | `src/monarch.properties` | `securedb.agentless.*`, `securedb.policy.*` | 환경별(`[1] VDI / [2] 개발 / [3] 운영`) 정책서버 URL, 토큰, 인증서 경로, 정책명(`AES256_*`, `SHA512_*`) 관리 |
-| **암복호화 엔진** | `src/co/kr/kydbm/common/crypto/CryptoService.java` | `getInstance()`, `isAvailable()`, `encrypt()`, `decrypt()`, `getNts()`, `getNtsBsh()`, `close()` | `SDBAgentlessApi` 싱글턴 관리, 암복호화 및 NTS 토큰 생성, JVM 종료 시 리소스 정리, 통신 장애 시 Fallback 방어 |
+| **암복호화 엔진** | `src/co/kr/kydbm/common/crypto/CryptoService.java` | `getInstance()`, `isAvailable()`, `encrypt()`, `decrypt()`, `getNts()`, `getNtsBsh()`, `close()` | `SDBAgentlessApi` 싱글턴 관리, 암복호화 및 NTS 토큰 생성, JVM 종료 시 리소스 정리, Fail-Closed 차단(`securedb.fail.closed=true` 기본) |
 | **공통 DAO** | `src/co/kr/kydbm/core/dao/MonArchDaoImpl.java` | `injectPrivacyParams()`, `decryptRow()`, `convertHashSearchParam()` | SQL 실행 전 파라미터 자동 암호화/토큰 생성(`*_ENC`, `@*_HASH@`), 조회 결과 `*_ENC` 자동 복호화, 검색 파라미터 NTS 변환 |
 | **확장 검색 필터** | `src/co/kr/kydbm/core/utils/FilterGenerator.java` | `isNtsTargetQuery()`, `isHashField()`, `makeTextQry()`, `getExtFilterParams()` | 그리드 동적 확장 필터(`extFilters`)에서 `_HASH` 쿼리 판별 및 `=` / `LIKE` 조건 NTS 변환 |
 | **엑셀 다운로드** | `src/co/kr/kydbm/core/filecontrol/ExcelDownload.java` | `downStream()`, `RowCallbackHandler.processRow()`, `decryptIfEncCell()` | 대용량 엑셀(XLSX)/CSV 스트리밍 조회 시 `*_ENC` 컬럼 자동 복호화 출력 |

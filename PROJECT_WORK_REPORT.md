@@ -66,7 +66,7 @@
 *(상세 기술 구조 및 시나리오는 [SECUREDB_GUIDE.md](SECUREDB_GUIDE.md) 참조)*
 - **API 및 공통 엔진 구축**:
   - `WebContent/WEB-INF/lib/SDBAgentlessAPIforJava-V3.7.3-2.0.4.jar` 적용
-  - `src/co/kr/kydbm/common/crypto/CryptoService.java`: `AgentlessApiFactory` / `SDBAgentlessApi` 싱글턴 관리, `encrypt()`, `decrypt()`, `getNts()`, `getNtsBsh()`, `close()` 및 장애 시 Fallback 방어
+  - `src/co/kr/kydbm/common/crypto/CryptoService.java`: `AgentlessApiFactory` / `SDBAgentlessApi` 싱글턴 관리, `encrypt()`, `decrypt()`, `getNts()`, `getNtsBsh()`, `close()` 및 Fail-Closed 차단(`securedb.fail.closed=true` 기본, `false` 시 평문 Fallback)
 - **환경별 설정 분리 (`src/monarch.properties`, `src/properties/jdbc.properties`)**:
   - `[1] VDI 로컬 테스트용` / `[2] 개발서버(112.106.119.13)` / `[3] 운영서버(112.106.119.183)` 블록 및 `D:\CRM` WAR 배포 안내 주석 정리
 - **네이밍 컨벤션(`*_ENC`, `*_HASH`) 기반 전구간 자동 연동**:

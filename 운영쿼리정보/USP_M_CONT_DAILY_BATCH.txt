@@ -19,7 +19,10 @@ BEGIN
     EXECUTE IMMEDIATE 'ALTER SESSION SET NLS_DATE_FORMAT = ''YYYY-MM-DD''';
 
 	-- 사용자 정보 데일리 캡쳐
+	-- 20261117 khma 제외 처리 : USP_M_USER_INFO_BACKUP 미사용(삭제 대상) 결정에 따른 일일배치 호출 주석 처리
+	/*
 	USP_M_USER_INFO_BACKUP;
+	*/
 
 	-- 이용현황 관련 집계쿼리
 	USP_M_CONT_RPT;
