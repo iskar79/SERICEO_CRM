@@ -1,50 +1,42 @@
 # SERICEO CRM 마이그레이션 통합 실행 계획서 (Master Execution Plan)
 
-본 문서는 SERICEO CRM 고도화 과제(개인정보 암호화, 엑셀 보안, 시스템 업그레이드)를 수행하는 개발자들을 위한 **최상위 작업 순서 가이드**입니다.
-
-## 🚨 필수 작업 순서 및 Step-by-Step 원칙 (매우 중요)
-1. **작업 순서 엄수**: 아래의 순서를 무시하고 임의의 순서로 개발을 진행할 경우, 라이브러리 충돌 및 원인 불명의 버그(의존성 꼬임 현상)가 발생할 수 있습니다. **반드시 [Step 0 ➡️ Step 1 ➡️ Step 2 ➡️ Step 3] 순서로 작업을 진행하십시오.**
-2. **VDI 베이스라인 구동 최우선 확인**: 코드 수정에 들어가기 전, `sericeo_crm_VDI반입용_20261029.zip`을 VDI 이클립스에 반입하여 **현재 운영 소스와 100% 동일한 상태에서 톰캣 서버가 이상 없이 구동되는지 먼저 확인**합니다.
-3. **완전한 Step-by-Step 진행 & 클립보드 복사·붙여넣기(`Ctrl+C` ➡️ `Ctrl+V`) 활용**:
-   * 여러 파일을 한꺼번에 수정하지 않고 **반드시 파일 1개(또는 함수 블록 1개) 단위로 수정 ➡️ 로컬 이클립스 에러 확인 ➡️ VDI 복사·붙여넣기 반영 ➡️ VDI 동작 검증** 순서로 진행합니다.
-   * 외부 PC에서 VDI 내부로는 **클립보드 텍스트 복사·붙여넣기가 가능**하며, 업그레이드용 바이너리(`.jar`)는 이미 최초 반입 압축본 하위 폴더(`Spring 4.3.30 신규 라이브러리/`, `POI 4.1.2 신규 라이브러리/`)에 포함되어 있습니다.
-   * 중소형 파일은 **전체 선택 복사(`Ctrl+A` ➡️ `Ctrl+C` ➡️ `Ctrl+V`)**로, `jquery.kdb.superContaner.js` 등 대형 파일은 **이클립스 라인 이동(`Ctrl+L`) 및 `// YYYYMMDD khma Start ~ End` 블록 핀포인트 붙여넣기**로 안전하게 이관합니다.
-4. **기존 코드 삭제 금지 및 AI 흔적 절대 금지**: 모든 수정 코드는 기존 소스를 주석(`/* ... */`, `<!-- ... -->`)으로 보존하고 `[날짜] [khma]` 주석 규칙을 100% 준수하며, AI 작업 흔적을 일절 남기지 않습니다.
+> **2026-11-17 khma 현행화**: Step 0 ~ Step 2, Step 4 ~ Step 11 구현 및 VDI 검증이 완료되었으며, Step 3(KSign SecureDB Agentless Java API V2) 코어 연동 및 개발서버(`112.106.119.13`) 구축·1차 암복호화 검증이 완료되어 현재 나머지 컬럼 쿼리 반영 및 통합 테스트를 진행 중입니다. (전체 완료 요약은 [PROJECT_WORK_REPORT.md](PROJECT_WORK_REPORT.md), 인프라/DB/암호화 기준은 [INFRA_AND_SECUREDB_REFERENCE.md](INFRA_AND_SECUREDB_REFERENCE.md) 참조)
 
 ---
 
-### 📖 Step 0: 아키텍처 구조 파악 (사전 필수 숙지)
-* **관련 문서**: `ARCHITECTURE.md`, `AGENTS.md`
-* **작업 내용**: SERICEO CRM 고유의 프론트엔드 엔진(4대 기둥) 및 메타데이터 기반 백엔드 동작 원리 파악
-* **수행 목적**: 본 시스템은 일반적인 Spring MVC 방식이 아닌 자체 프레임워크(MonArch)를 사용하므로, 소스 코드 구조를 모른 채로 1/2/3번 개발을 시작하면 코드를 엉뚱한 곳에 삽입하게 됩니다. **실제 코딩에 들어가기 전 무조건 1회 이상 정독해야 합니다.**
+## 1. 필수 작업 원칙
+1. **Step-by-Step 진행 & VDI 2단계 검증 게이트**: 파일 단위로 수정 ➡️ 로컬 컴파일 확인 ➡️ VDI 반영(`Ctrl+C` ➡️ `Ctrl+V`) ➡️ 동작 검증 순서로 진행합니다.
+2. **표준 주석 및 코드 보존**: 모든 수정 코드에는 `[YYYYMMDD] [khma]` 표준 주석을 작성하며, 운영 핵심 로직 변경 시 기존 코드를 주석으로 보존합니다.
+3. **환경별 설정 분리**: `src/monarch.properties_*` 및 `src/properties/jdbc.properties_*`(`개발VDI`, `개발서버`, `운영서버`)를 기준으로 WAR 배포 대상 환경에 맞춰 적용합니다.
 
-### 🛠️ Step 0-1: VDI 최초 프로젝트 반입 및 베이스라인 구동 확인 (필수 선행 조치)
-* **관련 문서**: `1_TASK_SYSTEM_UPGRADE.md`, `CHANGELOG_KHMA.md`
-* **작업 내용**:
-  1. `sericeo_crm_VDI반입용_20261029.zip`(68.90 MB)을 VDI 빈 프로젝트 폴더에 압축 해제 후 Eclipse Import (`Existing Projects into Workspace`) 수행.
-  2. 구형 VJET 플러그인 찌꺼기가 제거된 `.project` 및 운영 최신 동기화 소스가 그대로 적용된 상태에서 **Tomcat 9 서버 기동 및 기본 화면 동작 정상 여부를 최우선 검증**.
+---
 
-### 🥇 Step 1: 시스템 버전 업그레이드 (기초 공사)
+## 2. 전체 단계별 진행 현황
+
+### 📖 Step 0: 아키텍처 구조 파악 및 베이스라인 검증 (완료)
+* **관련 문서**: `ARCHITECTURE.md`, `AGENTS.md`, `INFRA_AND_SECUREDB_REFERENCE.md`
+* **상태**: **완료** — 운영 소스(`sericrm_20261021`) 100% 동기화, 이클립스 빌드 경로 정비 및 VDI Tomcat 9 베이스라인 정상 기동 확인
+
+### 🥇 Step 1: 시스템 버전 업그레이드 (완료)
 * **관련 문서**: `1_TASK_SYSTEM_UPGRADE.md`
-* **작업 내용**: `WEB-INF/lib/Spring 4.3.30 신규 라이브러리/` 내 JAR 20종(Spring 4.3.30 18종 + Commons 2종) 교체 적용, `web.xml` 및 `Monarch820-servlet.xml` 스키마 상향, `monform.jsp` 내 `jquery-1.12.4.min.js` 전환 (하나씩 순차 적용)
-* **수행 목적**: 후행 작업(엑셀 암호화 및 API 연동)을 위한 최신 라이브러리(`POI 4.1.2` 등) 기반을 다지고, 구형 보안 취약점을 미리 제거하기 위함입니다. 반드시 이 작업이 완료되고 서버가 정상 기동되는 것을 확인한 후 다음 단계로 넘어가야 합니다.
+* **상태**: **완료** — Spring `4.3.30.RELEASE`, Commons(`fileupload 1.5`, `io 2.15.1`), jQuery `1.12.4`, `MappingJacksonJsonViewEx` 전환, `MonArchDaoImpl` 제네릭/로그인 쿼리 보정
 
-### 🥈 Step 2: 엑셀 다운로드 보안 적용 (기능 개발)
+### 🥈 Step 2: 엑셀 다운로드 보안 및 대용량 스트리밍 (완료)
 * **관련 문서**: `2_TASK_EXCEL_DOWNLOAD_PWD.md`
-* **작업 내용**: `WEB-INF/lib/POI 4.1.2 신규 라이브러리/` 내 JAR 7종 교체 적용, `CommonExcelUtil.java` 호환성 수정, 프론트엔드 4단 보안 모달 팝업 추가 및 백엔드 Apache POI 4.1.2 AES 암호화·감사로그 로직 구현 (하나씩 순차 적용)
-* **수행 목적**: Step 1에서 확보된 안정적인 환경 위에서 독립적인 부가 기능을 먼저 개발하고 테스트를 완료합니다.
+* **상태**: **완료** — Apache POI `4.1.2` 교체, `DownXlsNew` 2단계 사유/암호 팝업, `CRM.M_EXCEL_DOWN_LOG` 감사 이력, 10만건 이상 스트리밍(`SXSSFWorkbook`/OpenCSV) 및 연타 방지 UX 적용
 
-### 🥉 Step 3: 개인정보 암호화 (공통 모듈 확장 적용 - ⚠️ 최종 마지막 단계로 진행)
-* **관련 문서**: `3_ALT_SECUREDB_UDF.md` (DB UDF 우선 적용 방식), `3_TASK_SECUREDB_API.md` (Java API 대안 방식)
-* **작업 상태**: **모든 단위 기능 검증 및 시스템 안정화 완료 후 최종 마지막 순서로 진행 (보류)**
-* **작업 내용**: DB 쿼리 UDF(ENC/DEC 함수) 우선 적용 검토 후 한계 발생 시 Java API 대안 검토, `MonArchDaoImpl` 등 공통 쿼리 모듈 확장 및 프로시저/배치/엑셀업로드 적용
-* **수행 목적**: 시스템의 심장부(전체 DB 컬럼, 쿼리, 프로시저, Oracle 일배치 등)를 건드리는 가장 위험하고 방대한 작업이므로, Step 1, 2, 4, 5, 6, 7의 모든 기능 개발과 VDI 동작 검증이 완전히 끝난 후 최종 마지막 단계에서 안정적으로 수행합니다.
+### 🥉 Step 3: 개인정보 암호화 — KSign SecureDB Agentless Java API V2 (진행 중)
+* **관련 문서**: `3_TASK_SECUREDB_API.md`, `SECUREDB_GUIDE.md`, `INFRA_AND_SECUREDB_REFERENCE.md`
+* **상태**: **코어 연동 및 개발서버 1차 검증 완료 / 나머지 컬럼 통합 테스트 중**
+  - `SDBAgentlessAPIforJava-V3.7.3-2.0.4.jar` 및 `CryptoService`(싱글턴, `securedb.fail.closed=true`) 구축 완료
+  - `MonArchDaoImpl`, `FilterGenerator`, `ExcelDownload`에서 `*_ENC` / `*_HASH` 컨벤션 기반 자동 암복호화·NTS 검색·엑셀 복호화 연동 완료
+  - 개발서버(`112.106.119.13`, `D:\CRM\ROOT.war`) 구축 및 `NAME`/`NAME_ENC`/`NAME_HASH` 1차 검증 완료
+  - 잔여: 나머지 개인정보 컬럼(`A_USER`, `A_FAMILY`, `US_USER` 등) 서비스 쿼리/화면 반영 및 통합 테스트 후 운영서버(`112.106.119.183`) 배포
 
-### ⏳ Step 4: 비밀번호 검증 로직 단일 통합 (고객사 승인 대기)
+### ✅ Step 4: 비밀번호 복잡도 및 아이디 저장 통합 (완료)
 * **관련 문서**: `4_TASK_PASSWORD_VALIDATION_UNIFICATION.md`
-* **작업 상태**: 고객사 승인 후 작업 예정 (현재 대기)
-* **작업 내용**: `MonArch800.js`의 `validatePassword` 함수를 단일 통합 함수로 교체하여 폼 객체/다중 인자/단일 문자열 복잡도 검증 다형성 일원화 지원
+* **상태**: **완료** — `MonArch800.js` `validatePassword` 통합 검증 및 `SAVE_ID` 쿠키 연동
 
----
-
-> **개발자 주의사항**: 각 Step의 작업에 착수하기 전, 반드시 해당 문서(md)를 끝까지 정독하고 가이드라인에 명시된 Step-by-Step 1:1 코드 치환 방식을 엄수해 주시기 바랍니다.
+### ✅ Step 5 ~ Step 11: 차세대 파일 시스템, 예외/통신 표준화, UI/성능 고도화 (완료)
+* **관련 문서**: `5_TASK_FILE_SYSTEM_DRAG_DROP.md`, `PROJECT_WORK_REPORT.md`
+* **상태**: **완료** — `CRM.M_FILE_MGMT` Drag&Drop 파일 시스템, `ResultInfo` JSON 예외/통신 통일, Core 모듈 5종 `js/core/` 분리, 그리드 `masking` 지원, `textarea` 디코딩 UX 개선 및 렌더링 최적화
