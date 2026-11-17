@@ -34,3 +34,10 @@ SIGNETIME                DATE
 CHGTIME                  DATE           
 OUTCODE                  VARCHAR2(20)   
 OUTDESC                  VARCHAR2(300)  
+NAME_ENC                 VARCHAR2(94)   
+NAME_HASH                VARCHAR2(2640) 
+MTELNO_ENC               VARCHAR2(94)   
+MTELNO_HASH              VARCHAR2(2200) 
+EMAIL_ENC                VARCHAR2(94)   
+EMAIL_HASH               VARCHAR2(2200) 
+BIRTHDAY_ENC             VARCHAR2(94)   
