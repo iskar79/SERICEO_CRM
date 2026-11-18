@@ -35,7 +35,7 @@
    - `MonArch800.js`: `validatePassword` 다형성 통합 함수(폼객체, 3개인자, 단일문자열) 적용 완료.
    - `MonArch800.js` 레거시 주석 전수 정리 완료, JDK 11 컴파일 파싱 검증 완료.
 
-| **Step 2-1** | WebContent/WEB-INF/lib/ | POI 4.1.2 7종 + 의존 JAR 3종(commons-math3, SparseBitSet, curvesapi) 배치 | [x] | [ ] | **로컬완료 (VDI 반영 대기)** |
+| **Step 2-1** | WebContent/WEB-INF/lib/ | POI 4.1.2 7종 + 의존 JAR 3종(commons-math3, SparseBitSet, curvesapi) 배치 | [x] | [x] | **완료 (VDI 정상구동 확인)** |
    - `WebContent/WEB-INF/lib/`: 구형 POI 3.8 JAR 7종 `_20261030` 접미사로 백업, POI 4.1.2 JAR 7종 배치 완료 (VDI 확인 완료).
    - `src/co/kr/kydbm/common/CommonExcelUtil.java`: POI 4.1.2 호환 `CellType` Enum 및 `DateUtil` 적용, 컴파일 에러 0건 (VDI 확인 완료).
 
@@ -45,7 +45,7 @@
 7. **미사용 파일 정리: ExcelDownload2.java 완전 삭제 완료 (VDI 확인 완료)**:
    - `src/co/kr/kydbm/core/filecontrol/ExcelDownload2.java` 및 클래스 파일 전수 삭제 완료.
 
-| **Step 2-4** | src/co/kr/kydbm/core/filecontrol/UploadController.java | 엑셀 파라미터 수신, return null; 보정, Throwable 로깅 보강 | [x] | [ ] | **로컬완료 (VDI 반영 대기)** |
+| **Step 2-4** | src/co/kr/kydbm/core/filecontrol/UploadController.java | 엑셀 파라미터 수신, return null; 보정, Throwable 로깅 보강 | [x] | [x] | **완료 (VDI 정상구동 확인)** |
    - `UploadController.java`: `excelUsage`, `excelTarget`, `excelReason`, `excelPassword` 파라미터 취득 및 `ExcelDownload.downExcel`에 전달. 표준 헤더 주석 적용, 사장된 레거시 주석 전수 정리, 깨진 한글 Javadoc 복원, 상세 설명 보강 완료.
    - `ExcelDownload.java`: 기존 7개 파라미터 `downExcel` 하위호환 유지, 8개 오버로딩 `downExcel` 추가. POI 4.1.2 Agile AES 암호화 워크북(`SXSSFWorkbook` 100행 스트리밍) 및 `POIFSFileSystem` 암호화 스트림 방출 구현. 표준 헤더 및 Javadoc 완비.
 
@@ -100,17 +100,17 @@
 | **Step 2-12**| `UploadController.java`, `superContaner.js` | M_EXCEL_DOWN_LOG DOWN_CNT 정합성 보강 (REGDATE 오라클 컬럼명 일치, 사용자 Fallback 갱신 및 superContaner _records 연동) | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
 | **Step 2-13**| `MonArchDao.java`, `MonArchDaoImpl.java`, `ExcelDownload.java`, `UploadController.java` | 대용량 10만건 이상 엑셀/CSV 스트리밍 다운로드 파이프라인 이식 (RowCallbackHandler, SXSSFWorkbook(100) 디스크압축, OpenCSV 스트리밍, 구형 JXL 65,536행 한계 및 WAS 힙 일괄적재 제거) | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
 | **Step 2-14**| `UploadController.java`, `ExcelDownload.java`, `MonArch800.js`, `superContaner.js` | 엑셀 다운로드 연타 방지 및 비침해적 인라인 상태 안내 UX 연동 (클릭 즉시 버튼 잠금 + 안내 배지 노출, response.reset() 직후 fileDownloadToken 쿠키 주입, 응답 시작 시 자동 원복, 120초 타임아웃 재요청) | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
-| **Step 2-15**| `UploadController.java`, `MonArch800.js`, `superContaner.js` | 일반 엑셀 자동 INSERT와 보안 엑셀 UPDATE 분기 정밀 격리(기존 로그 덮어쓰기 간섭 원천 차단), DownXlsNew 2단계 선행잠금 재진입(Re-entry) 허용 및 실패 시 CleanUp 복원 보완 | `[x]` | `[ ]` | **로컬 수정 완료 (VDI 반영 대기)** |
+| **Step 2-15**| `UploadController.java`, `MonArch800.js`, `superContaner.js` | 일반 엑셀 자동 INSERT와 보안 엑셀 UPDATE 분기 정밀 격리(기존 로그 덮어쓰기 간섭 원천 차단), DownXlsNew 2단계 선행잠금 재진입(Re-entry) 허용 및 실패 시 CleanUp 복원 보완 | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
 | **Step 9** | `WebContent/js/jquery.kdb.superContaner.js` | 그리드 컬럼 마스킹 엔진 구현 (`colModel`의 `mask: "name"`, `"phone"`, `"email"` 등 속성 연동, 마우스 오버 `title` 툴팁 원본 데이터 유지) | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
 | **Step 10-1**| `WebContent/js/core/jquery.kdb.core.superCalendar.js`, `WebContent/js/MonArch.js` (구형 `js/jquery.kdb.superCalendar.js` 정리 삭제) | Mon_LinkCRM_Maven 표준 구조 적용 (js/core 폴더 생성 및 superCalendar 이관, 구형 파일 정리 삭제, MonArch.js 로드 경로 갱신) | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
-| **Step 1-2c**| `src/co/kr/kydbm/core/dao/MonArchDaoImpl.java` | exeLoginProcess 로그인 쿼리 내 미사용 '거래처' 테이블 서브쿼리 제거 (ORA-00942 오류 원천 방어 및 NULL 처리) | `[x]` | `[ ]` | **로컬 수정 완료 (VDI 반영 대기)** |
+| **Step 1-2c**| `src/co/kr/kydbm/core/dao/MonArchDaoImpl.java` | exeLoginProcess 로그인 쿼리 내 미사용 '거래처' 테이블 서브쿼리 제거 (ORA-00942 오류 원천 방어 및 NULL 처리) | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
 | **Step 10-2**| `WebContent/css/Common.css`, `Theme_*.css`, `MonArchResource.js`, `monform.jsp`, `favicon.ico` | 헤더 상단 탑바(사이트선택/법인검색/저장버튼) UI 리팩토링 및 사이트별(CEO/MS/PRO) 클래스 직결 배경색/캐시파쇄(?v=)/파비콘 404 해결 | `[x]` | `[x]` | **완료 (VDI 반영 및 정상동작 확인)** |
 | **Step 10-3**| `WebContent/js/core/jquery.kdb.core.superTree.js`, `superChart.js`, `superContaner.js`, `MonArch.js` | superTree(4개 메서드) 및 superChart(3개 메서드) js/core 모듈 독립 분리 및 디스패처 연동 | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
 | **Step 5-5** | `운영쿼리정보/M_FILE_MGMT.sql`, `UploadController.java`, `superContaner.js`, `Resource.js`, `Monarch820-servlet.xml` | CRM.M_FILE_MGMT 테이블/트리거/인덱스 DDL 작성, singleFileNew 및 multiFileNew 모두 M_FILE_MGMT(FILE_SEARCH_KEY 및 MULTIFILE_LIST)로 일원화, 데이터 수정 이력 서비스명(M_DATA_HIST) 변경 | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
 | **Step 11-1**| `WebContent/js/jquery.kdb.superContaner.js` | 그리드 렌더링(tableShowData) 시 템플릿 행(TrData)에서 컬럼별 메타데이터(colMetaList) 1회 사전 캐싱으로 매 행·셀 반복 DOM .attr() 조회 제거 | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
 | **Step 11-2**| `WebContent/js/jquery.kdb.MonArch800.js` | `$.decHTML` 함수에서 변환 대상 엔티티(`&`) 및 `<br>` 태그가 없는 일반 문자열 조기 반환(Early Return) 처리로 불필요한 정규식 체인 실행 제거 | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
 | **Step 10-4**| `WebContent/js/core/jquery.kdb.core.superMap.js`, `jquery.kdb.core.superAnswer.js`, `superTree.js`, `superChart.js`, `superCalendar.js`, `superContaner.js`, `MonArch.js`, `MonArch_Simple.js`, `SurveyAnsform.htm` | superMap(11개)·SuperAnswer(5개) 모듈 분리, core 5종 상세 Javadoc/단계별 주석 보강, MonArch_Simple.js 모듈 로드/SurveyAnsform.htm jQuery 1.12.4 상향 및 dspmode == 1 버그 수정 | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
-| **Step 11-3**| `WebContent/js/jquery.kdb.superContaner.js` | getJson 구조체 모달 호출 시 전체 .ui-widget-overlay z-index 일괄 변경 제거 (구조체 모달 닫힌 후 부모 모달 overlay 클릭 차단/비활성화 버그 수정) | `[x]` | `[ ]` | **로컬 수정 완료 (VDI 반영 대기)** |
+| **Step 11-3**| `WebContent/js/jquery.kdb.superContaner.js` | getJson 구조체 모달 호출 시 전체 .ui-widget-overlay z-index 일괄 변경 제거 (구조체 모달 닫힌 후 부모 모달 overlay 클릭 차단/비활성화 버그 수정) | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
 | **Step 3-1** | `src/monarch.properties` | SecureDB Agentless HTTPS 접속 설정(VDI/개발서버 112.106.119.13/운영서버 112.106.119.183 주석 블록 및 인증서/D:\CRM 배포 안내) | `[x]` | `[x]` | **완료 (VDI 반영 완료)** |
 | **Step 3-1b**| `src/properties/jdbc.properties` | 배포 환경별([1] VDI / [2] 개발 112.106.119.13 / [3] 운영 112.106.119.183) Oracle JDBC 접속 정보 블록 및 D:\CRM 배포 주석 정리 | `[x]` | `[x]` | **완료 (VDI 반영 완료)** |
 | **Step 3-2** | `src/co/kr/kydbm/common/crypto/CryptoService.java` | KSign SecureDB Agentless Java API V2 공통 암복호화 서비스 클래스 작성 (`AgentlessApiFactory`, `SDBAgentlessApi` 싱글턴 재사용, `close()` 리소스 해제, `securedb.fail.closed` Fail-Closed 차단 지원) | `[x]` | `[x]` | **완료 (VDI 반영 및 1차 검증 확인)** |

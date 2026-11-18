@@ -287,13 +287,13 @@ VDI 내부망 코드를 카메라로 촬영하여 전달받는 경우, 단순 OC
   * 대용량 10만건 이상 엑셀/CSV 스트리밍 다운로드 파이프라인 이식 (RowCallbackHandler, SXSSFWorkbook(100) 디스크압축, OpenCSV 스트리밍, 구형 JXL 65,536행 한계 및 WAS 힙 일괄적재 제거).
 * **[완료] Step 2-14 (UploadController.java, ExcelDownload.java, MonArch800.js, superContaner.js)** ([① 로컬: 완료(x) / ② VDI: 완료(x)]):
   * 엑셀 다운로드 연타 방지 및 비침해적 인라인 상태 안내 UX 연동 (클릭 즉시 버튼 잠금 + 안내 배지 노출, response.reset() 직후 fileDownloadToken 쿠키 주입, 응답 시작 시 자동 원복, 120초 타임아웃 재요청).
-* **[진행중] Step 2-15 (UploadController.java, MonArch800.js, superContaner.js)** ([① 로컬: 완료(x) / ② VDI: 대기( )]):
+* **[완료] Step 2-15 (UploadController.java, MonArch800.js, superContaner.js)** ([① 로컬: 완료(x) / ② VDI: 완료(x)]):
   * 일반 엑셀 자동 INSERT와 보안 엑셀 UPDATE 분기 정밀 격리(기존 로그 덮어쓰기 간섭 원천 차단), DownXlsNew 2단계 선행잠금 재진입(Re-entry) 허용 및 실패 시 CleanUp 복원 보완.
 * **[완료] Step 9 (superContaner.js)** ([① 로컬: 완료(x) / ② VDI: 완료(x)]):
-  * 그리드 컬럼 마스킹 엔진 구현 (`colModel` mask 속성: name, phone, email, jumin, card 등 연동, 마우스 오버 title 툴팁 원본 유지).
+  * 그리드 컬럼 마스킹 엔진 구현 (`colModel` masking/mask 속성: name, phone, email, jumin, card 등 연동, 마우스 오버 title 툴팁 원본 유지).
 * **[완료] Step 10-1 (MonArch.js, js/core/jquery.kdb.core.superCalendar.js, js/jquery.kdb.superCalendar.js 삭제)** ([① 로컬: 완료(x) / ② VDI: 완료(x)]):
   * Mon_LinkCRM_Maven 표준 구조 적용: WebContent/js/core 폴더 생성 및 superCalendar 이관, 구형 js/jquery.kdb.superCalendar.js 정리 삭제, MonArch.js 스크립트 경로 갱신.
-* **[진행중] Step 1-2c (MonArchDaoImpl.java)** ([① 로컬: 완료(x) / ② VDI: 대기( )]):
+* **[완료] Step 1-2c (MonArchDaoImpl.java)** ([① 로컬: 완료(x) / ② VDI: 완료(x)]):
   * exeLoginProcess 로그인 쿼리 내 미사용 '거래처' 테이블 서브쿼리 제거 (ORA-00942 오류 원천 해결 및 NULL 바인딩).
 * **[완료] Step 10-2 (Common.css, Theme_*.css, MonArchResource.js, monform.jsp, favicon.ico)** ([① 로컬: 완료(x) / ② VDI: 완료(x)]):
   * 헤더 상단 탑바(사이트선택/법인검색/저장버튼) UI 리팩토링 및 사이트별(CEO/MS/PRO) 클래스 직결 배경색/캐시파쇄(?v=)/파비콘 404 해결 완료.
@@ -307,5 +307,7 @@ VDI 내부망 코드를 카메라로 촬영하여 전달받는 경우, 단순 OC
   * `$.decHTML` 함수에서 변환 대상 엔티티(`&`) 및 `<br>` 태그가 없는 일반 문자열은 정규식 9종 체인을 생략하고 즉시 반환(Early Return)하도록 개선 완료.
 * **[완료] Step 10-4 (core/jquery.kdb.core.superMap.js, superAnswer.js, superTree.js, superChart.js, superCalendar.js, superContaner.js, MonArch.js, MonArch_Simple.js, SurveyAnsform.htm)** ([① 로컬: 완료(x) / ② VDI: 완료(x)]):
   * `superContaner.js`에서 `superMap`(지도 11개 메서드) 및 `SuperAnswer`(설문/답변 5개 메서드)를 `js/core` 하위 모듈로 독립 분리하고, `js/core/` 하위 5대 분리 모듈 전체 상세 Javadoc/단계별 설명 주석 보강, `MonArch_Simple.js` 코어 모듈 로드 추가, `SurveyAnsform.htm` jQuery 1.12.4 상향 및 `superAnswer.js` 내 `dspmode == 1` 비교 연산자 수정 및 VDI 반영 확인 완료.
-* **[대기/보류] Step 3 (SecureDB 개인정보 암복호화 - DB UDF 쿼리 함수 우선 방식)**:
-  * 시스템 전반(전체 테이블 컬럼, 프로시저, 일배치, 쿼리)에 미치는 영향도가 가장 크므로, 모든 단위 기능 검증 및 시스템 안정화 완료 후 **최종 마지막 순서**로 검토 및 적용 진행 예정.
+* **[완료] Step 11-3 (superContaner.js)** ([① 로컬: 완료(x) / ② VDI: 완료(x)]):
+  * getJson 구조체 모달 호출 시 전체 `.ui-widget-overlay` z-index 일괄 변경 제거 및 textarea/pre HTML 엔티티 디코딩 보정 완료.
+* **[완료] Step 3-1 ~ Step 3-5 (KSign SecureDB Agentless Java API V2 코어 연동)** ([① 로컬: 완료(x) / ② VDI: 완료(x)]):
+  * `CryptoService`, `MonArchDaoImpl`, `FilterGenerator`, `ExcelDownload`에서 `*_ENC`/`*_HASH` 네이밍 컨벤션 기반 자동 암복호화, NTS 색인 검색, 엑셀 복호화 및 Fail-Closed(`securedb.fail.closed=true`) 적용 완료 (개발서버 `112.106.119.13` 1차 검증 완료, 잔여 컬럼 쿼리/화면 매핑 및 통합 테스트 진행 중).
