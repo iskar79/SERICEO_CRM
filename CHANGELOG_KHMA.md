@@ -88,6 +88,7 @@
 | **Step 3-3** | `src/co/kr/kydbm/core/dao/MonArchDaoImpl.java` | `*_ENC` 파라미터 자동 암호화 및 `@*_HASH@` 존재 시 NTS 토큰 자동 주입, SELECT `*_ENC` 복호화, `ReadQuery` 진단 로그 보강 | `[x]` | `[x]` | **완료 (VDI 반영 완료)** |
 | **Step 3-4** | `src/co/kr/kydbm/core/utils/FilterGenerator.java`, `SvcCRUD.java` | SQL 내 `_HASH` 포함 여부 동적 판별 후 확장필터 `*_HASH` 검색 필드 NTS 색인 검색(`= nts` / `LIKE nts_bsh`) 자동 변환, `SvcCRUD` 실행타입 오류 진단 로그 보강 | `[x]` | `[x]` | **완료 (VDI 반영 완료)** |
 | **Step 3-5** | `src/co/kr/kydbm/core/filecontrol/ExcelDownload.java` | 대용량 스트리밍 엑셀(XLSX)/CSV `RowCallbackHandler` 내 `*_ENC` 컬럼 자동 복호화(`decryptIfEncCell`) 연동 | `[x]` | `[x]` | **완료 (VDI 반영 완료)** |
+| **Step 1-5** | `src/co/kr/kydbm/core/service/LoginController.java` | 로그인 성공/실패/5회차단 및 로그아웃 접속 이력을 기존 `M_USE_LOG` 테이블에 자동 적재(`insertLoginUseLog`, IP/User-Agent 포함) 및 `printStackTrace` 제거 | `[x]` | `[x]` | **완료 (VDI 반영 확인)** |
 
 ### 📖 Step 0. 사전 환경 정상화 및 아키텍처 숙지 (완료)
 > 📘 관련 문서: `ARCHITECTURE.md`, `AGENTS.md`, `0_MASTER_EXECUTION_PLAN.md`
