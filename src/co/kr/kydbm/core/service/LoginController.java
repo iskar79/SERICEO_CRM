@@ -100,6 +100,8 @@ public class LoginController {
 				strRand = sb.toString();
 				
 				session.setAttribute("authValue", strRand);
+				// 20261119 khma : 세션 타임아웃(SessionTimeoutListener) 시에도 클라이언트 IP를 기록할 수 있도록 세션에 보관
+				session.setAttribute("loginClientIp", getClientIp(request));
 				
 				// 결과 세팅 : 이미 로그인이 되어있기 때문에 메인 화면으로 넘겨준다.
 				resultInfo.setResult(CommonConst.SUCCESS);
@@ -247,6 +249,8 @@ public class LoginController {
 				strRand = sb.toString();
 				
 				session.setAttribute("authValue", strRand);
+				// 20261119 khma : 세션 타임아웃(SessionTimeoutListener) 시에도 클라이언트 IP를 기록할 수 있도록 세션에 보관
+				session.setAttribute("loginClientIp", getClientIp(request));
 				
 				// 20261118 khma : 로그인 성공 접속 이력을 M_USE_LOG에 기록
 				insertLoginUseLog(monArchDao, request, userInfo.getUsiteNo(), userInfo.getUserNo(),
@@ -323,8 +327,15 @@ public class LoginController {
 			UserInfo userInfo = (UserInfo) session.getAttribute("userInfo");
 			if (userInfo != null && StringUtils.isNotEmpty(userInfo.getUserNo())) {
 				MonArchDaoImpl monArchDao = new MonArchDaoImpl();
+				// 20261119 khma : 접속이력 단일 조건 조회(SERVICE_NAME='LOGIN') 편의를 위해 로그아웃 SERVICE_NAME을 LOGIN으로 통합 (METHOD_NAME='LOGOUT'으로 구분)
+				/*
 				insertLoginUseLog(monArchDao, request, userInfo.getUsiteNo(), userInfo.getUserNo(),
 						"LOGOUT", "LOGOUT", userInfo.getUserCode(), "로그아웃",
+						buildLoginReqDoc(request, userInfo.getUserCode(), userInfo.getUserName(), "로그아웃"),
+						System.currentTimeMillis() - startTime);
+				*/
+				insertLoginUseLog(monArchDao, request, userInfo.getUsiteNo(), userInfo.getUserNo(),
+						"LOGIN", "LOGOUT", userInfo.getUserCode(), "로그아웃",
 						buildLoginReqDoc(request, userInfo.getUserCode(), userInfo.getUserName(), "로그아웃"),
 						System.currentTimeMillis() - startTime);
 			}
@@ -368,7 +379,7 @@ public class LoginController {
 	 * @param request HttpServletRequest 요청 객체
 	 * @param mUsiteNo 사이트 식별 번호 (기본값 "44")
 	 * @param mUserNo 사용자 번호 (미인증/실패 시 "0")
-	 * @param serviceName 서비스 구분명 ("LOGIN" 또는 "LOGOUT")
+	 * @param serviceName 서비스 구분명 ("LOGIN" 통합)
 	 * @param methodName 상세 구분명 ("LOGIN_SUCCESS", "LOGIN_FAIL", "LOGIN_LOCKED", "LOGOUT")
 	 * @param keyValue 로그인 시도 아이디 (USER_CODE)
 	 * @param actionName 한글 액션 설명 ("로그인 성공", "로그인 실패", "로그인 차단(5회 초과)", "로그아웃")

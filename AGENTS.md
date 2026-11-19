@@ -311,5 +311,5 @@ VDI 내부망 코드를 카메라로 촬영하여 전달받는 경우, 단순 OC
   * getJson 구조체 모달 호출 시 전체 `.ui-widget-overlay` z-index 일괄 변경 제거 및 textarea/pre HTML 엔티티 디코딩 보정 완료.
 * **[완료] Step 3-1 ~ Step 3-5 (KSign SecureDB Agentless Java API V2 코어 연동)** ([① 로컬: 완료(x) / ② VDI: 완료(x)]):
   * `CryptoService`, `MonArchDaoImpl`, `FilterGenerator`, `ExcelDownload`에서 `*_ENC`/`*_HASH` 네이밍 컨벤션 기반 자동 암복호화, NTS 색인 검색, 엑셀 복호화 및 Fail-Closed(`securedb.fail.closed=true`) 적용 완료 (개발서버 `112.106.119.13` 1차 검증 완료, 잔여 컬럼 쿼리/화면 매핑 및 통합 테스트 진행 중).
-* **[완료] Step 1-5 (LoginController.java)** ([① 로컬: 완료(x) / ② VDI: 완료(x)]):
-  * 로그인 성공(`LOGIN_SUCCESS`), 실패(`LOGIN_FAIL`), 5회 초과 차단(`LOGIN_LOCKED`), 로그아웃(`LOGOUT`) 시 클라이언트 IP 및 User-Agent를 포함하여 기존 `M_USE_LOG` 테이블에 접속 이력 자동 적재 및 `printStackTrace` 제거 완료.
+* **[완료] Step 1-5 / 1-5b (LoginController.java, SessionTimeoutListener.java, web.xml)** ([① 로컬: 완료(x) / ② VDI: 완료(x)]):
+  * 로그인 성공(`LOGIN_SUCCESS`), 실패(`LOGIN_FAIL`), 5회 초과 차단(`LOGIN_LOCKED`), 로그아웃(`LOGOUT`), 세션 타임아웃 만료(`SESSION_TIMEOUT`) 5종 접속 이력을 모두 `SERVICE_NAME='LOGIN'`으로 통합하여 `M_USE_LOG`에 자동 적재(IP/User-Agent 포함).

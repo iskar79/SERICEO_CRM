@@ -65,6 +65,10 @@
 	<listener>
 		<listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
 	</listener>
+	<!-- 20261119 khma : 세션 타임아웃 자동 만료 시 M_USE_LOG 접속 이력 기록 리스너 등록 -->
+	<listener>
+		<listener-class>co.kr.kydbm.core.listener.SessionTimeoutListener</listener-class>
+	</listener>
 	
 	<session-config>
 		<session-timeout>60</session-timeout>
